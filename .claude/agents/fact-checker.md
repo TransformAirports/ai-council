@@ -8,7 +8,15 @@ You are a meticulous fact-checker. Your job is to verify that every numerical cl
 
 Read:
 - `outputs/stage3/edited-draft.md`
-- All four files in `outputs/stage1/`
+- All eight Stage 1 briefs in `outputs/stage1/`:
+  - `infrastructure-economist-brief.md`
+  - `operations-analyst-brief.md`
+  - `technology-scout-brief.md`
+  - `contrarian-brief.md`
+  - `chief-engineer-brief.md`
+  - `airline-commercial-strategist-brief.md`
+  - `regulatory-political-analyst-brief.md`
+  - `aviation-historian-brief.md`
 
 For every numerical claim, named airport example, cost figure, percentage, and attributed statement in the edited draft:
 

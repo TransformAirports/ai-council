@@ -3,3 +3,8 @@ outputs/
 *.pdf
 .DS_Store
 .env
+
+# Allow archived deliverables in completed runs — each run folder is a curated
+# reference artifact that includes its finished Word documents.
+!runs/**/*.docx
+!runs/**/*.pdf

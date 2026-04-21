@@ -52,37 +52,13 @@ mwaa-ai-council/
 
 Once all agent files are committed to the repo, here's the run sequence. You can kick this off from Claude Code with a top-level prompt:
 
-```
-I'm ready to execute the MWAA AI Council run defined in prompts/runs/infrastructure-vs-intelligence.md.
+The orchestration prompt is now maintained as a modular template at [`prompts/orchestration.md`](../prompts/orchestration.md). To kick off a run:
 
-Execute the following sequence:
+1. Copy [`prompts/runs/_template.md`](../prompts/runs/_template.md) to `prompts/runs/<your-slug>.md` and fill in the sections.
+2. Open `prompts/orchestration.md` and replace the two values at the top: `{{RUN_FILE}}` (path to your new run file) and `{{RUN_SLUG}}` (used for the archive folder name).
+3. Copy the orchestration body (from "I'm ready to execute..." to the end) and paste into a fresh Claude Code session in the repo root.
 
-STAGE 1 — Research (run in parallel):
-- Invoke the infrastructure-economist agent
-- Invoke the operations-analyst agent
-- Invoke the technology-scout agent
-- Invoke the contrarian agent
-
-Wait for all four briefs to complete. Confirm the four files exist in outputs/stage1/ before proceeding.
-
-STAGE 2 — Synthesis & Debate:
-- Invoke the strategist agent to produce draft v1
-- Invoke the red-team agent to critique v1
-- Invoke the strategist agent to produce v2 incorporating the critique
-- Invoke the red-team agent to critique v2
-- Invoke the strategist agent to produce v3 incorporating the critique
-
-After v3, stop and present the draft and both critiques to me for human review. Do not proceed to Stage 3 without my approval.
-
-STAGE 3 — Polish (after my go-ahead):
-- Invoke the editor agent
-- Invoke the fact-checker agent
-
-Present the final draft and fact-check report to me for final human review.
-
-STAGE 4 — Word Document:
-After my approval of the final draft, use the docx skill to produce the final Word document with proper formatting, a cover page, executive summary, and methodology appendix.
-```
+The orchestration file is the source of truth for the four-stage sequence, the model guidance, and the rules for the whole run. If you need to edit the sequence itself, open a PR against `prompts/orchestration.md` so the change is versioned.
 
 ## Methodology Appendix (to include in the final Word doc)
 

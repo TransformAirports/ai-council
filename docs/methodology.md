@@ -12,21 +12,21 @@ Paste this into every final document. Fill the bracketed fields before publishin
 
 > **Methodology**
 >
-> This document was produced by a multi-agent AI system operated by [name / role]. The system consisted of eight specialized agents running on Anthropic's Claude platform:
+> This document was produced by the Transform Airports AI Council, a multi-agent system operated by [name / role]. The Council consists of twelve specialized agents running on Anthropic's Claude platform:
 >
-> - **Four research agents** — Infrastructure Economist, Operations Analyst, Technology Scout, and Contrarian — that independently gathered evidence without reading each other's work.
-> - **A Strategist** that synthesized the four briefs into a single argumentative draft.
-> - **A Red Team** agent that attacked the Strategist's drafts across multiple revision rounds.
+> - **Eight research agents** — Infrastructure Economist, Operations Analyst, Technology Scout, Contrarian, Chief Engineer, Airline Commercial Strategist, Regulatory/Political Analyst, and Aviation Historian — that independently gathered evidence without reading each other's work.
+> - **A Strategist** that synthesized the eight briefs into a single argumentative draft.
+> - **A Red Team** that attacked the Strategist's drafts across multiple revision rounds.
 > - **An Editor** that tightened the final prose without adding new content or claims.
 > - **A Fact-checker** that verified every numerical and attributed claim against the research briefs. Unverifiable claims were removed or flagged for human review.
 >
-> Total agent runtime: [X] hours. Human review occurred at two checkpoints: after the third Strategist draft and after the Fact-checker's report. Agent definitions are maintained as versioned markdown files in a private repository and are edited only by human reviewers via pull request — agents do not modify themselves or each other.
+> Total agent runtime: [X] hours. Human review occurred at two checkpoints: after the third Strategist draft and after the Fact-checker's report. Agent definitions are maintained as versioned markdown files and are edited only by human reviewers via pull request — agents do not modify themselves or each other.
 >
 > The final text was reviewed and approved by [name] before release. AI-assisted production does not reduce human accountability for the arguments and claims in this document.
 
 ## Principles behind the design
 
-**Independent research beats coordinated research.** The four Stage 1 agents do not share a context. They cannot see each other's briefs. This forces genuine variance in the evidence pool. A pipeline in which agents share drafts tends to converge early and lose the friction that produces a good final argument.
+**Independent research beats coordinated research.** The eight Stage 1 agents do not share a context. They cannot see each other's briefs. Each one argues from a different lens — economics, operations, technology, opposition, engineering, airline commercial strategy, regulation, history — and each has a default stance, not a neutral posture. This forces genuine variance in the evidence pool. A pipeline in which agents share drafts tends to converge early and lose the friction that produces a good final argument.
 
 **Steelmanning is mandatory.** The Contrarian agent is not a token skeptic. Its job is to make the strongest possible case against the thesis. If the Strategist can beat the Contrarian only by ignoring it, the thesis is not ready to publish.
 
