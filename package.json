@@ -1,0 +1,17 @@
+{
+  "name": "transform-airports-ai-council",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Transform Airports AI Council — agent definitions and Supabase sync.",
+  "scripts": {
+    "sync": "node scripts/sync-agents.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "gray-matter": "^4.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

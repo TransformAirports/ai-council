@@ -209,3 +209,35 @@ The Council is tuned for airport industry analysis — airport economics, operat
 ## Accountability
 
 AI output is 85%. The last 15% is the judgment of the human whose name goes on the document. Every final piece the Council produces carries that human's name, reviewed and approved before release. The methodology appendix discloses how the document was made. The disclosure is not a disclaimer — it is a statement of process.
+
+---
+
+## Sync architecture
+
+The agent files in [`.claude/agents/`](.claude/agents/) are the source of truth. A companion Lovable site reads the same agent roster from Supabase. The two stay in sync via a GitHub Action.
+
+```
+.claude/agents/*.md  ──push to main──►  GitHub Action  ──upsert──►  Supabase ◄──read──  Lovable site
+```
+
+**Required frontmatter on every agent file:**
+
+```yaml
+---
+name: <kebab-case slug>          # also the Claude Code subagent identifier
+display_name: <human-readable>
+description: <one-line role>
+order: <integer>
+tools: <comma-separated list>    # required by Claude Code
+---
+```
+
+On every push to `main` that touches `.claude/agents/**`, `README.md`, or `scripts/sync-agents.mjs`, the workflow at [`.github/workflows/sync-agents.yml`](.github/workflows/sync-agents.yml) runs [`scripts/sync-agents.mjs`](scripts/sync-agents.mjs). The script parses each agent file with `gray-matter`, upserts a row into the Supabase `agents` table keyed on `slug`, then deletes any rows whose slug is no longer in the repo. Renames and removals therefore propagate without manual cleanup.
+
+The Supabase schema lives at [`supabase/migrations/0001_agents.sql`](supabase/migrations/0001_agents.sql). The `agents` table is publicly readable via RLS; writes require the service role key, which only the GitHub Action holds. The `agent_proposals` table accepts public inserts so the Lovable site can collect modification or addition proposals from readers; those proposals never modify `agents` directly — they become PR candidates against this repo, reviewed by humans before any agent behavior changes.
+
+To run the sync locally for debugging:
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_KEY=... GIT_SHA=$(git rev-parse HEAD) npm run sync
+```
