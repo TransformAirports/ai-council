@@ -12,6 +12,6 @@
     "gray-matter": "^4.0.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
