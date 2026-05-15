@@ -141,3 +141,8 @@ open a PR against `.claude/agents/` with new agents. See
 - **airline-commercial-strategist:** {{BLANK = USE DEFAULT}}
 - **regulatory-political-analyst:** {{BLANK = USE DEFAULT}}
 - **aviation-historian:** {{BLANK = USE DEFAULT}}
+- **airport-ceo:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **airport-coo:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **director-of-public-safety:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **airport-emergency-management-director:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **emergency-management-consultant:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}

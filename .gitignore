@@ -2,6 +2,13 @@ outputs/
 .DS_Store
 .env
 
+# Python CLI build / venv artifacts
+.venv*/
+__pycache__/
+*.egg-info/
+build/
+dist/
+
 # Allow archived deliverables in completed runs — each run folder is a curated
 # reference artifact that includes its finished Word documents.
 !runs/**/*.docx

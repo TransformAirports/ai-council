@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transform-airports-ai-council"
+version = "0.1.0"
+description = "CLI for the Transform Airports AI Council."
+requires-python = ">=3.11"
+dependencies = [
+  "claude-agent-sdk>=0.1.0",
+  "questionary>=2.0",
+  "rich>=13.7",
+  "python-frontmatter>=1.1",
+  "python-docx>=1.1",
+  "python-slugify>=8.0",
+]
+
+[project.scripts]
+council = "cli.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["cli*"]
