@@ -34,7 +34,7 @@ def _show_file_excerpt(path: Path, max_lines: int = 60) -> None:
     console.print(Panel(Markdown(excerpt + suffix), title=str(path), border_style="cyan"))
 
 
-def checkpoint_after_stage2(
+async def checkpoint_after_stage2(
     outputs_dir: Path,
     auto_approve: bool = False,
 ) -> CheckpointResult:
@@ -52,14 +52,14 @@ def checkpoint_after_stage2(
         console.print("[yellow]--no-review: auto-approving Stage 2 → Stage 3.[/yellow]")
         return CheckpointResult(approved=True)
 
-    answer = questionary.select(
+    answer = await questionary.select(
         "Proceed to Stage 3 (Editor + Fact-checker)?",
         choices=[
             "Yes — continue to Stage 3",
             "No — redo Strategist v3 with my notes",
             "Abort the run",
         ],
-    ).ask()
+    ).ask_async()
     if answer is None or answer.startswith("Abort"):
         return CheckpointResult(approved=False)
     if answer.startswith("No"):
@@ -67,7 +67,7 @@ def checkpoint_after_stage2(
     return CheckpointResult(approved=True)
 
 
-def checkpoint_after_stage3(
+async def checkpoint_after_stage3(
     outputs_dir: Path,
     auto_approve: bool = False,
 ) -> CheckpointResult:
@@ -84,8 +84,8 @@ def checkpoint_after_stage3(
         console.print("[yellow]--no-review: auto-approving Stage 3 → Stage 4.[/yellow]")
         return CheckpointResult(approved=True)
 
-    answer = questionary.confirm(
+    answer = await questionary.confirm(
         "Generate the Word documents and archive the run?",
         default=True,
-    ).ask()
+    ).ask_async()
     return CheckpointResult(approved=bool(answer))

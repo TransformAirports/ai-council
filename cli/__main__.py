@@ -23,7 +23,7 @@ from rich.console import Console
 
 from cli.agents import load_all_agents
 from cli.interactive import collect_run_spec, confirm_spec
-from cli.runfile import write_run_file
+from cli.runfile import RUNS_DIR, parse_run_file, write_run_file
 
 console = Console()
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -49,24 +49,39 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Alias for --dry-run.",
     )
+    p.add_argument(
+        "--resume",
+        metavar="SLUG",
+        help="Resume a previously interrupted run. Reads prompts/runs/<SLUG>.md, "
+        "keeps existing outputs/ artifacts, and re-runs only the steps whose "
+        "output files are missing or empty. Skips the interactive prompts.",
+    )
     return p.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     try:
-        agents = load_all_agents()
-        spec = collect_run_spec(agents)
+        if args.resume:
+            spec = parse_run_file(args.resume)
+            run_file = RUNS_DIR / f"{args.resume}.md"
+            console.print(
+                f"[cyan]Resuming run: {args.resume}[/cyan] "
+                f"[dim]({len(spec.selected_research_agents)} research agents seated)[/dim]"
+            )
+        else:
+            agents = load_all_agents()
+            spec = collect_run_spec(agents)
 
-        if args.no_review:
-            console.print("[dim]--no-review: skipping spec confirmation.[/dim]")
-        elif not confirm_spec(spec):
-            console.print("[yellow]Aborted. No file written.[/yellow]")
-            return 1
+            if args.no_review:
+                console.print("[dim]--no-review: skipping spec confirmation.[/dim]")
+            elif not confirm_spec(spec):
+                console.print("[yellow]Aborted. No file written.[/yellow]")
+                return 1
 
-        run_file = write_run_file(spec)
-        rel = run_file.relative_to(REPO_ROOT)
-        console.print(f"[green]Wrote run file:[/green] {rel}")
+            run_file = write_run_file(spec)
+            rel = run_file.relative_to(REPO_ROOT)
+            console.print(f"[green]Wrote run file:[/green] {rel}")
 
         if args.dry_run or args.skip_prompts:
             console.print("[dim]--dry-run: stopping before model calls.[/dim]")
@@ -80,6 +95,7 @@ def main(argv: list[str] | None = None) -> int:
                 run_file=run_file,
                 repo_root=REPO_ROOT,
                 auto_approve=args.no_review,
+                resume=bool(args.resume),
             )
         )
         console.print(f"[green]Run complete. Total estimated cost: ${tally.total:.2f}[/green]")

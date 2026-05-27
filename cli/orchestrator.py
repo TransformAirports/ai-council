@@ -38,6 +38,13 @@ class CostTally:
         return sum(self.by_step.values())
 
 
+def _has_content(path: Path, min_bytes: int = 200) -> bool:
+    try:
+        return path.is_file() and path.stat().st_size >= min_bytes
+    except OSError:
+        return False
+
+
 async def _run_agent(
     *,
     agent: Agent,
@@ -46,8 +53,28 @@ async def _run_agent(
     cwd: Path,
     step_label: str,
     tally: CostTally,
+    output_path: Path | None = None,
+    max_turns: int = 80,
 ) -> None:
-    """Invoke one agent end-to-end via the Claude Agent SDK."""
+    """Invoke one agent end-to-end via the Claude Agent SDK.
+
+    If `output_path` is set and already exists with material content, the
+    invocation is skipped — supports `--resume` after a partial run.
+
+    After completion, if `output_path` is set but the file is missing or empty,
+    raises a clear error. Otherwise an exhausted-turn-budget run can look like
+    success in the trace ("done, $X, N turns") even though no file was written.
+
+    `max_turns` is generous by default (80) because synthesis agents have to
+    read many briefs before writing. Stage 1 doesn't strictly need this much
+    headroom; Stage 2 and Stage 3 do.
+    """
+    if output_path is not None and _has_content(output_path):
+        console.print(
+            f"[dim]↷ {step_label} skipped — {output_path.relative_to(cwd)} already exists[/dim]"
+        )
+        return
+
     from claude_agent_sdk import (
         AssistantMessage,
         ClaudeAgentOptions,
@@ -63,6 +90,7 @@ async def _run_agent(
         permission_mode="bypassPermissions",
         model=model,
         cwd=str(cwd),
+        max_turns=max_turns,
     )
 
     console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
@@ -89,6 +117,17 @@ async def _run_agent(
                 f"  [green]✓ {step_label} done[/green] "
                 f"[dim](${cost:.2f}, {getattr(msg, 'num_turns', '?')} turns)[/dim]"
             )
+
+    # Catch the "agent completed its turn budget without writing" silent failure.
+    # The SDK reports cost and turn count even when Claude Code marks the result
+    # is_error=true with subtype=success (the signature of a max_turns exhaustion).
+    if output_path is not None and not _has_content(output_path):
+        raise RuntimeError(
+            f"{step_label} finished without writing {output_path.relative_to(cwd)}. "
+            f"This usually means the agent exhausted its turn budget on reads "
+            f"before getting to the Write step. Try raising max_turns or "
+            f"reducing how many files the agent has to read."
+        )
 
 
 def _stage1_prompt(agent: Agent, run_file: Path, output_path: Path, override: str) -> str:
@@ -185,15 +224,23 @@ def _existing_artifacts(outputs_dir: Path) -> list[Path]:
     return found
 
 
-def prepare_outputs(outputs_dir: Path, auto_approve: bool) -> None:
-    """Ensure outputs/ is empty and laid out for a fresh run.
+async def prepare_outputs(outputs_dir: Path, auto_approve: bool, resume: bool = False) -> None:
+    """Ensure outputs/ is laid out for a run.
 
-    If prior-run artifacts are present, either confirm with the user (interactive)
-    or wipe silently (--no-review). Always preserves outputs/.gitkeep.
+    Default behavior: if prior-run artifacts are present, either confirm with the
+    user (interactive) or wipe silently (--no-review). Always preserves
+    outputs/.gitkeep.
+
+    With `resume=True`: leave existing artifacts in place. The per-step skip
+    logic in _run_agent will pick up where the previous run stopped.
     """
     outputs_dir.mkdir(parents=True, exist_ok=True)
     existing = _existing_artifacts(outputs_dir)
-    if existing:
+    if resume:
+        console.print(
+            f"[cyan]Resume mode: keeping {len(existing)} existing file(s) in outputs/.[/cyan]"
+        )
+    elif existing:
         if auto_approve:
             console.print(
                 f"[yellow]Clearing {len(existing)} stale file(s) from outputs/ before this run.[/yellow]"
@@ -204,9 +251,9 @@ def prepare_outputs(outputs_dir: Path, auto_approve: bool) -> None:
             )
             preview = "\n".join(f"  • {p.relative_to(outputs_dir)}" for p in existing[:8])
             console.print(f"[dim]{preview}{'…' if len(existing) > 8 else ''}[/dim]")
-            answer = questionary.confirm(
+            answer = await questionary.confirm(
                 "Clear outputs/ and start fresh?", default=True
-            ).ask()
+            ).ask_async()
             if not answer:
                 raise RuntimeError("Aborted: outputs/ not cleared.")
         for sub in STAGE_SUBDIRS:
@@ -241,6 +288,7 @@ async def run_stage1(
                 cwd=outputs_dir.parent,
                 step_label=f"stage1/{name}",
                 tally=tally,
+                output_path=out,
             )
         )
     await asyncio.gather(*tasks)
@@ -265,6 +313,13 @@ async def run_stage2(
     strategist = by_name["strategist"]
     red_team = by_name["red-team"]
     prompts = _stage2_prompts(run_file)
+    output_paths = {
+        "strategist-v1": outputs_dir / "stage2" / "strategist-draft-v1.md",
+        "red-team-v1": outputs_dir / "stage2" / "red-team-critique-v1.md",
+        "strategist-v2": outputs_dir / "stage2" / "strategist-draft-v2.md",
+        "red-team-v2": outputs_dir / "stage2" / "red-team-critique-v2.md",
+        "strategist-v3": outputs_dir / "stage2" / "strategist-draft-v3.md",
+    }
     sequence = [
         ("strategist-v1", strategist),
         ("red-team-v1", red_team),
@@ -284,6 +339,7 @@ async def run_stage2(
             cwd=outputs_dir.parent,
             step_label=f"stage2/{step_id}",
             tally=tally,
+            output_path=output_paths[step_id],
         )
 
 
@@ -304,6 +360,7 @@ async def run_stage3(
         cwd=outputs_dir.parent,
         step_label="stage3/editor",
         tally=tally,
+        output_path=outputs_dir / "stage3" / "edited-draft.md",
     )
     await _run_agent(
         agent=fact_checker,
@@ -312,6 +369,7 @@ async def run_stage3(
         cwd=outputs_dir.parent,
         step_label="stage3/fact-checker",
         tally=tally,
+        output_path=outputs_dir / "stage3" / "final-draft.md",
     )
 
 
@@ -321,13 +379,14 @@ async def run_pipeline(
     run_file: Path,
     repo_root: Path,
     auto_approve: bool,
+    resume: bool = False,
 ) -> CostTally:
     from cli.checkpoints import checkpoint_after_stage2, checkpoint_after_stage3
     from cli.docx_builder import build_documents
     from cli.archive import archive_run
 
     outputs_dir = repo_root / "outputs"
-    prepare_outputs(outputs_dir, auto_approve=auto_approve)
+    await prepare_outputs(outputs_dir, auto_approve=auto_approve, resume=resume)
     all_agents = load_all_agents()
     tally = CostTally()
 
@@ -338,10 +397,13 @@ async def run_pipeline(
     await run_stage2(spec, run_file, outputs_dir, all_agents, tally)
 
     while True:
-        result = checkpoint_after_stage2(outputs_dir, auto_approve=auto_approve)
+        result = await checkpoint_after_stage2(outputs_dir, auto_approve=auto_approve)
         if result.approved:
             break
         if result.redo_from == "strategist-v3":
+            v3_path = outputs_dir / "stage2" / "strategist-draft-v3.md"
+            if v3_path.exists():
+                v3_path.unlink()
             await run_stage2(
                 spec, run_file, outputs_dir, all_agents, tally, start_from="strategist-v3"
             )
@@ -352,7 +414,7 @@ async def run_pipeline(
     console.rule("[bold]Stage 3 — edit & fact-check[/bold]")
     await run_stage3(run_file, outputs_dir, all_agents, tally)
 
-    result = checkpoint_after_stage3(outputs_dir, auto_approve=auto_approve)
+    result = await checkpoint_after_stage3(outputs_dir, auto_approve=auto_approve)
     if not result.approved:
         console.print("[yellow]Stopping at Stage 3. No Word docs generated.[/yellow]")
         return tally

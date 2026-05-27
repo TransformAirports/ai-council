@@ -96,3 +96,80 @@ def write_run_file(spec: RunSpec, runs_dir: Path = RUNS_DIR) -> Path:
         )
     path.write_text(render_run_file(spec), encoding="utf-8")
     return path
+
+
+def _section_body(text: str, header: str) -> str:
+    """Extract the body under a `## header` until the next `## ` heading."""
+    lines = text.splitlines()
+    target = f"## {header}"
+    out: list[str] = []
+    capturing = False
+    for line in lines:
+        if line.strip().startswith("## "):
+            if line.strip() == target:
+                capturing = True
+                continue
+            if capturing:
+                break
+        if capturing:
+            out.append(line)
+    return "\n".join(out).strip()
+
+
+def _bullets(body: str) -> list[str]:
+    return [
+        line[2:].strip()
+        for line in body.splitlines()
+        if line.strip().startswith("- ") and not line.strip().startswith("- **")
+    ]
+
+
+def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
+    """Reconstruct a RunSpec from an existing prompts/runs/<slug>.md file.
+
+    Used by `council --resume <slug>` so the orchestrator can pick up a partial
+    run without re-prompting the operator for inputs already captured on disk.
+    """
+    path = runs_dir / f"{slug}.md"
+    if not path.is_file():
+        raise FileNotFoundError(f"Run file not found: {path}")
+    text = path.read_text(encoding="utf-8")
+
+    title = ""
+    for line in text.splitlines():
+        if line.startswith("# Run:"):
+            title = line[len("# Run:") :].strip()
+            break
+    if not title:
+        title = slug.replace("-", " ").title()
+
+    overrides_body = _section_body(text, "Research agent overrides")
+    selected: list[str] = []
+    overrides: dict[str, str] = {}
+    for line in overrides_body.splitlines():
+        if not line.strip().startswith("- **"):
+            continue
+        try:
+            name = line.split("**", 2)[1].rstrip(":")
+            after_name = line.split(":**", 1)[1].strip() if ":**" in line else ""
+        except IndexError:
+            continue
+        if name in RESEARCH_AGENT_NAMES:
+            selected.append(name)
+            if after_name and after_name != "(default)":
+                overrides[name] = after_name
+
+    return RunSpec(
+        title=title,
+        slug=slug,
+        thesis=_section_body(text, "Thesis"),
+        audience=_section_body(text, "Audience"),
+        tone=_section_body(text, "Tone"),
+        length=_section_body(text, "Length"),
+        is_not=_bullets(_section_body(text, "What this is NOT")),
+        is_yes=_bullets(_section_body(text, "What this IS")),
+        operator_context=_section_body(text, "Operator-specific framing"),
+        success_criteria=_bullets(_section_body(text, "Success criteria")),
+        selected_research_agents=selected,
+        agent_overrides=overrides,
+    )
