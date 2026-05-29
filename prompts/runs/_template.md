@@ -148,3 +148,4 @@ open a PR against `.claude/agents/` with new agents. See
 - **emergency-management-consultant:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **slacker:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **virtual-christian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **architectural-historian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}

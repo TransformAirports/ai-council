@@ -31,6 +31,7 @@ RESEARCH_AGENT_NAMES: tuple[str, ...] = (
     "emergency-management-consultant",
     "slacker",
     "virtual-christian",
+    "architectural-historian",
 )
 
 PROCESS_AGENT_NAMES: tuple[str, ...] = (
