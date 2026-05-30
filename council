@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Wrapper that auto-installs the CLI on first run and launches it on every run.
+#
+# Usage:
+#   ./council              # interactive new run
+#   ./council --no-review  # autonomous run, no human checkpoints
+#   ./council --resume foo # resume a previously interrupted run
+#
+# No `pip install`, no `source .venv/bin/activate`. First invocation creates
+# .venv/ and pip-installs the package; subsequent invocations skip that and
+# go straight to running.
+
+set -e
+
+REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VENV="$REPO_ROOT/.venv"
+
+if [ ! -x "$VENV/bin/council" ]; then
+  echo "First-time setup: creating virtual environment and installing..."
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "Error: python3 is not installed. Install Python 3.11+ and try again." >&2
+    exit 1
+  fi
+  python3 -m venv "$VENV"
+  "$VENV/bin/pip" install --quiet --upgrade pip
+  "$VENV/bin/pip" install --quiet -e "$REPO_ROOT"
+  echo "Installed. Launching..."
+  echo
+fi
+
+exec "$VENV/bin/council" "$@"

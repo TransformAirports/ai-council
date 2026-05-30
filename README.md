@@ -113,20 +113,18 @@ The archived run at `runs/2026-04-17-infrastructure-vs-intelligence/` is the fir
 ### Prerequisites
 
 - macOS or Linux with Python 3.11 or newer (`python3 --version` to check)
-- An Anthropic API key with access to Claude Sonnet and Claude Opus models, **or** a Claude.ai subscription with Opus access
+- Either a Claude.ai subscription with Opus access **or** an Anthropic API key — see [Authenticate Claude](#authenticate-claude) below
 - This repository cloned locally
 
-### One-time install
+### Install and run
 
-From the repository root:
+One step. From the repository root:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
+./council
 ```
 
-That installs the `council` command into your virtual environment along with the Claude Agent SDK and the Word-document builder.
+The first invocation creates a virtual environment, installs the Claude Agent SDK and the Word-document builder, and launches the CLI. Every subsequent invocation skips the install and goes straight to running. No `pip install`, no `source .venv/bin/activate`.
 
 ### Authenticate Claude
 
@@ -142,20 +140,23 @@ The CLI runs on the Claude Agent SDK, which uses the Claude Code CLI binary unde
 ### Start a run
 
 ```bash
-council
+./council
 ```
 
-The CLI prompts you for:
+The CLI asks for three things plus a council pick:
 
-1. A run title and slug
-2. The thesis (one to three sentences, sharp)
-3. Audience, tone register, target length
-4. What the piece should refuse to be, and what it should be
-5. Operator-specific framing if any
-6. Success criteria for your own review
-7. Which research agents sit on the Council for this run
+1. **Title** — one short headline. The slug is auto-derived.
+2. **Thesis** — one to three sentences, sharp and falsifiable. Multi-line paste is fine.
+3. **Scope** *(optional)* — paste a bulleted list of what the council should address. Skip to let the council scope itself from the thesis.
+4. **Avoid** *(optional)* — paste a list of what the piece should refuse to be. Skip for the standard guardrails.
+5. **Council composition** — pick a preset:
+   - **All sixteen lenses** — every research agent
+   - **Default eight** — the original industry-knowledge roster
+   - **Operational focus** — Ops Analyst, Chief Engineer, COO, Public Safety, EM Director, Tech Scout
+   - **Strategic focus** — CEO, COO, Regulatory, Airline Commercial, Infra Econ, Aviation Historian
+   - **Custom** — grouped checklist where you toggle individual agents
 
-It writes the run file to `prompts/runs/<slug>.md`, confirms the spec with you, clears any stale artifacts from `outputs/`, and starts Stage 1.
+Audience, tone (analytical sharp), and length (~9k-word report) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
 
 ### Flags
 
