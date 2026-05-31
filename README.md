@@ -151,7 +151,7 @@ The CLI asks for three things plus a council pick:
 4. **Avoid** *(optional)* — paste a list of what the piece should refuse to be. Skip for the standard guardrails.
 5. **Council composition** — pick a preset:
    - **All sixteen lenses** — every research agent
-   - **Default eight** — the original industry-knowledge roster
+   - **Default seven (audit-tuned)** — the agents that consistently surface in synthesis, per [`council --audit`](#auditing-the-council): Tech Scout, Contrarian, Airport CEO, Airport COO, Infra Economist, Ops Analyst, Airline Commercial Strategist
    - **Operational focus** — Ops Analyst, Chief Engineer, COO, Public Safety, EM Director, Tech Scout
    - **Strategic focus** — CEO, COO, Regulatory, Airline Commercial, Infra Econ, Aviation Historian
    - **Custom** — grouped checklist where you toggle individual agents
@@ -164,9 +164,20 @@ Audience, tone (analytical sharp), and length (~9k-word report) use sensible def
 | --- | --- |
 | `--no-review` | Skip the initial spec confirmation and both human checkpoints. Runs fully autonomously. |
 | `--resume SLUG` | Resume a previously interrupted run. Reads `prompts/runs/<SLUG>.md`, keeps existing `outputs/` artifacts, and re-runs only the steps whose output files are missing. |
+| `--audit` | Scan all archived runs and produce a council-audit report. See [Auditing the council](#auditing-the-council). |
 | `--dry-run` | Write the run file from your answers and stop without calling the model. Useful for previewing. |
 | `--skip-prompts` | Alias for `--dry-run`. |
 | `--help` | Print usage and exit. |
+
+### Auditing the council
+
+```bash
+./council --audit
+```
+
+Scans every archived run under `runs/`, extracts objective signals (citation counts in the final draft, fact-check rejection counts, brief word volume, completion status), and produces a markdown report at `runs/_audit-YYYY-MM-DD.md`. The report ranks each agent by **citations per 1,000 brief words** — how often the Strategist surfaced an agent's work relative to how much that agent wrote — and flags agents that are underused, that produce a disproportionate share of fact-check rejections, or that have never been seated. Findings include actionable next steps pointing at specific `.claude/agents/*.md` files to edit.
+
+The audit-tuned **Default seven** preset is derived directly from this signal. Re-run the audit after every few new archives and update [cli/interactive.py](cli/interactive.py)'s `PRESET_DEFAULT` to keep it aligned with reality.
 
 ### Troubleshooting
 

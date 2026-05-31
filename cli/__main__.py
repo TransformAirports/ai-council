@@ -56,12 +56,34 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "keeps existing outputs/ artifacts, and re-runs only the steps whose "
         "output files are missing or empty. Skips the interactive prompts.",
     )
+    p.add_argument(
+        "--audit",
+        action="store_true",
+        help="Scan all archived runs under runs/ and produce a council-audit "
+        "report identifying which agents are underused, which produce the most "
+        "fact-check rejections, and which have never been seated. Writes the "
+        "report to runs/_audit-YYYY-MM-DD.md and exits.",
+    )
     return p.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     try:
+        if args.audit:
+            from cli.audit import audit_runs, render_audit_report, write_audit_report
+
+            agents = load_all_agents()
+            result = audit_runs(agents=agents)
+            report = render_audit_report(result, agents)
+            console.print(report)
+            if result["runs"]:
+                out_path = write_audit_report(report)
+                console.print(
+                    f"\n[green]Audit written to:[/green] {out_path.relative_to(REPO_ROOT)}"
+                )
+            return 0
+
         if args.resume:
             spec = parse_run_file(args.resume)
             run_file = RUNS_DIR / f"{args.resume}.md"

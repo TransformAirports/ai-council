@@ -62,15 +62,21 @@ DEFAULT_SUCCESS_CRITERIA = [
 # Council presets.
 # ----------------------------------------------------------------------------
 
-PRESET_DEFAULT_EIGHT: tuple[str, ...] = (
-    "infrastructure-economist",
-    "operations-analyst",
-    "technology-scout",
-    "contrarian",
-    "chief-engineer",
-    "airline-commercial-strategist",
-    "regulatory-political-analyst",
-    "aviation-historian",
+# Audit-tuned default council. Each agent in this list returned at least 2.8
+# citations per 1,000 brief words across the first four archived runs (see
+# `council --audit` for current scores). The agents dropped from the prior
+# "Default Eight" roster — chief-engineer, aviation-historian, and
+# regulatory-political-analyst — wrote substantial briefs but the Strategist
+# rarely surfaced their content. Re-run the audit periodically and update this
+# list as the data evolves; this is meant to be tuned, not frozen.
+PRESET_DEFAULT: tuple[str, ...] = (
+    "technology-scout",              # 14.0 cites / 1k brief words
+    "contrarian",                    # 13.1
+    "airport-ceo",                   # 9.8
+    "airport-coo",                   # 8.3
+    "infrastructure-economist",      # 5.5
+    "operations-analyst",            # 4.9
+    "airline-commercial-strategist", # 2.8
 )
 
 PRESET_OPERATIONAL: tuple[str, ...] = (
@@ -189,7 +195,7 @@ def _apply_preset(preset: str, research: list[Agent]) -> list[str]:
     if preset.startswith("All"):
         return [a.name for a in research]
     if preset.startswith("Default"):
-        return [n for n in PRESET_DEFAULT_EIGHT if n in available]
+        return [n for n in PRESET_DEFAULT if n in available]
     if preset.startswith("Operational"):
         return [n for n in PRESET_OPERATIONAL if n in available]
     if preset.startswith("Strategic"):
@@ -273,9 +279,10 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     # 5. Council preset
     console.print()
     research = research_agents(all_agents)
+    default_count = len([n for n in PRESET_DEFAULT if n in {a.name for a in research}])
     preset_options = [
         f"All sixteen lenses ({len(research)} agents)",
-        "Default eight (industry-knowledge roster)",
+        f"Default {default_count} (audit-tuned contributors)",
         "Operational focus (Ops, Engineering, COO, Public Safety, EM)",
         "Strategic focus (CEO, COO, Regulatory, Commercial, Econ, History)",
         "Custom — pick from grouped checklist",
