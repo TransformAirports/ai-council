@@ -23,7 +23,7 @@ from cli.interactive import RunSpec
 console = Console()
 
 SONNET = "claude-sonnet-4-6"
-OPUS = "claude-opus-4-7"
+OPUS = "claude-opus-4-8"
 
 
 @dataclass

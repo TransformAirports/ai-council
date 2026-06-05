@@ -30,7 +30,7 @@ INLINE_CODE = re.compile(r"`([^`]+)`")
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
-def _add_inline(paragraph, text: str, base_size: int = 11) -> None:
+def _add_inline(paragraph, text: str, base_size: int = 11, font: str = "Calibri") -> None:
     """Add a text run, parsing **bold**, *italic*, and `code` segments."""
     if not text:
         return
@@ -53,7 +53,7 @@ def _add_inline(paragraph, text: str, base_size: int = 11) -> None:
     for kind, value in tokens:
         run = paragraph.add_run(value)
         run.font.size = Pt(base_size)
-        run.font.name = "Calibri"
+        run.font.name = font
         if kind == "bold":
             run.bold = True
         elif kind == "italic":
@@ -66,7 +66,7 @@ def _strip_comments(text: str) -> str:
     return HTML_COMMENT.sub("", text)
 
 
-def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None:
+def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11, font: str = "Calibri") -> None:
     text = _strip_comments(markdown)
     lines = text.splitlines()
     i = 0
@@ -80,7 +80,7 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None
         if m:
             level = min(len(m.group(1)), 4)
             heading = doc.add_heading(level=level)
-            _add_inline(heading, m.group(2), base_size=18 - level * 2)
+            _add_inline(heading, m.group(2), base_size=18 - level * 2, font=font)
             i += 1
             continue
 
@@ -92,7 +92,7 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None
                 if not bm:
                     break
                 p = doc.add_paragraph(style="List Bullet")
-                _add_inline(p, bm.group(1), base_size=body_size)
+                _add_inline(p, bm.group(1), base_size=body_size, font=font)
                 i += 1
             continue
 
@@ -104,7 +104,7 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None
                 if not om:
                     break
                 p = doc.add_paragraph(style="List Number")
-                _add_inline(p, om.group(1), base_size=body_size)
+                _add_inline(p, om.group(1), base_size=body_size, font=font)
                 i += 1
             continue
 
@@ -120,7 +120,7 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None
                 i += 1
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Pt(24)
-            _add_inline(p, " ".join(buf), base_size=body_size)
+            _add_inline(p, " ".join(buf), base_size=body_size, font=font)
             for run in p.runs:
                 run.italic = True
             continue
@@ -134,7 +134,7 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11) -> None
             buf.append(lines[i].rstrip())
             i += 1
         p = doc.add_paragraph()
-        _add_inline(p, " ".join(buf), base_size=body_size)
+        _add_inline(p, " ".join(buf), base_size=body_size, font=font)
 
 
 def _set_default_font(doc: Document, name: str = "Calibri", size: int = 11) -> None:

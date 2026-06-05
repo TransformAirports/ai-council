@@ -64,6 +64,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "fact-check rejections, and which have never been seated. Writes the "
         "report to runs/_audit-YYYY-MM-DD.md and exits.",
     )
+    p.add_argument(
+        "--publish",
+        nargs="?",
+        const="__all__",
+        metavar="SLUG",
+        help="Format the full reports in runs/*/stage4 into polished, "
+        "distribution-ready documents under reports/. Each gets a cover page, "
+        "abstract, a page explaining the Council process and the agents used, "
+        "page numbers, and an AI-generation disclaimer. Pass a SLUG to publish "
+        "just one run; omit it to publish every archived run. Exits when done.",
+    )
     return p.parse_args(argv)
 
 
@@ -83,6 +94,32 @@ def main(argv: list[str] | None = None) -> int:
                     f"\n[green]Audit written to:[/green] {out_path.relative_to(REPO_ROOT)}"
                 )
             return 0
+
+        if args.publish:
+            from cli.publish import publish_all
+
+            only = None if args.publish == "__all__" else args.publish
+            scope = f"run '{only}'" if only else "all archived runs"
+            console.print(f"[cyan]Publishing polished reports for {scope}…[/cyan]")
+            results = publish_all(only_slug=only)
+            if not results:
+                console.print(
+                    "[yellow]No matching reports found under runs/*/stage4.[/yellow]"
+                )
+                return 1
+            ok = 0
+            for slug, out_path, status in results:
+                if status == "ok" and out_path is not None:
+                    console.print(
+                        f"  [green]✓[/green] {slug} → {out_path.relative_to(REPO_ROOT)}"
+                    )
+                    ok += 1
+                else:
+                    console.print(f"  [red]✗[/red] {slug} — {status}")
+            console.print(
+                f"[green]Published {ok} of {len(results)} report(s) to reports/.[/green]"
+            )
+            return 0 if ok else 2
 
         if args.resume:
             spec = parse_run_file(args.resume)

@@ -13,3 +13,7 @@ dist/
 # reference artifact that includes its finished Word documents.
 !runs/**/*.docx
 !runs/**/*.pdf
+
+# Polished, distribution-ready reports are regenerable from the archives via
+# `council --publish`. Treated as build output, not committed.
+reports/
