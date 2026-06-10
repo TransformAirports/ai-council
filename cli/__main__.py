@@ -19,6 +19,7 @@ import asyncio
 import sys
 from pathlib import Path
 
+from dotenv import load_dotenv
 from rich.console import Console
 
 from cli.agents import load_all_agents
@@ -27,6 +28,10 @@ from cli.runfile import RUNS_DIR, parse_run_file, write_run_file
 
 console = Console()
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# Load API keys from .env at the repo root (see .env.example). Shell exports
+# take precedence — load_dotenv never overrides an existing environment var.
+load_dotenv(REPO_ROOT / ".env")
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:

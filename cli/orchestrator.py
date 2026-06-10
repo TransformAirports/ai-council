@@ -579,6 +579,20 @@ async def run_pipeline(
     console.rule("[bold]Archive[/bold]")
     archive_path = archive_run(repo_root=repo_root, slug=spec.slug, tally=tally)
     console.print(f"[green]Archived to:[/green] {archive_path}")
+
+    # Final step: publish the polished, distribution-ready document. The run
+    # is complete without a separate `council --publish` invocation; that flag
+    # remains for re-publishing or backfilling older archives.
+    console.rule("[bold]Publish[/bold]")
+    from cli.publish import publish_all
+
+    for slug, out_path, status in publish_all(only_slug=spec.slug):
+        if status == "ok" and out_path is not None:
+            console.print(
+                f"[green]Published:[/green] {out_path.relative_to(repo_root)}"
+            )
+        else:
+            console.print(f"[yellow]Publish issue for {slug}: {status}[/yellow]")
     return tally
 
 

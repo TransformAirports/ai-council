@@ -40,6 +40,11 @@ def render_run_file(spec: RunSpec) -> str:
     lines.append(spec.length)
     lines.append("")
 
+    lines.append("## Output format")
+    lines.append("")
+    lines.append(spec.output_format)
+    lines.append("")
+
     lines.append("## What this is NOT")
     lines.append("")
     for item in spec.is_not:
@@ -159,13 +164,28 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
             if after_name and after_name != "(default)":
                 overrides[name] = after_name
 
+    length = _section_body(text, "Length")
+    output_format = _section_body(text, "Output format").strip().lower()
+    if output_format not in ("report", "article", "brief", "recommendations"):
+        # Older run files have no Output format section — infer from Length.
+        low = length.lower()
+        if "long-form article" in low:
+            output_format = "article"
+        elif "recommendations" in low:
+            output_format = "recommendations"
+        elif "-word brief" in low or low.startswith("a 700"):
+            output_format = "brief"
+        else:
+            output_format = "report"
+
     return RunSpec(
         title=title,
         slug=slug,
         thesis=_section_body(text, "Thesis"),
         audience=_section_body(text, "Audience"),
         tone=_section_body(text, "Tone"),
-        length=_section_body(text, "Length"),
+        length=length,
+        output_format=output_format,
         is_not=_bullets(_section_body(text, "What this is NOT")),
         is_yes=_bullets(_section_body(text, "What this IS")),
         operator_context=_section_body(text, "Operator-specific framing"),

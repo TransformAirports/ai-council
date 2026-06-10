@@ -43,7 +43,9 @@ DEFAULT_LENGTH = (
 )
 
 # Output formats the operator can pick from. The chosen string is written into
-# the run file's Length section, which the Strategist and Editor read.
+# the run file's Length section, which the Strategist and Editor read. The
+# format KEY also travels through the run file so the publisher can style the
+# polished document appropriately (see FORMAT_KEYS and cli/publish.py).
 OUTPUT_FORMATS: dict[str, str] = {
     "Full Research Report (4,000–6,000 words)": (
         "4,000–6,000 words for the full research report; ~1,100-word executive summary."
@@ -61,6 +63,15 @@ OUTPUT_FORMATS: dict[str, str] = {
         "each with a one-sentence evidentiary basis, preceded by a single framing "
         "paragraph. No executive summary."
     ),
+}
+
+# Stable keys for each format label — written into the run file and read by
+# the publisher to pick the right document treatment.
+FORMAT_KEYS: dict[str, str] = {
+    "Full Research Report (4,000–6,000 words)": "report",
+    "Long-Form Article (1,500–2,000 words)": "article",
+    "Brief (700–1,000 words)": "brief",
+    "Concise recommendations": "recommendations",
 }
 
 DEFAULT_IS_YES = [
@@ -172,6 +183,7 @@ class RunSpec:
     selected_research_agents: list[str] = field(default_factory=list)
     agent_overrides: dict[str, str] = field(default_factory=dict)
     want_pptx: bool = False
+    output_format: str = "report"  # report | article | brief | recommendations
 
 
 # ----------------------------------------------------------------------------
@@ -333,6 +345,7 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     if format_choice is None:
         raise KeyboardInterrupt
     length = OUTPUT_FORMATS[format_choice]
+    output_format = FORMAT_KEYS[format_choice]
 
     # 6. Council preset
     console.print()
@@ -392,6 +405,7 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
         selected_research_agents=selected,
         agent_overrides={},
         want_pptx=want_pptx,
+        output_format=output_format,
     )
 
 
