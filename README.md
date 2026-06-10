@@ -45,7 +45,7 @@ The Strategist is the agent that turns whatever research lenses you seated into 
 
 #### Pick your council — the research lenses
 
-Nineteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
+Eighteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
 
 | Lens | What it brings to the table |
 | --- | --- |
@@ -62,7 +62,6 @@ Nineteen research lenses are available. Seat as few or as many as the thesis war
 | Airport COO | The operator's chair: airfield, terminal, maintenance, airline relations |
 | Director of Public Safety | Airport police, ARFF, dispatch under one command; Part 139 and 1542 reality |
 | Airport EM Director | Long-tenured airport EM perspective; real EOC activations and exercises |
-| EM Consultant (external) | Outside-in preparedness diagnosis; cross-sector pattern matching |
 | The Slacker | Gut thesis first, then a strict ten-minute research sprint, then a revised position — the intuition-vs-evidence delta no other agent generates |
 | Virtual Christian | The operator's free-thinker voice modeled on the council's human; reframes the question instead of answering it head-on |
 | Virtual Chris | Executive connector — maps the stakeholder lattice, initiative adjacencies, and cross-disciplinary patterns others miss; the council's optimist |
@@ -173,18 +172,37 @@ The CLI asks for:
 
 Audience and tone (analytical sharp) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
 
-### Flags
+### The hub
+
+`./council` with no flags opens the interactive hub — the intended way to use the tool. It greets you with the Council's status (lenses, archives, latest run), **detects interrupted runs automatically** and offers to resume them first, and routes everything from one menu:
+
+- **Resume interrupted run** — shown only when one is detected, with the stage it died at and how long ago. Completed steps are never re-run or re-billed. Clearing an interrupted run that contains synthesis work requires typing `CLEAR` — a stray Enter can't destroy paid output.
+- **New report** — the five-question flow, then a single **pre-flight screen**: council roster, models, estimated cost range, auth status for both providers, checkpoint mode, budget ceiling, and deck option, all visible with one keystroke to launch and one place to adjust.
+- **Revise a report**, **Build a deck for a finished report**, **Re-publish**, **Audit**, **Settings**.
+
+After a run completes, a **what-next menu** closes the loop: open the published document, open or generate the executive deck, open the archive, or start a revision on the spot. Long runs end with a macOS notification.
+
+Every run accepts a **budget ceiling** (default in Settings): the orchestrator checks spend between steps and halts cleanly with resume instructions if the ceiling is hit — completed work is never interrupted mid-call.
+
+If a run fails, the CLI saves the technical detail to `logs/last-error.log` and tells you exactly what to do: relaunch and choose Resume.
+
+### Settings — council.toml
+
+Model assignments per role (research, synthesis, critique, editor, humanizer, fact-check, presentation), the per-agent turn budget, and the default cost ceiling live in `council.toml` at the repo root — created and edited from the hub's Settings menu, no Python required. Want a cheap draft run? Point `research` at Sonnet in Settings and switch it back after.
+
+### Flags (deep links)
+
+Every flag is a shortcut into the same flows the menu offers — nothing is flag-only.
 
 | Flag | Effect |
 | --- | --- |
-| `--no-review` | Skip the initial spec confirmation and both human checkpoints. Runs fully autonomously. |
-| `--resume SLUG` | Resume a previously interrupted run. Reads `prompts/runs/<SLUG>.md`, keeps existing `outputs/` artifacts, and re-runs only the steps whose output files are missing. |
-| `--audit` | Scan all archived runs and produce a council-audit report. See [Auditing the council](#auditing-the-council). |
-| `--publish [SLUG]` | Format archived full reports into polished, distribution-ready documents under `reports/`. See [Publishing reports](#publishing-reports). |
-| `--revise [SLUG]` | Produce a revised version of an existing report from new reader feedback. See [Revising a report](#revising-a-report). |
-| `--pptx` | Also generate a companion executive PowerPoint after Stage 4 (presentation-designer agent on Fable 5). The deck archives alongside the Word documents. |
-| `--dry-run` | Write the run file from your answers and stop without calling the model. Useful for previewing. |
-| `--skip-prompts` | Alias for `--dry-run`. |
+| `--resume [SLUG]` | Jump to resume; auto-detects the interrupted run if no slug is given. |
+| `--audit` | Jump to the council audit. |
+| `--publish [SLUG]` | Jump to re-publish (all archives, or one slug). |
+| `--revise [SLUG]` | Jump to revision (picker, or a specific report). |
+| `--pptx` | Jump to deck-building for a finished run. |
+| `--no-review` | Run autonomously where applicable (combined with `--revise`). |
+| `--dry-run` / `--skip-prompts` | Collect a new run spec, write the run file, stop before any model call. |
 | `--help` | Print usage and exit. |
 
 ### Auditing the council

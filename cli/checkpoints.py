@@ -21,6 +21,7 @@ console = Console()
 class CheckpointResult:
     approved: bool
     redo_from: str | None = None  # optional name of a step to redo
+    notes: str = ""               # operator notes to inject into the redo prompt
 
 
 def _show_file_excerpt(path: Path, max_lines: int = 60) -> None:
@@ -63,7 +64,14 @@ async def checkpoint_after_stage2(
     if answer is None or answer.startswith("Abort"):
         return CheckpointResult(approved=False)
     if answer.startswith("No"):
-        return CheckpointResult(approved=False, redo_from="strategist-v3")
+        notes = await questionary.text(
+            "Your notes for the redo (what should v3 do differently?) "
+            "— press Esc then Enter to submit:",
+            multiline=True,
+        ).ask_async()
+        return CheckpointResult(
+            approved=False, redo_from="strategist-v3", notes=(notes or "").strip()
+        )
     return CheckpointResult(approved=True)
 
 

@@ -44,6 +44,9 @@ def _clear_outputs(outputs_dir: Path) -> None:
         target = outputs_dir / sub
         if target.is_dir():
             shutil.rmtree(target)
+    marker = outputs_dir / ".active-run.json"
+    if marker.exists():
+        marker.unlink()
     keep = outputs_dir / ".gitkeep"
     if not keep.exists():
         keep.touch()

@@ -312,15 +312,23 @@ def build_documents(
     final_draft: Path,
     methodology: Path,
     out_dir: Path,
-) -> tuple[Path, Path]:
+    output_format: str = "report",
+) -> tuple[Path, Path | None]:
+    """Build the stage-4 Word documents.
+
+    Short formats (brief, recommendations) get no executive summary — a
+    distillation of a 700-word document is noise, not a deliverable.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     final_draft_md = final_draft.read_text(encoding="utf-8")
     methodology_md = methodology.read_text(encoding="utf-8") if methodology.is_file() else ""
 
     full_path = out_dir / f"{slug}.docx"
-    exec_path = out_dir / f"{slug}-executive-summary.docx"
-
     _build_full_report(title, final_draft_md, methodology_md, full_path)
-    _build_executive_summary(title, final_draft_md, exec_path)
+
+    exec_path: Path | None = None
+    if output_format not in ("brief", "recommendations"):
+        exec_path = out_dir / f"{slug}-executive-summary.docx"
+        _build_executive_summary(title, final_draft_md, exec_path)
 
     return full_path, exec_path

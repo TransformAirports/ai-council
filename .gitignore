@@ -17,3 +17,7 @@ dist/
 # Polished, distribution-ready reports are regenerable from the archives via
 # `council --publish`. Treated as build output, not committed.
 reports/
+
+# Operator-local config (edited via Settings in ./council) and error logs.
+council.toml
+logs/

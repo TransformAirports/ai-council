@@ -92,6 +92,20 @@ def render_run_file(spec: RunSpec) -> str:
     return "\n".join(lines)
 
 
+def ensure_unique_slug(slug: str, runs_dir: Path = RUNS_DIR) -> str:
+    """Return a slug that doesn't collide with an existing run file.
+
+    Re-using a title shouldn't kill the session after the operator has typed
+    everything — collisions get a numeric suffix instead.
+    """
+    if not (runs_dir / f"{slug}.md").exists():
+        return slug
+    n = 2
+    while (runs_dir / f"{slug}-{n}.md").exists():
+        n += 1
+    return f"{slug}-{n}"
+
+
 def write_run_file(spec: RunSpec, runs_dir: Path = RUNS_DIR) -> Path:
     runs_dir.mkdir(parents=True, exist_ok=True)
     path = runs_dir / f"{spec.slug}.md"

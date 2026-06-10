@@ -150,7 +150,6 @@ AGENT_GROUPS: list[tuple[str, list[str]]] = [
     ("Public Safety & Emergency Management", [
         "director-of-public-safety",
         "airport-emergency-management-director",
-        "emergency-management-consultant",
     ]),
     ("Out-of-the-Box Thinkers", [
         "slacker",
@@ -373,13 +372,9 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
         console.print("[yellow]At least one research agent is required. Starting over.[/yellow]")
         return collect_run_spec(all_agents)
 
-    # 7. Companion PowerPoint
-    console.print()
-    want_pptx = bool(
-        questionary.confirm(
-            "Also generate a companion executive PowerPoint?", default=False
-        ).ask()
-    )
+    # The companion-deck choice lives on the pre-flight screen (one place to
+    # adjust everything) rather than as another question here.
+    want_pptx = False
 
     # Map the simplified inputs onto the run-file structure the strategist,
     # red-team, editor, and fact-checker already know how to read.

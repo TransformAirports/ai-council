@@ -14,41 +14,42 @@ Human checkpoints between Stage 2/3 and Stage 3/4 are in checkpoints.py.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import shutil
+import subprocess
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 import questionary
 from rich.console import Console
 
 from cli.agents import Agent, load_all_agents
+from cli.config import get_config
 from cli.interactive import RunSpec
 
 console = Console()
 
-# Role-based model assignments. Research and synthesis run on Opus 4.8;
-# critique and editorial passes run on Fable 5 (stronger critique/synthesis/
-# editorial performance). The Fact-checker stays on Opus 4.8 deliberately —
-# verification benefits from a different model family than the one that wrote
-# and polished the text it is checking.
-RESEARCH_MODEL = "claude-opus-4-8"
-SYNTHESIS_MODEL = "claude-opus-4-8"      # Strategist
-CRITIQUE_MODEL = "claude-fable-5"        # Red Team
-EDITOR_MODEL = "claude-fable-5"          # Editor
-HUMANIZER_MODEL = "claude-fable-5"       # Humanizer
-FACTCHECK_MODEL = "claude-opus-4-8"      # Fact-checker
-PRESENTATION_MODEL = "claude-fable-5"    # Companion PowerPoint
+# Model assignments live in council.toml (see cli/config.py for defaults and
+# the Settings menu for editing). Role keys: research, synthesis (Strategist),
+# critique (Red Team), editor, humanizer, factcheck, presentation,
+# openai_deep_research. The Fact-checker defaults to a different model family
+# than the ones that write and polish — verification benefits from fresh eyes.
 
-# Default model for the OpenAI-hosted Deep Research agent. An agent file can
-# override this via a `model:` frontmatter key. NOTE: verify this model ID is
-# enabled on your OpenAI account before seating the agent.
-OPENAI_DEEP_RESEARCH_MODEL = "gpt-5.5-pro-deep-research"
+
+def _model(role: str) -> str:
+    return get_config().model(role)
+
+
+class RunBudgetExceeded(RuntimeError):
+    """Raised between steps when the run's cost ceiling has been reached."""
 
 
 @dataclass
 class CostTally:
     by_step: dict[str, float] = field(default_factory=dict)
+    budget_usd: float | None = None  # run-level ceiling, checked between steps
 
     def add(self, step: str, cost: float) -> None:
         self.by_step[step] = self.by_step.get(step, 0.0) + cost
@@ -56,6 +57,24 @@ class CostTally:
     @property
     def total(self) -> float:
         return sum(self.by_step.values())
+
+    def check_budget(self, next_step: str) -> None:
+        if self.budget_usd is not None and self.total >= self.budget_usd:
+            raise RunBudgetExceeded(
+                f"Budget ceiling reached: ${self.total:.2f} spent of the "
+                f"${self.budget_usd:.2f} limit, with '{next_step}' still pending. "
+                f"Work so far is saved — relaunch and choose Resume to continue "
+                f"with a higher ceiling."
+            )
+
+
+@dataclass
+class RunResult:
+    tally: CostTally
+    archive_path: Path | None = None
+    published_path: Path | None = None
+    deck_path: Path | None = None
+    completed: bool = False
 
 
 def _has_content(path: Path, min_bytes: int = 200) -> bool:
@@ -74,26 +93,31 @@ async def _run_agent(
     step_label: str,
     tally: CostTally,
     output_path: Path | None = None,
-    max_turns: int = 80,
+    max_turns: int | None = None,
 ) -> None:
     """Invoke one agent end-to-end via the Claude Agent SDK.
 
     If `output_path` is set and already exists with material content, the
-    invocation is skipped — supports `--resume` after a partial run.
+    invocation is skipped — supports resume after a partial run.
 
     After completion, if `output_path` is set but the file is missing or empty,
     raises a clear error. Otherwise an exhausted-turn-budget run can look like
     success in the trace ("done, $X, N turns") even though no file was written.
 
-    `max_turns` is generous by default (80) because synthesis agents have to
-    read many briefs before writing. Stage 1 doesn't strictly need this much
-    headroom; Stage 2 and Stage 3 do.
+    `max_turns` defaults from council.toml (generous, because synthesis agents
+    read many briefs before writing). The run-level budget ceiling is checked
+    here, between steps — completed work is never interrupted mid-call.
     """
+    if max_turns is None:
+        max_turns = get_config().max_turns
+
     if output_path is not None and _has_content(output_path):
         console.print(
             f"[dim]↷ {step_label} skipped — {output_path.relative_to(cwd)} already exists[/dim]"
         )
         return
+
+    tally.check_budget(step_label)
 
     if agent.provider == "openai":
         await _run_openai_deep_research(
@@ -191,7 +215,7 @@ async def _run_openai_deep_research(
             "Run `pip install -e .` to pick up the new dependency."
         ) from e
 
-    model = agent.model_override or OPENAI_DEEP_RESEARCH_MODEL
+    model = agent.model_override or _model("openai_deep_research")
     console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model} via OpenAI)")
 
     def _call() -> str:
@@ -385,7 +409,7 @@ async def run_stage1(
             _run_agent(
                 agent=agent,
                 user_prompt=prompt,
-                model=RESEARCH_MODEL,
+                model=_model("research"),
                 cwd=outputs_dir.parent,
                 step_label=f"stage1/{name}",
                 tally=tally,
@@ -409,11 +433,19 @@ async def run_stage2(
     all_agents: list[Agent],
     tally: CostTally,
     start_from: str = "strategist-v1",
+    v3_note: str = "",
 ) -> None:
     by_name = {a.name: a for a in all_agents}
     strategist = by_name["strategist"]
     red_team = by_name["red-team"]
     prompts = _stage2_prompts(run_file)
+    if v3_note:
+        prompts["strategist-v3"] += (
+            "\n\nThe human operator reviewed the previous v3 and asked for this "
+            "redo with the following notes. Address them directly — they take "
+            "precedence over anything they conflict with:\n"
+            f"{v3_note}"
+        )
     output_paths = {
         "strategist-v1": outputs_dir / "stage2" / "strategist-draft-v1.md",
         "red-team-v1": outputs_dir / "stage2" / "red-team-critique-v1.md",
@@ -422,11 +454,11 @@ async def run_stage2(
         "strategist-v3": outputs_dir / "stage2" / "strategist-draft-v3.md",
     }
     sequence = [
-        ("strategist-v1", strategist, SYNTHESIS_MODEL),
-        ("red-team-v1", red_team, CRITIQUE_MODEL),
-        ("strategist-v2", strategist, SYNTHESIS_MODEL),
-        ("red-team-v2", red_team, CRITIQUE_MODEL),
-        ("strategist-v3", strategist, SYNTHESIS_MODEL),
+        ("strategist-v1", strategist, _model("synthesis")),
+        ("red-team-v1", red_team, _model("critique")),
+        ("strategist-v2", strategist, _model("synthesis")),
+        ("red-team-v2", red_team, _model("critique")),
+        ("strategist-v3", strategist, _model("synthesis")),
     ]
     started = False
     for step_id, agent, model in sequence:
@@ -458,7 +490,7 @@ async def run_stage3(
     await _run_agent(
         agent=editor,
         user_prompt=prompts["editor"],
-        model=EDITOR_MODEL,
+        model=_model("editor"),
         cwd=outputs_dir.parent,
         step_label="stage3/editor",
         tally=tally,
@@ -467,7 +499,7 @@ async def run_stage3(
     await _run_agent(
         agent=humanizer,
         user_prompt=prompts["humanizer"],
-        model=HUMANIZER_MODEL,
+        model=_model("humanizer"),
         cwd=outputs_dir.parent,
         step_label="stage3/humanizer",
         tally=tally,
@@ -476,7 +508,7 @@ async def run_stage3(
     await _run_agent(
         agent=fact_checker,
         user_prompt=prompts["fact-checker"],
-        model=FACTCHECK_MODEL,
+        model=_model("factcheck"),
         cwd=outputs_dir.parent,
         step_label="stage3/fact-checker",
         tally=tally,
@@ -509,12 +541,107 @@ async def run_presentation(
     await _run_agent(
         agent=designer,
         user_prompt=prompt,
-        model=PRESENTATION_MODEL,
+        model=_model("presentation"),
         cwd=outputs_dir.parent,
         step_label="stage4/presentation",
         tally=tally,
         output_path=out_path,
     )
+
+
+async def run_presentation_for_archive(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+) -> Path:
+    """Generate a companion deck for an already-archived run.
+
+    The deck is written into the archive's stage4/ and copied to reports/
+    for distribution. Returns the reports/ path.
+    """
+    from cli.publish import REPORTS_DIR
+
+    all_agents = load_all_agents()
+    by_name = {a.name: a for a in all_agents}
+    designer = by_name["presentation-designer"]
+    tally = CostTally()
+
+    stage4 = archive_dir / "stage4"
+    stage4.mkdir(parents=True, exist_ok=True)
+    out_path = stage4 / f"{slug}.pptx"
+    final_rel = (archive_dir / "stage3" / "final-draft.md").relative_to(repo_root).as_posix()
+    factcheck_rel = (archive_dir / "stage3" / "fact-check-report.md").relative_to(repo_root).as_posix()
+    prompt = (
+        f"Build the companion executive presentation for the report titled "
+        f"\"{title}\".\n\n"
+        f"Source material:\n"
+        f"- Final draft: `{final_rel}`\n"
+        f"- Fact-check report: `{factcheck_rel}` (read if present)\n"
+        f"- Run prompt: `prompts/runs/{slug}.md` (read if present)\n\n"
+        f"Save the finished deck to: `{out_path}`\n"
+        f"The repo's Python interpreter with python-pptx installed is at "
+        f"`.venv/bin/python` — use it for your build script, and validate the "
+        f"deck opens cleanly before finishing."
+    )
+    await _run_agent(
+        agent=designer,
+        user_prompt=prompt,
+        model=_model("presentation"),
+        cwd=repo_root,
+        step_label=f"deck/{slug}",
+        tally=tally,
+        output_path=out_path,
+    )
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    deck_dst = REPORTS_DIR / f"{slug}.pptx"
+    shutil.copy2(out_path, deck_dst)
+    console.print(
+        f"[green]Deck built:[/green] {deck_dst.relative_to(repo_root)} "
+        f"[dim](${tally.total:.2f})[/dim]"
+    )
+    return deck_dst
+
+
+ACTIVE_RUN_MARKER = ".active-run.json"
+
+
+def write_run_marker(outputs_dir: Path, spec: RunSpec) -> None:
+    """Record which run owns outputs/ so an interrupted run can be detected."""
+    marker = {
+        "slug": spec.slug,
+        "title": spec.title,
+        "started": datetime.now().isoformat(timespec="seconds"),
+        "format": getattr(spec, "output_format", "report"),
+        "want_pptx": getattr(spec, "want_pptx", False),
+    }
+    (outputs_dir / ACTIVE_RUN_MARKER).write_text(
+        json.dumps(marker, indent=2), encoding="utf-8"
+    )
+
+
+def read_run_marker(outputs_dir: Path) -> dict | None:
+    p = outputs_dir / ACTIVE_RUN_MARKER
+    if not p.is_file():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def _notify_done(title: str, message: str) -> None:
+    """Best-effort completion signal: macOS notification + terminal bell."""
+    try:
+        subprocess.run(
+            ["osascript", "-e",
+             f'display notification "{message}" with title "{title}" sound name "Glass"'],
+            capture_output=True, timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    print("\a", end="", flush=True)
 
 
 async def run_pipeline(
@@ -524,15 +651,18 @@ async def run_pipeline(
     repo_root: Path,
     auto_approve: bool,
     resume: bool = False,
-) -> CostTally:
+    budget_usd: float | None = None,
+) -> RunResult:
     from cli.checkpoints import checkpoint_after_stage2, checkpoint_after_stage3
     from cli.docx_builder import build_documents
     from cli.archive import archive_run
 
     outputs_dir = repo_root / "outputs"
     await prepare_outputs(outputs_dir, auto_approve=auto_approve, resume=resume)
+    write_run_marker(outputs_dir, spec)
     all_agents = load_all_agents()
-    tally = CostTally()
+    tally = CostTally(budget_usd=budget_usd)
+    result_out = RunResult(tally=tally)
 
     console.rule("[bold]Stage 1 — parallel research briefs[/bold]")
     await run_stage1(spec, run_file, outputs_dir, all_agents, tally)
@@ -549,19 +679,20 @@ async def run_pipeline(
             if v3_path.exists():
                 v3_path.unlink()
             await run_stage2(
-                spec, run_file, outputs_dir, all_agents, tally, start_from="strategist-v3"
+                spec, run_file, outputs_dir, all_agents, tally,
+                start_from="strategist-v3", v3_note=result.notes,
             )
             continue
         console.print("[yellow]Stopping at Stage 2.[/yellow]")
-        return tally
+        return result_out
 
-    console.rule("[bold]Stage 3 — edit & fact-check[/bold]")
+    console.rule("[bold]Stage 3 — edit, humanize & fact-check[/bold]")
     await run_stage3(run_file, outputs_dir, all_agents, tally)
 
     result = await checkpoint_after_stage3(outputs_dir, auto_approve=auto_approve)
     if not result.approved:
         console.print("[yellow]Stopping at Stage 3. No Word docs generated.[/yellow]")
-        return tally
+        return result_out
 
     console.rule("[bold]Stage 4 — Word documents[/bold]")
     build_documents(
@@ -570,30 +701,45 @@ async def run_pipeline(
         final_draft=outputs_dir / "stage3" / "final-draft.md",
         methodology=repo_root / "docs" / "methodology.md",
         out_dir=outputs_dir / "stage4",
+        output_format=getattr(spec, "output_format", "report"),
     )
 
     if getattr(spec, "want_pptx", False):
         console.rule("[bold]Companion PowerPoint[/bold]")
-        await run_presentation(spec, outputs_dir, load_all_agents(), tally)
+        await run_presentation(spec, outputs_dir, all_agents, tally)
 
     console.rule("[bold]Archive[/bold]")
     archive_path = archive_run(repo_root=repo_root, slug=spec.slug, tally=tally)
     console.print(f"[green]Archived to:[/green] {archive_path}")
+    result_out.archive_path = archive_path
 
     # Final step: publish the polished, distribution-ready document. The run
     # is complete without a separate `council --publish` invocation; that flag
     # remains for re-publishing or backfilling older archives.
     console.rule("[bold]Publish[/bold]")
-    from cli.publish import publish_all
+    from cli.publish import REPORTS_DIR, publish_all
 
     for slug, out_path, status in publish_all(only_slug=spec.slug):
         if status == "ok" and out_path is not None:
             console.print(
                 f"[green]Published:[/green] {out_path.relative_to(repo_root)}"
             )
+            result_out.published_path = out_path
         else:
             console.print(f"[yellow]Publish issue for {slug}: {status}[/yellow]")
-    return tally
+
+    # A companion deck archived with the run also belongs in reports/.
+    deck_src = archive_path / "stage4" / f"{spec.slug}.pptx"
+    if deck_src.is_file():
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        deck_dst = REPORTS_DIR / f"{spec.slug}.pptx"
+        shutil.copy2(deck_src, deck_dst)
+        console.print(f"[green]Deck:[/green] {deck_dst.relative_to(repo_root)}")
+        result_out.deck_path = deck_dst
+
+    result_out.completed = True
+    _notify_done("AI Council", f"Run complete: {spec.title} (${tally.total:.2f})")
+    return result_out
 
 
 # ----------------------------------------------------------------------------
@@ -695,12 +841,12 @@ async def run_revision_pipeline(
     console.print(f"[dim]Revising from: {src_draft_rel}[/dim]")
 
     steps = [
-        ("strategist-a", by_name["strategist"], base / "revised-draft-a.md", SYNTHESIS_MODEL),
-        ("red-team", by_name["red-team"], base / "red-team-critique.md", CRITIQUE_MODEL),
-        ("strategist-b", by_name["strategist"], base / "revised-draft-b.md", SYNTHESIS_MODEL),
-        ("editor", by_name["editor"], base / "edited-draft.md", EDITOR_MODEL),
-        ("humanizer", by_name["humanizer"], base / "humanized-draft.md", HUMANIZER_MODEL),
-        ("fact-checker", by_name["fact-checker"], base / "final-draft.md", FACTCHECK_MODEL),
+        ("strategist-a", by_name["strategist"], base / "revised-draft-a.md", _model("synthesis")),
+        ("red-team", by_name["red-team"], base / "red-team-critique.md", _model("critique")),
+        ("strategist-b", by_name["strategist"], base / "revised-draft-b.md", _model("synthesis")),
+        ("editor", by_name["editor"], base / "edited-draft.md", _model("editor")),
+        ("humanizer", by_name["humanizer"], base / "humanized-draft.md", _model("humanizer")),
+        ("fact-checker", by_name["fact-checker"], base / "final-draft.md", _model("factcheck")),
     ]
     for step_id, agent, out_path, model in steps:
         await _run_agent(
