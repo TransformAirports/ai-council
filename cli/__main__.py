@@ -22,7 +22,7 @@ from pathlib import Path
 from rich.console import Console
 
 from cli.agents import load_all_agents
-from cli.interactive import collect_run_spec, confirm_spec
+from cli.interactive import choose_mode, collect_run_spec, confirm_spec
 from cli.runfile import RUNS_DIR, parse_run_file, write_run_file
 
 console = Console()
@@ -75,6 +75,24 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "page numbers, and an AI-generation disclaimer. Pass a SLUG to publish "
         "just one run; omit it to publish every archived run. Exits when done.",
     )
+    p.add_argument(
+        "--pptx",
+        action="store_true",
+        help="Also generate a companion executive PowerPoint after Stage 4 "
+        "(presentation-designer agent on Fable 5). The deck lands in the run "
+        "archive alongside the Word documents.",
+    )
+    p.add_argument(
+        "--revise",
+        nargs="?",
+        const="__pick__",
+        metavar="SLUG",
+        help="Revise an existing report from new reader feedback. Reuses the "
+        "original research briefs and runs a focused Strategist/Red Team/Editor/"
+        "Fact-checker loop on the existing draft plus your feedback, producing "
+        "reports/<slug>-revised-vN.docx. Pass a SLUG to target one report; omit "
+        "it to pick from a list.",
+    )
     return p.parse_args(argv)
 
 
@@ -121,6 +139,47 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0 if ok else 2
 
+        # Decide between creating a new report and revising an existing one.
+        # An explicit --revise flag wins; --resume stays the new-run resume path;
+        # otherwise ask interactively.
+        do_revise = False
+        revise_slug = None
+        if args.revise is not None:
+            do_revise = True
+            revise_slug = None if args.revise == "__pick__" else args.revise
+        elif not args.resume:
+            do_revise = choose_mode() == "revise"
+
+        if do_revise:
+            from cli.orchestrator import run_revision_pipeline
+            from cli.revise import collect_revision_request
+
+            request = collect_revision_request(only_slug=revise_slug)
+            if request is None:
+                return 1
+            if args.dry_run or args.skip_prompts:
+                console.print(
+                    "[dim]--dry-run: feedback captured; stopping before model calls.[/dim]"
+                )
+                return 0
+            out_path, tally = asyncio.run(
+                run_revision_pipeline(
+                    request=request,
+                    repo_root=REPO_ROOT,
+                    auto_approve=args.no_review,
+                )
+            )
+            if out_path is None:
+                console.print(
+                    f"[yellow]Revision stopped. Cost so far: ${tally.total:.2f}[/yellow]"
+                )
+                return 0
+            console.print(
+                f"[green]Revision v{request.version} complete. "
+                f"Total estimated cost: ${tally.total:.2f}[/green]"
+            )
+            return 0
+
         if args.resume:
             spec = parse_run_file(args.resume)
             run_file = RUNS_DIR / f"{args.resume}.md"
@@ -141,6 +200,9 @@ def main(argv: list[str] | None = None) -> int:
             run_file = write_run_file(spec)
             rel = run_file.relative_to(REPO_ROOT)
             console.print(f"[green]Wrote run file:[/green] {rel}")
+
+        if args.pptx:
+            spec.want_pptx = True
 
         if args.dry_run or args.skip_prompts:
             console.print("[dim]--dry-run: stopping before model calls.[/dim]")

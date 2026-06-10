@@ -149,3 +149,6 @@ open a PR against `.claude/agents/` with new agents. See
 - **slacker:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **virtual-christian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **architectural-historian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **deep-research:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED — requires OPENAI_API_KEY}}
+- **virtual-chris:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
+- **virtual-pat:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}

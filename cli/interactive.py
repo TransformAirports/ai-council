@@ -39,8 +39,29 @@ DEFAULT_TONE = (
 )
 
 DEFAULT_LENGTH = (
-    "8,000–10,000 words for the full report; ~1,100-word executive summary."
+    "4,000–6,000 words for the full research report; ~1,100-word executive summary."
 )
+
+# Output formats the operator can pick from. The chosen string is written into
+# the run file's Length section, which the Strategist and Editor read.
+OUTPUT_FORMATS: dict[str, str] = {
+    "Full Research Report (4,000–6,000 words)": (
+        "4,000–6,000 words for the full research report; ~1,100-word executive summary."
+    ),
+    "Long-Form Article (1,500–2,000 words)": (
+        "A 1,500–2,000-word long-form article — one continuous argument, no appendices; "
+        "~400-word executive summary."
+    ),
+    "Brief (700–1,000 words)": (
+        "A 700–1,000-word brief: the thesis, the three strongest pieces of evidence, "
+        "the counter-case in one paragraph, and the bottom line. No executive summary."
+    ),
+    "Concise recommendations": (
+        "A concise set of numbered, actionable recommendations (400–700 words total), "
+        "each with a one-sentence evidentiary basis, preceded by a single framing "
+        "paragraph. No executive summary."
+    ),
+}
 
 DEFAULT_IS_YES = [
     "A sharp, evidence-driven argument that earns its conclusions",
@@ -123,6 +144,11 @@ AGENT_GROUPS: list[tuple[str, list[str]]] = [
     ("Out-of-the-Box Thinkers", [
         "slacker",
         "virtual-christian",
+        "virtual-chris",
+        "virtual-pat",
+    ]),
+    ("Extended Research", [
+        "deep-research",
     ]),
 ]
 
@@ -145,6 +171,7 @@ class RunSpec:
     success_criteria: list[str] = field(default_factory=list)
     selected_research_agents: list[str] = field(default_factory=list)
     agent_overrides: dict[str, str] = field(default_factory=dict)
+    want_pptx: bool = False
 
 
 # ----------------------------------------------------------------------------
@@ -193,7 +220,10 @@ def _parse_bullets(text: str) -> list[str]:
 def _apply_preset(preset: str, research: list[Agent]) -> list[str]:
     available = {a.name for a in research}
     if preset.startswith("All"):
-        return [a.name for a in research]
+        # "All" means all Claude-native lenses. Provider-gated agents (the
+        # OpenAI Deep Research lens needs OPENAI_API_KEY) are opt-in via Custom
+        # so a missing key never breaks the default path.
+        return [a.name for a in research if a.provider == "anthropic"]
     if preset.startswith("Default"):
         return [n for n in PRESET_DEFAULT if n in available]
     if preset.startswith("Operational"):
@@ -216,11 +246,15 @@ def _custom_council_picker(research: list[Agent]) -> list[str]:
             short = agent.description.splitlines()[0].strip()
             if len(short) > 80:
                 short = short[:77] + "..."
+            gated = agent.provider != "anthropic"
+            title = f"{agent.display_name} — {short}"
+            if gated:
+                title = f"{agent.display_name} (requires OPENAI_API_KEY) — {short}"
             choices.append(
                 questionary.Choice(
-                    title=f"{agent.display_name} — {short}",
+                    title=title,
                     value=name,
-                    checked=True,
+                    checked=not gated,
                 )
             )
     selected = questionary.checkbox(
@@ -235,6 +269,20 @@ def _custom_council_picker(research: list[Agent]) -> list[str]:
 # ----------------------------------------------------------------------------
 # Main entry point.
 # ----------------------------------------------------------------------------
+
+def choose_mode() -> str:
+    """Top-level mode select. Returns 'new' or 'revise'."""
+    answer = questionary.select(
+        "What would you like to do?",
+        choices=[
+            "Create a new report",
+            "Revise an existing report",
+        ],
+    ).ask()
+    if answer is None:
+        raise KeyboardInterrupt
+    return "revise" if answer.startswith("Revise") else "new"
+
 
 def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     console.print(
@@ -276,16 +324,27 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     avoid_text = _ask_multiline("Avoid", optional=True)
     avoid_items = _parse_bullets(avoid_text)
 
-    # 5. Council preset
+    # 5. Output format
+    console.print()
+    format_choice = questionary.select(
+        "Output format:",
+        choices=list(OUTPUT_FORMATS.keys()),
+    ).ask()
+    if format_choice is None:
+        raise KeyboardInterrupt
+    length = OUTPUT_FORMATS[format_choice]
+
+    # 6. Council preset
     console.print()
     research = research_agents(all_agents)
+    standard_count = len([a for a in research if a.provider == "anthropic"])
     default_count = len([n for n in PRESET_DEFAULT if n in {a.name for a in research}])
     preset_options = [
-        f"All sixteen lenses ({len(research)} agents)",
+        f"All standard lenses ({standard_count} agents)",
         f"Default {default_count} (audit-tuned contributors)",
         "Operational focus (Ops, Engineering, COO, Public Safety, EM)",
         "Strategic focus (CEO, COO, Regulatory, Commercial, Econ, History)",
-        "Custom — pick from grouped checklist",
+        "Custom — pick from grouped checklist (includes Deep Research)",
     ]
     preset_choice = questionary.select(
         "Council composition:",
@@ -300,6 +359,14 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     if not selected:
         console.print("[yellow]At least one research agent is required. Starting over.[/yellow]")
         return collect_run_spec(all_agents)
+
+    # 7. Companion PowerPoint
+    console.print()
+    want_pptx = bool(
+        questionary.confirm(
+            "Also generate a companion executive PowerPoint?", default=False
+        ).ask()
+    )
 
     # Map the simplified inputs onto the run-file structure the strategist,
     # red-team, editor, and fact-checker already know how to read.
@@ -317,13 +384,14 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
         thesis=thesis,
         audience=DEFAULT_AUDIENCE,
         tone=DEFAULT_TONE,
-        length=DEFAULT_LENGTH,
+        length=length,
         is_not=is_not,
         is_yes=is_yes,
         operator_context="",
         success_criteria=success_criteria,
         selected_research_agents=selected,
         agent_overrides={},
+        want_pptx=want_pptx,
     )
 
 

@@ -32,13 +32,18 @@ RESEARCH_AGENT_NAMES: tuple[str, ...] = (
     "slacker",
     "virtual-christian",
     "architectural-historian",
+    "deep-research",
+    "virtual-chris",
+    "virtual-pat",
 )
 
 PROCESS_AGENT_NAMES: tuple[str, ...] = (
     "strategist",
     "red-team",
     "editor",
+    "humanizer",
     "fact-checker",
+    "presentation-designer",
 )
 
 
@@ -51,6 +56,8 @@ class Agent:
     order: int
     system_prompt: str
     path: Path
+    provider: str = "anthropic"        # "anthropic" (Claude SDK) or "openai"
+    model_override: str | None = None  # per-agent model from frontmatter
 
     @property
     def is_research(self) -> bool:
@@ -83,6 +90,8 @@ def load_agent(path: Path) -> Agent:
         order=int(meta.get("order") or 999),
         system_prompt=post.content.strip(),
         path=path,
+        provider=str(meta.get("provider") or "anthropic").strip().lower(),
+        model_override=(str(meta["model"]).strip() if meta.get("model") else None),
     )
 
 

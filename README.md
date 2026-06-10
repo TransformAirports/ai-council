@@ -30,9 +30,10 @@ These three are not selectable. They protect the output regardless of which rese
 
 | Agent | What it does |
 | --- | --- |
-| **Red Team** | Attacks the Strategist's draft across two critique rounds. Finds weak claims, logical gaps, and unsupported assertions. |
-| **Editor** | Cuts 15–25% of word count. Kills buzzwords. Adds nothing. |
-| **Fact-checker** | Verifies every numerical and attributed claim against the research briefs. Has veto power over anything that cannot be sourced. |
+| **Red Team** (Fable 5) | Attacks the Strategist's draft across two critique rounds. Finds weak claims, logical gaps, and unsupported assertions. |
+| **Editor** (Fable 5) | Cuts 15–25% of word count. Kills buzzwords. Adds nothing. |
+| **Humanizer** (Fable 5) | Post-editing pass that refines tone, readability, and writing quality — smooths the seams of multi-agent assembly without touching a single claim, number, or tag. |
+| **Fact-checker** (Opus 4.8) | Verifies every numerical and attributed claim against the research briefs — running **after** the Humanizer, so verification covers the final text. Has veto power over anything that cannot be sourced. |
 
 #### The writer
 
@@ -44,7 +45,7 @@ The Strategist is the agent that turns whatever research lenses you seated into 
 
 #### Pick your council — the research lenses
 
-Sixteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against.
+Nineteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
 
 | Lens | What it brings to the table |
 | --- | --- |
@@ -62,8 +63,11 @@ Sixteen research lenses are available. Seat as few or as many as the thesis warr
 | Director of Public Safety | Airport police, ARFF, dispatch under one command; Part 139 and 1542 reality |
 | Airport EM Director | Long-tenured airport EM perspective; real EOC activations and exercises |
 | EM Consultant (external) | Outside-in preparedness diagnosis; cross-sector pattern matching |
-| The Slacker | Unstructured gut take plus wandering web searches; surfaces what the structured agents miss |
+| The Slacker | Gut thesis first, then a strict ten-minute research sprint, then a revised position — the intuition-vs-evidence delta no other agent generates |
 | Virtual Christian | The operator's free-thinker voice modeled on the council's human; reframes the question instead of answering it head-on |
+| Virtual Chris | Executive connector — maps the stakeholder lattice, initiative adjacencies, and cross-disciplinary patterns others miss; the council's optimist |
+| Virtual Pat | Modern-day MacGyver — unconventional, low-cost, highly practical solutions built from assets the airport already owns |
+| Deep Research (GPT-5.5 Pro) | Long-horizon, citation-dense research pass on OpenAI's deep-research model — a second model family's independent read (requires `OPENAI_API_KEY`) |
 
 ---
 
@@ -71,7 +75,9 @@ Sixteen research lenses are available. Seat as few or as many as the thesis warr
 
 A run starts with a sharp thesis. The sharper the thesis, the sharper the output. "An overview of regional airline trends" produces a summary. "Regional airline consolidation has gone far enough that the next wave of mergers will strand infrastructure the industry just built" produces an argument.
 
-You can start a run two ways:
+When you launch `./council`, it first asks whether you want to **create a new report** or **revise an existing one**. The new-report path is below; the revise path is in [Revising a report](#revising-a-report).
+
+You can start a new run two ways:
 
 - **The CLI (recommended).** Run `council` in the terminal. It walks you through the thesis, audience, tone, length, and which agents to seat on the Council, writes the run file for you, and drives the four stages end-to-end. Installation is in the next section.
 - **Claude Code.** Write a run-prompt file in `prompts/runs/` by hand, then say "run \<filename\>" inside Claude Code. The conversational flow handles the same four stages.
@@ -80,16 +86,16 @@ Either path produces the same artifacts and the same archive layout. You can swi
 
 ### The four stages
 
-**Stage 1 — Research** &nbsp;·&nbsp; *Parallel · Claude Sonnet · ~30–60 minutes*
+**Stage 1 — Research** &nbsp;·&nbsp; *Parallel · Claude Opus 4.8 (Deep Research lens on OpenAI) · ~30–60 minutes*
 The selected research agents work concurrently. Each produces an independent brief (typically 1,500–2,500 words) with inline source citations. They cannot read each other's output.
 
-**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Claude Opus · ~60–90 minutes*
+**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Strategist on Opus 4.8, Red Team on Fable 5 · ~60–90 minutes*
 Strategist drafts v1, Red Team critiques v1, Strategist revises to v2, Red Team critiques v2, Strategist produces v3 with explicit handoff notes about anything it knowingly left in.
 
 > **Human checkpoint #1.** The CLI shows you v3 and both critiques and asks whether to continue, redo the final draft with your notes, or stop. Pass `--no-review` to skip.
 
-**Stage 3 — Edit and fact-check** &nbsp;·&nbsp; *Sequential · Claude Opus · ~30–45 minutes*
-The Editor cuts roughly a fifth of the word count, removes buzzwords, and flags hedges. The Fact-checker verifies every numerical and attributed claim against the Stage 1 briefs. Unverifiable claims get cut or tagged `[UNVERIFIED — HUMAN REVIEW]`.
+**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Editor and Humanizer on Fable 5, Fact-checker on Opus 4.8 · ~30–60 minutes*
+The Editor cuts roughly a fifth of the word count, removes buzzwords, and flags hedges. The Humanizer then refines tone, readability, and writing quality without touching any claim, number, or tag. The Fact-checker runs last — verifying every numerical and attributed claim in the humanized text against the Stage 1 briefs. Unverifiable claims get cut or tagged `[UNVERIFIED — HUMAN REVIEW]`.
 
 > **Human checkpoint #2.** The CLI shows you the final draft and the fact-check report. Pass `--no-review` to skip.
 
@@ -114,6 +120,7 @@ The archived run at `runs/2026-04-17-infrastructure-vs-intelligence/` is the fir
 
 - macOS or Linux with Python 3.11 or newer (`python3 --version` to check)
 - Either a Claude.ai subscription with Opus access **or** an Anthropic API key — see [Authenticate Claude](#authenticate-claude) below
+- *(Optional)* `OPENAI_API_KEY` — only needed if you seat the Deep Research lens, which runs on OpenAI's deep-research model
 - This repository cloned locally
 
 ### Install and run
@@ -143,20 +150,26 @@ The CLI runs on the Claude Agent SDK, which uses the Claude Code CLI binary unde
 ./council
 ```
 
-The CLI asks for three things plus a council pick:
+The CLI asks for:
 
 1. **Title** — one short headline. The slug is auto-derived.
 2. **Thesis** — one to three sentences, sharp and falsifiable. Multi-line paste is fine.
 3. **Scope** *(optional)* — paste a bulleted list of what the council should address. Skip to let the council scope itself from the thesis.
 4. **Avoid** *(optional)* — paste a list of what the piece should refuse to be. Skip for the standard guardrails.
-5. **Council composition** — pick a preset:
-   - **All sixteen lenses** — every research agent
+5. **Output format** — the shape of the final deliverable:
+   - **Full Research Report** (4,000–6,000 words)
+   - **Long-Form Article** (1,500–2,000 words)
+   - **Brief** (700–1,000 words)
+   - **Concise recommendations** (numbered and actionable, 400–700 words)
+6. **Council composition** — pick a preset:
+   - **All standard lenses** — every Claude-native research agent
    - **Default seven (audit-tuned)** — the agents that consistently surface in synthesis, per [`council --audit`](#auditing-the-council): Tech Scout, Contrarian, Airport CEO, Airport COO, Infra Economist, Ops Analyst, Airline Commercial Strategist
    - **Operational focus** — Ops Analyst, Chief Engineer, COO, Public Safety, EM Director, Tech Scout
    - **Strategic focus** — CEO, COO, Regulatory, Airline Commercial, Infra Econ, Aviation Historian
-   - **Custom** — grouped checklist where you toggle individual agents
+   - **Custom** — grouped checklist where you toggle individual agents, including the OpenAI-hosted Deep Research lens
+7. **Companion PowerPoint** *(yes/no)* — optionally generate an executive deck alongside the Word documents (or pass `--pptx`).
 
-Audience, tone (analytical sharp), and length (~9k-word report) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
+Audience and tone (analytical sharp) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
 
 ### Flags
 
@@ -166,6 +179,8 @@ Audience, tone (analytical sharp), and length (~9k-word report) use sensible def
 | `--resume SLUG` | Resume a previously interrupted run. Reads `prompts/runs/<SLUG>.md`, keeps existing `outputs/` artifacts, and re-runs only the steps whose output files are missing. |
 | `--audit` | Scan all archived runs and produce a council-audit report. See [Auditing the council](#auditing-the-council). |
 | `--publish [SLUG]` | Format archived full reports into polished, distribution-ready documents under `reports/`. See [Publishing reports](#publishing-reports). |
+| `--revise [SLUG]` | Produce a revised version of an existing report from new reader feedback. See [Revising a report](#revising-a-report). |
+| `--pptx` | Also generate a companion executive PowerPoint after Stage 4 (presentation-designer agent on Fable 5). The deck archives alongside the Word documents. |
 | `--dry-run` | Write the run file from your answers and stop without calling the model. Useful for previewing. |
 | `--skip-prompts` | Alias for `--dry-run`. |
 | `--help` | Print usage and exit. |
@@ -196,6 +211,24 @@ Takes the full report from each `runs/*/stage4/` folder (executive summaries are
 - An **AI-generation disclaimer** as the final section
 
 To change the cover logo, replace `assets/council-logo.png` with a horizontal logo of your own (the build also accepts `assets/logo.png`). If neither exists, the cover renders cleanly without a logo. Typography and brand color are set at the top of [cli/publish.py](cli/publish.py) (`BODY_FONT`, `HEADING_FONT`, `BRAND_NAVY`).
+
+### Revising a report
+
+When a reader gives feedback on a finished report, you don't re-run the whole Council. A revision reuses the original research and applies a focused pass.
+
+```bash
+./council                  # then choose "Revise an existing report"
+./council --revise         # jump straight to the report picker
+./council --revise <slug>  # revise a specific report
+```
+
+You pick the report the feedback is about (a scrollable list), type the feedback, and the Council runs a tight loop on the **existing draft plus your feedback**:
+
+> Strategist (revise) → Red Team (critique) → Strategist (finalize) → Editor → Fact-checker
+
+It reuses the original Stage 1 research briefs — no new research, no ten-agent run — so a revision is a handful of Opus calls rather than a multi-hour job. The result is a polished `reports/<slug>-revised-vN.docx`, stamped **Revised — Version N** on the cover.
+
+Revisions chain: the first is v1, the next is v2, and each one revises the previous version's output rather than the original. The intermediate drafts, the critique, and the feedback that prompted each revision are preserved under `runs/<run>/revisions/vN/` for provenance. Add `--no-review` to skip the pre-build review of the revised draft.
 
 Re-running is safe: it overwrites the polished file for each run in place. The `reports/` folder is yours to hand out; nothing else in the pipeline writes to it.
 

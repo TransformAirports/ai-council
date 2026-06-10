@@ -69,7 +69,8 @@ PROCESS_AGENTS_NOTE = [
     ("Strategist", "synthesized the research briefs into a single argumentative draft."),
     ("Red Team", "attacked each draft to surface weak claims and logical gaps."),
     ("Editor", "tightened the prose and removed filler without adding new content."),
-    ("Fact-checker", "verified every numerical and attributed claim against the briefs."),
+    ("Humanizer", "refined tone and readability without altering any claim, number, or citation."),
+    ("Fact-checker", "verified every numerical and attributed claim against the briefs, after all editorial passes."),
 ]
 
 
@@ -276,7 +277,13 @@ def _add_page_numbers(doc: Document) -> None:
     num_run._r.append(fld_end)
 
 
-def _add_cover_page(doc: Document, title: str, run_date: str, logo: Path | None) -> None:
+def _add_cover_page(
+    doc: Document,
+    title: str,
+    run_date: str,
+    logo: Path | None,
+    revision_label: str | None = None,
+) -> None:
     # Logo banner at the top of the cover.
     if logo is not None:
         for _ in range(2):
@@ -306,6 +313,15 @@ def _add_cover_page(doc: Document, title: str, run_date: str, logo: Path | None)
     run.font.size = Pt(14)
     run.font.name = BODY_FONT
     run.font.color.rgb = INK_SOFT
+
+    if revision_label:
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run(revision_label.upper())
+        run.bold = True
+        run.font.size = Pt(12)
+        run.font.name = BODY_FONT
+        run.font.color.rgb = BRAND_NAVY
 
     for _ in range(3):
         doc.add_paragraph()
@@ -449,6 +465,9 @@ def build_polished_report(
     source: ReportSource,
     agents_by_name: dict[str, Agent],
     out_dir: Path = REPORTS_DIR,
+    *,
+    revision_label: str | None = None,
+    out_name: str | None = None,
 ) -> Path:
     if source.final_md is None:
         raise FileNotFoundError(
@@ -464,7 +483,7 @@ def build_polished_report(
 
     doc = Document()
     _apply_professional_styles(doc)
-    _add_cover_page(doc, title, run_date, logo)
+    _add_cover_page(doc, title, run_date, logo, revision_label=revision_label)
     _add_abstract_page(doc, abstract)
     _add_methodology_page(doc, agents_used)
 
@@ -475,7 +494,7 @@ def build_polished_report(
     _add_page_numbers(doc)
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / f"{source.slug}.docx"
+    out_path = out_dir / (out_name or f"{source.slug}.docx")
     doc.save(out_path)
     return out_path
 
