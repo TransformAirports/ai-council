@@ -26,6 +26,7 @@ RESEARCH_AGENT_NAMES: tuple[str, ...] = (
     "aviation-historian",
     "airport-ceo",
     "airport-coo",
+    "airport-procurement-expert",
     "director-of-public-safety",
     "airport-emergency-management-director",
     "slacker",

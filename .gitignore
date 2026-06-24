@@ -21,3 +21,7 @@ reports/
 # Operator-local config (edited via Settings in ./council) and error logs.
 council.toml
 logs/
+
+# Operator-supplied source material drop zone — populated and emptied by the
+# CLI's New-run flow; never committed.
+sources/

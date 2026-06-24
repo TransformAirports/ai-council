@@ -22,6 +22,12 @@ from rich.text import Text
 
 from cli.agents import load_all_agents, research_agents
 from cli.config import MODEL_CHOICES, get_config, save_config
+from cli.sources import (
+    DROPZONE,
+    attach_sources,
+    discover_dropzone,
+    format_size,
+)
 
 console = Console()
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -61,6 +67,13 @@ def banner() -> None:
                 f"{n_archives} completed runs", style="cyan")
     if last:
         body.append(f"\nlatest: {last}", style="dim")
+    dropped = discover_dropzone()
+    if dropped:
+        body.append(
+            f"\n📎  {len(dropped)} source file{'s' if len(dropped) != 1 else ''} "
+            f"staged in sources/ — included in the next New run",
+            style="green",
+        )
     console.print(Panel(body, border_style="blue", padding=(1, 4)))
 
 
@@ -69,10 +82,17 @@ def banner() -> None:
 # ----------------------------------------------------------------------------
 
 def detect_interrupted_run() -> dict | None:
-    """Return info about a partially-completed run sitting in outputs/, or None."""
+    """Return info about a partially-completed run sitting in outputs/, or None.
+
+    A run is "interrupted" if either:
+      - there are partial artifacts under outputs/stage*, OR
+      - the .active-run.json marker exists (a run was launched but never
+        reached archive — covers the case where Stage 1 died so early that
+        no briefs wrote, e.g. an immediate model-not-found error).
+    """
     from cli.orchestrator import read_run_marker
 
-    stage_counts = {}
+    stage_counts: dict[str, int] = {}
     newest = 0.0
     for sub in ("stage1", "stage2", "stage3", "stage4"):
         d = OUTPUTS_DIR / sub
@@ -83,17 +103,29 @@ def detect_interrupted_run() -> dict | None:
                 newest = max(newest, p.stat().st_mtime)
             except OSError:
                 pass
-    if not any(stage_counts.values()):
-        return None
 
     marker = read_run_marker(OUTPUTS_DIR) or {}
+    has_any_artifact = any(stage_counts.values())
+    has_marker = bool(marker)
+
+    if not has_any_artifact and not has_marker:
+        return None
+
     if stage_counts["stage3"]:
         where = "died during Stage 3–4"
     elif stage_counts["stage2"]:
         where = f"died during Stage 2 ({stage_counts['stage2']} of 5 drafts done)"
-    else:
+    elif stage_counts["stage1"]:
         where = f"died during Stage 1 ({stage_counts['stage1']} briefs done)"
+    else:
+        where = "died at Stage 1 startup (no briefs written yet)"
 
+    # Use the marker's start time when there are no files to read mtime from.
+    if not newest and marker.get("started"):
+        try:
+            newest = datetime.fromisoformat(marker["started"]).timestamp()
+        except (ValueError, TypeError):
+            pass
     age = ""
     if newest:
         hours = (datetime.now() - datetime.fromtimestamp(newest)).total_seconds() / 3600
@@ -134,14 +166,78 @@ def _guard_clear(info: dict) -> bool:
 # Pre-flight.
 # ----------------------------------------------------------------------------
 
-def _auth_lines(spec) -> list[tuple[str, str]]:
-    lines: list[tuple[str, str]] = []
+_auth_probe_cache: tuple[bool, str] | None = None
+
+
+def check_claude_auth(force: bool = False) -> tuple[bool, str]:
+    """Verify Claude can actually authenticate, by probing the real CLI.
+
+    The only reliable check is to run a tiny `claude -p` call and see if it
+    succeeds — credentials may live in the macOS Keychain, a file, or an env
+    key, and inferring from any one location gives false answers (an expired
+    file with a valid Keychain token, or vice versa). We test the ground truth.
+
+    Returns (ok, human_message). Result is cached for the session so the
+    pre-flight screen can redraw without re-probing. Pass force=True to re-probe
+    after a `claude login`.
+
+    Philosophy: block ONLY on a confirmed failure (a 401, or no CLI at all).
+    Never block on an inconclusive probe — that would be as bad as the bug it
+    replaces. If the probe is ambiguous, allow the run; Stage 1 will surface a
+    real problem with a clear message.
+    """
+    global _auth_probe_cache
+    if _auth_probe_cache is not None and not force:
+        return _auth_probe_cache
+
     if os.environ.get("ANTHROPIC_API_KEY"):
-        lines.append(("Claude", "API key (pay-as-you-go)"))
-    elif (Path.home() / ".claude" / ".credentials.json").exists() or shutil.which("claude"):
-        lines.append(("Claude", "subscription (claude login)"))
-    else:
-        lines.append(("Claude", "⚠ not detected — run `claude login` or set ANTHROPIC_API_KEY"))
+        _auth_probe_cache = (True, "API key (pay-as-you-go)")
+        return _auth_probe_cache
+
+    import subprocess
+
+    claude = shutil.which("claude")
+    if not claude:
+        _auth_probe_cache = (
+            False,
+            "⚠ Claude CLI not found — install Claude Code or set ANTHROPIC_API_KEY",
+        )
+        return _auth_probe_cache
+
+    try:
+        with console.status("[dim]Checking Claude authentication…[/dim]"):
+            proc = subprocess.run(
+                [claude, "-p", "Reply with exactly: PONG", "--max-turns", "1"],
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
+                timeout=90,
+            )
+        blob = f"{proc.stdout}\n{proc.stderr}"
+        if "PONG" in blob:
+            _auth_probe_cache = (True, "authenticated (verified just now)")
+        elif "401" in blob or "authenticat" in blob.lower():
+            _auth_probe_cache = (
+                False,
+                "⚠ authentication failed (401) — run `claude login`",
+            )
+        else:
+            # Reached the model but got an unexpected reply — not an auth
+            # problem; let the run proceed.
+            _auth_probe_cache = (True, "reachable (probe reply unexpected; proceeding)")
+    except subprocess.TimeoutExpired:
+        _auth_probe_cache = (
+            True,
+            "auth probe timed out — proceeding (Stage 1 will report any real issue)",
+        )
+    except OSError as e:
+        _auth_probe_cache = (True, f"auth probe could not run ({e}); proceeding")
+    return _auth_probe_cache
+
+
+def _auth_lines(spec) -> list[tuple[str, str]]:
+    ok, msg = check_claude_auth()
+    lines: list[tuple[str, str]] = [("Claude", msg)]
     if "deep-research" in spec.selected_research_agents:
         if os.environ.get("OPENAI_API_KEY"):
             lines.append(("OpenAI", "API key set (Deep Research bills to OpenAI)"))
@@ -169,6 +265,21 @@ def preflight(spec) -> dict | None:
     cfg = get_config()
     checkpoints_on = True
     budget: float | None = cfg.default_budget_usd or None
+
+    # Hard gate: dead Claude auth makes every agent 401 at "1 turn / $0.00".
+    # Catch it here, before a single dollar or minute is spent.
+    auth_ok, auth_msg = check_claude_auth()
+    if not auth_ok:
+        console.print(Panel(
+            f"[bold]Claude isn't authenticated, so the run can't proceed.[/bold]\n\n"
+            f"{auth_msg}\n\n"
+            f"Fix it in one step:\n"
+            f"  [cyan]claude login[/cyan]\n\n"
+            f"Verify with:  [cyan]claude -p \"say PONG\" --max-turns 1[/cyan]\n"
+            f"Then relaunch [cyan]./council[/cyan] and choose Resume.",
+            border_style="red", title="Authentication required",
+        ))
+        return None
 
     # Hard gate: Deep Research seated without a key fails an hour in. Fix now.
     if "deep-research" in spec.selected_research_agents and not os.environ.get("OPENAI_API_KEY"):
@@ -200,6 +311,12 @@ def preflight(spec) -> dict | None:
         t.add_row("[bold]Checkpoints[/bold]", "on — pause for your review twice" if checkpoints_on else "off — fully autonomous")
         t.add_row("[bold]Budget ceiling[/bold]", f"${budget:.0f}" if budget else "none")
         t.add_row("[bold]Companion deck[/bold]", "yes" if getattr(spec, "want_pptx", False) else "no")
+        if getattr(spec, "source_paths", None):
+            srcs = spec.source_paths
+            preview = ", ".join(Path(p).name for p in srcs[:3])
+            if len(srcs) > 3:
+                preview += f"  +{len(srcs) - 3} more"
+            t.add_row(f"[bold]📎 Sources[/bold] ({len(srcs)})", preview)
         for label, value in _auth_lines(spec):
             style = "red" if "⚠" in value else ""
             t.add_row(f"[bold]{label}[/bold]", f"[{style}]{value}[/{style}]" if style else value)
@@ -276,6 +393,39 @@ def post_run_menu(spec, result) -> None:
             return
 
 
+def _prompt_sources() -> list[Path]:
+    """Detect dropzone contents and ask whether to attach them.
+
+    Returns the list of files the operator wants to include (possibly empty).
+    """
+    dropped = discover_dropzone()
+    if not dropped:
+        return []
+    t = Table(show_header=False, box=None, padding=(0, 2))
+    for p in dropped:
+        try:
+            size = format_size(p.stat().st_size)
+        except OSError:
+            size = "—"
+        t.add_row(f"  • {p.name}", f"[dim]{size}[/dim]")
+    console.print(Panel(
+        t,
+        title="[bold]📎  Source material detected in sources/[/bold]",
+        border_style="green",
+    ))
+    answer = questionary.select(
+        "Include these as source material for this run?",
+        choices=[
+            "Yes — attach all and use them as the starting point",
+            "No — ignore them this run (they stay in sources/)",
+            "Cancel the new run",
+        ],
+    ).ask()
+    if answer is None or answer.startswith("Cancel"):
+        raise KeyboardInterrupt
+    return dropped if answer.startswith("Yes") else []
+
+
 def new_run_flow() -> None:
     from cli.interactive import collect_run_spec
     from cli.orchestrator import run_pipeline
@@ -292,12 +442,31 @@ def new_run_flow() -> None:
             return
         _clear_outputs_dir()
 
+    # Detect source material BEFORE the thesis flow — so the operator's
+    # thesis answer can refer to the files they just attached.
+    sources_to_attach = _prompt_sources()
+
     agents = load_all_agents()
     spec = collect_run_spec(agents)
     unique = ensure_unique_slug(spec.slug)
     if unique != spec.slug:
         console.print(f"[dim]Slug '{spec.slug}' exists — using '{unique}'.[/dim]")
         spec.slug = unique
+
+    # Now that the slug is settled, move sources into outputs/sources/<slug>/
+    # and extract office formats. The drop zone is left empty for the next run.
+    if sources_to_attach:
+        attached = attach_sources(spec.slug, sources_to_attach, REPO_ROOT / "outputs")
+        spec.source_paths = [
+            s.readable.relative_to(REPO_ROOT).as_posix() for s in attached
+        ]
+        console.print(
+            f"[green]📎  Attached {len(attached)} source file"
+            f"{'s' if len(attached) != 1 else ''} to '{spec.slug}'.[/green]"
+        )
+        for s in attached:
+            tag = " [dim](extracted)[/dim]" if s.extracted else ""
+            console.print(f"   • {s.original.name}{tag}")
 
     launch = preflight(spec)
     if launch is None:

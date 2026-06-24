@@ -1,9 +1,9 @@
 ---
 name: deep-research
-description: Research agent that routes to OpenAI's GPT-5.5 Pro Deep Research model instead of Claude. Runs a long-horizon, citation-dense autonomous research pass on the thesis — a second model family's read on the same question, useful both for depth and for cross-lab triangulation. Requires OPENAI_API_KEY. Invoke when the thesis warrants an exhaustive literature-and-data sweep beyond what single-session agents produce.
+description: Research agent that routes to OpenAI's o3-deep-research model instead of Claude. Runs a long-horizon, citation-dense autonomous research pass on the thesis — a second model family's read on the same question, useful both for depth and for cross-lab triangulation. Requires OPENAI_API_KEY. Invoke when the thesis warrants an exhaustive literature-and-data sweep beyond what single-session agents produce.
 provider: openai
-model: gpt-5.5-pro-deep-research
-display_name: Deep Research (GPT-5.5 Pro)
+model: o3-deep-research
+display_name: Deep Research (o3)
 order: 16
 ---
 

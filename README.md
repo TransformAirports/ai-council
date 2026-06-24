@@ -30,10 +30,12 @@ These three are not selectable. They protect the output regardless of which rese
 
 | Agent | What it does |
 | --- | --- |
-| **Red Team** (Fable 5) | Attacks the Strategist's draft across two critique rounds. Finds weak claims, logical gaps, and unsupported assertions. |
-| **Editor** (Fable 5) | Cuts 15–25% of word count. Kills buzzwords. Adds nothing. |
-| **Humanizer** (Fable 5) | Post-editing pass that refines tone, readability, and writing quality — smooths the seams of multi-agent assembly without touching a single claim, number, or tag. |
-| **Fact-checker** (Opus 4.8) | Verifies every numerical and attributed claim against the research briefs — running **after** the Humanizer, so verification covers the final text. Has veto power over anything that cannot be sourced. |
+| **Red Team** | Attacks the Strategist's draft across two critique rounds. Finds weak claims, logical gaps, and unsupported assertions. |
+| **Editor** | Cuts 15–25% of word count. Kills buzzwords. Adds nothing. |
+| **Humanizer** | Post-editing pass that refines tone, readability, and writing quality — smooths the seams of multi-agent assembly without touching a single claim, number, or tag. |
+| **Fact-checker** | Verifies every numerical and attributed claim against the research briefs — running **after** the Humanizer, so verification covers the final text. Has veto power over anything that cannot be sourced. |
+
+All process agents run on Claude Opus 4.8. Model assignments per role live in `council.toml` and are editable from the hub's Settings menu — point any role at Sonnet for a cheap draft pass, then switch back.
 
 #### The writer
 
@@ -45,7 +47,7 @@ The Strategist is the agent that turns whatever research lenses you seated into 
 
 #### Pick your council — the research lenses
 
-Eighteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
+Nineteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
 
 | Lens | What it brings to the table |
 | --- | --- |
@@ -60,6 +62,7 @@ Eighteen research lenses are available. Seat as few or as many as the thesis war
 | Architectural Historian | Terminal architecture as a building type; design intent the operational record forgets |
 | Airport CEO | Board accountability, bond rating, use-and-lease, long-horizon politics |
 | Airport COO | The operator's chair: airfield, terminal, maintenance, airline relations |
+| Airport Procurement Expert | Federal grant procurement, delivery-method selection, DBE, protest risk, the schedule arithmetic that turns a board vote into a buildable contract |
 | Director of Public Safety | Airport police, ARFF, dispatch under one command; Part 139 and 1542 reality |
 | Airport EM Director | Long-tenured airport EM perspective; real EOC activations and exercises |
 | The Slacker | Gut thesis first, then a strict ten-minute research sprint, then a revised position — the intuition-vs-evidence delta no other agent generates |
@@ -88,12 +91,12 @@ Either path produces the same artifacts and the same archive layout. You can swi
 **Stage 1 — Research** &nbsp;·&nbsp; *Parallel · Claude Opus 4.8 (Deep Research lens on OpenAI) · ~30–60 minutes*
 The selected research agents work concurrently. Each produces an independent brief (typically 1,500–2,500 words) with inline source citations. They cannot read each other's output.
 
-**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Strategist on Opus 4.8, Red Team on Fable 5 · ~60–90 minutes*
+**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Opus 4.8 · ~60–90 minutes*
 Strategist drafts v1, Red Team critiques v1, Strategist revises to v2, Red Team critiques v2, Strategist produces v3 with explicit handoff notes about anything it knowingly left in.
 
 > **Human checkpoint #1.** The CLI shows you v3 and both critiques and asks whether to continue, redo the final draft with your notes, or stop. Pass `--no-review` to skip.
 
-**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Editor and Humanizer on Fable 5, Fact-checker on Opus 4.8 · ~30–60 minutes*
+**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Opus 4.8 · ~30–60 minutes*
 The Editor cuts roughly a fifth of the word count, removes buzzwords, and flags hedges. The Humanizer then refines tone, readability, and writing quality without touching any claim, number, or tag. The Fact-checker runs last — verifying every numerical and attributed claim in the humanized text against the Stage 1 briefs. Unverifiable claims get cut or tagged `[UNVERIFIED — HUMAN REVIEW]`.
 
 > **Human checkpoint #2.** The CLI shows you the final draft and the fact-check report. Pass `--no-review` to skip.
@@ -171,6 +174,18 @@ The CLI asks for:
 7. **Companion PowerPoint** *(yes/no)* — optionally generate an executive deck alongside the Word documents (or pass `--pptx`).
 
 Audience and tone (analytical sharp) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
+
+### Source material
+
+Drop files into the `sources/` folder at the repo root before launching a new run — PDFs, Word docs, PowerPoint decks, Excel sheets, markdown, plain text. The hub shows a `📎` badge as soon as files appear, and the first prompt in **New report** asks whether to attach them.
+
+On accept, the CLI moves each file into the run's `outputs/sources/<slug>/` folder, converts `.docx` / `.pptx` / `.xlsx` to plain markdown sidecars (so every agent — including the OpenAI-hosted Deep Research lens, which has no file tools — can read them), and injects a preamble into every Stage 1 agent's prompt: *"Before you research anything, read these files first — treat them as the primary starting point and quote them directly."* The Stage 1 research is now grounded in your material, not just the open web.
+
+The sources move out of the drop zone (it's free for the next run) and travel into the run archive at completion (`runs/<dated>/sources/`), so future revisions, audits, and re-publishes can still see what the Council was given.
+
+Two limits worth knowing:
+- **Scanned PDFs without a text layer** read as pixels, not words. Most modern PDFs are searchable and work fine; if Deep Research is seated and a scanned PDF is in the mix, convert it first.
+- **Deep Research** can't read files directly — its prompt has the source text inlined, truncated at 30,000 characters per file. For very long documents, it sees the first portion.
 
 ### The hub
 

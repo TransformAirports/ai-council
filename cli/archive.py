@@ -44,6 +44,9 @@ def _clear_outputs(outputs_dir: Path) -> None:
         target = outputs_dir / sub
         if target.is_dir():
             shutil.rmtree(target)
+    src_dir = outputs_dir / "sources"
+    if src_dir.is_dir():
+        shutil.rmtree(src_dir)
     marker = outputs_dir / ".active-run.json"
     if marker.exists():
         marker.unlink()
@@ -65,6 +68,11 @@ def archive_run(*, repo_root: Path, slug: str, tally: CostTally) -> Path:
         src = outputs_dir / sub
         if src.is_dir():
             shutil.copytree(src, archive_dir / sub)
+
+    # Source material attached to this run (if any) lands in the archive
+    # alongside the stages, so revisions and audits can still see it.
+    from cli.sources import archive_sources
+    archive_sources(slug, outputs_dir, archive_dir)
 
     _write_retrospective(archive_dir, slug, tally)
     _clear_outputs(outputs_dir)

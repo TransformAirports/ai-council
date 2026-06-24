@@ -145,6 +145,7 @@ AGENT_GROUPS: list[tuple[str, list[str]]] = [
     ("Executive Leadership", [
         "airport-ceo",
         "airport-coo",
+        "airport-procurement-expert",
         "regulatory-political-analyst",
     ]),
     ("Public Safety & Emergency Management", [
@@ -183,6 +184,7 @@ class RunSpec:
     agent_overrides: dict[str, str] = field(default_factory=dict)
     want_pptx: bool = False
     output_format: str = "report"  # report | article | brief | recommendations
+    source_paths: list[str] = field(default_factory=list)  # readable paths for sources
 
 
 # ----------------------------------------------------------------------------

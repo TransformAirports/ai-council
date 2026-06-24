@@ -45,6 +45,20 @@ def render_run_file(spec: RunSpec) -> str:
     lines.append(spec.output_format)
     lines.append("")
 
+    if spec.source_paths:
+        lines.append("## Source material")
+        lines.append("")
+        lines.append(
+            "Operator-supplied files attached to this run. Read them before "
+            "conducting your own research; treat them as the primary starting "
+            "point and quote them directly. Where the source material conflicts "
+            "with your default evidence base, name the conflict in your brief."
+        )
+        lines.append("")
+        for p in spec.source_paths:
+            lines.append(f"- `{p}`")
+        lines.append("")
+
     lines.append("## What this is NOT")
     lines.append("")
     for item in spec.is_not:
@@ -180,6 +194,12 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
 
     length = _section_body(text, "Length")
     output_format = _section_body(text, "Output format").strip().lower()
+    source_section = _section_body(text, "Source material")
+    source_paths: list[str] = []
+    for line in source_section.splitlines():
+        s = line.strip()
+        if s.startswith("- `") and s.endswith("`"):
+            source_paths.append(s[3:-1])
     if output_format not in ("report", "article", "brief", "recommendations"):
         # Older run files have no Output format section — infer from Length.
         low = length.lower()
@@ -206,4 +226,5 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
         success_criteria=_bullets(_section_body(text, "Success criteria")),
         selected_research_agents=selected,
         agent_overrides=overrides,
+        source_paths=source_paths,
     )

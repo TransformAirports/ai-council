@@ -8,6 +8,7 @@ same flows for scripting and muscle memory.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import traceback
 from datetime import datetime
@@ -23,6 +24,41 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # Load API keys from .env at the repo root (see .env.example). Shell exports
 # take precedence — load_dotenv never overrides an existing environment var.
 load_dotenv(REPO_ROOT / ".env")
+
+
+# When ./council is launched from inside an active Claude Code session (a
+# common case while developing this very tool!), env vars like CLAUDECODE=1,
+# CLAUDE_CODE_CHILD_SESSION, and ANTHROPIC_BASE_URL get inherited by every
+# `claude` subprocess the SDK spawns. The children detect the parent and
+# refuse to do real work — they return immediately with the spurious
+# `is_error: true / subtype: success` envelope, every turn, every agent,
+# deterministically. Strip the inherited markers so child sessions boot as
+# top-level invocations.
+_PARENT_CLAUDE_ENV_VARS = (
+    "CLAUDECODE",
+    "CLAUDE_CODE_SESSION_ID",
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_ENTRYPOINT",
+    "CLAUDE_CODE_EXECPATH",
+    "CLAUDE_CODE_OAUTH_SCOPES",
+    "CLAUDE_CODE_ENABLE_ASK_USER_QUESTION_TOOL",
+    "CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES",
+    "CLAUDE_CODE_DISABLE_CRON",
+    "CLAUDE_CODE_SDK_HAS_OAUTH_REFRESH",
+    "CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH",
+    "CLAUDE_AGENT_SDK_VERSION",
+    "CLAUDE_EFFORT",
+    "ANTHROPIC_BASE_URL",
+)
+_stripped_parent_env = [v for v in _PARENT_CLAUDE_ENV_VARS if v in os.environ]
+for _v in _stripped_parent_env:
+    os.environ.pop(_v, None)
+if _stripped_parent_env:
+    console.print(
+        f"[dim]Detected a parent Claude Code session; stripped "
+        f"{len(_stripped_parent_env)} inherited env var(s) so child sessions "
+        f"boot cleanly.[/dim]"
+    )
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:

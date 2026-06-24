@@ -3,11 +3,11 @@
 Stage 1: parallel research briefs (Opus 4.8, the selected research agents;
          the Deep Research agent routes to OpenAI instead).
 Stage 2: Strategist v1 → Red Team v1 → Strategist v2 → Red Team v2 → Strategist v3
-         (Strategist on Opus 4.8; Red Team on Fable 5).
-Stage 3: Editor (Fable 5) → Humanizer (Fable 5) → Fact-checker (Opus 4.8).
+         (all on Opus 4.8).
+Stage 3: Editor → Humanizer → Fact-checker (all on Opus 4.8).
          The Fact-checker runs LAST so verification covers the humanized text.
 Stage 4: handed off to docx_builder.py; optional companion PowerPoint
-         (presentation-designer on Fable 5); archive done in archive.py.
+         (presentation-designer on Opus 4.8); archive done in archive.py.
 
 Human checkpoints between Stage 2/3 and Stage 3/4 are in checkpoints.py.
 """
@@ -149,42 +149,101 @@ async def _run_agent(
         model=model,
         cwd=str(cwd),
         max_turns=max_turns,
+        # Defense in depth: the SDK reads stdout as newline-delimited JSON with
+        # a 1 MB default line limit. A single large tool-result (e.g. an agent
+        # reading a big file) crashes the reader. Source PDFs are extracted to
+        # text before agents see them, but raise the ceiling generously so an
+        # incidental large read can't take down a run.
+        max_buffer_size=64 * 1024 * 1024,
     )
 
-    console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
-
-    async for msg in query(prompt=user_prompt, options=options):
-        if isinstance(msg, AssistantMessage):
-            for block in msg.content:
-                if isinstance(block, ToolUseBlock):
-                    tool = block.name
-                    target = ""
-                    if isinstance(block.input, dict):
-                        target = (
-                            block.input.get("file_path")
-                            or block.input.get("path")
-                            or block.input.get("url")
-                            or ""
+    # Retry the spurious-success SDK race. When many subprocesses spawn in
+    # parallel, some sessions fail to establish and the SDK reports it as
+    # "Claude Code returned an error result: success" — usually one turn,
+    # zero cost, no output. A single retry with backoff almost always wins,
+    # so don't fail the whole batch over a flaky session start.
+    SPURIOUS = "Claude Code returned an error result: success"
+    attempts_left = 2
+    last_exc: Exception | None = None
+    while attempts_left > 0:
+        attempts_left -= 1
+        saw_result = False
+        try:
+            console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
+            async for msg in query(prompt=user_prompt, options=options):
+                if isinstance(msg, AssistantMessage):
+                    for block in msg.content:
+                        if isinstance(block, ToolUseBlock):
+                            tool = block.name
+                            target = ""
+                            if isinstance(block.input, dict):
+                                target = (
+                                    block.input.get("file_path")
+                                    or block.input.get("path")
+                                    or block.input.get("url")
+                                    or ""
+                                )
+                            if target:
+                                console.print(f"  [dim]{tool}: {target}[/dim]")
+                elif isinstance(msg, ResultMessage):
+                    saw_result = True
+                    cost = getattr(msg, "total_cost_usd", None) or 0.0
+                    turns = getattr(msg, "num_turns", 0) or 0
+                    # Spurious success: SDK reports ResultMessage but the
+                    # agent did effectively no work AND wrote no file. Treat
+                    # as a retryable race.
+                    if (
+                        attempts_left > 0
+                        and turns <= 1
+                        and cost == 0.0
+                        and output_path is not None
+                        and not _has_content(output_path)
+                    ):
+                        console.print(
+                            f"  [yellow]↻ {step_label} returned 1 turn / $0 — "
+                            f"subprocess race; retrying in 5s[/yellow]"
                         )
-                    if target:
-                        console.print(f"  [dim]{tool}: {target}[/dim]")
-        elif isinstance(msg, ResultMessage):
-            cost = getattr(msg, "total_cost_usd", None) or 0.0
-            tally.add(step_label, cost)
-            console.print(
-                f"  [green]✓ {step_label} done[/green] "
-                f"[dim](${cost:.2f}, {getattr(msg, 'num_turns', '?')} turns)[/dim]"
-            )
+                        await asyncio.sleep(5)
+                        last_exc = RuntimeError("spurious-success retry")
+                        break
+                    tally.add(step_label, cost)
+                    console.print(
+                        f"  [green]✓ {step_label} done[/green] "
+                        f"[dim](${cost:.2f}, {turns} turns)[/dim]"
+                    )
+            else:
+                # async-for completed cleanly without our break — done.
+                break
+            # We broke out for a retry; loop continues.
+            continue
+        except Exception as e:  # noqa: BLE001 — translate the SDK's spurious-success into a retry
+            last_exc = e
+            if SPURIOUS in str(e) and not saw_result and attempts_left > 0:
+                console.print(
+                    f"  [yellow]↻ {step_label} hit subprocess startup race "
+                    f"({type(e).__name__}); retrying in 5s[/yellow]"
+                )
+                await asyncio.sleep(5)
+                continue
+            raise
 
     # Catch the "agent completed its turn budget without writing" silent failure.
     # The SDK reports cost and turn count even when Claude Code marks the result
     # is_error=true with subtype=success (the signature of a max_turns exhaustion).
     if output_path is not None and not _has_content(output_path):
+        if last_exc and "spurious-success" not in str(last_exc):
+            # The last attempt threw something other than our retry signal; re-raise.
+            raise last_exc
+        # A 1-turn / $0 result with no output almost always means the Claude
+        # Code subprocess could not authenticate (expired `claude login` token
+        # is the usual culprit). The pre-flight auth check should catch this
+        # first, but if a token expires mid-run, point at the real cause.
         raise RuntimeError(
-            f"{step_label} finished without writing {output_path.relative_to(cwd)}. "
-            f"This usually means the agent exhausted its turn budget on reads "
-            f"before getting to the Write step. Try raising max_turns or "
-            f"reducing how many files the agent has to read."
+            f"{step_label} produced no output (the agent ran 0–1 turns at $0). "
+            f"This is almost always a Claude authentication failure — your "
+            f"`claude login` token may have expired. Run `claude login`, verify "
+            f"with `claude -p \"say PONG\" --max-turns 1`, then relaunch and "
+            f"choose Resume."
         )
 
 
@@ -392,20 +451,38 @@ async def run_stage1(
     all_agents: list[Agent],
     tally: CostTally,
 ) -> None:
+    from cli.sources import stage1_preamble, inline_for_openai
+
+    source_paths = list(getattr(spec, "source_paths", []) or [])
+    preamble = stage1_preamble(source_paths)
     by_name = {a.name: a for a in all_agents}
+
+    # Cap concurrent Claude Code subprocesses. Spawning 10+ sessions in
+    # parallel causes a real startup race: some sessions fail to authenticate
+    # cleanly and the SDK reports them as spurious "error: success" results.
+    # Four-wide is the sweet spot — meaningful parallelism without overloading
+    # the SDK or hitting concurrent API ceilings.
+    stage1_semaphore = asyncio.Semaphore(4)
+
+    async def _bounded_run(coro):
+        async with stage1_semaphore:
+            return await coro
+
     tasks = []
     for name in spec.selected_research_agents:
         agent = by_name[name]
         out = outputs_dir / "stage1" / f"{name}-brief.md"
         override = spec.agent_overrides.get(name, "")
-        prompt = _stage1_prompt(agent, run_file, out, override)
+        prompt = _stage1_prompt(agent, run_file, out, override) + preamble
         if agent.provider == "openai":
-            # OpenAI agents have no file tools — inline the run prompt.
+            # OpenAI agents have no file tools — inline the run prompt and any
+            # source-material text the operator attached.
             prompt += (
                 "\n\n--- RUN PROMPT FILE (inlined; you cannot read files) ---\n"
                 + run_file.read_text(encoding="utf-8", errors="ignore")
             )
-        tasks.append(
+            prompt += inline_for_openai(source_paths, repo_root=outputs_dir.parent)
+        tasks.append(_bounded_run(
             _run_agent(
                 agent=agent,
                 user_prompt=prompt,
@@ -415,7 +492,7 @@ async def run_stage1(
                 tally=tally,
                 output_path=out,
             )
-        )
+        ))
     await asyncio.gather(*tasks)
     missing = [
         name
