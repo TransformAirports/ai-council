@@ -19,6 +19,9 @@ dependencies = [
   "python-slugify>=8.0",
   "python-dotenv>=1.0",
   "openai>=1.50",
+  "fastapi>=0.110",
+  "uvicorn>=0.27",
+  "websockets>=12.0",
 ]
 
 [project.scripts]

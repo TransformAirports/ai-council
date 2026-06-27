@@ -46,6 +46,31 @@ PROCESS_AGENT_NAMES: tuple[str, ...] = (
     "presentation-designer",
 )
 
+# Supplemental agents — the Council of High Intelligence personas, imported and
+# adapted from github.com/0xNyk/council-of-high-intelligence. They are seatable
+# research lenses, but kept distinct from the airport-domain roster: opt-in via
+# the Custom picker only, never pulled into the "All standard lenses" preset.
+SUPPLEMENTAL_AGENT_NAMES: tuple[str, ...] = (
+    "council-ada",
+    "council-aristotle",
+    "council-aurelius",
+    "council-feynman",
+    "council-kahneman",
+    "council-karpathy",
+    "council-lao-tzu",
+    "council-machiavelli",
+    "council-meadows",
+    "council-munger",
+    "council-musashi",
+    "council-rams",
+    "council-socrates",
+    "council-sun-tzu",
+    "council-sutskever",
+    "council-taleb",
+    "council-torvalds",
+    "council-watts",
+)
+
 
 @dataclass(frozen=True)
 class Agent:
@@ -61,6 +86,15 @@ class Agent:
 
     @property
     def is_research(self) -> bool:
+        # Supplemental agents are research-type too (seatable Stage 1 lenses).
+        return self.name in RESEARCH_AGENT_NAMES or self.name in SUPPLEMENTAL_AGENT_NAMES
+
+    @property
+    def is_supplemental(self) -> bool:
+        return self.name in SUPPLEMENTAL_AGENT_NAMES
+
+    @property
+    def is_standard_research(self) -> bool:
         return self.name in RESEARCH_AGENT_NAMES
 
     @property
@@ -104,6 +138,15 @@ def load_all_agents(agents_dir: Path = AGENTS_DIR) -> list[Agent]:
 
 def research_agents(agents: Iterable[Agent]) -> list[Agent]:
     return [a for a in agents if a.is_research]
+
+
+def standard_research_agents(agents: Iterable[Agent]) -> list[Agent]:
+    """Core airport-domain research lenses, excluding supplemental personas."""
+    return [a for a in agents if a.is_standard_research]
+
+
+def supplemental_agents(agents: Iterable[Agent]) -> list[Agent]:
+    return [a for a in agents if a.is_supplemental]
 
 
 def process_agents(agents: Iterable[Agent]) -> dict[str, Agent]:

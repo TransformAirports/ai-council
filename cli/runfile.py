@@ -7,7 +7,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cli.agents import RESEARCH_AGENT_NAMES
+from cli.agents import RESEARCH_AGENT_NAMES, SUPPLEMENTAL_AGENT_NAMES
+
+# Every agent that can be seated on a run, in a stable order (core roster
+# first, then supplemental personas).
+ALL_SEATABLE_NAMES: tuple[str, ...] = RESEARCH_AGENT_NAMES + SUPPLEMENTAL_AGENT_NAMES
 from cli.interactive import RunSpec
 
 RUNS_DIR = Path(__file__).resolve().parent.parent / "prompts" / "runs"
@@ -95,7 +99,7 @@ def render_run_file(spec: RunSpec) -> str:
         lines.append("")
         lines.append("**Excluded from this run:** " + ", ".join(excluded))
         lines.append("")
-    for name in RESEARCH_AGENT_NAMES:
+    for name in ALL_SEATABLE_NAMES:
         if name not in selected:
             continue
         override = spec.agent_overrides.get(name, "").strip()
@@ -187,7 +191,7 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
             after_name = line.split(":**", 1)[1].strip() if ":**" in line else ""
         except IndexError:
             continue
-        if name in RESEARCH_AGENT_NAMES:
+        if name in ALL_SEATABLE_NAMES:
             selected.append(name)
             if after_name and after_name != "(default)":
                 overrides[name] = after_name

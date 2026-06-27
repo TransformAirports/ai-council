@@ -20,7 +20,12 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from cli.agents import load_all_agents, research_agents
+from cli.agents import (
+    load_all_agents,
+    research_agents,
+    standard_research_agents,
+    supplemental_agents,
+)
 from cli.config import MODEL_CHOICES, get_config, save_config
 from cli.sources import (
     DROPZONE,
@@ -58,13 +63,14 @@ def _archive_stats() -> tuple[int, str | None]:
 
 def banner() -> None:
     agents = load_all_agents()
-    n_research = len(research_agents(agents))
+    n_standard = len(standard_research_agents(agents))
+    n_suppl = len(supplemental_agents(agents))
     n_archives, last = _archive_stats()
     body = Text()
     body.append("THE AI COUNCIL\n", style="bold white")
     body.append("Transform Airports — research, argued.\n\n", style="dim")
-    body.append(f"{n_research} research lenses · 6 process agents · "
-                f"{n_archives} completed runs", style="cyan")
+    body.append(f"{n_standard} research lenses (+{n_suppl} supplemental) · "
+                f"6 process agents · {n_archives} completed runs", style="cyan")
     if last:
         body.append(f"\nlatest: {last}", style="dim")
     dropped = discover_dropzone()

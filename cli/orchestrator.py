@@ -27,6 +27,7 @@ from rich.console import Console
 
 from cli.agents import Agent, load_all_agents
 from cli.config import get_config
+from cli.events import emit
 from cli.interactive import RunSpec
 
 console = Console()
@@ -170,6 +171,8 @@ async def _run_agent(
         saw_result = False
         try:
             console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
+            await emit("agent_start", step=step_label, agent=agent.name,
+                       display=agent.display_name, model=model)
             async for msg in query(prompt=user_prompt, options=options):
                 if isinstance(msg, AssistantMessage):
                     for block in msg.content:
@@ -185,6 +188,7 @@ async def _run_agent(
                                 )
                             if target:
                                 console.print(f"  [dim]{tool}: {target}[/dim]")
+                                await emit("agent_tool", step=step_label, tool=tool, target=target)
                 elif isinstance(msg, ResultMessage):
                     saw_result = True
                     cost = getattr(msg, "total_cost_usd", None) or 0.0
@@ -211,6 +215,8 @@ async def _run_agent(
                         f"  [green]✓ {step_label} done[/green] "
                         f"[dim](${cost:.2f}, {turns} turns)[/dim]"
                     )
+                    await emit("agent_done", step=step_label, agent=agent.name,
+                               cost=cost, turns=turns, total=tally.total)
             else:
                 # async-for completed cleanly without our break — done.
                 break
@@ -741,9 +747,16 @@ async def run_pipeline(
     tally = CostTally(budget_usd=budget_usd)
     result_out = RunResult(tally=tally)
 
+    await emit("run_start", slug=spec.slug, title=spec.title,
+               agents=list(spec.selected_research_agents),
+               output_format=getattr(spec, "output_format", "report"),
+               resume=resume)
+
+    await emit("stage_start", stage=1, label="Research — parallel briefs")
     console.rule("[bold]Stage 1 — parallel research briefs[/bold]")
     await run_stage1(spec, run_file, outputs_dir, all_agents, tally)
 
+    await emit("stage_start", stage=2, label="Synthesis & adversarial revision")
     console.rule("[bold]Stage 2 — synthesis & adversarial revision[/bold]")
     await run_stage2(spec, run_file, outputs_dir, all_agents, tally)
 
@@ -763,6 +776,7 @@ async def run_pipeline(
         console.print("[yellow]Stopping at Stage 2.[/yellow]")
         return result_out
 
+    await emit("stage_start", stage=3, label="Edit, humanize & fact-check")
     console.rule("[bold]Stage 3 — edit, humanize & fact-check[/bold]")
     await run_stage3(run_file, outputs_dir, all_agents, tally)
 
@@ -771,6 +785,7 @@ async def run_pipeline(
         console.print("[yellow]Stopping at Stage 3. No Word docs generated.[/yellow]")
         return result_out
 
+    await emit("stage_start", stage=4, label="Produce documents")
     console.rule("[bold]Stage 4 — Word documents[/bold]")
     build_documents(
         slug=spec.slug,
@@ -815,6 +830,15 @@ async def run_pipeline(
         result_out.deck_path = deck_dst
 
     result_out.completed = True
+    await emit(
+        "run_complete",
+        slug=spec.slug,
+        title=spec.title,
+        total=tally.total,
+        archive=str(archive_path),
+        published=str(result_out.published_path) if result_out.published_path else None,
+        deck=str(result_out.deck_path) if result_out.deck_path else None,
+    )
     _notify_done("AI Council", f"Run complete: {spec.title} (${tally.total:.2f})")
     return result_out
 
@@ -887,7 +911,7 @@ async def run_revision_pipeline(
     """Run the focused revision loop and build the polished revised report."""
     import questionary as _q
 
-    from cli.checkpoints import _show_file_excerpt
+    from cli.checkpoints import _read, _show_file_excerpt
     from cli.publish import ReportSource, build_polished_report
 
     source = request.source
@@ -916,6 +940,10 @@ async def run_revision_pipeline(
 
     console.rule(f"[bold]Revising '{source.slug}' → v{version}[/bold]")
     console.print(f"[dim]Revising from: {src_draft_rel}[/dim]")
+    await emit("run_start", slug=source.slug, title=f"{source.slug} — Revision v{version}",
+               agents=["strategist", "red-team", "editor", "humanizer", "fact-checker"],
+               mode="revise")
+    await emit("stage_start", stage=2, label=f"Revising to v{version}")
 
     steps = [
         ("strategist-a", by_name["strategist"], base / "revised-draft-a.md", _model("synthesis")),
@@ -938,17 +966,30 @@ async def run_revision_pipeline(
 
     final_draft = base / "final-draft.md"
     if not auto_approve:
-        console.rule(f"[bold]Revised draft v{version} — review[/bold]")
-        _show_file_excerpt(final_draft, max_lines=50)
-        answer = await _q.confirm(
-            "Build the polished revised report document?", default=True
-        ).ask_async()
-        if not answer:
-            console.print(
-                f"[yellow]Stopped. Revised draft saved at {base_rel}/final-draft.md "
-                f"but no Word document was built.[/yellow]"
-            )
-            return None, tally
+        from cli.events import get_sink, request_checkpoint
+        if get_sink() is not None:
+            decision = await request_checkpoint("revision", {
+                "title": f"Revised draft v{version} — review",
+                "subtitle": "Approve to build the polished revised document.",
+                "documents": [
+                    {"name": f"Revised draft v{version}", "content": _read(final_draft)},
+                ],
+                "actions": ["approve", "abort"],
+            }) or {"action": "abort"}
+            if decision.get("action") != "approve":
+                return None, tally
+        else:
+            console.rule(f"[bold]Revised draft v{version} — review[/bold]")
+            _show_file_excerpt(final_draft, max_lines=50)
+            answer = await _q.confirm(
+                "Build the polished revised report document?", default=True
+            ).ask_async()
+            if not answer:
+                console.print(
+                    f"[yellow]Stopped. Revised draft saved at {base_rel}/final-draft.md "
+                    f"but no Word document was built.[/yellow]"
+                )
+                return None, tally
 
     # Build the polished docx, stamped with the revision label.
     revised_source = ReportSource(

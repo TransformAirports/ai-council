@@ -81,6 +81,9 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="Deep link: build an executive deck for a finished run.")
     p.add_argument("--revise", nargs="?", const="__pick__", metavar="SLUG",
                    help="Deep link: revise an existing report from reader feedback.")
+    p.add_argument("--terminal", action="store_true",
+                   help="Use the headless terminal menu instead of the web app "
+                   "(for SSH / no-browser environments).")
     return p.parse_args(argv)
 
 
@@ -152,8 +155,20 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0
 
-        # No flags: the hub.
-        return menu.hub()
+        if args.terminal:
+            # Headless fallback: the old questionary hub, for SSH / no-browser.
+            return menu.hub()
+
+        # Default: launch the web app and open the browser.
+        from cli.server import serve
+
+        console.print(
+            "[bold cyan]The AI Council[/bold cyan] is starting at "
+            "[bold]http://127.0.0.1:8723[/bold] — opening your browser…\n"
+            "[dim]Leave this terminal running. Press Ctrl-C to stop the server.[/dim]"
+        )
+        serve()
+        return 0
 
     except KeyboardInterrupt:
         console.print("\n[yellow]Cancelled.[/yellow]")

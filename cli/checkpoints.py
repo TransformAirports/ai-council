@@ -14,7 +14,13 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
+from cli.events import get_sink, request_checkpoint
+
 console = Console()
+
+
+def _read(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.is_file() else ""
 
 
 @dataclass
@@ -52,6 +58,28 @@ async def checkpoint_after_stage2(
     if auto_approve:
         console.print("[yellow]--no-review: auto-approving Stage 2 → Stage 3.[/yellow]")
         return CheckpointResult(approved=True)
+
+    # Web UI path: send the drafts to the browser and await its decision.
+    if get_sink() is not None:
+        decision = await request_checkpoint("stage2", {
+            "title": "Checkpoint 1 — synthesis & debate",
+            "subtitle": "Review the third Strategist draft and both Red Team critiques.",
+            "documents": [
+                {"name": "Strategist draft v3", "content": _read(stage2 / "strategist-draft-v3.md")},
+                {"name": "Red Team critique v2", "content": _read(stage2 / "red-team-critique-v2.md")},
+                {"name": "Red Team critique v1", "content": _read(stage2 / "red-team-critique-v1.md")},
+            ],
+            "actions": ["continue", "redo", "abort"],
+        }) or {"action": "abort"}
+        action = decision.get("action", "abort")
+        if action == "continue":
+            return CheckpointResult(approved=True)
+        if action == "redo":
+            return CheckpointResult(
+                approved=False, redo_from="strategist-v3",
+                notes=str(decision.get("notes", "")).strip(),
+            )
+        return CheckpointResult(approved=False)
 
     answer = await questionary.select(
         "Proceed to Stage 3 (Editor + Fact-checker)?",
@@ -91,6 +119,18 @@ async def checkpoint_after_stage3(
     if auto_approve:
         console.print("[yellow]--no-review: auto-approving Stage 3 → Stage 4.[/yellow]")
         return CheckpointResult(approved=True)
+
+    if get_sink() is not None:
+        decision = await request_checkpoint("stage3", {
+            "title": "Checkpoint 2 — final review",
+            "subtitle": "The edited, humanized, fact-checked draft. Approve to produce documents.",
+            "documents": [
+                {"name": "Final draft", "content": _read(stage3 / "final-draft.md")},
+                {"name": "Fact-check report", "content": _read(stage3 / "fact-check-report.md")},
+            ],
+            "actions": ["approve", "abort"],
+        }) or {"action": "abort"}
+        return CheckpointResult(approved=decision.get("action") == "approve")
 
     answer = await questionary.confirm(
         "Generate the Word documents and archive the run?",

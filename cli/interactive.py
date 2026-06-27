@@ -161,6 +161,28 @@ AGENT_GROUPS: list[tuple[str, list[str]]] = [
     ("Extended Research", [
         "deep-research",
     ]),
+    # Supplemental personas (Council of High Intelligence). Listed last and
+    # never part of the "All standard lenses" preset — seat them deliberately.
+    ("Supplemental — Council of High Intelligence", [
+        "council-ada",
+        "council-aristotle",
+        "council-aurelius",
+        "council-feynman",
+        "council-kahneman",
+        "council-karpathy",
+        "council-lao-tzu",
+        "council-machiavelli",
+        "council-meadows",
+        "council-munger",
+        "council-musashi",
+        "council-rams",
+        "council-socrates",
+        "council-sun-tzu",
+        "council-sutskever",
+        "council-taleb",
+        "council-torvalds",
+        "council-watts",
+    ]),
 ]
 
 
@@ -233,10 +255,14 @@ def _parse_bullets(text: str) -> list[str]:
 def _apply_preset(preset: str, research: list[Agent]) -> list[str]:
     available = {a.name for a in research}
     if preset.startswith("All"):
-        # "All" means all Claude-native lenses. Provider-gated agents (the
-        # OpenAI Deep Research lens needs OPENAI_API_KEY) are opt-in via Custom
-        # so a missing key never breaks the default path.
-        return [a.name for a in research if a.provider == "anthropic"]
+        # "All standard" = the core airport-domain lenses on Claude. Excludes
+        # the OpenAI Deep Research lens (needs OPENAI_API_KEY) and the
+        # supplemental Council-of-High-Intelligence personas — both opt-in via
+        # Custom, so a missing key or a 37-agent run never happens by accident.
+        return [
+            a.name for a in research
+            if a.provider == "anthropic" and not a.is_supplemental
+        ]
     if preset.startswith("Default"):
         return [n for n in PRESET_DEFAULT if n in available]
     if preset.startswith("Operational"):
@@ -257,8 +283,8 @@ def _custom_council_picker(research: list[Agent]) -> list[str]:
             if agent is None:
                 continue
             short = agent.description.splitlines()[0].strip()
-            if len(short) > 80:
-                short = short[:77] + "..."
+            if len(short) > 100:
+                short = short[:97] + "..."
             gated = agent.provider != "anthropic"
             title = f"{agent.display_name} — {short}"
             if gated:
@@ -267,7 +293,10 @@ def _custom_council_picker(research: list[Agent]) -> list[str]:
                 questionary.Choice(
                     title=title,
                     value=name,
-                    checked=not gated,
+                    # Supplemental personas and provider-gated agents are
+                    # opt-in: unchecked by default so Custom starts from the
+                    # standard roster.
+                    checked=not gated and not agent.is_supplemental,
                 )
             )
     selected = questionary.checkbox(
@@ -351,7 +380,9 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     # 6. Council preset
     console.print()
     research = research_agents(all_agents)
-    standard_count = len([a for a in research if a.provider == "anthropic"])
+    standard_count = len([
+        a for a in research if a.provider == "anthropic" and not a.is_supplemental
+    ])
     default_count = len([n for n in PRESET_DEFAULT if n in {a.name for a in research}])
     preset_options = [
         f"All standard lenses ({standard_count} agents)",

@@ -1,6 +1,6 @@
 # The Transform Airports AI Council
 
-A multi-agent system that produces executive-grade analytical reports on the airport industry. This page explains what it is, how to use it, and how to install the CLI.
+A multi-agent research engine that produces executive-grade analytical reports on the airport industry. A parallel research swarm, an adversarial debate loop, and multi-model orchestration — coordinated end to end and streamed to a live web app. This page explains what it is, how to use it, and how to install it.
 
 **On this page**
 
@@ -12,7 +12,7 @@ A multi-agent system that produces executive-grade analytical reports on the air
 
 ## 1. What the AI Council is
 
-The Council is a roster of specialized agents working in sequence to produce a single long-form analytical document on a thesis you supply. A group of research lenses you choose work in parallel, each through a different stance. One synthesizes their work into an argument. One attacks that argument. The first revises, the second attacks again. An editor tightens the prose. A fact-checker verifies every number against the underlying briefs. You review the result at two checkpoints. The final deliverables are two Word documents — a full report and a three-page executive summary — with a methodology appendix.
+The Council is a 43-agent orchestration system that turns one sharp thesis into a single long-form analytical document. It coordinates a swarm of specialists across four stages: a fleet of research lenses you choose investigates the thesis in parallel, each from a different stance and none seeing the others' work; a Strategist synthesizes their briefs into an argument; a Red Team attacks it; the two trade rounds until the weak claims are gone; an Editor tightens the prose, a Humanizer rewrites it to feature quality, and a Fact-checker verifies every number against the underlying briefs and cuts what it can't source. Research runs on Claude Opus 4.8, an optional lens runs on OpenAI's deep-research model, and you steer the whole thing from a live web app — watching agents light up in real time and approving at two human checkpoints. The deliverables are polished Word documents and, on request, a companion executive deck.
 
 The point is to avoid the failure mode of asking a single model to write a long analytical piece: fluent prose that hedges where it shouldn't, cherry-picks its own evidence, smooths over objections, and flatters whatever thesis was handed in. The Council enforces three things a solo model will not do on its own.
 
@@ -70,6 +70,12 @@ Nineteen research lenses are available. Seat as few or as many as the thesis war
 | Virtual Chris | Executive connector — maps the stakeholder lattice, initiative adjacencies, and cross-disciplinary patterns others miss; the council's optimist |
 | Virtual Pat | Modern-day MacGyver — unconventional, low-cost, highly practical solutions built from assets the airport already owns |
 | Deep Research (GPT-5.5 Pro) | Long-horizon, citation-dense research pass on OpenAI's deep-research model — a second model family's independent read (requires `OPENAI_API_KEY`) |
+
+#### Supplemental — Council of High Intelligence
+
+Eighteen additional personas, imported and adapted from [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) by 0xNyk. They are seatable research lenses but kept deliberately separate: they appear in their own group at the bottom of the **Custom** picker, unchecked by default, and are never pulled into the "All standard lenses" preset. Seat them when you want a thesis pressure-tested by a way of thinking rather than an airport-domain role — Munger's inversion, Taleb's fragility lens, Socrates' premise-testing, Meadows' systems view, and so on. Each persona's full reasoning method is preserved; only their original multi-round "council" output scaffolding was removed so they slot into this pipeline.
+
+Marcus Aurelius · Socrates · Aristotle · Lao Tzu · Sun Tzu · Machiavelli · Musashi · Alan Watts · Ada Lovelace · Richard Feynman · Daniel Kahneman · Charlie Munger · Donella Meadows · Nassim Taleb · Dieter Rams · Linus Torvalds · Andrej Karpathy · Ilya Sutskever
 
 ---
 
@@ -133,7 +139,11 @@ One step. From the repository root:
 ./council
 ```
 
-The first invocation creates a virtual environment, installs the Claude Agent SDK and the Word-document builder, and launches the CLI. Every subsequent invocation skips the install and goes straight to running. No `pip install`, no `source .venv/bin/activate`.
+The first invocation creates a virtual environment, installs everything, and **opens the Council web app in your browser** at `http://127.0.0.1:8723`. Every subsequent invocation skips the install and goes straight to launching. No `pip install`, no `source .venv/bin/activate`.
+
+The web app guides the whole run. A **home** with your report library and a one-click resume for any interrupted run. A **configure** screen to set the thesis and seat the council from grouped agent cards. A **live run** view where the council appears as a constellation — research agents orbit the thesis and light up as they work in parallel, beams flow evidence inward, the adversarial agents ignite for the debate, and cost ticks in real time. The two human checkpoints are elegant in-page review panels. When it's done you read the report inline and download the Word and PowerPoint files. From the library you can also **revise** any past report from feedback, **build a deck** for it, or open the **council audit** — all in the browser. Leave the terminal running; press Ctrl-C to stop the server.
+
+Prefer the terminal (SSH, no browser)? `./council --terminal` runs the headless menu instead, and every deep-link flag (`--audit`, `--resume`, `--publish`, `--revise`, `--pptx`) still works without a browser.
 
 ### Authenticate Claude
 
