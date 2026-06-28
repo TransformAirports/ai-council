@@ -7,195 +7,211 @@
 <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-<div id="app">
+<div class="shell">
 
-  <header class="topbar">
-    <div class="brand" id="brand-home">
+  <!-- ───────────── SIDEBAR ───────────── -->
+  <aside class="sidebar">
+    <div class="side-brand" data-nav="home">
       <span class="brand-mark">▲</span>
       <div>
-        <div class="brand-title">THE&nbsp;AI&nbsp;COUNCIL</div>
-        <div class="brand-sub">Transform Airports — research, argued.</div>
+        <div class="brand-title">AI&nbsp;COUNCIL</div>
+        <div class="brand-sub">Transform Airports</div>
       </div>
     </div>
-    <nav class="topnav">
-      <button class="nav-link" data-nav="home">Home</button>
-      <button class="nav-link" data-nav="library">Library</button>
-      <button class="nav-link" data-nav="audit">Audit</button>
-      <span id="cost-pill" class="cost-pill hidden">$0.00</span>
+
+    <nav class="side-nav">
+      <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New report</button>
+      <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
+      <button class="side-link" data-nav="audit"><span class="sl-ic">◎</span> Council audit</button>
     </nav>
-  </header>
 
-  <!-- ───────────── HOME ───────────── -->
-  <main id="view-home" class="view">
-    <div class="hero">
-      <svg class="hero-orbits" viewBox="0 0 520 520" aria-hidden="true">
-        <circle class="deco-ring r1" cx="260" cy="260" r="240" style="transform-origin:260px 260px;"></circle>
-        <circle class="deco-ring r2" cx="260" cy="260" r="170" style="transform-origin:260px 260px;"></circle>
-        <circle class="deco-ring r1" cx="260" cy="260" r="105" style="transform-origin:260px 260px;"></circle>
-        <g id="hero-dots"></g>
-      </svg>
-      <div class="hero-glyph">▲</div>
-      <h1>Convene the Council.</h1>
-      <p class="hero-sub">A multi-agent research engine for the airport industry. Dozens of specialized agents investigate one thesis in parallel, an adversarial debate loop pressure-tests every claim across rounds, and a verification pass cuts what it can't source — orchestrated across frontier models and streamed to you live, from first brief to finished report.</p>
-      <div class="cap-strip">
-        <span class="cap-chip"><b>⚡</b> Parallel research swarm</span>
-        <span class="cap-chip"><b>⚔</b> Adversarial synthesis loop</span>
-        <span class="cap-chip"><b>◈</b> Multi-model orchestration</span>
-        <span class="cap-chip"><b>◉</b> Live agent telemetry</span>
-        <span class="cap-chip"><b>✓</b> Verified against sources</span>
-      </div>
-      <button id="home-new" class="launch-btn big">Begin a new report →</button>
-      <div class="hero-stats">
-        <span><b id="stat-agents">43</b> agents</span><i></i>
-        <span><b id="stat-lenses">19</b> research lenses</span><i></i>
-        <span><b>2</b> adversarial rounds</span><i></i>
-        <span><b>2</b> human checkpoints</span>
-      </div>
+    <div class="side-spacer"></div>
+
+    <div id="side-run" class="side-run hidden">
+      <div class="sr-label">Run in progress</div>
+      <div class="sr-stage" id="sr-stage">—</div>
+      <div class="sr-bar"><div id="sr-fill" class="sr-fill"></div></div>
+      <div class="sr-cost" id="sr-cost">$0.00</div>
     </div>
 
-    <div id="resume-banner" class="resume-banner hidden"></div>
+    <div class="side-status">
+      <div class="ss-row"><b id="ss-agents">43</b> agents</div>
+      <div class="ss-row"><b id="ss-runs">0</b> reports produced</div>
+      <div class="ss-foot">Opus 4.8 · live web app</div>
+    </div>
+  </aside>
 
-    <section class="card" id="library-preview">
-      <div class="card-head">
-        <h2>Recent reports</h2>
-        <button class="ghost-btn" data-nav="library">View all →</button>
+  <!-- ───────────── WORKSPACE ───────────── -->
+  <main class="workspace">
+
+    <!-- HOME -->
+    <section id="view-home" class="view">
+      <div class="hero">
+        <svg class="hero-orbits" viewBox="0 0 520 520" aria-hidden="true">
+          <circle class="deco-ring r1" cx="260" cy="260" r="240"></circle>
+          <circle class="deco-ring r2" cx="260" cy="260" r="170"></circle>
+          <circle class="deco-ring r1" cx="260" cy="260" r="105"></circle>
+          <g id="hero-dots"></g>
+        </svg>
+        <div class="eyebrow">Multi-agent research orchestration</div>
+        <h1>Convene the Council.</h1>
+        <p class="hero-sub">A parallel research swarm investigates one thesis, an adversarial debate loop pressure-tests every claim, and a verification pass cuts what it can't source — orchestrated across frontier models, streamed to you live.</p>
+        <div class="cap-strip">
+          <span class="cap-chip"><b>⚡</b> Parallel research swarm</span>
+          <span class="cap-chip"><b>⚔</b> Adversarial synthesis loop</span>
+          <span class="cap-chip"><b>◈</b> Multi-model orchestration</span>
+          <span class="cap-chip"><b>◉</b> Live agent telemetry</span>
+        </div>
+        <button id="home-new" class="btn-primary big">Begin a new report →</button>
+        <div class="hero-stats">
+          <span><b id="stat-agents">43</b> agents</span><i></i>
+          <span><b id="stat-lenses">19</b> research lenses</span><i></i>
+          <span><b>2</b> adversarial rounds</span><i></i>
+          <span><b>2</b> human checkpoints</span>
+        </div>
       </div>
+
+      <div id="resume-banner" class="resume-banner hidden"></div>
+
+      <div class="section-head"><h2>Recent reports</h2><button class="link-btn" data-nav="library">View all →</button></div>
       <div id="home-archives" class="archive-grid"></div>
     </section>
-  </main>
 
-  <!-- ───────────── CONFIGURE ───────────── -->
-  <main id="view-configure" class="view hidden">
-    <div class="page-head">
-      <button class="back-btn" data-nav="home">← Home</button>
-      <h1>New report</h1>
-    </div>
-
-    <section class="card">
-      <label class="field-label" for="f-title">Title</label>
-      <input id="f-title" class="text-input" placeholder="A short headline for this report" />
-
-      <label class="field-label" for="f-thesis">Thesis <span class="req">required</span></label>
-      <textarea id="f-thesis" class="text-input" rows="3" placeholder="One to three sentences, sharp and falsifiable. The sharper the thesis, the sharper the report."></textarea>
-
-      <div class="two-col">
-        <div>
-          <label class="field-label" for="f-scope">Scope <span class="opt">optional</span></label>
-          <textarea id="f-scope" class="text-input" rows="4" placeholder="One item per line — what the council should address."></textarea>
+    <!-- CONFIGURE (wizard) -->
+    <section id="view-configure" class="view hidden">
+      <div class="wizard">
+        <div class="wiz-steps">
+          <div class="wiz-step active" data-step="1"><span class="ws-num">1</span> Question</div>
+          <div class="wiz-step" data-step="2"><span class="ws-num">2</span> Council</div>
+          <div class="wiz-step" data-step="3"><span class="ws-num">3</span> Launch</div>
         </div>
-        <div>
-          <label class="field-label" for="f-avoid">Avoid <span class="opt">optional</span></label>
-          <textarea id="f-avoid" class="text-input" rows="4" placeholder="One item per line — what the report should refuse to be."></textarea>
+
+        <!-- step 1 -->
+        <div class="wiz-panel" data-panel="1">
+          <div class="panel-head"><h2>Frame the question</h2><p class="muted">The sharper the thesis, the sharper the report.</p></div>
+          <label class="field-label" for="f-title">Title</label>
+          <input id="f-title" class="text-input" placeholder="A short headline for this report" />
+          <label class="field-label" for="f-thesis">Thesis <span class="req">required</span></label>
+          <textarea id="f-thesis" class="text-input" rows="3" placeholder="One to three sentences, sharp and falsifiable."></textarea>
+          <div class="two-col">
+            <div><label class="field-label" for="f-scope">Scope <span class="opt">optional</span></label>
+              <textarea id="f-scope" class="text-input" rows="4" placeholder="One item per line — what the council should address."></textarea></div>
+            <div><label class="field-label" for="f-avoid">Avoid <span class="opt">optional</span></label>
+              <textarea id="f-avoid" class="text-input" rows="4" placeholder="One item per line — what the report should refuse to be."></textarea></div>
+          </div>
+          <label class="field-label">Output format</label>
+          <div id="format-pills" class="pill-row"></div>
+          <div id="sources-note" class="sources-note hidden"></div>
+        </div>
+
+        <!-- step 2 -->
+        <div class="wiz-panel hidden" data-panel="2">
+          <div class="panel-head"><h2>Compose the council</h2><p class="muted" id="seated-count">0 agents seated</p></div>
+          <div class="preset-row">
+            <button class="ghost-btn" data-preset="default">Audit-tuned default</button>
+            <button class="ghost-btn" data-preset="all">All standard</button>
+            <button class="ghost-btn" data-preset="none">Clear</button>
+          </div>
+          <div id="agent-groups"></div>
+        </div>
+
+        <!-- step 3 -->
+        <div class="wiz-panel hidden" data-panel="3">
+          <div class="panel-head"><h2>Review &amp; launch</h2><p class="muted">Confirm the spec, then convene.</p></div>
+          <div id="review-summary" class="review-summary"></div>
+          <div class="launch-row">
+            <label class="toggle"><input type="checkbox" id="f-pptx" /> <span>Companion executive deck</span></label>
+            <label class="toggle"><input type="checkbox" id="f-review" checked /> <span>Pause at the two checkpoints</span></label>
+            <div class="budget-field"><label for="f-budget">Budget ceiling&nbsp;$</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
+          </div>
+          <div id="auth-banner" class="auth-banner hidden"></div>
+        </div>
+
+        <div class="wiz-nav">
+          <button id="wiz-back" class="ghost-btn">← Back</button>
+          <div class="wiz-dots"><i data-dot="1" class="on"></i><i data-dot="2"></i><i data-dot="3"></i></div>
+          <button id="wiz-next" class="btn-primary">Next →</button>
         </div>
       </div>
-
-      <label class="field-label">Output format</label>
-      <div id="format-pills" class="pill-row"></div>
-      <div id="sources-note" class="sources-note hidden"></div>
     </section>
 
-    <section class="card">
-      <div class="card-head">
-        <h2>Compose the council</h2>
-        <div class="preset-row">
-          <button class="ghost-btn" data-preset="default">Audit-tuned default</button>
-          <button class="ghost-btn" data-preset="all">All standard</button>
-          <button class="ghost-btn" data-preset="none">Clear</button>
-        </div>
+    <!-- RUN -->
+    <section id="view-run" class="view hidden">
+      <div id="stage-rail" class="stage-rail"></div>
+      <section class="constellation-wrap panel">
+        <div class="run-meta"><div class="run-title" id="run-title">—</div><div class="run-stage" id="run-stage">Preparing…</div></div>
+        <button id="cancel-btn" class="ghost-btn danger run-cancel">Cancel</button>
+        <svg id="constellation" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Live council visualization"></svg>
+        <div id="node-tooltip" class="node-tooltip hidden"></div>
+      </section>
+      <section class="panel">
+        <div class="section-head sub"><h3>Activity</h3><button id="log-toggle" class="link-btn">Hide</button></div>
+        <div id="activity-log" class="activity-log"></div>
+      </section>
+    </section>
+
+    <!-- RESULT (document reader) -->
+    <section id="view-result" class="view hidden">
+      <div class="reader">
+        <article class="reader-main">
+          <div class="result-badge" id="result-badge">✓ Complete</div>
+          <h1 id="result-title">—</h1>
+          <div class="muted" id="result-cost">—</div>
+          <div id="result-downloads" class="download-row"></div>
+          <div class="result-actions">
+            <button id="result-revise" class="ghost-btn">✎ Revise from feedback</button>
+            <button id="result-deck" class="ghost-btn">📊 Build a deck</button>
+            <button id="result-new" class="ghost-btn">New report</button>
+          </div>
+          <hr class="reader-rule" />
+          <div id="result-body" class="report-body"></div>
+        </article>
+        <aside class="reader-toc"><div class="toc-label">Contents</div><nav id="result-toc"></nav></aside>
       </div>
-      <p class="muted" id="seated-count">0 agents seated</p>
-      <div id="agent-groups"></div>
     </section>
 
-    <section class="card launch-card">
-      <div class="launch-row">
-        <label class="toggle"><input type="checkbox" id="f-pptx" /> <span>Companion executive deck</span></label>
-        <label class="toggle"><input type="checkbox" id="f-review" checked /> <span>Pause at the two checkpoints</span></label>
-        <div class="budget-field"><label for="f-budget">Budget ceiling&nbsp;$</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
-      </div>
-      <div id="auth-banner" class="auth-banner hidden"></div>
-      <button id="launch-btn" class="launch-btn">🚀&nbsp;&nbsp;Convene the Council</button>
+    <!-- LIBRARY -->
+    <section id="view-library" class="view hidden">
+      <div class="section-head"><h1>Library</h1></div>
+      <div id="library-grid" class="archive-grid"></div>
     </section>
+
+    <!-- AUDIT -->
+    <section id="view-audit" class="view hidden">
+      <div class="section-head"><h1>Council audit</h1></div>
+      <div class="panel"><article id="audit-body" class="report-body"></article></div>
+    </section>
+
   </main>
-
-  <!-- ───────────── RUN ───────────── -->
-  <main id="view-run" class="view hidden">
-    <div id="stage-rail" class="stage-rail"></div>
-
-    <section class="constellation-wrap card">
-      <div class="run-meta">
-        <div class="run-title" id="run-title">—</div>
-        <div class="run-stage" id="run-stage">Preparing…</div>
-      </div>
-      <button id="cancel-btn" class="ghost-btn danger run-cancel">Cancel</button>
-      <svg id="constellation" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Live council visualization"></svg>
-      <div id="node-tooltip" class="node-tooltip hidden"></div>
-    </section>
-
-    <section class="card">
-      <div class="card-head">
-        <h2>Activity</h2>
-        <button id="log-toggle" class="ghost-btn">Hide</button>
-      </div>
-      <div id="activity-log" class="activity-log"></div>
-    </section>
-  </main>
-
-  <!-- ───────────── CHECKPOINT ───────────── -->
-  <div id="checkpoint-overlay" class="overlay hidden">
-    <div class="overlay-panel">
-      <div class="cp-flag">Human checkpoint</div>
-      <h2 id="cp-title">Checkpoint</h2>
-      <p class="muted" id="cp-subtitle"></p>
-      <div id="cp-tabs" class="cp-tabs"></div>
-      <div id="cp-content" class="cp-content"></div>
-      <textarea id="cp-notes" class="text-input hidden" rows="3" placeholder="Notes for the redo — what should the next draft do differently?"></textarea>
-      <div id="cp-actions" class="cp-actions"></div>
-    </div>
-  </div>
-
-  <!-- ───────────── RESULT ───────────── -->
-  <main id="view-result" class="view hidden">
-    <section class="card result-head">
-      <div class="result-badge">✓ Complete</div>
-      <h1 id="result-title">—</h1>
-      <div class="muted" id="result-cost">—</div>
-      <div id="result-downloads" class="download-row"></div>
-      <div class="result-actions">
-        <button id="result-revise" class="ghost-btn">✎ Revise from feedback</button>
-        <button id="result-deck" class="ghost-btn">📊 Build a deck</button>
-        <button id="result-new" class="ghost-btn">Start another report</button>
-      </div>
-    </section>
-    <section class="card"><article id="result-body" class="report-body"></article></section>
-  </main>
-
-  <!-- ───────────── LIBRARY ───────────── -->
-  <main id="view-library" class="view hidden">
-    <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Library</h1></div>
-    <div id="library-grid" class="archive-grid"></div>
-  </main>
-
-  <!-- ───────────── AUDIT ───────────── -->
-  <main id="view-audit" class="view hidden">
-    <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Council audit</h1></div>
-    <section class="card"><article id="audit-body" class="report-body"></article></section>
-  </main>
-
-  <!-- ───────────── REVISE MODAL ───────────── -->
-  <div id="revise-overlay" class="overlay hidden">
-    <div class="overlay-panel small">
-      <h2>Revise <span id="revise-target"></span></h2>
-      <p class="muted">The Council reuses the original research and runs a focused revision loop on your feedback.</p>
-      <textarea id="revise-feedback" class="text-input" rows="6" placeholder="What should change? Paste the reader's feedback or describe the revision."></textarea>
-      <div class="cp-actions">
-        <button class="cp-btn ghost" id="revise-cancel">Cancel</button>
-        <button class="cp-btn primary" id="revise-go">Start revision</button>
-      </div>
-    </div>
-  </div>
-
 </div>
+
+<!-- CHECKPOINT -->
+<div id="checkpoint-overlay" class="overlay hidden">
+  <div class="overlay-panel">
+    <div class="cp-flag">Human checkpoint</div>
+    <h2 id="cp-title">Checkpoint</h2>
+    <p class="muted" id="cp-subtitle"></p>
+    <div id="cp-tabs" class="cp-tabs"></div>
+    <div id="cp-content" class="cp-content"></div>
+    <textarea id="cp-notes" class="text-input hidden" rows="3" placeholder="Notes for the redo — what should the next draft do differently?"></textarea>
+    <div id="cp-actions" class="cp-actions"></div>
+  </div>
+</div>
+
+<!-- REVISE -->
+<div id="revise-overlay" class="overlay hidden">
+  <div class="overlay-panel small">
+    <h2>Revise <span id="revise-target"></span></h2>
+    <p class="muted">The Council reuses the original research and runs a focused revision loop on your feedback.</p>
+    <textarea id="revise-feedback" class="text-input" rows="6" placeholder="What should change? Paste the reader's feedback or describe the revision."></textarea>
+    <div class="cp-actions">
+      <button class="cp-btn ghost" id="revise-cancel">Cancel</button>
+      <button class="cp-btn primary" id="revise-go">Start revision</button>
+    </div>
+  </div>
+</div>
+
+<span id="cost-pill" class="hidden"></span>
 <script src="/static/app.js"></script>
 </body>
 </html>
