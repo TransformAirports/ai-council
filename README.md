@@ -1,308 +1,218 @@
 # The Transform Airports AI Council
 
-A multi-agent research engine that produces executive-grade analytical reports on the airport industry. A parallel research swarm, an adversarial debate loop, and multi-model orchestration — coordinated end to end and streamed to a live web app. This page explains what it is, how to use it, and how to install it.
+**Ask one sharp question about the airport industry. Get back an executive-grade report that was researched, argued, attacked, rewritten, and fact-checked — by a council of 43 AI agents working together.**
 
-**On this page**
+The Council exists because a single AI, asked to write a long analytical piece, produces something fluent and subtly useless: it hedges, it flatters the question, and it smooths over every objection. The Council is built to prevent that. Research agents investigate independently and are never allowed to see each other's work. A Red Team exists only to attack the draft. A fact-checker cuts any number it can't trace to a source. You review the result at two checkpoints before anything is final.
 
-1. [What the AI Council is](#1-what-the-ai-council-is)
-2. [How to use it](#2-how-to-use-it)
-3. [Install and start the CLI](#3-install-and-start-the-cli)
+The deliverables are polished Word documents — a full report and an executive summary — plus, on request, a boardroom-ready PowerPoint.
 
 ---
 
-## 1. What the AI Council is
+## How a run works
 
-The Council is a 43-agent orchestration system that turns one sharp thesis into a single long-form analytical document. It coordinates a swarm of specialists across four stages: a fleet of research lenses you choose investigates the thesis in parallel, each from a different stance and none seeing the others' work; a Strategist synthesizes their briefs into an argument; a Red Team attacks it; the two trade rounds until the weak claims are gone; an Editor tightens the prose, a Humanizer rewrites it to feature quality, and a Fact-checker verifies every number against the underlying briefs and cuts what it can't source. Research runs on Claude Opus 4.8, an optional lens runs on OpenAI's deep-research model, and you steer the whole thing from a live web app — watching agents light up in real time and approving at two human checkpoints. The deliverables are polished Word documents and, on request, a companion executive deck.
+1. **You frame the question.** A short thesis — a claim someone could disagree with, not a topic. The app guides you through it.
+2. **You choose your council.** Pick which research agents sit on the panel for this question, from the roster below. Seven clicks or one preset.
+3. **The council investigates — live.** Each seated agent researches the question from its own angle, in parallel, without seeing the others' work. You watch it happen in real time: agents light up as they work, evidence flows in, the cost ticks.
+4. **The argument gets forged.** A Strategist writes the case from all the research. The Red Team attacks it. The Strategist revises. Twice. You review the result and can send it back with notes.
+5. **The polish and the proof.** An Editor tightens it, the Humanizer rewrites it to magazine quality, and the Fact-checker verifies every number against the research — cutting anything it can't source. You approve, and finished documents land in your library.
 
-The point is to avoid the failure mode of asking a single model to write a long analytical piece: fluent prose that hedges where it shouldn't, cherry-picks its own evidence, smooths over objections, and flatters whatever thesis was handed in. The Council enforces three things a solo model will not do on its own.
-
-- **Independent evidence.** The research agents you seat do not see each other's work. Each argues from a different default stance. You get variance instead of convergence.
-- **Adversarial pressure.** The Red Team agent's only job is to break the Strategist's draft. Three rounds of attack-and-revise strip out the weak claims.
-- **A hard stop on unverifiable numbers.** Every numerical claim in the final draft has to trace back to a Stage 1 brief. If it can't, the Fact-checker cuts it or flags it for human review.
-
-### How you compose the council
-
-You assemble each run yourself. The CLI presents the research lenses as a checklist; you seat the ones whose perspective the thesis actually needs. Three quality guardrails — the Red Team, the Editor, and the Fact-checker — run on every job and are not optional. Everything else is a pick-and-choose decision about what kind of council you want at this table for this thesis.
-
-#### Required — the quality guardrails
-
-These three are not selectable. They protect the output regardless of which research lenses you seat.
-
-| Agent | What it does |
-| --- | --- |
-| **Red Team** | Attacks the Strategist's draft across two critique rounds. Finds weak claims, logical gaps, and unsupported assertions. |
-| **Editor** | Cuts 15–25% of word count. Kills buzzwords. Adds nothing. |
-| **Humanizer** | Post-editing pass that refines tone, readability, and writing quality — smooths the seams of multi-agent assembly without touching a single claim, number, or tag. |
-| **Fact-checker** | Verifies every numerical and attributed claim against the research briefs — running **after** the Humanizer, so verification covers the final text. Has veto power over anything that cannot be sourced. |
-
-The editorial tier — Red Team, Editor, Humanizer, and the presentation designer — runs on Claude Fable 5; the Strategist and Fact-checker run on Opus 4.8, keeping verification on a different model family than the agents that wrote and polished the text. Model assignments per role live in `council.toml` and are editable from Settings — point any role at Sonnet for a cheap draft pass, then switch back.
-
-#### The writer
-
-The Strategist is the agent that turns whatever research lenses you seated into a single argumentative draft. There is one Strategist; it always runs once research is in.
-
-| Agent | What it does |
-| --- | --- |
-| **Strategist** | Reads every research brief, writes the argumentative draft, and revises it in response to each Red Team pass. |
-
-#### Pick your council — the research lenses
-
-Nineteen research lenses are available. Seat as few or as many as the thesis warrants. Each one is biased by design — none are neutral — and each writes an independent brief without seeing the others. Fewer seats means a tighter scope and a cheaper run; more seats means more variance for the Strategist to argue against. Research briefs run on Claude Opus 4.8; the Deep Research lens routes to OpenAI instead and requires `OPENAI_API_KEY`.
-
-| Lens | What it brings to the table |
-| --- | --- |
-| Infrastructure Economist | Airport CapEx economics, cost overruns, debt service |
-| Operations Analyst | Delay causes, throughput, gate utilization |
-| Technology Scout | What operational technology actually costs and returns |
-| Contrarian | The strongest possible case against the thesis |
-| Chief Engineer | Constructability, lifecycle cost, megaproject failure modes |
-| Airline Commercial Strategist | Hub economics, CPE sensitivity, carrier responses |
-| Regulatory & Political Analyst | FAA, TSA, CBP, Congress, and the binding political constraints |
-| Aviation Historian | Long-cycle industry arcs, deregulation, consolidation waves |
-| Architectural Historian | Terminal architecture as a building type; design intent the operational record forgets |
-| Airport CEO | Board accountability, bond rating, use-and-lease, long-horizon politics |
-| Airport COO | The operator's chair: airfield, terminal, maintenance, airline relations |
-| Airport Procurement Expert | Federal grant procurement, delivery-method selection, DBE, protest risk, the schedule arithmetic that turns a board vote into a buildable contract |
-| Director of Public Safety | Airport police, ARFF, dispatch under one command; Part 139 and 1542 reality |
-| Airport EM Director | Long-tenured airport EM perspective; real EOC activations and exercises |
-| The Slacker | Gut thesis first, then a strict ten-minute research sprint, then a revised position — the intuition-vs-evidence delta no other agent generates |
-| Virtual Christian | The operator's free-thinker voice modeled on the council's human; reframes the question instead of answering it head-on |
-| Virtual Chris | Executive connector — maps the stakeholder lattice, initiative adjacencies, and cross-disciplinary patterns others miss; the council's optimist |
-| Virtual Pat | Modern-day MacGyver — unconventional, low-cost, highly practical solutions built from assets the airport already owns |
-| Deep Research (GPT-5.5 Pro) | Long-horizon, citation-dense research pass on OpenAI's deep-research model — a second model family's independent read (requires `OPENAI_API_KEY`) |
-
-#### Supplemental — Council of High Intelligence
-
-Eighteen additional personas, imported and adapted from [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) by 0xNyk. They are seatable research lenses but kept deliberately separate: they appear in their own group at the bottom of the **Custom** picker, unchecked by default, and are never pulled into the "All standard lenses" preset. Seat them when you want a thesis pressure-tested by a way of thinking rather than an airport-domain role — Munger's inversion, Taleb's fragility lens, Socrates' premise-testing, Meadows' systems view, and so on. Each persona's full reasoning method is preserved; only their original multi-round "council" output scaffolding was removed so they slot into this pipeline.
-
-Marcus Aurelius · Socrates · Aristotle · Lao Tzu · Sun Tzu · Machiavelli · Musashi · Alan Watts · Ada Lovelace · Richard Feynman · Daniel Kahneman · Charlie Munger · Donella Meadows · Nassim Taleb · Dieter Rams · Linus Torvalds · Andrej Karpathy · Ilya Sutskever
+A full run takes two to four hours and produces work that would take a consulting team weeks. You can leave it running — it notifies you when it's done or when it needs your review.
 
 ---
 
-## 2. How to use it
+## Meet the Council
 
-A run starts with a sharp thesis. The sharper the thesis, the sharper the output. "An overview of regional airline trends" produces a summary. "Regional airline consolidation has gone far enough that the next wave of mergers will strand infrastructure the industry just built" produces an argument. For the full craft — what makes a thesis falsifiable, how to write scope items agents can act on, and which failure modes to name in Avoid — see [Writing effective run prompts](docs/writing-effective-run-prompts.md).
+Forty-three agents, three kinds: a permanent **writing & quality team** that works on every report, nineteen **research lenses** you choose from per question, and eighteen **supplemental thinkers** for when a question deserves a perspective from outside the industry entirely.
 
-When you launch `./council`, it first asks whether you want to **create a new report** or **revise an existing one**. The new-report path is below; the revise path is in [Revising a report](#revising-a-report).
+### The writing & quality team — on every report
 
-You can start a new run two ways:
+| Agent | Role |
+|---|---|
+| **The Strategist** | Reads every research brief and writes the argument. Revises it after each Red Team attack. The author. |
+| **The Red Team** | Exists only to break the draft — weak claims, logical gaps, unsupported assertions. Attacks twice, in writing, point by point. |
+| **The Editor** | Cuts 15–25% of the word count, kills jargon and filler, sharpens every sentence. Adds nothing. |
+| **The Humanizer** | Rewrites the edited draft to the standard of a Harvard Business Review feature — so the final piece reads like one excellent writer produced it, not a committee. |
+| **The Fact-Checker** | Verifies every number, quote, and claim against the underlying research. Anything it can't trace gets cut or flagged for your review. It has veto power, and it runs last. |
+| **The Presentation Designer** | On request, distills the finished report into an elegant executive slide deck. |
 
-- **The CLI (recommended).** Run `council` in the terminal. It walks you through the thesis, audience, tone, length, and which agents to seat on the Council, writes the run file for you, and drives the four stages end-to-end. Installation is in the next section.
-- **Claude Code.** Write a run-prompt file in `prompts/runs/` by hand, then say "run \<filename\>" inside Claude Code. The conversational flow handles the same four stages.
+### The research lenses — you choose who sits
 
-Either path produces the same artifacts and the same archive layout. You can switch between them between runs.
+**Economics & industry**
 
-### The four stages
+| Agent | What they bring |
+|---|---|
+| **Infrastructure Economist** | Airport capital spending, project economics, cost overruns, and what infrastructure investment actually returns. |
+| **Airline Commercial Strategist** | How airlines think: hub economics, route networks, cost sensitivity, and how carriers respond to airport decisions. |
+| **Aviation Historian** | The long arcs — deregulation, consolidation waves, boom-and-bust construction cycles — and which past moments genuinely rhyme with today. |
+| **The Contrarian** | Builds the strongest possible case *against* your thesis. If the argument survives the Contrarian, it's ready for skeptical readers. |
 
-**Stage 1 — Research** &nbsp;·&nbsp; *Parallel · Claude Opus 4.8 (Deep Research lens on OpenAI) · ~30–60 minutes*
-The selected research agents work concurrently. Each produces an independent brief (typically 1,500–2,500 words) with inline source citations. They cannot read each other's output.
+**Operations & engineering**
 
-**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Strategist on Opus 4.8, Red Team on Fable 5 · ~60–90 minutes*
-Strategist drafts v1, Red Team critiques v1, Strategist revises to v2, Red Team critiques v2, Strategist produces v3 with explicit handoff notes about anything it knowingly left in.
+| Agent | What they bring |
+|---|---|
+| **Operations Analyst** | Throughput, delays, gate utilization — and whether the real bottleneck is infrastructure or how it's operated. |
+| **Chief Engineer** | Twenty-five years of program delivery: constructability, lifecycle cost, design standards, and how megaprojects actually fail. |
+| **Technology Scout** | What airport technology — sensors, biometrics, predictive analytics — actually costs and actually returns once deployed, versus what the brochure said. |
+| **Architectural Historian** | Airport terminals as architecture: the design intent behind the great buildings, and what gets lost when operations forget it. |
 
-> **Human checkpoint #1.** The CLI shows you v3 and both critiques and asks whether to continue, redo the final draft with your notes, or stop. Pass `--no-review` to skip.
+**Executive leadership**
 
-**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Editor and Humanizer on Fable 5, Fact-checker on Opus 4.8 · ~30–60 minutes*
-The Editor cuts roughly a fifth of the word count, removes buzzwords, and flags hedges. The Humanizer then refines tone, readability, and writing quality without touching any claim, number, or tag. The Fact-checker runs last — verifying every numerical and attributed claim in the humanized text against the Stage 1 briefs. Unverifiable claims get cut or tagged `[UNVERIFIED — HUMAN REVIEW]`.
+| Agent | What they bring |
+|---|---|
+| **Airport CEO** | The chief executive's chair: board accountability, bond ratings, airline agreements, and the politics above operations. |
+| **Airport COO** | The operator's chair: airfield, terminals, maintenance, airline relations — whether the plan works at 5:45 AM on a Monday, not just on paper. |
+| **Airport Procurement Expert** | The discipline that turns a board vote into a signed contract: federal grant rules, delivery methods, protest risk, and the schedule math master plans understate. |
+| **Regulatory & Political Analyst** | The FAA, TSA, Congress, and local politics — which constraints are actually binding and on what timeline anything can change. |
 
-> **Human checkpoint #2.** The CLI shows you the final draft and the fact-check report. Pass `--no-review` to skip.
+**Public safety & emergency management**
 
-**Stage 4 — Word documents** &nbsp;·&nbsp; *Local generation · ~10 seconds*
-The CLI builds two `.docx` files: a full report with cover page, table of contents placeholder, body, and methodology appendix; and a three-page executive summary distilled from the same final draft.
+| Agent | What they bring |
+|---|---|
+| **Director of Public Safety** | Airport police, fire/rescue, and 911 dispatch under one command — response capability, staffing reality, and federal certification. |
+| **Airport EM Director** | Decades of real emergency activations: what actually happens in the operations center during the first 30 minutes, versus what the plan says. |
 
-### After the run
+**Out-of-the-box thinkers**
 
-The CLI archives everything to `runs/YYYY-MM-DD-<slug>/` with the four stage subfolders intact and writes a `retrospective.md` that includes the cost breakdown. It then clears `outputs/` so the next run starts fresh — and finishes by automatically publishing the polished, distribution-ready document to `reports/<slug>.docx`, styled for whichever output format the run used. One command in, finished document out.
+| Agent | What they bring |
+|---|---|
+| **The Slacker** | Deliberately unprepared. Writes a gut reaction first, then gets exactly ten minutes of research to test it — and reports honestly what survived. The gap between instinct and evidence is signal no other agent produces. |
+| **Virtual Christian** | Modeled on the Council's human operator: a free-thinking airport operations leader who connects dots across domains and reframes the question until you say "huh — I hadn't thought of it that way." |
+| **Virtual Chris** | The executive connector — finds the alliances, adjacencies, and openings others miss, drawing on history, politics, culture, and science. The council's optimist. |
+| **Virtual Pat** | A modern-day MacGyver: unconventional, low-cost, highly practical solutions built from things the airport already owns. Always has the "here's the version that costs 2% as much" answer. |
 
-A typical full run takes 2–4 hours of wall-clock time and costs roughly $40–60 in API spend. Reducing the number of research agents brings both down proportionally.
+**Extended research**
 
-### An example you can read
+| Agent | What they bring |
+|---|---|
+| **Deep Research** | Runs on OpenAI's deep-research model instead of Claude — a second AI family's independent, exhaustive read of the same question. Optional; requires an OpenAI account. |
 
-The archived run at `runs/2026-04-17-infrastructure-vs-intelligence/` is the first complete Council deliverable. It tested the thesis that airports are over-investing in infrastructure and under-investing in operational intelligence, produced an 11,600-word report and a three-page executive summary, and verified 118 numerical claims against the briefs. Read it as a worked example of what a finished run looks like end-to-end.
+### The supplemental council — eighteen great minds, on call
+
+For questions that deserve a perspective from outside aviation, you can seat legendary thinkers — each one a faithful rendering of how that mind worked, adapted from the open-source [Council of High Intelligence](https://github.com/0xNyk/council-of-high-intelligence).
+
+| Thinker | The way they see |
+|---|---|
+| **Ada Lovelace** | The first to see computation as abstraction, not just arithmetic. |
+| **Aristotle** | The taxonomist who insists understanding begins with classification. |
+| **Marcus Aurelius** | Emperor and philosopher, who governs himself before governing others. |
+| **Richard Feynman** | The physicist who won't accept what he can't explain simply. |
+| **Daniel Kahneman** | Proved judgment is systematically irrational; names the biases. |
+| **Andrej Karpathy** | The neural-net whisperer who knows how AI actually learns and fails. |
+| **Lao Tzu** | The sage who sees the problem is often the intervention itself. |
+| **Machiavelli** | The realist who reads how people and institutions actually behave. |
+| **Donella Meadows** | The systems thinker who finds the leverage points others miss. |
+| **Charlie Munger** | The polymath who triangulates truth across many mental models, by inversion. |
+| **Miyamoto Musashi** | The undefeated swordsman who reads timing, position, and rhythm. |
+| **Dieter Rams** | The designer who believes good design is as little design as possible. |
+| **Socrates** | The gadfly who destroys false certainty by testing every premise. |
+| **Sun Tzu** | The strategist who sees position, timing, and information in any contest. |
+| **Ilya Sutskever** | The researcher at the frontier between capability and catastrophe. |
+| **Nassim Taleb** | The scholar of fragility, robustness, and antifragility under uncertainty. |
+| **Linus Torvalds** | The engineer who builds things that work and ships them. |
+| **Alan Watts** | The philosopher who dissolves problems by reframing how we see them. |
 
 ---
 
-## 3. Install and start the CLI
+## What you get
+
+- **A full report** (Word) — professionally formatted with a cover page, abstract, a page explaining exactly how it was produced and which agents worked on it, and page numbers. Available in four lengths: full research report, long-form article, brief, or a concise set of recommendations.
+- **An executive summary** (Word) — a standalone three-page distillation.
+- **A companion deck** (PowerPoint, optional) — the argument as an executive would present it to a board.
+- **Full provenance** — every run's research briefs, draft history, critiques, and fact-check report are archived, so anyone can see how a conclusion was reached.
+
+Every report ends with a clear disclaimer that it was produced by AI, and every number in it traces to a source or is flagged for human review.
+
+---
+
+## Using it
+
+From the project folder, run:
+
+```bash
+./council
+```
+
+Your browser opens to the Council's web app. From there, everything is guided:
+
+- **Home** — your library of finished reports, and a one-click resume if a run was ever interrupted.
+- **New report** — a three-step wizard: frame the question (with a built-in writing guide and tips under every field), choose your council (with a live cost estimate as you pick), review and launch.
+- **The live run** — watch the council work as a constellation: agents light up as they research, evidence streams toward the center, the cost ticks in real time. When it's your turn to review, the draft and critiques appear side by side for your decision.
+- **The result** — read the finished report right in the app, download the documents, revise it from feedback, or build the deck.
+
+A typical full run costs $20–60 in AI usage and takes 2–4 hours. The app shows a cost estimate before you launch and enforces a budget ceiling you set.
+
+**The one skill worth learning:** how you frame the question determines everything. The short version — make a claim someone could disagree with, not a topic. The full craft is in [Writing effective run prompts](docs/writing-effective-run-prompts.md), and the same guidance is built into the app.
+
+---
+
+<details>
+<summary><b>⚙️ Setup & technical reference</b> (for whoever administers this)</summary>
 
 ### Prerequisites
 
-- macOS or Linux with Python 3.11 or newer (`python3 --version` to check)
-- Either a Claude.ai subscription with Opus access **or** an Anthropic API key — see [Authenticate Claude](#authenticate-claude) below
-- *(Optional)* `OPENAI_API_KEY` — only needed if you seat the Deep Research lens, which runs on OpenAI's deep-research model
+- macOS or Linux with Python 3.11+ (`python3 --version` to check)
+- A Claude subscription with Opus access (sign in once with `claude login`) **or** an `ANTHROPIC_API_KEY`
+- *(Optional)* `OPENAI_API_KEY` — only if you seat the Deep Research lens
 - This repository cloned locally
 
-### Install and run
+The first `./council` creates a virtual environment and installs everything automatically. No manual `pip install`.
 
-One step. From the repository root:
+### API keys
 
-```bash
-./council
-```
+Copy `.env.example` to `.env` at the repo root and fill in what you use. The CLI loads it automatically; shell exports win over `.env` values. `.env` is gitignored.
 
-The first invocation creates a virtual environment, installs everything, and **opens the Council web app in your browser** at `http://127.0.0.1:8723`. Every subsequent invocation skips the install and goes straight to launching. No `pip install`, no `source .venv/bin/activate`.
+### Model routing
 
-The web app guides the whole run. A **home** with your report library and a one-click resume for any interrupted run. A **configure** screen to set the thesis and seat the council from grouped agent cards. A **live run** view where the council appears as a constellation — research agents orbit the thesis and light up as they work in parallel, beams flow evidence inward, the adversarial agents ignite for the debate, and cost ticks in real time. The two human checkpoints are elegant in-page review panels. When it's done you read the report inline and download the Word and PowerPoint files. From the library you can also **revise** any past report from feedback, **build a deck** for it, or open the **council audit** — all in the browser. Leave the terminal running; press Ctrl-C to stop the server.
+Research and synthesis run on Claude Opus 4.8. The editorial tier — Red Team, Editor, Humanizer, presentation — runs on Claude Fable 5. The Fact-checker stays on Opus deliberately, keeping verification on a different model family than the agents that wrote the text. The optional Deep Research lens runs on OpenAI's `o3-deep-research`. All assignments live in `council.toml`, editable from the app's Settings.
 
-Prefer the terminal (SSH, no browser)? `./council --terminal` runs the headless menu instead, and every deep-link flag (`--audit`, `--resume`, `--publish`, `--revise`, `--pptx`) still works without a browser.
+### Command-line deep links
 
-### Authenticate Claude
+`./council` with no flags opens the web app. Every flow is also reachable headless:
 
-The CLI runs on the Claude Agent SDK, which uses the Claude Code CLI binary under the hood. That gives you two ways to pay for runs.
-
-The easiest place to put keys: copy `.env.example` to `.env` at the repo root and fill in what you use. The CLI loads it automatically at startup (shell exports still win). `.env` is gitignored, so keys never end up in the repo.
-
-| Option | How to set it up |
-| --- | --- |
-| **Subscription credits** (Claude.ai Pro, Max, Team, or Enterprise) | Sign into Claude Code once with `claude login`. Leave `ANTHROPIC_API_KEY` unset. Runs draw against your Claude.ai plan's usage allowance. |
-| **Pay-as-you-go API key** (Anthropic API console) | Export `ANTHROPIC_API_KEY="sk-ant-..."` in your shell. Runs draw against your API console balance and the CLI reports per-step USD cost. |
-
-> **Subscription caveats.** Stages 2 and 3 use Claude Opus, so your subscription needs Opus access (Max, or Team and Enterprise with Opus enabled; Pro alone is generally Sonnet-only and will not complete a full run). The Council also fires many calls in close succession — a 13-agent run can approach the 5-hour rolling window on a Max plan. If you hit a rate limit mid-run, the SDK pauses until the window resets.
-
-### Start a run
-
-```bash
-./council
-```
-
-The CLI asks for:
-
-1. **Title** — one short headline. The slug is auto-derived.
-2. **Thesis** — one to three sentences, sharp and falsifiable. Multi-line paste is fine.
-3. **Scope** *(optional)* — paste a bulleted list of what the council should address. Skip to let the council scope itself from the thesis.
-4. **Avoid** *(optional)* — paste a list of what the piece should refuse to be. Skip for the standard guardrails.
-5. **Output format** — the shape of the final deliverable:
-   - **Full Research Report** (4,000–6,000 words)
-   - **Long-Form Article** (1,500–2,000 words)
-   - **Brief** (700–1,000 words)
-   - **Concise recommendations** (numbered and actionable, 400–700 words)
-6. **Council composition** — pick a preset:
-   - **All standard lenses** — every Claude-native research agent
-   - **Default seven (audit-tuned)** — the agents that consistently surface in synthesis, per [`council --audit`](#auditing-the-council): Tech Scout, Contrarian, Airport CEO, Airport COO, Infra Economist, Ops Analyst, Airline Commercial Strategist
-   - **Operational focus** — Ops Analyst, Chief Engineer, COO, Public Safety, EM Director, Tech Scout
-   - **Strategic focus** — CEO, COO, Regulatory, Airline Commercial, Infra Econ, Aviation Historian
-   - **Custom** — grouped checklist where you toggle individual agents, including the OpenAI-hosted Deep Research lens
-7. **Companion PowerPoint** *(yes/no)* — optionally generate an executive deck alongside the Word documents (or pass `--pptx`).
-
-Audience and tone (analytical sharp) use sensible defaults you can override by editing `prompts/runs/<slug>.md` before confirming. The CLI writes the run file, confirms the spec, clears any stale artifacts from `outputs/`, and starts Stage 1.
+| Flag | Effect |
+|---|---|
+| `--terminal` | The full menu in the terminal instead of the browser (SSH / no-browser use). |
+| `--resume [SLUG]` | Resume an interrupted run; auto-detects if no slug given. Completed steps are never re-run or re-billed. |
+| `--revise [SLUG]` | Revise an existing report from reader feedback. |
+| `--publish [SLUG]` | Re-publish polished documents from the archives. |
+| `--pptx` | Build an executive deck for a finished run. |
+| `--audit` | Score every agent's contribution across all archived runs. |
+| `--dry-run` | Write the run file and stop before any AI calls. |
 
 ### Source material
 
-Drop files into the `sources/` folder at the repo root before launching a new run — PDFs, Word docs, PowerPoint decks, Excel sheets, markdown, plain text. The hub shows a `📎` badge as soon as files appear, and the first prompt in **New report** asks whether to attach them.
+Drop PDFs, Word docs, decks, or spreadsheets into `sources/` before launching. The app detects them, attaches them to the run, converts them to text the agents can read, and instructs every researcher to treat them as the primary starting point. Sources are archived with the run.
 
-On accept, the CLI moves each file into the run's `outputs/sources/<slug>/` folder, converts `.docx` / `.pptx` / `.xlsx` to plain markdown sidecars (so every agent — including the OpenAI-hosted Deep Research lens, which has no file tools — can read them), and injects a preamble into every Stage 1 agent's prompt: *"Before you research anything, read these files first — treat them as the primary starting point and quote them directly."* The Stage 1 research is now grounded in your material, not just the open web.
+### The pipeline, precisely
 
-The sources move out of the drop zone (it's free for the next run) and travel into the run archive at completion (`runs/<dated>/sources/`), so future revisions, audits, and re-publishes can still see what the Council was given.
-
-Two limits worth knowing:
-- **Scanned PDFs without a text layer** read as pixels, not words. Most modern PDFs are searchable and work fine; if Deep Research is seated and a scanned PDF is in the mix, convert it first.
-- **Deep Research** can't read files directly — its prompt has the source text inlined, truncated at 30,000 characters per file. For very long documents, it sees the first portion.
-
-### The hub
-
-`./council` with no flags opens the interactive hub — the intended way to use the tool. It greets you with the Council's status (lenses, archives, latest run), **detects interrupted runs automatically** and offers to resume them first, and routes everything from one menu:
-
-- **Resume interrupted run** — shown only when one is detected, with the stage it died at and how long ago. Completed steps are never re-run or re-billed. Clearing an interrupted run that contains synthesis work requires typing `CLEAR` — a stray Enter can't destroy paid output.
-- **New report** — the five-question flow, then a single **pre-flight screen**: council roster, models, estimated cost range, auth status for both providers, checkpoint mode, budget ceiling, and deck option, all visible with one keystroke to launch and one place to adjust.
-- **Revise a report**, **Build a deck for a finished report**, **Re-publish**, **Audit**, **Settings**.
-
-After a run completes, a **what-next menu** closes the loop: open the published document, open or generate the executive deck, open the archive, or start a revision on the spot. Long runs end with a macOS notification.
-
-Every run accepts a **budget ceiling** (default in Settings): the orchestrator checks spend between steps and halts cleanly with resume instructions if the ceiling is hit — completed work is never interrupted mid-call.
-
-If a run fails, the CLI saves the technical detail to `logs/last-error.log` and tells you exactly what to do: relaunch and choose Resume.
-
-### Settings — council.toml
-
-Model assignments per role (research, synthesis, critique, editor, humanizer, fact-check, presentation), the per-agent turn budget, and the default cost ceiling live in `council.toml` at the repo root — created and edited from the hub's Settings menu, no Python required. Want a cheap draft run? Point `research` at Sonnet in Settings and switch it back after.
-
-### Flags (deep links)
-
-Every flag is a shortcut into the same flows the menu offers — nothing is flag-only.
-
-| Flag | Effect |
-| --- | --- |
-| `--resume [SLUG]` | Jump to resume; auto-detects the interrupted run if no slug is given. |
-| `--audit` | Jump to the council audit. |
-| `--publish [SLUG]` | Jump to re-publish (all archives, or one slug). |
-| `--revise [SLUG]` | Jump to revision (picker, or a specific report). |
-| `--pptx` | Jump to deck-building for a finished run. |
-| `--no-review` | Run autonomously where applicable (combined with `--revise`). |
-| `--dry-run` / `--skip-prompts` | Collect a new run spec, write the run file, stop before any model call. |
-| `--help` | Print usage and exit. |
-
-### Auditing the council
-
-```bash
-./council --audit
-```
-
-Scans every archived run under `runs/`, extracts objective signals (citation counts in the final draft, fact-check rejection counts, brief word volume, completion status), and produces a markdown report at `runs/_audit-YYYY-MM-DD.md`. The report ranks each agent by **citations per 1,000 brief words** — how often the Strategist surfaced an agent's work relative to how much that agent wrote — and flags agents that are underused, that produce a disproportionate share of fact-check rejections, or that have never been seated. Findings include actionable next steps pointing at specific `.claude/agents/*.md` files to edit.
-
-The audit-tuned **Default seven** preset is derived directly from this signal. Re-run the audit after every few new archives and update [cli/interactive.py](cli/interactive.py)'s `PRESET_DEFAULT` to keep it aligned with reality.
-
-### Publishing reports
-
-Publishing happens **automatically at the end of every run** — the pipeline's final step writes the polished document to `reports/`. The flag exists for re-publishing and backfill:
-
-```bash
-./council --publish              # re-publish every archived run
-./council --publish <slug>       # re-publish one run
-```
-
-The treatment adapts to the run's output format:
-
-| Format | Treatment |
-| --- | --- |
-| Full Research Report | Cover page, abstract page, methodology page, body, full-page disclaimer |
-| Long-Form Article | Cover page, body, compact production colophon, inline disclaimer |
-| Brief | Compact page-one title block (no cover), body, colophon, inline disclaimer |
-| Concise recommendations | Same compact treatment as Brief |
-
-All formats get Georgia typography, brand-navy headings, page numbers, and the AI-generation disclaimer. The publisher rebuilds the body from each run's `stage3/final-draft.md` (executive summaries are excluded) and writes to a top-level `reports/` folder. The body is rebuilt cleanly from the run's `stage3/final-draft.md` so the published version doesn't inherit the stage4 file's own cover page and appendix. Each published report gets:
-
-- A branded cover page — the logo at `assets/council-logo.png`, the report title, the subheading "An Analytical Report Generated by the AI Research Council", and a **FINAL — FOR DISTRIBUTION** mark. Typeset in Georgia with MWAA brand-navy headings.
-- An **Abstract** page (drawn from the run's thesis and scope)
-- A **How This Report Was Produced** page — the four-stage process, the exact research agents that were seated for that run (read from the run's `stage1/` brief filenames, so it reflects what actually ran), and a pointer to the full agent specifications at the [agents directory on GitHub](https://github.com/TransformAirports/ai-council/tree/main/.claude/agents)
-- **Page numbers** in the footer
-- An **AI-generation disclaimer** as the final section
-
-To change the cover logo, replace `assets/council-logo.png` with a horizontal logo of your own (the build also accepts `assets/logo.png`). If neither exists, the cover renders cleanly without a logo. Typography and brand color are set at the top of [cli/publish.py](cli/publish.py) (`BODY_FONT`, `HEADING_FONT`, `BRAND_NAVY`).
+Four stages: (1) parallel independent research — seated agents write briefs concurrently, forbidden from reading each other's output; (2) synthesis and adversarial debate — Strategist v1 → Red Team → v2 → Red Team → v3, then **human checkpoint #1**; (3) Editor → Humanizer → Fact-checker (verification runs last so it covers the final text), then **human checkpoint #2**; (4) document production, archive to `runs/YYYY-MM-DD-<slug>/`, and automatic publishing to `reports/`. Budget ceilings are enforced between steps; interrupted runs resume from the last completed artifact.
 
 ### Revising a report
 
-When a reader gives feedback on a finished report, you don't re-run the whole Council. A revision reuses the original research and applies a focused pass.
+A revision doesn't re-run the council. It reuses the original research and runs a focused loop — Strategist revises against the feedback, Red Team checks the revision, Editor/Humanizer/Fact-checker re-verify — producing `reports/<slug>-revised-vN.docx`, stamped as a numbered revision. Revisions chain: v2 builds on v1.
 
-```bash
-./council                  # then choose "Revise an existing report"
-./council --revise         # jump straight to the report picker
-./council --revise <slug>  # revise a specific report
-```
+### The council audit
 
-You pick the report the feedback is about (a scrollable list), type the feedback, and the Council runs a tight loop on the **existing draft plus your feedback**:
+`--audit` (or the Audit tab in the app) scores every agent across all archived runs — how often the Strategist actually used each agent's work per 1,000 words of brief written — and recommends roster changes. The default preset is tuned from this data.
 
-> Strategist (revise) → Red Team (critique) → Strategist (finalize) → Editor → Fact-checker
+### Where things live
 
-It reuses the original Stage 1 research briefs — no new research, no ten-agent run — so a revision is a handful of Opus calls rather than a multi-hour job. The result is a polished `reports/<slug>-revised-vN.docx`, stamped **Revised — Version N** on the cover.
+| Path | Contents |
+|---|---|
+| `.claude/agents/` | All 43 agent definitions — versioned markdown, human-edited only |
+| `cli/` | The engine and web app (`cli/server.py`, `cli/webapp/`) |
+| `prompts/runs/` | One run-prompt file per question |
+| `docs/` | The [writing guide](docs/writing-effective-run-prompts.md) and the [methodology](docs/methodology.md) that appears in every report |
+| `runs/` | Complete archives of every run — briefs, drafts, critiques, fact-checks, documents |
+| `reports/` | Polished, distribution-ready documents (regenerated on demand; not committed) |
+| `council.toml` | Operator config: models per role, budgets, defaults |
 
-Revisions chain: the first is v1, the next is v2, and each one revises the previous version's output rather than the original. The intermediate drafts, the critique, and the feedback that prompted each revision are preserved under `runs/<run>/revisions/vN/` for provenance. Add `--no-review` to skip the pre-build review of the revised draft.
+### Governance
 
-Re-running is safe: it overwrites the polished file for each run in place. The `reports/` folder is yours to hand out; nothing else in the pipeline writes to it.
+Agents never edit themselves or each other. Behavior changes go through human-reviewed edits to the files in `.claude/agents/` — see [how to propose an agent change](docs/how-to-propose-an-agent-change.md). The methodology appendix in every published report discloses exactly how the document was produced.
 
-### Troubleshooting
+</details>
 
-- **Claude is not authenticated.** Either run `claude login` to use subscription credits, or export `ANTHROPIC_API_KEY` for API billing — you need one or the other in the shell session you run `council` in.
-- **"Rate limit reached"** mid-run on a subscription plan. The SDK pauses until your Claude.ai rolling window resets. To finish faster, switch to an API key or deselect a few research lenses to shorten the run.
-- **"outputs/ contains files from a previous run."** The CLI offers to clear them. Without `--no-review` it asks; with the flag it clears silently. To pick up where a crash left off, run `council --resume <slug>` instead.
-- **An agent "completed" but did not write its output.** The orchestrator catches this and reports it clearly. It almost always means the agent exhausted its `max_turns` budget on file reads before reaching the Write step. Raising `max_turns` in `cli/orchestrator.py` or seating fewer research lenses resolves it.
-- **The Word document looks rough.** The built-in markdown-to-docx is intentionally minimal — open the file in Word and apply your preferred styles, or polish the markdown in `outputs/stage3/final-draft.md` and rerun Stage 4 manually.
+---
 
-### Where the source files live
-
-- `.claude/agents/` — the twenty agent definitions (sixteen research lenses plus the Strategist, Red Team, Editor, and Fact-checker)
-- `cli/` — the Python CLI (entry point: `cli/__main__.py`)
-- `prompts/runs/` — run-prompt files, one per thesis
-- `prompts/orchestration.md` — the canonical four-stage sequence Claude Code reads
-- `docs/methodology.md` — the methodology appendix attached to every published report
-- `docs/writing-effective-run-prompts.md` — the guide to framing a Title, Thesis, Scope, and Avoid
-- `runs/` — archived deliverables, one folder per completed run
-- `scripts/build_it_memo.py` — generator for the IT-department-facing memo
+*Built by the Office of Strategy and Operational Performance, Metropolitan Washington Airports Authority. Reports are AI-produced drafts for human review — AI assistance does not reduce human accountability for what gets published.*
