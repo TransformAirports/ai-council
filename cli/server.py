@@ -371,6 +371,14 @@ async def api_home() -> JSONResponse:
     })
 
 
+@app.get("/api/guide")
+async def api_guide() -> JSONResponse:
+    """The run-prompt writing guide, served from docs/ so it never drifts."""
+    path = REPO_ROOT / "docs" / "writing-effective-run-prompts.md"
+    md = path.read_text(encoding="utf-8", errors="ignore") if path.is_file() else "Guide not found."
+    return JSONResponse({"markdown": md})
+
+
 @app.get("/api/audit")
 async def api_audit() -> JSONResponse:
     from cli.audit import audit_runs, render_audit_report

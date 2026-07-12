@@ -37,7 +37,7 @@
     <div class="side-status">
       <div class="ss-row"><b id="ss-agents">43</b> agents</div>
       <div class="ss-row"><b id="ss-runs">0</b> reports produced</div>
-      <div class="ss-foot">Opus 4.8 · live web app</div>
+      <div class="ss-foot" id="ss-models">—</div>
     </div>
   </aside>
 
@@ -88,17 +88,64 @@
 
         <!-- step 1 -->
         <div class="wiz-panel" data-panel="1">
-          <div class="panel-head"><h2>Frame the question</h2><p class="muted">The sharper the thesis, the sharper the report.</p></div>
+          <div class="panel-head with-action">
+            <div><h2>Frame the question</h2><p class="muted">Topics produce summaries. Theses produce arguments.</p></div>
+            <button id="guide-btn" class="ghost-btn">📖 Writing guide</button>
+          </div>
+
           <label class="field-label" for="f-title">Title</label>
           <input id="f-title" class="text-input" placeholder="A short headline for this report" />
+          <p class="field-hint">Subject <em>and</em> angle, under ~8 words — it becomes the filename and the cover.</p>
+
           <label class="field-label" for="f-thesis">Thesis <span class="req">required</span></label>
-          <textarea id="f-thesis" class="text-input" rows="3" placeholder="One to three sentences, sharp and falsifiable."></textarea>
-          <div class="two-col">
-            <div><label class="field-label" for="f-scope">Scope <span class="opt">optional</span></label>
-              <textarea id="f-scope" class="text-input" rows="4" placeholder="One item per line — what the council should address."></textarea></div>
-            <div><label class="field-label" for="f-avoid">Avoid <span class="opt">optional</span></label>
-              <textarea id="f-avoid" class="text-input" rows="4" placeholder="One item per line — what the report should refuse to be."></textarea></div>
+          <textarea id="f-thesis" class="text-input" rows="3" placeholder='A falsifiable claim with a mechanism: "X — not because A, but because B."'></textarea>
+          <div class="field-hint">
+            The most-read sentence of the run — every agent starts here.
+            <details class="hint-more"><summary>The four tests</summary>
+              <ul>
+                <li><b>Dinner-party test</b> — could someone informed say "I don't think that's true"?</li>
+                <li><b>Verb test</b> — claim verbs (<i>fails, will strand, should be</i>), not survey verbs (<i>examines, explores</i>).</li>
+                <li><b>Number test</b> — at least one quantity, date, or named case an agent can check.</li>
+                <li><b>Two-sided test</b> — can you state the strongest opposing position in one sentence?</li>
+              </ul>
+            </details>
           </div>
+
+          <div class="two-col">
+            <div>
+              <label class="field-label" for="f-scope">Scope <span class="opt">optional</span></label>
+              <textarea id="f-scope" class="text-input" rows="5" placeholder="One item per line — each becomes a research assignment and a success criterion."></textarea>
+              <div class="field-hint">
+                Name what to compare, where to look, or what would settle it. 5–8 items is the sweet spot.
+                <details class="hint-more"><summary>Patterns that work</summary>
+                  <ul>
+                    <li><b>Failure taxonomy</b> — "catalog 6–10 deployments that failed, and the decision that doomed each."</li>
+                    <li><b>Named benchmarks</b> — "how do high performers (FRA, AMS, ATL) actually do this?"</li>
+                    <li><b>The hidden number</b> — "stated read rates vs. real performance after 2–3 years."</li>
+                    <li><b>Decision framework</b> — end with "decision framework, not preferences."</li>
+                    <li><b>What actually happens</b> — "…and why does it differ from what enterprise IT recommends?"</li>
+                    <li>Tie the last item to the decision you actually face.</li>
+                  </ul>
+                </details>
+              </div>
+            </div>
+            <div>
+              <label class="field-label" for="f-avoid">Avoid <span class="opt">optional</span></label>
+              <textarea id="f-avoid" class="text-input" rows="5" placeholder="One item per line — the lazy versions this report must refuse to be."></textarea>
+              <div class="field-hint">
+                Ask: <i>if this report went wrong, what would it sound like?</i> Name those failure modes.
+                <details class="hint-more"><summary>Examples from real runs</summary>
+                  <ul>
+                    <li>"Vendor capability lists. Anything that ends with 'deploy a platform.'"</li>
+                    <li>"Promises about computer-vision sortation that haven't proven out at scale."</li>
+                    <li>"A polemic that ignores the genuine reasons for the status quo."</li>
+                    <li>Keep it to 2–4 lines — a ten-line list constrains the argument into blandness.</li>
+                  </ul>
+                </details>
+              </div>
+            </div>
+          </div>
+
           <label class="field-label">Output format</label>
           <div id="format-pills" class="pill-row"></div>
           <div id="sources-note" class="sources-note hidden"></div>
@@ -195,6 +242,17 @@
     <div id="cp-content" class="cp-content"></div>
     <textarea id="cp-notes" class="text-input hidden" rows="3" placeholder="Notes for the redo — what should the next draft do differently?"></textarea>
     <div id="cp-actions" class="cp-actions"></div>
+  </div>
+</div>
+
+<!-- WRITING GUIDE -->
+<div id="guide-overlay" class="overlay hidden">
+  <div class="overlay-panel guide-panel">
+    <div class="guide-head">
+      <h2>Writing effective run prompts</h2>
+      <button id="guide-close" class="ghost-btn">✕ Close</button>
+    </div>
+    <div id="guide-body" class="cp-content guide-body"><p class="muted">Loading…</p></div>
   </div>
 </div>
 

@@ -14,29 +14,35 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = REPO_ROOT / "council.toml"
 
+# Research and synthesis run on Opus 4.8. The editorial tier — the agents
+# that work AFTER the research briefs land (Red Team critique, Editor,
+# Humanizer, presentation) — runs on Fable 5 for stronger critique and
+# editorial performance. The Fact-checker stays on Opus deliberately:
+# verification benefits from a different model family than the ones that
+# wrote and polished the text it is checking.
 DEFAULT_MODELS: dict[str, str] = {
     "research": "claude-opus-4-8",
     "synthesis": "claude-opus-4-8",
-    "critique": "claude-opus-4-8",
-    "editor": "claude-opus-4-8",
-    "humanizer": "claude-opus-4-8",
+    "critique": "claude-fable-5",
+    "editor": "claude-fable-5",
+    "humanizer": "claude-fable-5",
     "factcheck": "claude-opus-4-8",
-    "presentation": "claude-opus-4-8",
+    "presentation": "claude-fable-5",
     # OpenAI's deep-research model. Use `o3-deep-research` for the heavyweight
     # long-horizon sweep (slower, more expensive); switch to
     # `o4-mini-deep-research` from Settings for a faster/cheaper pass.
     "openai_deep_research": "o3-deep-research",
 }
 
-MODEL_CHOICES = ["claude-opus-4-8", "claude-sonnet-4-6"]
+MODEL_CHOICES = ["claude-opus-4-8", "claude-fable-5", "claude-sonnet-4-6"]
 
-# Models that are not currently available to this account. When a saved
-# council.toml still names one of these (because it was selected before the
-# block landed, or because a teammate's config got committed), the loader
-# silently substitutes the value below — operators never get a mid-run
+# Models that are not currently available. When a saved council.toml names one
+# (selected before a block landed, or committed by a teammate), the loader
+# silently substitutes the replacement — operators never get a mid-run
 # "model not available" error from a stale setting.
+# claude-fable-5 was blocked here from 2026-06-10 to 2026-06-24; it is
+# available again and back in the defaults above.
 BLOCKED_MODELS: dict[str, str] = {
-    "claude-fable-5": "claude-opus-4-8",
     # `gpt-5.5-pro-deep-research` was a placeholder ID that never existed in the
     # OpenAI catalog. Real Deep Research models are `o3-deep-research` (heavy)
     # and `o4-mini-deep-research` (light). Auto-rewrite the placeholder.

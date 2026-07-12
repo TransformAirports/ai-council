@@ -3,11 +3,12 @@
 Stage 1: parallel research briefs (Opus 4.8, the selected research agents;
          the Deep Research agent routes to OpenAI instead).
 Stage 2: Strategist v1 → Red Team v1 → Strategist v2 → Red Team v2 → Strategist v3
-         (all on Opus 4.8).
-Stage 3: Editor → Humanizer → Fact-checker (all on Opus 4.8).
-         The Fact-checker runs LAST so verification covers the humanized text.
+         (Strategist on Opus 4.8; Red Team on Fable 5).
+Stage 3: Editor (Fable 5) → Humanizer (Fable 5) → Fact-checker (Opus 4.8).
+         The Fact-checker runs LAST so verification covers the humanized text,
+         and stays on a different model family than the agents that wrote it.
 Stage 4: handed off to docx_builder.py; optional companion PowerPoint
-         (presentation-designer on Opus 4.8); archive done in archive.py.
+         (presentation-designer on Fable 5); archive done in archive.py.
 
 Human checkpoints between Stage 2/3 and Stage 3/4 are in checkpoints.py.
 """

@@ -26,18 +26,28 @@ async function init() {
   state.formats = metaRes.formats;
   state.authOk = metaRes.auth_ok; state.authMsg = metaRes.auth_message;
   state.sources = metaRes.sources || []; state.defaultBudget = metaRes.default_budget ?? 80;
+  state.modelsCfg = metaRes.models || {};
 
   buildFormats(); buildAgentGroups(); applyPreset("default");
   wireUI(); buildHeroDots(); setHeroStats(agentsRes);
   await loadHome(); nav("home");
 }
 
+function modelShort(id) {
+  return String(id || "").replace("claude-", "").replace("opus-4-8", "Opus 4.8")
+    .replace("fable-5", "Fable 5").replace("sonnet-4-6", "Sonnet 4.6")
+    .replace("o3-deep-research", "o3 DR").replace("o4-mini-deep-research", "o4-mini DR");
+}
 function setHeroStats(agentsRes) {
   const members = agentsRes.groups.flatMap((g) => g.members);
   const lenses = members.filter((m) => !m.supplemental).length;
   const total = members.length + agentsRes.process.length;
   countUp($("#stat-agents"), total); countUp($("#stat-lenses"), lenses);
   $("#ss-agents").textContent = total;
+  // Sidebar footer reflects the live model routing, not a hardcoded label.
+  const models = state.modelsCfg || {};
+  const unique = [...new Set([models.research, models.editor].filter(Boolean).map(modelShort))];
+  $("#ss-models").textContent = (unique.join(" + ") || "—") + " · live";
 }
 function countUp(el, target) {
   if (!el) return; const dur = 900, t0 = performance.now();
@@ -46,9 +56,9 @@ function countUp(el, target) {
 }
 function buildHeroDots() {
   const root = $("#hero-dots"); if (!root) return;
-  [{ r: 240, d: 90, rev: 0, c: "#4187f7" }, { r: 170, d: 140, rev: 1, c: "#a78bfa" }, { r: 105, d: 90, rev: 0, c: "#34d3c0" }].forEach((ring) => {
+  [{ r: 240, d: 120, rev: 0, c: "#6e7bf2" }, { r: 170, d: 180, rev: 1, c: "#4a4f59" }, { r: 105, d: 120, rev: 0, c: "#4a4f59" }].forEach((ring) => {
     const g = svg("g", { style: `transform-origin:260px 260px;animation:spin ${ring.d}s linear infinite${ring.rev ? " reverse" : ""};` });
-    g.appendChild(svg("circle", { cx: 260, cy: 260 - ring.r, r: 4, fill: ring.c, style: `filter:drop-shadow(0 0 8px ${ring.c});` }));
+    g.appendChild(svg("circle", { cx: 260, cy: 260 - ring.r, r: 3, fill: ring.c }));
     root.appendChild(g);
   });
 }
@@ -75,6 +85,11 @@ function wireUI() {
   $("#result-deck").onclick = () => startRun({ type: "start", mode: "deck", slug: state.resultSlug });
   $("#revise-cancel").onclick = () => $("#revise-overlay").classList.add("hidden");
   $("#revise-go").onclick = submitRevise;
+  $("#f-pptx").onchange = () => { if (state.step === 3) buildReview(); };
+  $("#guide-btn").onclick = openGuide;
+  $("#guide-close").onclick = () => $("#guide-overlay").classList.add("hidden");
+  $("#guide-overlay").onclick = (e) => { if (e.target === $("#guide-overlay")) $("#guide-overlay").classList.add("hidden"); };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#guide-overlay").classList.add("hidden"); });
   $("#log-toggle").onclick = () => { const l = $("#activity-log"); const h = l.classList.toggle("hidden"); $("#log-toggle").textContent = h ? "Show" : "Hide"; };
 
   if (!state.authOk) { const b = $("#auth-banner"); b.textContent = "⚠ " + state.authMsg + "  —  run `claude login` in your terminal, then reload."; b.classList.remove("hidden"); }
@@ -112,6 +127,10 @@ function buildReview() {
   if (scope.length) rows.push(["Scope", scope.map(escapeHtml).join(" · ")]);
   if (avoid.length) rows.push(["Avoid", avoid.map(escapeHtml).join(" · ")]);
   if (state.sources.length) rows.push(["Sources", state.sources.map((s) => escapeHtml(s.name)).join(", ")]);
+  const e = estimateCost($("#f-pptx").checked);
+  rows.push(["Est. cost", `<span class="est">$${e.low}–$${e.high}</span>` +
+    (e.deep ? ` <span class="est-note">+ OpenAI deep research, billed separately</span>` : "") +
+    ` <span class="est-note">· rough estimate, calibrated from past runs</span>`]);
   $("#review-summary").innerHTML = rows.map(([k, v]) =>
     `<div class="rs-row"><div class="rs-key">${k}</div><div class="rs-val">${v}</div></div>`).join("");
 }
@@ -199,7 +218,22 @@ function applyPreset(which) {
   if (which === "default") return setSeated(all.filter((m) => m.default).map((m) => m.name));
   if (which === "all") return setSeated(all.filter((m) => !m.gated && !m.supplemental).map((m) => m.name));
 }
-function updateCount() { $("#seated-count").innerHTML = `<b>${state.seated.size}</b> agent${state.seated.size === 1 ? "" : "s"} seated`; }
+// Cost estimate — mirrors cli/menu.py estimate_cost so web and terminal agree.
+function estimateCost(includeDeck) {
+  const hasDeep = state.seated.has("deep-research");
+  const n = state.seated.size - (hasDeep ? 1 : 0); // Deep Research bills to OpenAI, not here
+  let low = 1.5 * n + 7, high = 4.0 * n + 19;
+  if (includeDeck) { low += 1; high += 4; }
+  return { low: Math.round(low), high: Math.round(high), deep: hasDeep };
+}
+function updateCount() {
+  const e = estimateCost(false);
+  const n = state.seated.size;
+  let html = `<b>${n}</b> agent${n === 1 ? "" : "s"} seated`;
+  if (n > 0) html += ` &middot; est. <span class="est">$${e.low}–$${e.high}</span>`;
+  if (e.deep) html += ` <span class="est-note">+ OpenAI deep research, billed separately</span>`;
+  $("#seated-count").innerHTML = html;
+}
 
 // ─────────── launch ───────────
 function launchNew() {
@@ -301,7 +335,7 @@ function handleEvent(e) {
       setStage(e.stage); $("#run-stage").textContent = `Stage ${e.stage} · ${e.label}`;
       $("#sr-stage").textContent = `Stage ${e.stage} · ${e.label}`; $("#sr-fill").style.width = (STAGE_FILL[e.stage] || 50) + "%";
       log(`▸ Stage ${e.stage}: ${e.label}`); break;
-    case "agent_start": nodeState(e.agent, "running"); log(`▶ ${e.display || e.agent} started`); break;
+    case "agent_start": nodeState(e.agent, "running"); log(`▶ ${e.display || e.agent} started · ${modelShort(e.model)}`); break;
     case "agent_tool": if (e.target) log(`  ${e.tool}: ${shortPath(e.target)}`); break;
     case "agent_done": {
       const node = constellation.nodes[e.agent]; if (node) { node.cost.textContent = "$" + e.cost.toFixed(2); flyEvidence(node); }
@@ -340,6 +374,20 @@ function showCheckpoint(e) {
   $("#checkpoint-overlay").classList.remove("hidden");
 }
 
+// ─────────── writing guide ───────────
+async function openGuide() {
+  $("#guide-overlay").classList.remove("hidden");
+  if (!state.guideMd) {
+    try {
+      const data = await fetch("/api/guide").then((r) => r.json());
+      state.guideMd = data.markdown || "";
+    } catch (_) { state.guideMd = "Could not load the guide. See docs/writing-effective-run-prompts.md in the repo."; }
+  }
+  const body = $("#guide-body");
+  body.innerHTML = renderMarkdown(state.guideMd);
+  body.scrollTop = 0;
+}
+
 // ─────────── revise / result ───────────
 function openReviseModal(slug) { state.reviseSlug = slug; $("#revise-target").textContent = slug; $("#revise-feedback").value = ""; $("#revise-overlay").classList.remove("hidden"); }
 function submitRevise() { const f = $("#revise-feedback").value.trim(); if (!f) { $("#revise-feedback").focus(); return; } $("#revise-overlay").classList.add("hidden"); startRun({ type: "start", mode: "revise", slug: state.reviseSlug, feedback: f, auto_approve: false }); }
@@ -365,14 +413,30 @@ function linesOf(t) { return t.split("\n").map((s) => s.replace(/^[-*•]\s*/, "
 function shortPath(p) { const x = String(p).split("/"); return x.length > 2 ? ".../" + x.slice(-2).join("/") : p; }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function renderMarkdown(md) {
-  if (!md) return ""; const lines = md.replace(/<!--[\s\S]*?-->/g, "").split("\n"); let html = "", inList = false, inQuote = false;
+  if (!md) return ""; const lines = md.replace(/<!--[\s\S]*?-->/g, "").split("\n");
+  let html = "", inList = false, inQuote = false, i = 0;
   const inline = (t) => escapeHtml(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>").replace(/`([^`]+)`/g, "<code>$1</code>");
   const cl = () => { if (inList) { html += "</ul>"; inList = false; } }; const cq = () => { if (inQuote) { html += "</blockquote>"; inQuote = false; } };
-  for (const raw of lines) { const line = raw.replace(/\s+$/, ""); let m;
+  const cells = (row) => row.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+  while (i < lines.length) {
+    const line = lines[i].replace(/\s+$/, ""); let m;
+    // Tables: a | row followed by a |---| separator row.
+    if (line.startsWith("|") && i + 1 < lines.length && /^\|[\s:\-|]+\|?\s*$/.test(lines[i + 1])) {
+      cl(); cq();
+      const head = cells(line); i += 2;
+      let body = "";
+      while (i < lines.length && lines[i].trim().startsWith("|")) { body += "<tr>" + cells(lines[i]).map((c) => `<td>${inline(c)}</td>`).join("") + "</tr>"; i++; }
+      html += `<table class="md-table"><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>`;
+      continue;
+    }
     if ((m = line.match(/^(#{1,4})\s+(.*)$/))) { cl(); cq(); html += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; }
+    else if (/^(---|\*\*\*)\s*$/.test(line)) { cl(); cq(); html += "<hr />"; }
+    else if ((m = line.match(/^[-*]\s+\[([ xX])\]\s+(.*)$/))) { cq(); if (!inList) { html += "<ul>"; inList = true; } html += `<li>${m[1].trim() ? "☑" : "☐"} ${inline(m[2])}</li>`; }
     else if ((m = line.match(/^[-*]\s+(.*)$/))) { cq(); if (!inList) { html += "<ul>"; inList = true; } html += `<li>${inline(m[1])}</li>`; }
     else if ((m = line.match(/^>\s?(.*)$/))) { cl(); if (!inQuote) { html += "<blockquote>"; inQuote = true; } html += inline(m[1]) + " "; }
-    else if (line.trim() === "") { cl(); cq(); } else { cl(); cq(); html += `<p>${inline(line)}</p>`; } }
+    else if (line.trim() === "") { cl(); cq(); } else { cl(); cq(); html += `<p>${inline(line)}</p>`; }
+    i++;
+  }
   cl(); cq(); return html;
 }
 init();

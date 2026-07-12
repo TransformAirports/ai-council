@@ -35,7 +35,7 @@ These three are not selectable. They protect the output regardless of which rese
 | **Humanizer** | Post-editing pass that refines tone, readability, and writing quality — smooths the seams of multi-agent assembly without touching a single claim, number, or tag. |
 | **Fact-checker** | Verifies every numerical and attributed claim against the research briefs — running **after** the Humanizer, so verification covers the final text. Has veto power over anything that cannot be sourced. |
 
-All process agents run on Claude Opus 4.8. Model assignments per role live in `council.toml` and are editable from the hub's Settings menu — point any role at Sonnet for a cheap draft pass, then switch back.
+The editorial tier — Red Team, Editor, Humanizer, and the presentation designer — runs on Claude Fable 5; the Strategist and Fact-checker run on Opus 4.8, keeping verification on a different model family than the agents that wrote and polished the text. Model assignments per role live in `council.toml` and are editable from Settings — point any role at Sonnet for a cheap draft pass, then switch back.
 
 #### The writer
 
@@ -81,7 +81,7 @@ Marcus Aurelius · Socrates · Aristotle · Lao Tzu · Sun Tzu · Machiavelli ·
 
 ## 2. How to use it
 
-A run starts with a sharp thesis. The sharper the thesis, the sharper the output. "An overview of regional airline trends" produces a summary. "Regional airline consolidation has gone far enough that the next wave of mergers will strand infrastructure the industry just built" produces an argument.
+A run starts with a sharp thesis. The sharper the thesis, the sharper the output. "An overview of regional airline trends" produces a summary. "Regional airline consolidation has gone far enough that the next wave of mergers will strand infrastructure the industry just built" produces an argument. For the full craft — what makes a thesis falsifiable, how to write scope items agents can act on, and which failure modes to name in Avoid — see [Writing effective run prompts](docs/writing-effective-run-prompts.md).
 
 When you launch `./council`, it first asks whether you want to **create a new report** or **revise an existing one**. The new-report path is below; the revise path is in [Revising a report](#revising-a-report).
 
@@ -97,12 +97,12 @@ Either path produces the same artifacts and the same archive layout. You can swi
 **Stage 1 — Research** &nbsp;·&nbsp; *Parallel · Claude Opus 4.8 (Deep Research lens on OpenAI) · ~30–60 minutes*
 The selected research agents work concurrently. Each produces an independent brief (typically 1,500–2,500 words) with inline source citations. They cannot read each other's output.
 
-**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Opus 4.8 · ~60–90 minutes*
+**Stage 2 — Synthesis and debate** &nbsp;·&nbsp; *Sequential · Strategist on Opus 4.8, Red Team on Fable 5 · ~60–90 minutes*
 Strategist drafts v1, Red Team critiques v1, Strategist revises to v2, Red Team critiques v2, Strategist produces v3 with explicit handoff notes about anything it knowingly left in.
 
 > **Human checkpoint #1.** The CLI shows you v3 and both critiques and asks whether to continue, redo the final draft with your notes, or stop. Pass `--no-review` to skip.
 
-**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Opus 4.8 · ~30–60 minutes*
+**Stage 3 — Edit, humanize, and fact-check** &nbsp;·&nbsp; *Sequential · Editor and Humanizer on Fable 5, Fact-checker on Opus 4.8 · ~30–60 minutes*
 The Editor cuts roughly a fifth of the word count, removes buzzwords, and flags hedges. The Humanizer then refines tone, readability, and writing quality without touching any claim, number, or tag. The Fact-checker runs last — verifying every numerical and attributed claim in the humanized text against the Stage 1 briefs. Unverifiable claims get cut or tagged `[UNVERIFIED — HUMAN REVIEW]`.
 
 > **Human checkpoint #2.** The CLI shows you the final draft and the fact-check report. Pass `--no-review` to skip.
@@ -303,5 +303,6 @@ Re-running is safe: it overwrites the polished file for each run in place. The `
 - `prompts/runs/` — run-prompt files, one per thesis
 - `prompts/orchestration.md` — the canonical four-stage sequence Claude Code reads
 - `docs/methodology.md` — the methodology appendix attached to every published report
+- `docs/writing-effective-run-prompts.md` — the guide to framing a Title, Thesis, Scope, and Avoid
 - `runs/` — archived deliverables, one folder per completed run
 - `scripts/build_it_memo.py` — generator for the IT-department-facing memo

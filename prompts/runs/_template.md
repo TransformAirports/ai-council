@@ -15,6 +15,10 @@ HOW TO USE THIS FILE
 GUIDING PRINCIPLE
 The sharper the thesis, the sharper the output. "Topics" produce summaries.
 Theses produce arguments. This template is for theses.
+
+For the full craft — anatomy of a strong thesis, scope items agents can act
+on, and which failure modes to name — see
+docs/writing-effective-run-prompts.md.
 -->
 
 ## Thesis
