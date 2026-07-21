@@ -49,6 +49,21 @@ _active_task: asyncio.Task | None = None
 # Static + index.
 # ----------------------------------------------------------------------------
 
+@app.middleware("http")
+async def no_cache(request, call_next):
+    """Never let the browser cache the app.
+
+    This is a locally-served tool that gets updated in place. A cached app.js
+    against fresh index.html (or vice versa) produces broken, hard-to-diagnose
+    UI — e.g. a nav that doesn't know about a view that exists in the markup,
+    which blanks the page. Always serve fresh.
+    """
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+
 @app.get("/", response_class=HTMLResponse)
 async def index() -> HTMLResponse:
     return HTMLResponse((WEBAPP_DIR / "index.html").read_text(encoding="utf-8"))
@@ -130,10 +145,34 @@ async def _drive_new(spec: RunSpec, sink: WebSink, auto_approve: bool,
         await sink.emit("run_stopped", {"total": result.tally.total})
 
 
+async def _drive_scope(payload: dict, sink: WebSink) -> None:
+    from cli.scope import run_scope_pipeline
+    result = await run_scope_pipeline(
+        title=payload.get("title") or "Scope engagement",
+        notes=payload.get("notes", ""),
+        repo_root=REPO_ROOT,
+        auto_approve=bool(payload.get("auto_approve")),
+        budget_usd=payload.get("budget"),
+    )
+    if not result.completed:
+        await sink.emit("run_stopped", {"total": result.tally.total})
+
+
 async def _drive_resume(slug: str, sink: WebSink, auto_approve: bool,
                         budget_usd: float | None) -> None:
-    from cli.orchestrator import run_pipeline
+    from cli.orchestrator import read_run_marker, run_pipeline
     from cli.runfile import RUNS_DIR, parse_run_file
+    # Scope engagements resume through the scope pipeline, keyed by the marker.
+    marker = read_run_marker(REPO_ROOT / "outputs") or {}
+    if marker.get("mode") == "scope":
+        from cli.scope import run_scope_pipeline
+        result = await run_scope_pipeline(
+            title=marker.get("title") or slug, repo_root=REPO_ROOT,
+            auto_approve=auto_approve, budget_usd=budget_usd,
+        )
+        if not result.completed:
+            await sink.emit("run_stopped", {"total": result.tally.total})
+        return
     spec = parse_run_file(slug)
     run_file = RUNS_DIR / f"{slug}.md"
     result = await run_pipeline(
@@ -199,7 +238,9 @@ async def _drive_run(mode: str, payload: dict, sink: WebSink) -> None:
     auto_approve = bool(payload.get("auto_approve"))
     budget = payload.get("budget")
     try:
-        if mode == "resume":
+        if mode == "scope":
+            await _drive_scope(payload, sink)
+        elif mode == "resume":
             await _drive_resume(payload["slug"], sink, auto_approve, budget)
         elif mode == "revise":
             await _drive_revise(payload["slug"], payload.get("feedback", ""), sink, auto_approve)

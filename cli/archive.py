@@ -47,6 +47,9 @@ def _clear_outputs(outputs_dir: Path) -> None:
     src_dir = outputs_dir / "sources"
     if src_dir.is_dir():
         shutil.rmtree(src_dir)
+    scope_dir = outputs_dir / "scope"
+    if scope_dir.is_dir():
+        shutil.rmtree(scope_dir)
     marker = outputs_dir / ".active-run.json"
     if marker.exists():
         marker.unlink()

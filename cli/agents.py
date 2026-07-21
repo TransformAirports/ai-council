@@ -44,6 +44,12 @@ PROCESS_AGENT_NAMES: tuple[str, ...] = (
     "humanizer",
     "fact-checker",
     "presentation-designer",
+    # Scope-fulfillment mode: turn a client scope of work into every
+    # deliverable it requires.
+    "scope-planner",
+    "scope-researcher",
+    "scope-builder",
+    "scope-qa",
 )
 
 # Supplemental agents — the Council of High Intelligence personas, imported and

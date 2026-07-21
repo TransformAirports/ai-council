@@ -21,6 +21,7 @@
 
     <nav class="side-nav">
       <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New report</button>
+      <button class="side-link" data-nav="scope"><span class="sl-ic">⛭</span> Fulfill a scope</button>
       <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
       <button class="side-link" data-nav="audit"><span class="sl-ic">◎</span> Council audit</button>
     </nav>
@@ -179,6 +180,26 @@
           <div class="wiz-dots"><i data-dot="1" class="on"></i><i data-dot="2"></i><i data-dot="3"></i></div>
           <button id="wiz-next" class="btn-primary">Next →</button>
         </div>
+      </div>
+    </section>
+
+    <!-- SCOPE -->
+    <section id="view-scope" class="view hidden">
+      <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Fulfill a scope</h1></div>
+      <div class="panel">
+        <p class="muted" style="margin-top:0;">Hand the Council a client scope of work — an RFP, a statement of work, an emailed scope — and it plans every required deliverable, researches the grounding, and builds the full set: Word documents, PowerPoint decks, assessments, guides. You approve the plan before production begins, and review the acceptance audit before packaging.</p>
+        <div id="scope-sources" class="sources-note hidden"></div>
+        <div id="scope-nosources" class="auth-banner hidden">No scope documents found. Drop the scope (PDF, Word, or text) into the <code>sources/</code> folder, then reload this page.</div>
+        <label class="field-label" for="s-title">Engagement name</label>
+        <input id="s-title" class="text-input" placeholder="e.g. SMS Role-Based Training Development" />
+        <label class="field-label" for="s-notes">Notes for the planner <span class="opt">optional</span></label>
+        <textarea id="s-notes" class="text-input" rows="3" placeholder="Anything the scope doesn't say — priorities, constraints, what the client cares about most."></textarea>
+        <div class="launch-row" style="justify-content:flex-start;">
+          <label class="toggle"><input type="checkbox" id="s-review" checked /> <span>Pause at plan approval &amp; final QA</span></label>
+          <div class="budget-field"><label for="s-budget">Budget ceiling&nbsp;$</label><input id="s-budget" class="num-input" type="number" min="0" step="25" value="250" /></div>
+        </div>
+        <p class="field-hint">A multi-deliverable engagement is a large run — expect several hours and substantially more than a single report. The plan checkpoint shows you exactly what will be built before production spends anything.</p>
+        <button id="scope-launch" class="btn-primary big">⛭&nbsp; Plan the engagement</button>
       </div>
     </section>
 

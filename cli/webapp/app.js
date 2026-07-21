@@ -65,12 +65,31 @@ function buildHeroDots() {
 
 // ─────────── navigation ───────────
 function nav(view) {
-  ["home", "configure", "run", "result", "library", "audit"].forEach((v) => $("#view-" + v).classList.toggle("hidden", v !== view));
+  // Drive off the DOM rather than a hardcoded list: a view present in the
+  // markup but missing here (or vice versa) must never blank the whole app.
+  const views = $$(".workspace > .view");
+  if (!views.some((el) => el.id === "view-" + view)) { console.warn("nav: unknown view", view); return; }
+  views.forEach((el) => el.classList.toggle("hidden", el.id !== "view-" + view));
   $$(".side-link").forEach((l) => l.classList.toggle("active", l.dataset.nav === view));
   $(".workspace").scrollTo(0, 0);
   if (view === "configure") goStep(1);
+  if (view === "scope") prepScopeView();
   if (view === "library") loadLibrary();
   if (view === "audit") loadAudit();
+}
+
+async function prepScopeView() {
+  // Re-fetch meta so files dropped into sources/ after page load are seen.
+  try {
+    const meta = await fetch("/api/meta").then((r) => r.json());
+    state.sources = meta.sources || [];
+  } catch (_) {}
+  const has = state.sources.length > 0;
+  const note = $("#scope-sources"), warn = $("#scope-nosources");
+  note.classList.toggle("hidden", !has);
+  warn.classList.toggle("hidden", has);
+  if (has) note.textContent = `📎 Scope material staged: ` + state.sources.map((s) => `${s.name} (${s.size})`).join(", ");
+  $("#scope-launch").disabled = !has || !state.authOk;
 }
 
 function wireUI() {
@@ -86,6 +105,15 @@ function wireUI() {
   $("#revise-cancel").onclick = () => $("#revise-overlay").classList.add("hidden");
   $("#revise-go").onclick = submitRevise;
   $("#f-pptx").onchange = () => { if (state.step === 3) buildReview(); };
+  $("#scope-launch").onclick = () => {
+    const title = $("#s-title").value.trim();
+    if (!title) { $("#s-title").focus(); $("#s-title").style.borderColor = "var(--red)"; return; }
+    startRun({
+      type: "start", mode: "scope", title, notes: $("#s-notes").value.trim(),
+      auto_approve: !$("#s-review").checked,
+      budget: parseFloat($("#s-budget").value) || null,
+    });
+  };
   $("#guide-btn").onclick = openGuide;
   $("#guide-close").onclick = () => $("#guide-overlay").classList.add("hidden");
   $("#guide-overlay").onclick = (e) => { if (e.target === $("#guide-overlay")) $("#guide-overlay").classList.add("hidden"); };
@@ -260,11 +288,11 @@ function startRun(payload) {
 }
 
 // ─────────── stage rail ───────────
-const STAGES = [{ n: 1, label: "Research" }, { n: 2, label: "Synthesis & debate" }, { n: 3, label: "Edit & verify" }, { n: 4, label: "Produce" }];
-function buildStageRail() {
+const STAGES = ["Research", "Synthesis & debate", "Edit & verify", "Produce"];
+function buildStageRail(labels) {
   const rail = $("#stage-rail"); rail.innerHTML = "";
-  STAGES.forEach((s) => { const node = document.createElement("div"); node.className = "stage-node"; node.dataset.stage = s.n;
-    node.innerHTML = `<div class="stage-dot"></div><div class="stage-label">${s.label}</div>`; rail.appendChild(node); });
+  (labels || STAGES).forEach((label, i) => { const node = document.createElement("div"); node.className = "stage-node"; node.dataset.stage = i + 1;
+    node.innerHTML = `<div class="stage-dot"></div><div class="stage-label">${escapeHtml(label)}</div>`; rail.appendChild(node); });
 }
 function setStage(n) { $$(".stage-node").forEach((node) => { const sn = +node.dataset.stage; node.classList.toggle("active", sn === n); node.classList.toggle("done", sn < n); }); }
 
@@ -330,7 +358,15 @@ function hideTip() { $("#node-tooltip").classList.add("hidden"); }
 // ─────────── events ───────────
 function handleEvent(e) {
   switch (e.type) {
-    case "run_start": buildConstellation(e.agents || []); log("Council convened: " + e.title, "ok"); break;
+    case "run_start":
+      if (e.stages) buildStageRail(e.stages);
+      buildConstellation(e.agents || []);
+      log("Council convened: " + e.title, "ok"); break;
+    case "deliverable_done":
+      log(`📦 ${e.id} — ${e.title} → ${e.file}  (${e.done}/${e.total})`, "ok");
+      $("#run-stage").textContent = `Building deliverables · ${e.done} of ${e.total} complete`;
+      $("#sr-fill").style.width = (45 + Math.round((e.done / e.total) * 45)) + "%";
+      break;
     case "stage_start":
       setStage(e.stage); $("#run-stage").textContent = `Stage ${e.stage} · ${e.label}`;
       $("#sr-stage").textContent = `Stage ${e.stage} · ${e.label}`; $("#sr-fill").style.width = (STAGE_FILL[e.stage] || 50) + "%";
@@ -395,6 +431,18 @@ async function showResult(e) {
   setStage(5); state.resultSlug = e.slug; $("#side-run").classList.add("hidden");
   $("#result-badge").textContent = "✓ Complete"; $("#result-title").textContent = e.title;
   $("#result-cost").textContent = `Total cost $${(e.total || 0).toFixed(2)} · archived to runs/`;
+  if (e.mode === "scope") {
+    // Engagement result: the deliverable manifest + the zip.
+    let md = `# Deliverables\n\n`;
+    (e.deliverables || []).forEach((d) => { md += `- **${d.id}** — ${d.title} (\`${d.file}\`)\n`; });
+    md += `\nAll files are in \`reports/scope-${e.slug}/\` alongside the QA report and manifest. `;
+    md += `AI-produced engagement materials — subject-matter-expert review required before client delivery.`;
+    $("#result-body").innerHTML = renderMarkdown(md);
+    $("#result-toc").innerHTML = "";
+    const dl = $("#result-downloads"); dl.innerHTML = "";
+    if (e.zip) { const a = document.createElement("a"); a.className = "dl-btn"; a.href = e.zip; a.textContent = "⤓ All deliverables (.zip)"; dl.appendChild(a); }
+    await loadHome(); nav("result"); return;
+  }
   try { const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json()); $("#result-body").innerHTML = renderMarkdown(data.markdown || ""); buildTOC(); renderDownloads(data.downloads); }
   catch (_) { $("#result-body").textContent = "Report saved to runs/."; }
   await loadHome(); nav("result");

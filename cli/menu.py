@@ -8,6 +8,7 @@ requiring a single flag. Flags still exist as deep links for scripting.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import shutil
 import subprocess
@@ -116,6 +117,31 @@ def detect_interrupted_run() -> dict | None:
 
     if not has_any_artifact and not has_marker:
         return None
+
+    # Scope engagements live under outputs/scope/<slug>/, not the stage dirs.
+    if marker.get("mode") == "scope" and marker.get("slug"):
+        deliv = OUTPUTS_DIR / "scope" / marker["slug"] / "deliverables"
+        built = len([p for p in deliv.glob("*") if p.suffix in (".docx", ".pptx")]) if deliv.is_dir() else 0
+        planned = 0
+        plan_file = OUTPUTS_DIR / "scope" / marker["slug"] / "plan.json"
+        if plan_file.is_file():
+            try:
+                planned = len(json.loads(plan_file.read_text())["deliverables"])
+            except Exception:  # noqa: BLE001
+                planned = 0
+        age = ""
+        if marker.get("started"):
+            try:
+                hrs = (datetime.now() - datetime.fromisoformat(marker["started"])).total_seconds() / 3600
+                age = f"{hrs:.0f}h ago" if hrs >= 1 else f"{hrs * 60:.0f}m ago"
+            except (ValueError, TypeError):
+                pass
+        return {
+            "slug": marker["slug"], "title": marker.get("title") or marker["slug"],
+            "where": f"scope engagement — {built} of {planned or '?'} deliverables built",
+            "age": age, "has_expensive_work": built > 0, "stage_counts": stage_counts,
+            "mode": "scope",
+        }
 
     if stage_counts["stage3"]:
         where = "died during Stage 3–4"

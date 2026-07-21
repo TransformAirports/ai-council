@@ -84,6 +84,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--terminal", action="store_true",
                    help="Use the headless terminal menu instead of the web app "
                    "(for SSH / no-browser environments).")
+    p.add_argument("--scope", metavar="TITLE",
+                   help="Deep link: fulfill a client scope of work headlessly. "
+                   "Drop the scope document into sources/ first. Combine with "
+                   "--no-review to run without checkpoints; without it, use the "
+                   "web app so the plan-approval checkpoint has a UI.")
     return p.parse_args(argv)
 
 
@@ -140,6 +145,28 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 menu.resume_flow()
             return 0
+
+        if args.scope:
+            import asyncio
+
+            if not args.no_review:
+                console.print(
+                    "[yellow]--scope without --no-review needs the web app for the "
+                    "plan-approval checkpoint. Launch ./council and use 'Fulfill a "
+                    "scope', or add --no-review to run fully autonomously.[/yellow]"
+                )
+                return 1
+            from cli.scope import run_scope_pipeline
+
+            result = asyncio.run(run_scope_pipeline(
+                title=args.scope, auto_approve=True,
+            ))
+            if result.completed:
+                console.print(
+                    f"[green]Engagement complete — {result.zip_path} "
+                    f"(${result.tally.total:.2f})[/green]"
+                )
+            return 0 if result.completed else 1
 
         if args.dry_run or args.skip_prompts:
             from cli.agents import load_all_agents

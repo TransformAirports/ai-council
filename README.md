@@ -183,6 +183,20 @@ Research and synthesis run on Claude Opus 4.8. The editorial tier — Red Team, 
 
 Drop PDFs, Word docs, decks, or spreadsheets into `sources/` before launching. The app detects them, attaches them to the run, converts them to text the agents can read, and instructs every researcher to treat them as the primary starting point. Sources are archived with the run.
 
+### Scope mode — fulfilling an entire engagement
+
+Beyond single reports, the Council can fulfill a full scope of work. Drop the scope document (an RFP, SOW, or emailed scope) into `sources/`, open **Fulfill a scope** in the app, and:
+
+1. A **Scope Planner** reads the scope and produces a deliverables plan — every required artifact enumerated with type, dependencies, and build instructions, plus an honest list of client materials the scope assumes but that weren't supplied.
+2. **You approve the plan** before production spends anything (redo-with-notes supported).
+3. **Scope Researchers** answer the plan's regulatory and best-practice questions in parallel, citation-first.
+4. **Scope Builders** produce every artifact — Word documents and PowerPoint decks — in dependency order, aligning each with the artifacts it builds on. Missing client-specific material becomes marked `[AUTHORITY-SPECIFIC — INSERT: …]` placeholders, never invented content.
+5. A **Scope QA** agent audits the finished set against the original scope — a requirement-by-requirement acceptance trace — and you review it before packaging.
+
+Everything lands in `reports/scope-<name>/` plus a single zip, with a manifest and the QA report. Re-running the same engagement title resumes: completed deliverables are never rebuilt or re-billed. Headless: `./council --scope "Engagement name" --no-review`.
+
+Scope engagements are large runs — budget accordingly (the default ceiling for scope mode is $250) and treat the output as consultant-grade *drafts*: AI-produced engagement materials that need subject-matter-expert review before client delivery.
+
 ### The pipeline, precisely
 
 Four stages: (1) parallel independent research — seated agents write briefs concurrently, forbidden from reading each other's output; (2) synthesis and adversarial debate — Strategist v1 → Red Team → v2 → Red Team → v3, then **human checkpoint #1**; (3) Editor → Humanizer → Fact-checker (verification runs last so it covers the final text), then **human checkpoint #2**; (4) document production, archive to `runs/YYYY-MM-DD-<slug>/`, and automatic publishing to `reports/`. Budget ceilings are enforced between steps; interrupted runs resume from the last completed artifact.
