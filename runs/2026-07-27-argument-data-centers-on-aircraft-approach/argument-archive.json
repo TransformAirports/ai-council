@@ -1,0 +1,375 @@
+{
+  "cost_by_step": {},
+  "created_at": "2026-07-27T19:19:52+00:00",
+  "files": [
+    {
+      "path": ".DS_Store",
+      "sha256": "e5de05bd2c9fbfb2af09d65992eaf6d6e5d10db3e7eff408f4053977e905bd45",
+      "size_bytes": 6148
+    },
+    {
+      "path": ".active-run.json",
+      "sha256": "6f3b262d3fc67f10afa5bc6253d6519f2bccfff66e3051414ef02cec4fec0f2c",
+      "size_bytes": 327
+    },
+    {
+      "path": ".gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "claim-lineage.jsonl",
+      "sha256": "c2fbf9074c75043a8524737bf56c5a7b43f728ab0499a73a241da5b2f1f3c46d",
+      "size_bytes": 21213
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T124736216549",
+      "sha256": "8a9ad5bc71be7249b73e2d258a8a4de603c6e17cd91d359bb1146b071998c346",
+      "size_bytes": 16210
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T130107344259",
+      "sha256": "392d27148339510c0cc6600d5c64e44d9d93b3d5890ad7f7cc2fa5bf9491b2c2",
+      "size_bytes": 18947
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T140640918060",
+      "sha256": "4f37bfe053cb0e9873207293c42b87208f18cf1a91c90c7df4580b2165d48fea",
+      "size_bytes": 23501
+    },
+    {
+      "path": "context/argument-request.json",
+      "sha256": "39a3c7e410ffd86818d80cbf48d291c99ab927e98aa8e958f6079c402d5e8794",
+      "size_bytes": 4200
+    },
+    {
+      "path": "context/argument-request.md",
+      "sha256": "f188d40c0c31ecfca0f1eb44cb44405d8c23934546d17442e98ab0df55edad25",
+      "size_bytes": 4274
+    },
+    {
+      "path": "evidence-ledger.jsonl",
+      "sha256": "f0b16d86b8c9614a4dedf3db1a32ac028c7139fec2ace459f7aa8560c4dad3aa",
+      "size_bytes": 177109
+    },
+    {
+      "path": "quality-gate.json",
+      "sha256": "cbed6001f071eb0d62d639a3563fa7e8f634d881b31aa16a01a956f5316ffe60",
+      "size_bytes": 765
+    },
+    {
+      "path": "retrospective.md",
+      "sha256": "730877c6bf895a0912d2afcee19944eed160a4e329f8954845f11c9097cf8a65",
+      "size_bytes": 287
+    },
+    {
+      "path": "run-manifest.json",
+      "sha256": "22db2fece50ee49523b5288dc3d68f38435c079c6f50ef0c3149f28ebc1c4f67",
+      "size_bytes": 106094
+    },
+    {
+      "path": "sources/pasted-argument.md",
+      "sha256": "7abe3e744ca68b653ce3f0c762667bc0edecb296837afef7e3ec34a1d7bb5aed",
+      "size_bytes": 3603
+    },
+    {
+      "path": "stage1/airline-commercial-strategist-brief.md",
+      "sha256": "6f330d75d92060dbd3ed2a5a6f8326bd800c3b3321ec8346f52ecfa687631d74",
+      "size_bytes": 14005
+    },
+    {
+      "path": "stage1/airline-commercial-strategist-evidence.jsonl",
+      "sha256": "6abc65ada6902b4c0ea5c04b64f05b5e401000414c919ecbacd57e5a8f92a301",
+      "size_bytes": 10115
+    },
+    {
+      "path": "stage1/airport-ceo-brief.md",
+      "sha256": "06de216e4e3bfcac68eb4bb73c5a51a9454eb368091a373152c742dd6d7a1a9d",
+      "size_bytes": 12971
+    },
+    {
+      "path": "stage1/airport-ceo-evidence.jsonl",
+      "sha256": "0b9b8c606c5c72a3a0d2504ac47b073e60f61b5b4abe340cf03d8a23ff11216f",
+      "size_bytes": 12172
+    },
+    {
+      "path": "stage1/airport-coo-brief.md",
+      "sha256": "80ae77b255120cb78d8d8f11de38c3a781fbea7e653db987663f285077ddba81",
+      "size_bytes": 9288
+    },
+    {
+      "path": "stage1/airport-coo-evidence.jsonl",
+      "sha256": "7b629d5c462df88a11d2f71508f3d3469d30a7a206ff81095c08e827defaa46b",
+      "size_bytes": 12328
+    },
+    {
+      "path": "stage1/aviation-historian-brief.md",
+      "sha256": "f446009afde1099339151be98cb7f8fbd83beef3cd995708a73d0ea706402414",
+      "size_bytes": 15139
+    },
+    {
+      "path": "stage1/aviation-historian-evidence.jsonl",
+      "sha256": "3b236846f53ec19a2b1d94188227e6526a8fec0884f16003769bb1ca7b7ad14b",
+      "size_bytes": 13154
+    },
+    {
+      "path": "stage1/chief-engineer-brief.md",
+      "sha256": "d09b952cc185ca97ca678832fccd762de43123eeffb6585633d59cc1f2846f02",
+      "size_bytes": 19400
+    },
+    {
+      "path": "stage1/chief-engineer-evidence.jsonl",
+      "sha256": "a4dbdcc76b183ba7669da6629382fb136222f959b5cb12a6687e5bf2eac33cd2",
+      "size_bytes": 16265
+    },
+    {
+      "path": "stage1/contrarian-brief.md",
+      "sha256": "7f763ab32723bb8cb1afc858031766c700b6fbc54c97b62048f4c535e28b3e98",
+      "size_bytes": 15855
+    },
+    {
+      "path": "stage1/contrarian-evidence.jsonl",
+      "sha256": "e51f25ffdf5daa1e5b640b282a679ec203f43987f0cb73edf4e7156799486bc9",
+      "size_bytes": 13484
+    },
+    {
+      "path": "stage1/evidence-map.md",
+      "sha256": "b1451007b733c2c008715552b6c2fca06f1ad89435b4c4e52501101e003184ad",
+      "size_bytes": 18866
+    },
+    {
+      "path": "stage1/infrastructure-economist-brief.md",
+      "sha256": "4cc2d92c04b3ddb4285eeda8c250c760f403850c05eec53b34df39a8f53d4e3d",
+      "size_bytes": 14806
+    },
+    {
+      "path": "stage1/infrastructure-economist-evidence.jsonl",
+      "sha256": "3dbda17d9b35862834cbff36116866207bd6c712c2843b554c58c95dd782a049",
+      "size_bytes": 11607
+    },
+    {
+      "path": "stage1/operations-analyst-brief.md",
+      "sha256": "14b921fa5e1870277c1c713243f1a7897529094a1ba44c63091ee76f4885d517",
+      "size_bytes": 12196
+    },
+    {
+      "path": "stage1/operations-analyst-evidence.jsonl",
+      "sha256": "04a362efa1ccc9de377726928aa0cfb92764b87b84ea19ede7fb940130c5fe04",
+      "size_bytes": 12529
+    },
+    {
+      "path": "stage1/quantitative-analysis/README.md",
+      "sha256": "50a9c173c8ecc9452c4b3fa8ed4c75cab05815d105c8c50c9ee4512cb5409021",
+      "size_bytes": 2275
+    },
+    {
+      "path": "stage1/quantitative-analysis/approach_departure_surface_height_limits.csv",
+      "sha256": "9836b6c1b1e4e189087e8db30dadba008ab91cacc4501f504a28673a6ac41119",
+      "size_bytes": 201
+    },
+    {
+      "path": "stage1/quantitative-analysis/calculations.json",
+      "sha256": "9f1aa32446cac636107d6747f73cc5957bda15755ab9bec6da2621958d06d311",
+      "size_bytes": 9593
+    },
+    {
+      "path": "stage1/quantitative-analysis/glideslope_overflight_height.csv",
+      "sha256": "b28932cd8b27ce09b441fb5100b35cb1118411a3435c5faf4dfb2db7f40b9406",
+      "size_bytes": 181
+    },
+    {
+      "path": "stage1/quantitative-analysis/wildlife_separation_shortfall.csv",
+      "sha256": "0a86ebe9fc7d2306183bc0f1c1613cabf94dcdf1c92b40cc1fba7eedeef29be9",
+      "size_bytes": 273
+    },
+    {
+      "path": "stage1/quantitative-analyst-brief.md",
+      "sha256": "54f55f9fbd7a0934ed8a9cf271ea76f305a3184eef09c3a6a7de42b3571fcd56",
+      "size_bytes": 7729
+    },
+    {
+      "path": "stage1/quantitative-analyst-evidence.jsonl",
+      "sha256": "779976110de95bacc7c43e82c2f23a6bbcd00791754ce374945ae39eee8b20d6",
+      "size_bytes": 11360
+    },
+    {
+      "path": "stage1/regulatory-political-analyst-brief.md",
+      "sha256": "efab6b4ca11a64802f512f0c0c4eec72daa73fefa03340949938c47aa2a78a47",
+      "size_bytes": 14749
+    },
+    {
+      "path": "stage1/regulatory-political-analyst-evidence.jsonl",
+      "sha256": "ba67cf22dedd54d083f3b65890840590c16679cfba799726aca2501c52a7ac27",
+      "size_bytes": 16174
+    },
+    {
+      "path": "stage1/technology-scout-brief.md",
+      "sha256": "9e88f748f06b39434a58948306ac9818b1be67355191421a9e23b9332c04f4c9",
+      "size_bytes": 9339
+    },
+    {
+      "path": "stage1/technology-scout-evidence.jsonl",
+      "sha256": "70eaaddd9c494111a2ad633787a106519dcc3922ead568ceb1c4e376084c3fe1",
+      "size_bytes": 10108
+    },
+    {
+      "path": "stage2/strategist-draft.md",
+      "sha256": "cd01453af247e8c2cdf8f072d31ebd31f00e98700d7e8e48364790c0dd429e5a",
+      "size_bytes": 10891
+    },
+    {
+      "path": "stage3/fact-check-report.md",
+      "sha256": "194403900f6e4faaf64154872f3bab87219d38b4560943b53d408a2cb7e3019c",
+      "size_bytes": 18067
+    },
+    {
+      "path": "stage3/fact-check-report.md.partial-20260727T124736215582",
+      "sha256": "679283c83fc84e528e54d42e73d370cf78464f9b83e04dd8eed5902646550d57",
+      "size_bytes": 8898
+    },
+    {
+      "path": "stage3/fact-check-report.md.partial-20260727T130107343517",
+      "sha256": "21106b87fa5b58ccbc8c89b4d23ebf538c662eb93c415841164606e8b078decf",
+      "size_bytes": 17770
+    },
+    {
+      "path": "stage3/fact-check-report.md.partial-20260727T140640916700",
+      "sha256": "170c9d1e8d524bb5d48f638c09732603d0b60000bf96cf140535ded2095979b0",
+      "size_bytes": 21273
+    },
+    {
+      "path": "stage3/final-draft.md",
+      "sha256": "3ee693d3beb2f978759ce361191949834721a3291e4ef915f3f643141be93bf2",
+      "size_bytes": 10848
+    },
+    {
+      "path": "stage3/final-draft.md.partial-20260727T124736213242",
+      "sha256": "2e96b9545a4c131c5a6c8d406ebf0fe2e0fc1df4a2a85460464a52d2e20d7542",
+      "size_bytes": 9589
+    },
+    {
+      "path": "stage3/final-draft.md.partial-20260727T130107342092",
+      "sha256": "91d48cc40452b41e7679e82f8274c19686f54bd309a73abc3be87049656cb552",
+      "size_bytes": 11276
+    },
+    {
+      "path": "stage3/final-draft.md.partial-20260727T140640914375",
+      "sha256": "3618531e4673e2754991da632b3399f9c8f2cafd72f38043c4cebc725c862d25",
+      "size_bytes": 11064
+    },
+    {
+      "path": "stage3/lineage-remediation-input/claim-lineage.jsonl",
+      "sha256": "4f37bfe053cb0e9873207293c42b87208f18cf1a91c90c7df4580b2165d48fea",
+      "size_bytes": 23501
+    },
+    {
+      "path": "stage3/lineage-remediation-input/fact-check-report.md",
+      "sha256": "170c9d1e8d524bb5d48f638c09732603d0b60000bf96cf140535ded2095979b0",
+      "size_bytes": 21273
+    },
+    {
+      "path": "stage3/lineage-remediation-input/final-draft.md",
+      "sha256": "3618531e4673e2754991da632b3399f9c8f2cafd72f38043c4cebc725c862d25",
+      "size_bytes": 11064
+    },
+    {
+      "path": "stage3/lineage-remediation-input/instructions.md",
+      "sha256": "7f2bb96842d0abfc1a7f39b5d6869e6bc4d40f9394bbb0b8f9816c8e88c2357c",
+      "size_bytes": 3693
+    },
+    {
+      "path": "stage3/lineage-remediation-input/quality-gate.json",
+      "sha256": "47e1d4d8d685490a2c22e981472afd2325647ee36369b6b60909f6f552496050",
+      "size_bytes": 6819
+    },
+    {
+      "path": "stage4/argument-data-centers-on-aircraft-approach-qa.json",
+      "sha256": "e31ced08d979915c79d8cb037b9fe2ac911f2fdcbc91f0430adf5ef835a0289f",
+      "size_bytes": 4879
+    },
+    {
+      "path": "stage4/argument-data-centers-on-aircraft-approach-visual-inspection.json",
+      "sha256": "19b2188e88d370648b2de449885a4ee1f2c1c986c52de1543e229baa9b55ec57",
+      "size_bytes": 3013
+    },
+    {
+      "path": "stage4/argument-data-centers-on-aircraft-approach.pptx",
+      "sha256": "f1673d6ae35b483950b95edd801f6de97d5d2894828c6fc9fc00573f773da8b4",
+      "size_bytes": 31270
+    },
+    {
+      "path": "stage4/argument-data-centers-on-aircraft-approach.pptx.inspect.ndjson",
+      "sha256": "35aecb12f01782bb544804b097c1fd2cc615c04072f3d2cbf7fbb8bf45850123",
+      "size_bytes": 24456
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-1.png",
+      "sha256": "5796e966b0b0197af498a6d39563504489ec103658d97dce479c69900eb53655",
+      "size_bytes": 155405
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-2.png",
+      "sha256": "4e967d5e57162781a2a82674ebfb800212fd757099af30a43f62a4119dad4868",
+      "size_bytes": 146918
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-3.png",
+      "sha256": "e3413e9a456f3cb35760a42c94bab20ace5e3f40ff151f4a41ac6a5fd7c3765d",
+      "size_bytes": 180768
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-4.png",
+      "sha256": "2b6ccfafe7892f68debd9aed20122408fb9eae3b7198d1937abd2814ab796fd1",
+      "size_bytes": 213405
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach.pdf",
+      "sha256": "d499aaedad3c648cd0825cd79a0a5ce8dd644810f0f069dc97d7c1243eff7ba1",
+      "size_bytes": 153507
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/designer-qa.json",
+      "sha256": "519bdd16896317cde2d77da372c853d40cb0e09b24f5226304b6a2ebe254e3cb",
+      "size_bytes": 4400
+    },
+    {
+      "path": "stage4/inspection/data-centers-on-aircraft-approach/montage.png",
+      "sha256": "80af2e3fe46abccb8b548c87b05cb8d67a96916726905510eb699fc69b839de9",
+      "size_bytes": 237010
+    },
+    {
+      "path": "stage4/qa/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-1.png",
+      "sha256": "5796e966b0b0197af498a6d39563504489ec103658d97dce479c69900eb53655",
+      "size_bytes": 155405
+    },
+    {
+      "path": "stage4/qa/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-2.png",
+      "sha256": "4e967d5e57162781a2a82674ebfb800212fd757099af30a43f62a4119dad4868",
+      "size_bytes": 146918
+    },
+    {
+      "path": "stage4/qa/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-3.png",
+      "sha256": "e3413e9a456f3cb35760a42c94bab20ace5e3f40ff151f4a41ac6a5fd7c3765d",
+      "size_bytes": 180768
+    },
+    {
+      "path": "stage4/qa/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach-4.png",
+      "sha256": "2b6ccfafe7892f68debd9aed20122408fb9eae3b7198d1937abd2814ab796fd1",
+      "size_bytes": 213405
+    },
+    {
+      "path": "stage4/qa/data-centers-on-aircraft-approach/argument-data-centers-on-aircraft-approach.pdf",
+      "sha256": "dbde58d7f0075ab05248d6b3bdeba24c1070811d82d76637cb8ca3cfc81767cc",
+      "size_bytes": 153507
+    },
+    {
+      "path": "stage4/visual-brief.json",
+      "sha256": "5fc1e4bacbf93650b6a04fc45c7a7d8fff93ad259db1e79c0a8ca58c58bb71b9",
+      "size_bytes": 23532
+    }
+  ],
+  "mode": "strengthen",
+  "schema_version": "1.0",
+  "slug": "data-centers-on-aircraft-approach",
+  "title": "Data Centers on Aircraft Approach"
+}

@@ -1,35 +1,63 @@
-"""Four-stage Council orchestrator built on the Claude Agent SDK.
+"""Manifest-driven Council v2 orchestration on the Claude Agent SDK.
 
-Stage 1: parallel research briefs (Opus 4.8, the selected research agents;
-         the Deep Research agent routes to OpenAI instead).
-Stage 2: Strategist v1 → Red Team v1 → Strategist v2 → Red Team v2 → Strategist v3
-         (Strategist on Opus 4.8; Red Team on Fable 5).
-Stage 3: Editor (Fable 5) → Humanizer (Fable 5) → Fact-checker (Opus 4.8).
-         The Fact-checker runs LAST so verification covers the humanized text,
-         and stays on a different model family than the agents that wrote it.
-Stage 4: handed off to docx_builder.py; optional companion PowerPoint
-         (presentation-designer on Fable 5); archive done in archive.py.
-
-Human checkpoints between Stage 2/3 and Stage 3/4 are in checkpoints.py.
+The public flow is context/research/curation, creative and adversarial
+synthesis, editorial polish plus source verification, then art-directed Office
+production. Model choices come from ``council.toml`` rather than this module.
+Every handoff has a typed artifact contract; final claims bind to exact
+footnotes, evidence IDs, and final-draft bytes before publication. Two human
+checkpoints remain between synthesis, verification, and production.
 """
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 import questionary
 from rich.console import Console
 
 from cli.agents import Agent, load_all_agents
+from cli.artifacts import ArtifactContract, contract_for_path, validate_artifact
 from cli.config import get_config
+from cli.evidence import (
+    bind_claim_lineage_to_draft,
+    build_evidence_ledger,
+    ensure_claim_lineage,
+    file_sha256,
+    normalise_evidence_ledger,
+    write_jsonl,
+)
 from cli.events import emit
 from cli.interactive import RunSpec
+from cli.quality_gate import PublicationQualityError, run_publication_quality_gate
+from cli.run_manifest import (
+    assert_manifest_complete,
+    build_dependency_fingerprint,
+    build_execution_contract_fingerprint,
+    create_run_manifest,
+    dependency_fingerprint_matches,
+    manifest_prompt_block,
+    update_artifact,
+    update_stage,
+)
+from cli.revision_state import (
+    STATE_NAME as REVISION_STATE_NAME,
+    RevisionDependency,
+    assert_revision_state_current,
+    build_revision_dependency_fingerprint,
+    record_revision_step,
+    repo_relative as revision_repo_relative,
+    revision_step_matches,
+)
 
 console = Console()
 
@@ -52,6 +80,10 @@ class RunBudgetExceeded(RuntimeError):
 class CostTally:
     by_step: dict[str, float] = field(default_factory=dict)
     budget_usd: float | None = None  # run-level ceiling, checked between steps
+    _reservations: dict[str, float] = field(
+        default_factory=dict, init=False, repr=False
+    )
+    _planned_call_units: int = field(default=0, init=False, repr=False)
 
     def add(self, step: str, cost: float) -> None:
         self.by_step[step] = self.by_step.get(step, 0.0) + cost
@@ -60,14 +92,68 @@ class CostTally:
     def total(self) -> float:
         return sum(self.by_step.values())
 
+    @property
+    def remaining(self) -> float | None:
+        if self.budget_usd is None:
+            return None
+        return max(
+            0.0,
+            self.budget_usd
+            - self.total
+            - sum(self._reservations.values()),
+        )
+
     def check_budget(self, next_step: str) -> None:
-        if self.budget_usd is not None and self.total >= self.budget_usd:
+        if self.budget_usd is not None and (
+            self.total + sum(self._reservations.values())
+        ) >= self.budget_usd:
             raise RunBudgetExceeded(
                 f"Budget ceiling reached: ${self.total:.2f} spent of the "
                 f"${self.budget_usd:.2f} limit, with '{next_step}' still pending. "
                 f"Work so far is saved — relaunch and choose Resume to continue "
                 f"with a higher ceiling."
             )
+
+    def reserve(
+        self, step: str, requested_usd: float | None = None
+    ) -> float | None:
+        """Atomically reserve one call's spend from the shared run ceiling.
+
+        All Council tasks share one event loop, so this synchronous mutation
+        cannot interleave. The returned amount is also passed to the Claude
+        SDK's per-call ``max_budget_usd`` guard.
+        """
+
+        if self.budget_usd is None:
+            return None
+        self.check_budget(step)
+        available = self.remaining or 0.0
+        planned_units = max(1, self._planned_call_units)
+        allocation = (
+            available / planned_units
+            if requested_usd is None
+            else min(available, max(0.0, requested_usd))
+        )
+        if allocation <= 0:
+            self.check_budget(step)
+            raise RunBudgetExceeded(
+                f"No budget remains for '{step}' under the "
+                f"${self.budget_usd:.2f} ceiling."
+            )
+        if self._planned_call_units:
+            self._planned_call_units -= 1
+        self._reservations[step] = allocation
+        return allocation
+
+    def release(self, step: str) -> None:
+        self._reservations.pop(step, None)
+
+    def plan_calls(self, count: int) -> None:
+        self._planned_call_units = max(0, int(count))
+
+    def consume_skipped_call(self) -> None:
+        if self._planned_call_units:
+            self._planned_call_units -= 1
 
 
 @dataclass
@@ -79,11 +165,368 @@ class RunResult:
     completed: bool = False
 
 
-def _has_content(path: Path, min_bytes: int = 200) -> bool:
+@dataclass(frozen=True)
+class PipelineStep:
+    """Inspectable execution contract consumed by the v2 orchestrator."""
+
+    id: str
+    phase: str
+    agent: str
+    model_role: str
+    output: str
+    inputs: tuple[str, ...]
+    quality_gate: str = "typed_artifact"
+
+
+PIPELINE_DEFINITION: tuple[PipelineStep, ...] = (
+    PipelineStep(
+        "airport-context",
+        "context",
+        "airport-context-builder",
+        "context",
+        "context/airport-context.md",
+        ("run-manifest.json",),
+    ),
+    PipelineStep(
+        "evidence-curation",
+        "evidence",
+        "evidence-curator",
+        "curation",
+        "stage1/evidence-map.md",
+        (
+            "run-manifest.json",
+            "evidence-ledger.jsonl",
+            "context/airport-context.md",
+            "stage1/*-brief.md",
+        ),
+    ),
+    PipelineStep(
+        "creative-director",
+        "synthesis",
+        "creative-director",
+        "creative",
+        "stage2/narrative-options.md",
+        (
+            "run-manifest.json",
+            "context/airport-context.md",
+            "evidence-ledger.jsonl",
+            "stage1/evidence-map.md",
+        ),
+    ),
+    PipelineStep(
+        "strategist-v1",
+        "synthesis",
+        "strategist",
+        "synthesis",
+        "stage2/strategist-draft-v1.md",
+        (
+            "run-manifest.json",
+            "context/airport-context.md",
+            "stage1/*-brief.md",
+            "stage2/narrative-options.md",
+            "stage1/evidence-map.md",
+            "evidence-ledger.jsonl",
+        ),
+    ),
+    PipelineStep(
+        "evidence-prosecutor",
+        "synthesis",
+        "evidence-prosecutor",
+        "critique",
+        "stage2/red-team-critique-v1.md",
+        (
+            "run-manifest.json",
+            "stage1/*-brief.md",
+            "stage1/evidence-map.md",
+            "stage2/strategist-draft-v1.md",
+            "evidence-ledger.jsonl",
+        ),
+    ),
+    PipelineStep(
+        "strategist-v2",
+        "synthesis",
+        "strategist",
+        "synthesis",
+        "stage2/strategist-draft-v2.md",
+        (
+            "run-manifest.json",
+            "stage1/*-brief.md",
+            "stage1/evidence-map.md",
+            "evidence-ledger.jsonl",
+            "stage2/narrative-options.md",
+            "stage2/strategist-draft-v1.md",
+            "stage2/red-team-critique-v1.md",
+        ),
+    ),
+    PipelineStep(
+        "airport-executive-review",
+        "synthesis",
+        "airport-executive-reviewer",
+        "executive_review",
+        "stage2/red-team-critique-v2.md",
+        (
+            "run-manifest.json",
+            "stage2/strategist-draft-v2.md",
+            "stage2/red-team-critique-v1.md",
+            "context/airport-context.md",
+            "stage1/evidence-map.md",
+        ),
+    ),
+    PipelineStep(
+        "strategist-v3",
+        "synthesis",
+        "strategist",
+        "synthesis",
+        "stage2/strategist-draft-v3.md",
+        (
+            "run-manifest.json",
+            "stage1/*-brief.md",
+            "stage1/evidence-map.md",
+            "evidence-ledger.jsonl",
+            "stage2/narrative-options.md",
+            "stage2/strategist-draft-v2.md",
+            "stage2/red-team-critique-v2.md",
+        ),
+    ),
+    PipelineStep(
+        "editor",
+        "polish",
+        "editor",
+        "editor",
+        "stage3/edited-draft.md",
+        ("run-manifest.json", "stage2/strategist-draft-v3.md"),
+    ),
+    PipelineStep(
+        "humanizer",
+        "polish",
+        "humanizer",
+        "humanizer",
+        "stage3/humanized-draft.md",
+        ("run-manifest.json", "stage3/edited-draft.md"),
+    ),
+    PipelineStep(
+        "fact-checker",
+        "verification",
+        "fact-checker",
+        "factcheck",
+        "stage3/final-draft.md",
+        (
+            "run-manifest.json",
+            "stage1/*-brief.md",
+            "stage1/evidence-map.md",
+            "stage3/humanized-draft.md",
+            "evidence-ledger.jsonl",
+            "context/airport-context.md",
+            "context/context-sources.jsonl",
+        ),
+        quality_gate="primary_source_verification",
+    ),
+    PipelineStep(
+        "art-director",
+        "production",
+        "art-director",
+        "art_direction",
+        "stage4/visual-brief.json",
+        (
+            "stage3/final-draft.md",
+            "stage3/fact-check-report.md",
+            "run-manifest.json",
+            "stage1/evidence-map.md",
+            "evidence-ledger.jsonl",
+            "claim-lineage.jsonl",
+            "context/airport-context.md",
+        ),
+    ),
+    PipelineStep(
+        "word-visual-inspection",
+        "production",
+        "art-director",
+        "art_direction",
+        "stage4/{slug}-word-visual-inspection.json",
+        (
+            "stage4/{slug}.docx",
+            "stage4/qa/{slug}/*.png",
+        ),
+        quality_gate="rendered_page_inspection",
+    ),
+    PipelineStep(
+        "presentation",
+        "production",
+        "presentation-designer",
+        "presentation",
+        "stage4/{slug}.pptx",
+        (
+            "stage4/visual-brief.json",
+            "stage3/final-draft.md",
+            "stage3/fact-check-report.md",
+            "claim-lineage.jsonl",
+            "evidence-ledger.jsonl",
+            "context/airport-context.md",
+            "run-manifest.json",
+        ),
+        quality_gate="office_package",
+    ),
+)
+
+RESEARCH_EVIDENCE_CONTRACT = ArtifactContract(
+    "jsonl",
+    min_records=1,
+    required_keys=("claim", "source_title", "source_type", "confidence"),
+    required_any=(("source_url", "source_path"),),
+    optional=True,
+)
+
+CONTEXT_SOURCES_CONTRACT = ArtifactContract(
+    "jsonl",
+    min_records=0,
+    required_keys=(
+        "source",
+        "source_url",
+        "source_type",
+        "is_primary",
+        "locator",
+        "date",
+        "context_supported",
+    ),
+)
+
+EVIDENCE_LEDGER_CONTRACT = ArtifactContract(
+    "jsonl",
+    min_records=1,
+    required_keys=(
+        "evidence_id",
+        "agent_id",
+        "claim",
+        "source_title",
+        "source_type",
+        "is_primary",
+        "confidence",
+    ),
+    required_any=(("source_url", "source_path"),),
+)
+
+CLAIM_LINEAGE_CONTRACT = ArtifactContract(
+    "jsonl",
+    min_records=1,
+    required_keys=(
+        "claim_id",
+        "claim",
+        "citation",
+        "footnote_id",
+        "evidence_ids",
+        "verification_status",
+        "primary_source_checked",
+        "retained",
+        "draft_sha256",
+    ),
+)
+
+CLAIM_LINEAGE_AGENT_CONTRACT = ArtifactContract(
+    "jsonl",
+    min_records=1,
+    required_keys=(
+        "claim_id",
+        "claim",
+        "citation",
+        "footnote_id",
+        "evidence_ids",
+        "verification_status",
+        "primary_source_checked",
+        "retained",
+    ),
+)
+
+
+def _pipeline_steps(phase: str) -> tuple[PipelineStep, ...]:
+    return tuple(step for step in PIPELINE_DEFINITION if step.phase == phase)
+
+
+def _has_content(
+    path: Path,
+    min_bytes: int = 200,
+    *,
+    contract: ArtifactContract | None = None,
+) -> bool:
+    """Return whether an artifact satisfies its typed completion contract.
+
+    ``min_bytes`` remains in the signature for compatibility with callers from
+    older extensions, but completion is no longer based on byte size.
+    """
+
+    del min_bytes
+    return validate_artifact(path, contract or contract_for_path(path)).valid
+
+
+def _required_outputs_complete(
+    outputs: tuple[tuple[Path, ArtifactContract], ...],
+) -> bool:
+    return bool(outputs) and all(
+        validate_artifact(path, contract).valid for path, contract in outputs
+    )
+
+
+def _required_outputs_match_manifest(
+    outputs: tuple[tuple[Path, ArtifactContract], ...],
+    manifest_path: Path | None,
+    dependency_inputs: tuple[str, ...] = (),
+) -> bool:
+    """Confirm resumable outputs and their declared upstream inputs still match."""
+
+    if manifest_path is None:
+        return True
     try:
-        return path.is_file() and path.stat().st_size >= min_bytes
-    except OSError:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
         return False
+    by_path = {
+        str(item.get("path")): item
+        for item in manifest.get("artifacts", [])
+        if isinstance(item, dict)
+    }
+    outputs_dir = manifest_path.parent
+    for path, contract in outputs:
+        validation = validate_artifact(path, contract)
+        try:
+            relative = path.resolve().relative_to(outputs_dir.resolve()).as_posix()
+        except ValueError:
+            return False
+        record = by_path.get(relative)
+        if (
+            not record
+            or record.get("status") != "complete"
+            or not validation.sha256
+            or record.get("sha256") != validation.sha256
+        ):
+            return False
+        if dependency_inputs:
+            recorded_dependencies = record.get("dependencies")
+            recorded_declarations = tuple(
+                str(item.get("declared_input") or "")
+                for item in (
+                    recorded_dependencies.get("inputs", [])
+                    if isinstance(recorded_dependencies, dict)
+                    else []
+                )
+                if isinstance(item, dict)
+            )
+            if (
+                recorded_declarations != dependency_inputs
+                or not dependency_fingerprint_matches(
+                    manifest_path, recorded_dependencies
+                )
+            ):
+                return False
+    return True
+
+
+def _quarantine_partial_output(path: Path | None) -> None:
+    """Keep failed generated output for diagnosis without letting resume skip it."""
+
+    if path is None or not path.is_file():
+        return
+    stamp = datetime.now().strftime("%Y%m%dT%H%M%S%f")
+    partial = path.with_name(f"{path.name}.partial-{stamp}")
+    os.replace(path, partial)
 
 
 async def _run_agent(
@@ -96,7 +539,15 @@ async def _run_agent(
     tally: CostTally,
     output_path: Path | None = None,
     max_turns: int | None = None,
-) -> None:
+    artifact_contract: ArtifactContract | None = None,
+    manifest_path: Path | None = None,
+    artifact_id: str | None = None,
+    budget_allocation_usd: float | None = None,
+    required_outputs: tuple[tuple[Path, ArtifactContract], ...] = (),
+    dependency_inputs: tuple[str, ...] = (),
+    emit_completion: bool = True,
+    cost_journal: Callable[[CostTally], None] | None = None,
+) -> dict[str, object]:
     """Invoke one agent end-to-end via the Claude Agent SDK.
 
     If `output_path` is set and already exists with material content, the
@@ -113,27 +564,149 @@ async def _run_agent(
     if max_turns is None:
         max_turns = get_config().max_turns
 
-    if output_path is not None and _has_content(output_path):
+    output_contract = (
+        artifact_contract
+        or (contract_for_path(output_path) if output_path is not None else None)
+    )
+    completion_outputs = tuple(required_outputs)
+    if output_path is not None and output_contract is not None:
+        completion_outputs = (
+            (output_path, output_contract),
+            *tuple(
+                item for item in completion_outputs if item[0] != output_path
+            ),
+        )
+    if (
+        completion_outputs
+        and _required_outputs_complete(completion_outputs)
+        and _required_outputs_match_manifest(
+            completion_outputs,
+            manifest_path,
+            dependency_inputs,
+        )
+    ):
+        if agent.provider != "openai":
+            tally.consume_skipped_call()
         console.print(
             f"[dim]↷ {step_label} skipped — {output_path.relative_to(cwd)} already exists[/dim]"
         )
-        return
+        validation = validate_artifact(output_path, output_contract)
+        if manifest_path is not None:
+            update_artifact(
+                manifest_path,
+                output_path,
+                validation,
+                artifact_id=artifact_id,
+                producer=agent.name,
+            )
+        await emit(
+            "agent_skipped",
+            step=step_label,
+            agent=agent.name,
+            path=str(output_path),
+            reason="validated artifact already complete",
+        )
+        await emit(
+            "artifact_validated",
+            step=step_label,
+            **validation.to_dict(),
+        )
+        return {"skipped": True, "provider": agent.provider}
 
-    tally.check_budget(step_label)
+    if manifest_path is not None:
+        for candidate_path, candidate_contract in completion_outputs:
+            if (
+                validate_artifact(candidate_path, candidate_contract).valid
+                and not _required_outputs_match_manifest(
+                    ((candidate_path, candidate_contract),),
+                    manifest_path,
+                    dependency_inputs,
+                )
+            ):
+                _quarantine_partial_output(candidate_path)
+
+    call_budget = (
+        None
+        if agent.provider == "openai"
+        else tally.reserve(step_label, budget_allocation_usd)
+    )
 
     if agent.provider == "openai":
-        await _run_openai_deep_research(
+        openai_metrics = await _run_openai_deep_research(
             agent=agent,
             user_prompt=user_prompt,
             step_label=step_label,
             tally=tally,
             output_path=output_path,
         )
-        if output_path is not None and not _has_content(output_path):
+        if (
+            output_path is not None
+            and output_contract is not None
+            and not _has_content(output_path, contract=output_contract)
+        ):
+            await emit(
+                "agent_error",
+                step=step_label,
+                agent=agent.name,
+                error_type="ArtifactContractError",
+                message=f"OpenAI finished without a valid {output_path.name}.",
+                provider="openai",
+                billed_separately=True,
+            )
             raise RuntimeError(
                 f"{step_label} (OpenAI) finished without producing {output_path}."
             )
-        return
+        if output_path is not None and output_contract is not None:
+            validation = validate_artifact(output_path, output_contract)
+            if manifest_path is not None:
+                dependencies = (
+                    build_dependency_fingerprint(
+                        manifest_path, dependency_inputs
+                    )
+                    if dependency_inputs
+                    else None
+                )
+                if (
+                    dependencies is not None
+                    and dependencies.get("complete") is not True
+                ):
+                    _quarantine_partial_output(output_path)
+                    raise RuntimeError(
+                        f"{step_label} cannot bind its output because a declared "
+                        "upstream input is missing or unsafe."
+                    )
+                update_artifact(
+                    manifest_path,
+                    output_path,
+                    validation,
+                    artifact_id=artifact_id,
+                    producer=agent.name,
+                    dependencies=dependencies,
+                )
+            await emit(
+                "artifact_validated",
+                step=step_label,
+                **validation.to_dict(),
+            )
+        if emit_completion:
+            await emit(
+                "agent_done",
+                step=step_label,
+                agent=agent.name,
+                cost=None,
+                turns=None,
+                total=tally.total,
+                provider="openai",
+                billed_separately=True,
+                usage=openai_metrics,
+            )
+        return {
+            "skipped": False,
+            "provider": "openai",
+            "cost": None,
+            "turns": None,
+            "usage": openai_metrics,
+        }
 
     from claude_agent_sdk import (
         AssistantMessage,
@@ -151,6 +724,7 @@ async def _run_agent(
         model=model,
         cwd=str(cwd),
         max_turns=max_turns,
+        max_budget_usd=call_budget,
         # Defense in depth: the SDK reads stdout as newline-delimited JSON with
         # a 1 MB default line limit. A single large tool-result (e.g. an agent
         # reading a big file) crashes the reader. Source PDFs are extracted to
@@ -167,6 +741,8 @@ async def _run_agent(
     SPURIOUS = "Claude Code returned an error result: success"
     attempts_left = 2
     last_exc: Exception | None = None
+    completed_cost: float | None = None
+    completed_turns: int | None = None
     while attempts_left > 0:
         attempts_left -= 1
         saw_result = False
@@ -202,7 +778,12 @@ async def _run_agent(
                         and turns <= 1
                         and cost == 0.0
                         and output_path is not None
-                        and not _has_content(output_path)
+                        and (
+                            output_contract is None
+                            or not _has_content(
+                                output_path, contract=output_contract
+                            )
+                        )
                     ):
                         console.print(
                             f"  [yellow]↻ {step_label} returned 1 turn / $0 — "
@@ -211,13 +792,64 @@ async def _run_agent(
                         await asyncio.sleep(5)
                         last_exc = RuntimeError("spurious-success retry")
                         break
-                    tally.add(step_label, cost)
-                    console.print(
-                        f"  [green]✓ {step_label} done[/green] "
-                        f"[dim](${cost:.2f}, {turns} turns)[/dim]"
+                    result_errors = list(getattr(msg, "errors", None) or [])
+                    permission_denials = list(
+                        getattr(msg, "permission_denials", None) or []
                     )
-                    await emit("agent_done", step=step_label, agent=agent.name,
-                               cost=cost, turns=turns, total=tally.total)
+                    stop_reason = str(
+                        getattr(msg, "stop_reason", None) or ""
+                    ).strip()
+                    subtype = str(getattr(msg, "subtype", "") or "").strip()
+                    api_status = getattr(msg, "api_error_status", None)
+                    fatal_stop = any(
+                        token in stop_reason.casefold()
+                        for token in (
+                            "refus",
+                            "error",
+                            "max_token",
+                            "max_budget",
+                            "context_window",
+                        )
+                    )
+                    failed_result = (
+                        bool(getattr(msg, "is_error", False))
+                        or bool(result_errors)
+                        or bool(permission_denials)
+                        or (
+                            isinstance(api_status, int)
+                            and api_status >= 400
+                        )
+                        or subtype.casefold().startswith("error")
+                        or fatal_stop
+                    )
+                    if failed_result:
+                        tally.add(step_label, cost)
+                        if cost_journal is not None:
+                            cost_journal(tally)
+                        tally.release(step_label)
+                        _quarantine_partial_output(output_path)
+                        details = [
+                            *result_errors[:3],
+                            (
+                                f"permission denials: {len(permission_denials)}"
+                                if permission_denials
+                                else ""
+                            ),
+                            f"API status: {api_status}" if api_status else "",
+                            f"stop reason: {stop_reason}" if stop_reason else "",
+                            f"subtype: {subtype}" if subtype else "",
+                        ]
+                        detail = "; ".join(item for item in details if item)
+                        raise RuntimeError(
+                            f"{step_label} returned an unsuccessful model result"
+                            + (f": {detail}" if detail else "")
+                        )
+                    tally.add(step_label, cost)
+                    if cost_journal is not None:
+                        cost_journal(tally)
+                    tally.release(step_label)
+                    completed_cost = float(cost)
+                    completed_turns = int(turns)
             else:
                 # async-for completed cleanly without our break — done.
                 break
@@ -232,12 +864,44 @@ async def _run_agent(
                 )
                 await asyncio.sleep(5)
                 continue
+            await emit(
+                "agent_error",
+                step=step_label,
+                agent=agent.name,
+                error_type=type(e).__name__,
+                message=str(e),
+            )
+            tally.release(step_label)
             raise
 
     # Catch the "agent completed its turn budget without writing" silent failure.
     # The SDK reports cost and turn count even when Claude Code marks the result
     # is_error=true with subtype=success (the signature of a max_turns exhaustion).
-    if output_path is not None and not _has_content(output_path):
+    if (
+        output_path is not None
+        and output_contract is not None
+        and not _has_content(output_path, contract=output_contract)
+    ):
+        tally.release(step_label)
+        validation = validate_artifact(output_path, output_contract)
+        if manifest_path is not None:
+            update_artifact(
+                manifest_path,
+                output_path,
+                validation,
+                artifact_id=artifact_id,
+                producer=agent.name,
+            )
+        await emit(
+            "artifact_validated",
+            step=step_label,
+            **validation.to_dict(),
+        )
+        if output_path.is_file() and validation.size_bytes:
+            raise RuntimeError(
+                f"{step_label} wrote {output_path}, but it failed the artifact "
+                f"contract: {'; '.join(validation.errors)}"
+            )
         if last_exc and "spurious-success" not in str(last_exc):
             # The last attempt threw something other than our retry signal; re-raise.
             raise last_exc
@@ -252,6 +916,107 @@ async def _run_agent(
             f"with `claude -p \"say PONG\" --max-turns 1`, then relaunch and "
             f"choose Resume."
         )
+    tally.release(step_label)
+    incomplete_companions = [
+        (path, validate_artifact(path, contract))
+        for path, contract in completion_outputs
+        if not validate_artifact(path, contract).valid
+    ]
+    if incomplete_companions:
+        detail = "; ".join(
+            f"{path.name}: {', '.join(validation.errors)}"
+            for path, validation in incomplete_companions
+        )
+        # The outputs form one commit unit. Preserve every member as a
+        # quarantined diagnostic, including a valid-looking primary file,
+        # rather than allowing a later resume to mix artifacts from different
+        # attempts.
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        await emit(
+            "agent_error",
+            step=step_label,
+            agent=agent.name,
+            error_type="ArtifactContractError",
+            message=detail,
+        )
+        raise RuntimeError(
+            f"{step_label} did not complete its atomic artifact set: {detail}"
+        )
+    dependencies = (
+        build_dependency_fingerprint(manifest_path, dependency_inputs)
+        if manifest_path is not None and dependency_inputs
+        else None
+    )
+    if dependencies is not None and dependencies.get("complete") is not True:
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        raise RuntimeError(
+            f"{step_label} cannot bind its output because a declared upstream "
+            "input is missing or unsafe."
+        )
+    if manifest_path is not None:
+        for companion_path, companion_contract in completion_outputs:
+            if companion_path == output_path:
+                continue
+            companion_validation = validate_artifact(
+                companion_path, companion_contract
+            )
+            update_artifact(
+                manifest_path,
+                companion_path,
+                companion_validation,
+                producer=agent.name,
+                dependencies=dependencies,
+            )
+    if output_path is not None and output_contract is not None:
+        validation = validate_artifact(output_path, output_contract)
+        if manifest_path is not None:
+            update_artifact(
+                manifest_path,
+                output_path,
+                validation,
+                artifact_id=artifact_id,
+                producer=agent.name,
+                dependencies=dependencies,
+            )
+        await emit(
+            "artifact_validated",
+            step=step_label,
+            **validation.to_dict(),
+        )
+    if completed_cost is None or completed_turns is None:
+        await emit(
+            "agent_error",
+            step=step_label,
+            agent=agent.name,
+            error_type="MissingResultMessage",
+            message="Agent stream ended without a successful ResultMessage.",
+        )
+        raise RuntimeError(
+            f"{step_label} ended without a successful model result."
+        )
+    if emit_completion:
+        console.print(
+            f"  [green]✓ {step_label} done[/green] "
+            f"[dim](${completed_cost:.2f}, {completed_turns} turns)[/dim]"
+        )
+        await emit(
+            "agent_done",
+            step=step_label,
+            agent=agent.name,
+            cost=completed_cost,
+            turns=completed_turns,
+            total=tally.total,
+            provider="anthropic",
+            billed_separately=False,
+        )
+    return {
+        "skipped": False,
+        "provider": "anthropic",
+        "cost": completed_cost,
+        "turns": completed_turns,
+    }
 
 
 async def _run_openai_deep_research(
@@ -261,7 +1026,7 @@ async def _run_openai_deep_research(
     step_label: str,
     tally: CostTally,
     output_path: Path | None,
-) -> None:
+) -> dict[str, int | None]:
     """Run a research brief through an OpenAI deep-research model.
 
     OpenAI agents cannot use our file tools, so the prompt must carry all
@@ -283,8 +1048,17 @@ async def _run_openai_deep_research(
 
     model = agent.model_override or _model("openai_deep_research")
     console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model} via OpenAI)")
+    await emit(
+        "agent_start",
+        step=step_label,
+        agent=agent.name,
+        display=agent.display_name,
+        model=model,
+        provider="openai",
+        billed_separately=True,
+    )
 
-    def _call() -> str:
+    def _call() -> tuple[str, dict[str, int | None]]:
         client = OpenAI(timeout=3600.0)
         resp = client.responses.create(
             model=model,
@@ -292,30 +1066,71 @@ async def _run_openai_deep_research(
             input=user_prompt,
             tools=[{"type": "web_search_preview"}],
         )
-        return resp.output_text
+        usage = getattr(resp, "usage", None)
+        metrics = {
+            "input_tokens": getattr(usage, "input_tokens", None),
+            "output_tokens": getattr(usage, "output_tokens", None),
+            "total_tokens": getattr(usage, "total_tokens", None),
+        }
+        return resp.output_text, metrics
 
-    text = await asyncio.to_thread(_call)
+    try:
+        text, metrics = await asyncio.to_thread(_call)
+    except Exception as exc:
+        await emit(
+            "agent_error",
+            step=step_label,
+            agent=agent.name,
+            error_type=type(exc).__name__,
+            message=str(exc),
+            provider="openai",
+            billed_separately=True,
+        )
+        raise
     if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(text, encoding="utf-8")
-    # OpenAI usage is billed on the OpenAI account; not added to the Claude tally.
-    tally.add(step_label, 0.0)
+    # OpenAI usage is billed on the OpenAI account and intentionally excluded
+    # from the Claude-only tally and ceiling.
     console.print(
         f"  [green]✓ {step_label} done[/green] [dim](billed to OpenAI account, "
         f"not in Claude tally)[/dim]"
     )
+    return metrics
 
 
 def _stage1_prompt(agent: Agent, run_file: Path, output_path: Path, override: str) -> str:
     parts = [
         f"You are producing an independent research brief for the Council run defined in `{run_file}`.",
         f"Read that file first for the thesis, audience, tone, and any per-agent override.",
+        "Read `prompts/research-contract.md` and follow its brief/evidence artifact "
+        "schema exactly.",
+        "Read `outputs/run-manifest.json` for the authoritative run contract and "
+        "`outputs/context/airport-context.md` for airport-specific constraints, "
+        "governance, plans, and operator-supplied context. Treat context sources as "
+        "starting evidence, not as conclusions.",
         "",
         f"Write your brief to: `{output_path}`",
         "",
         "Critical rule: do NOT read any other agent's output in `outputs/stage1/`. "
         "Independent evidence is a design feature — Stage 2 needs your distinct lens.",
     ]
+    if agent.provider != "openai":
+        evidence_path = output_path.with_name(
+            output_path.name.replace("-brief.md", "-evidence.jsonl")
+        )
+        parts += [
+            "",
+            f"Also write a structured evidence companion to: `{evidence_path}`",
+            "Write one valid JSON object per line, with no markdown fence. Each record "
+            "must contain `claim`, `source_title`, `source_url` or `source_path`, "
+            "`source_type`, `is_primary`, `page_or_section`, "
+            "`supporting_excerpt`, `source_date`, `data_vintage`, "
+            "`airport_or_entity`, `units`, `denominator`, `caveat`, and "
+            "`confidence`. Omit or use null for "
+            "unknown optional fields; never invent metadata. The brief remains the "
+            "readable analysis and the JSONL is its claim-level evidence trail.",
+        ]
     if override:
         parts += [
             "",
@@ -324,19 +1139,50 @@ def _stage1_prompt(agent: Agent, run_file: Path, output_path: Path, override: st
     return "\n".join(parts)
 
 
-def _stage2_prompts(run_file: Path) -> dict[str, str]:
-    return {
+def _stage2_prompts(
+    run_file: Path,
+    manifest_path: Path | None = None,
+    repo_root: Path | None = None,
+) -> dict[str, str]:
+    prompts = {
+        "creative-director": (
+            f"Read the run prompt at `{run_file}`, `outputs/run-manifest.json`, "
+            "`outputs/context/airport-context.md`, "
+            "`outputs/stage1/evidence-map.md`, and "
+            "`outputs/evidence-ledger.jsonl`.\n\n"
+            "Develop three genuinely different narrative spines for the report: "
+            "(1) conservative and board-ready, (2) counterintuitive, and "
+            "(3) operationally grounded in a specific airport moment. For each, "
+            "provide the thesis, opening scene, signature evidence visual, strongest "
+            "objection, memorable comparison, and why it matters to the decision "
+            "owner. Rank the options using truth, originality, airport specificity, "
+            "and decision usefulness; recommend one without inventing facts.\n"
+            "Write to: `outputs/stage2/narrative-options.md`"
+        ),
         "strategist-v1": (
             "Read the run prompt at "
-            f"`{run_file}` and all eight (or fewer) briefs in `outputs/stage1/`.\n\n"
-            "Produce the first argumentative draft of the Council's main piece.\n"
+            f"`{run_file}`, `outputs/run-manifest.json`, every brief declared in the "
+            "manifest, `outputs/context/airport-context.md`, "
+            "`outputs/stage1/evidence-map.md`, "
+            "`outputs/stage2/narrative-options.md`, and "
+            "`outputs/evidence-ledger.jsonl`.\n\n"
+            "Produce the first argumentative draft of the Council's main piece. Use "
+            "the strongest narrative spine, preserve meaningful disagreement, and "
+            "cite primary sources through markdown footnotes rather than internal "
+            "agent or brief names.\n"
             "Write to: `outputs/stage2/strategist-draft-v1.md`"
         ),
-        "red-team-v1": (
+        "evidence-prosecutor": (
             "Read the run prompt at "
-            f"`{run_file}` and the Strategist's draft at `outputs/stage2/strategist-draft-v1.md`.\n\n"
-            "Attack the draft: weak claims, logical gaps, unsupported assertions, places the argument is vulnerable. "
-            "Number every critique item so the Strategist can address each one.\n"
+            f"`{run_file}`, `outputs/run-manifest.json`, the Strategist's draft at "
+            "`outputs/stage2/strategist-draft-v1.md`, every selected research brief, "
+            "`outputs/stage1/evidence-map.md`, and "
+            "`outputs/evidence-ledger.jsonl`.\n\n"
+            "Act as an evidence prosecutor. Attack source quality, numerical support, "
+            "causal leaps, cherry-picking, stale data, missing denominators, hidden "
+            "assumptions, and any counterevidence the draft suppresses. Trace each "
+            "load-bearing critique to evidence IDs or primary sources. Number every "
+            "item so the Strategist can answer it.\n"
             "Write to: `outputs/stage2/red-team-critique-v1.md`"
         ),
         "strategist-v2": (
@@ -346,10 +1192,18 @@ def _stage2_prompts(run_file: Path) -> dict[str, str]:
             "say so explicitly in a brief revision-notes section at the top.\n"
             "Write the revised draft to: `outputs/stage2/strategist-draft-v2.md`"
         ),
-        "red-team-v2": (
-            "Read `outputs/stage2/strategist-draft-v2.md` and your previous critique at "
-            "`outputs/stage2/red-team-critique-v1.md`.\n\n"
-            "Attack again. Focus on what the v2 revision did NOT fix, and on new weaknesses the revision introduced.\n"
+        "airport-executive-review": (
+            "Read `outputs/stage2/strategist-draft-v2.md`, "
+            "`outputs/stage2/red-team-critique-v1.md`, "
+            "`outputs/context/airport-context.md`, "
+            "`outputs/stage1/evidence-map.md`, `outputs/run-manifest.json`, and "
+            f"the decision framing in `{run_file}`.\n\n"
+            "Review from the chair of a skeptical airport executive. Test operational "
+            "feasibility, owner and authority, airline response, use-and-lease terms, "
+            "procurement path, board and political realities, bond and funding impact, "
+            "FAA constraints, staffing, first-90-day action, leading metrics, and stop "
+            "conditions. Focus on what the evidence pass did not test. Number every "
+            "item and distinguish a fatal flaw from an implementation condition.\n"
             "Write to: `outputs/stage2/red-team-critique-v2.md`"
         ),
         "strategist-v3": (
@@ -360,14 +1214,26 @@ def _stage2_prompts(run_file: Path) -> dict[str, str]:
             "Write to: `outputs/stage2/strategist-draft-v3.md`"
         ),
     }
+    if manifest_path is not None and repo_root is not None:
+        contract = manifest_prompt_block(manifest_path, repo_root=repo_root)
+        prompts = {name: prompt + contract for name, prompt in prompts.items()}
+    return prompts
 
 
-def _stage3_prompts(run_file: Path) -> dict[str, str]:
-    return {
+def _stage3_prompts(
+    run_file: Path,
+    manifest_path: Path | None = None,
+    repo_root: Path | None = None,
+) -> dict[str, str]:
+    prompts = {
         "editor": (
             "Read the run prompt at "
             f"`{run_file}` and `outputs/stage2/strategist-draft-v3.md`.\n\n"
-            "Cut 15-25% of word count. Kill buzzwords (see CLAUDE.md). Flag any hedge or "
+            "Honor the output format and keep the reader-facing draft inside the "
+            "numeric range in `## Length`; publication checks that range "
+            "deterministically. Cut repetition and excess—up to 25% when the draft "
+            "has room—but never cut below the requested floor. Kill buzzwords (see "
+            "CLAUDE.md). Flag any hedge or "
             "numerical claim that needs Fact-checker verification with a bracketed inline tag.\n"
             "Write the edited draft to: `outputs/stage3/edited-draft.md`\n"
             "Write your editor notes to: `outputs/stage3/editor-notes.md`"
@@ -382,23 +1248,62 @@ def _stage3_prompts(run_file: Path) -> dict[str, str]:
             "Write the refined draft to: `outputs/stage3/humanized-draft.md`"
         ),
         "fact-checker": (
-            "Read `outputs/stage3/humanized-draft.md` and every brief in `outputs/stage1/`. "
+            "Read `outputs/stage3/humanized-draft.md`, `outputs/run-manifest.json`, "
+            "every brief declared in the manifest, "
+            "`outputs/stage1/evidence-map.md`, `outputs/evidence-ledger.jsonl`, "
+            "`outputs/context/airport-context.md`, and "
+            "`outputs/context/context-sources.jsonl`. "
             f"Also read the run prompt at `{run_file}`.\n\n"
-            "Verify every numerical claim, attributed quote, and specific assertion against the Stage 1 briefs. "
-            "Tag claims you cannot verify with `[UNVERIFIED — HUMAN REVIEW]` in the final draft. You have veto "
-            "power over any claim that cannot be sourced.\n"
+            "Verify every numerical claim, attributed quote, and specific assertion "
+            "against the underlying primary source—not merely against another agent's "
+            "brief. Open the cited URL or local source when tools permit; confirm the "
+            "exact number, denominator, date, page or section, attribution, and that "
+            "the source supports the draft's wording. A brief can help locate evidence "
+            "but cannot certify it. Correct or remove claims that fail. Do not release "
+            "an `[UNVERIFIED — HUMAN REVIEW]` tag in the final draft. Preserve the "
+            "requested output format and keep reader-facing prose inside the numeric "
+            "range in the run prompt's `## Length` section.\n"
             "Write the fact-check report to: `outputs/stage3/fact-check-report.md`\n"
-            "Write the final draft to: `outputs/stage3/final-draft.md`"
+            "Write the final draft to: `outputs/stage3/final-draft.md`\n"
+            "Write claim-level verification to `outputs/claim-lineage.jsonl`, one "
+            "JSON object per line with: `claim_id`, `claim` (exact reader-facing "
+            "claim text), `footnote_id` (the marker label without `[^ ]`), "
+            "`citation` (exactly equal to that footnote's definition), "
+            "`evidence_ids`, `retained` (boolean), "
+            "`verification_status` (verified, qualified, corrected, removed, or "
+            "unverified), `primary_source_checked`, and "
+            "`correction` when applicable. No markdown fence."
         ),
     }
+    if manifest_path is not None and repo_root is not None:
+        contract = manifest_prompt_block(manifest_path, repo_root=repo_root)
+        prompts = {name: prompt + contract for name, prompt in prompts.items()}
+    return prompts
 
 
-STAGE_SUBDIRS: tuple[str, ...] = ("stage1", "stage2", "stage3", "stage4")
+STAGE_SUBDIRS: tuple[str, ...] = (
+    "context",
+    "evaluation",
+    "stage1",
+    "stage2",
+    "stage3",
+    "stage4",
+)
+RUN_ROOT_ARTIFACTS: tuple[str, ...] = (
+    "run-manifest.json",
+    "evidence-ledger.jsonl",
+    "claim-lineage.jsonl",
+    "quality-gate.json",
+)
 
 
 def _existing_artifacts(outputs_dir: Path) -> list[Path]:
     """Return any pre-existing files under outputs/stage*/ that would conflict."""
-    found: list[Path] = []
+    found: list[Path] = [
+        outputs_dir / name
+        for name in RUN_ROOT_ARTIFACTS
+        if (outputs_dir / name).is_file()
+    ]
     for sub in STAGE_SUBDIRS:
         stage_dir = outputs_dir / sub
         if not stage_dir.is_dir():
@@ -445,10 +1350,128 @@ async def prepare_outputs(outputs_dir: Path, auto_approve: bool, resume: bool = 
             target = outputs_dir / sub
             if target.is_dir():
                 shutil.rmtree(target)
+        for name in RUN_ROOT_ARTIFACTS:
+            target = outputs_dir / name
+            if target.is_file():
+                target.unlink()
 
     for sub in STAGE_SUBDIRS:
         (outputs_dir / sub).mkdir(parents=True, exist_ok=True)
     (outputs_dir / ".gitkeep").touch(exist_ok=True)
+
+
+async def run_airport_context(
+    *,
+    spec: RunSpec,
+    run_file: Path,
+    outputs_dir: Path,
+    all_agents: list[Agent],
+    tally: CostTally,
+    manifest_path: Path,
+) -> None:
+    """Build the shared airport context packet before independent research."""
+
+    step = next(item for item in PIPELINE_DEFINITION if item.id == "airport-context")
+    by_name = {agent.name: agent for agent in all_agents}
+    agent = by_name.get(step.agent)
+    context_path = outputs_dir / step.output
+    sources_path = outputs_dir / "context" / "context-sources.jsonl"
+    await emit(
+        "phase_start",
+        phase="context",
+        label="Build airport and decision context",
+    )
+    update_stage(manifest_path, "context", "running")
+
+    if agent is None:
+        # Compatibility for installations that resume before the v2 process
+        # agent files have been installed. This is intentionally a factual
+        # handoff, not a synthetic airport profile.
+        source_lines = "\n".join(
+            f"- `{path}`" for path in list(getattr(spec, "source_paths", []) or [])
+        ) or "- No operator-supplied source files were attached."
+        context_path.parent.mkdir(parents=True, exist_ok=True)
+        context_path.write_text(
+            "# Airport and decision context\n\n"
+            "The dedicated airport-context builder is not installed in this "
+            "environment. Researchers must use the run prompt and attached sources "
+            "without assuming a specific airport, governance model, airline "
+            "agreement, approval path, capital plan, or operating constraint.\n\n"
+            f"## Decision\n\n{getattr(spec, 'decision_required', '') or 'Not specified.'}\n\n"
+            f"## Decision owner\n\n{getattr(spec, 'decision_owner', '') or 'Not specified.'}\n\n"
+            f"## Operator context\n\n{getattr(spec, 'operator_context', '') or 'Not specified.'}\n\n"
+            f"## Attached sources\n\n{source_lines}\n",
+            encoding="utf-8",
+        )
+        sources_path.write_text("\n", encoding="utf-8")
+    else:
+        prompt = (
+            f"Read the authoritative run contract at `outputs/run-manifest.json` "
+            f"and the run prompt at `{run_file}`. Build a concise airport context "
+            "packet before the research swarm begins.\n\n"
+            "Identify the named airport/operator, decision owner, decision required, "
+            "time horizon, approval path, governance, airline/use-and-lease context, "
+            "capital and financial constraints, operating conditions, relevant plans, "
+            "and source limitations. Read every operator-supplied source declared in "
+            "the manifest. If no airport or operator is named, do not conduct broad "
+            "airport web research or invent a local profile; summarize only the "
+            "decision framing and attached-source context, and label what remains "
+            "unknown.\n\n"
+            "Write the readable packet to `outputs/context/airport-context.md`. "
+            "Write one JSON object per line to "
+            "`outputs/context/context-sources.jsonl` for every source actually used, "
+            "with `source`, `source_url`, `source_type`, `is_primary`, `locator`, "
+            "`date`, and `context_supported`. If no source was used, still create "
+            "the file as newline-only valid empty JSONL. Do not wrap JSONL in "
+            "markdown."
+        )
+        await _run_agent(
+            agent=agent,
+            user_prompt=prompt,
+            model=_model(step.model_role),
+            cwd=outputs_dir.parent,
+            step_label="context/airport-context",
+            tally=tally,
+            output_path=context_path,
+            manifest_path=manifest_path,
+            artifact_id="context/airport-context",
+            required_outputs=(
+                (sources_path, CONTEXT_SOURCES_CONTRACT),
+            ),
+            dependency_inputs=step.inputs,
+        )
+
+    context_validation = validate_artifact(context_path)
+    update_artifact(
+        manifest_path,
+        context_path,
+        context_validation,
+        artifact_id="context/airport-context",
+        producer=step.agent if agent is not None else "orchestrator",
+        dependencies=build_dependency_fingerprint(
+            manifest_path, step.inputs
+        ),
+    )
+    source_validation = validate_artifact(
+        sources_path, CONTEXT_SOURCES_CONTRACT
+    )
+    update_artifact(
+        manifest_path,
+        sources_path,
+        source_validation,
+        artifact_id="context/sources",
+        producer=step.agent if agent is not None else "orchestrator",
+        required=True,
+        dependencies=build_dependency_fingerprint(
+            manifest_path, step.inputs
+        ),
+    )
+    update_stage(
+        manifest_path,
+        "context",
+        "complete",
+        context_sources=source_validation.record_count,
+    )
 
 
 async def run_stage1(
@@ -457,6 +1480,7 @@ async def run_stage1(
     outputs_dir: Path,
     all_agents: list[Agent],
     tally: CostTally,
+    manifest_path: Path,
 ) -> None:
     from cli.sources import stage1_preamble, inline_for_openai
 
@@ -475,6 +1499,19 @@ async def run_stage1(
         async with stage1_semaphore:
             return await coro
 
+    await emit(
+        "research_swarm_start",
+        agents=list(spec.selected_research_agents),
+        total=len(spec.selected_research_agents),
+        concurrency=4,
+    )
+    update_stage(
+        manifest_path,
+        "research",
+        "running",
+        agents=len(spec.selected_research_agents),
+        concurrency=4,
+    )
     tasks = []
     for name in spec.selected_research_agents:
         agent = by_name[name]
@@ -489,6 +1526,48 @@ async def run_stage1(
                 + run_file.read_text(encoding="utf-8", errors="ignore")
             )
             prompt += inline_for_openai(source_paths, repo_root=outputs_dir.parent)
+        required_outputs: list[tuple[Path, ArtifactContract]] = []
+        if agent.provider != "openai":
+            required_outputs.append(
+                (
+                    outputs_dir / "stage1" / f"{name}-evidence.jsonl",
+                    ArtifactContract(
+                        "jsonl",
+                        min_records=1,
+                        required_keys=RESEARCH_EVIDENCE_CONTRACT.required_keys,
+                        required_any=RESEARCH_EVIDENCE_CONTRACT.required_any,
+                    ),
+                )
+            )
+        if name == "quantitative-analyst":
+            required_outputs.extend(
+                (
+                    (
+                        outputs_dir
+                        / "stage1"
+                        / "quantitative-analysis"
+                        / "calculations.json",
+                        contract_for_path(
+                            outputs_dir
+                            / "stage1"
+                            / "quantitative-analysis"
+                            / "calculations.json"
+                        ),
+                    ),
+                    (
+                        outputs_dir
+                        / "stage1"
+                        / "quantitative-analysis"
+                        / "README.md",
+                        contract_for_path(
+                            outputs_dir
+                            / "stage1"
+                            / "quantitative-analysis"
+                            / "README.md"
+                        ),
+                    ),
+                )
+            )
         tasks.append(_bounded_run(
             _run_agent(
                 agent=agent,
@@ -498,6 +1577,13 @@ async def run_stage1(
                 step_label=f"stage1/{name}",
                 tally=tally,
                 output_path=out,
+                manifest_path=manifest_path,
+                artifact_id=f"stage1/{name}/brief",
+                required_outputs=tuple(required_outputs),
+                dependency_inputs=(
+                    "run-manifest.json",
+                    "context/airport-context.md",
+                ),
             )
         ))
     await asyncio.gather(*tasks)
@@ -508,6 +1594,332 @@ async def run_stage1(
     ]
     if missing:
         raise RuntimeError(f"Stage 1 agents did not write their briefs: {missing}")
+    for name in spec.selected_research_agents:
+        evidence_path = outputs_dir / "stage1" / f"{name}-evidence.jsonl"
+        required_evidence = by_name[name].provider != "openai"
+        evidence_contract = (
+            ArtifactContract(
+                "jsonl",
+                min_records=1,
+                required_keys=RESEARCH_EVIDENCE_CONTRACT.required_keys,
+                required_any=RESEARCH_EVIDENCE_CONTRACT.required_any,
+            )
+            if required_evidence
+            else RESEARCH_EVIDENCE_CONTRACT
+        )
+        evidence_validation = validate_artifact(evidence_path, evidence_contract)
+        update_artifact(
+            manifest_path,
+            evidence_path,
+            evidence_validation,
+            artifact_id=f"stage1/{name}/evidence",
+            producer=name,
+            required=required_evidence,
+        )
+        if not evidence_validation.valid:
+            raise RuntimeError(
+                f"{name} did not produce a valid evidence companion: "
+                + "; ".join(evidence_validation.errors)
+            )
+        await emit(
+            "artifact_validated",
+            step=f"stage1/{name}/evidence",
+            **evidence_validation.to_dict(),
+        )
+    if "quantitative-analyst" in set(spec.selected_research_agents):
+        quantitative_artifacts = (
+            (
+                outputs_dir
+                / "stage1"
+                / "quantitative-analysis"
+                / "calculations.json",
+                "stage1/quantitative/calculations",
+            ),
+            (
+                outputs_dir / "stage1" / "quantitative-analysis" / "README.md",
+                "stage1/quantitative/readme",
+            ),
+        )
+        for quantitative_path, artifact_id in quantitative_artifacts:
+            validation = validate_artifact(quantitative_path)
+            update_artifact(
+                manifest_path,
+                quantitative_path,
+                validation,
+                artifact_id=artifact_id,
+                producer="quantitative-analyst",
+            )
+            await emit(
+                "artifact_validated",
+                step=artifact_id,
+                **validation.to_dict(),
+            )
+            if not validation.valid:
+                raise RuntimeError(
+                    "Quantitative Analyst did not produce a reproducible "
+                    f"{quantitative_path.name}: {'; '.join(validation.errors)}"
+                )
+    update_stage(
+        manifest_path,
+        "research",
+        "complete",
+        agents=len(spec.selected_research_agents),
+    )
+    await emit(
+        "research_swarm_complete",
+        agents=list(spec.selected_research_agents),
+        total=len(spec.selected_research_agents),
+    )
+
+
+async def run_evidence_curation(
+    *,
+    spec: RunSpec,
+    run_file: Path,
+    outputs_dir: Path,
+    all_agents: list[Agent],
+    tally: CostTally,
+    manifest_path: Path,
+) -> None:
+    """Build the ledger, close load-bearing gaps, and rank the evidence."""
+
+    await emit(
+        "phase_start",
+        phase="evidence",
+        label="Curate evidence, disagreements, and research gaps",
+    )
+    update_stage(manifest_path, "evidence", "running")
+    ledger_path = outputs_dir / "evidence-ledger.jsonl"
+    compatibility_path = outputs_dir / "stage1" / "evidence-ledger.jsonl"
+    curation_path = outputs_dir / "stage1" / "evidence-map.md"
+    by_name = {agent.name: agent for agent in all_agents}
+    dependency_inputs = [
+        "run-manifest.json",
+        "context/airport-context.md",
+    ]
+    for name in spec.selected_research_agents:
+        dependency_inputs.append(f"stage1/{name}-brief.md")
+        agent = by_name.get(name)
+        if agent is None or agent.provider != "openai":
+            dependency_inputs.append(f"stage1/{name}-evidence.jsonl")
+        if name == "quantitative-analyst":
+            dependency_inputs.extend(
+                (
+                    "stage1/quantitative-analysis/calculations.json",
+                    "stage1/quantitative-analysis/README.md",
+                )
+            )
+    curation_dependencies = tuple(dependency_inputs)
+    curation_outputs = (
+        (ledger_path, EVIDENCE_LEDGER_CONTRACT),
+        (compatibility_path, EVIDENCE_LEDGER_CONTRACT),
+        (curation_path, contract_for_path(curation_path)),
+    )
+    existing_ledger = validate_artifact(
+        ledger_path, EVIDENCE_LEDGER_CONTRACT
+    )
+    existing_curation = validate_artifact(curation_path)
+    if (
+        existing_ledger.valid
+        and existing_curation.valid
+        and _required_outputs_match_manifest(
+            curation_outputs,
+            manifest_path,
+            curation_dependencies,
+        )
+    ):
+        # Resume must preserve Curator-added gap-fill evidence rather than
+        # rebuilding the ledger from the pre-curation agent companions.
+        curated_result = normalise_evidence_ledger(ledger_path)
+        write_jsonl(compatibility_path, curated_result.records)
+        update_artifact(
+            manifest_path,
+            ledger_path,
+            validate_artifact(ledger_path, EVIDENCE_LEDGER_CONTRACT),
+            artifact_id="evidence/ledger",
+            producer="evidence-curator",
+            dependencies=build_dependency_fingerprint(
+                manifest_path, curation_dependencies
+            ),
+        )
+        update_artifact(
+            manifest_path,
+            compatibility_path,
+            validate_artifact(compatibility_path, EVIDENCE_LEDGER_CONTRACT),
+            artifact_id="evidence/ledger-compatibility",
+            producer="evidence-curator",
+            required=False,
+            dependencies=build_dependency_fingerprint(
+                manifest_path, curation_dependencies
+            ),
+        )
+        update_artifact(
+            manifest_path,
+            curation_path,
+            existing_curation,
+            artifact_id="evidence/curation",
+            producer="evidence-curator",
+            dependencies=build_dependency_fingerprint(
+                manifest_path, curation_dependencies
+            ),
+        )
+        await emit(
+            "evidence_update",
+            ledger_path=str(ledger_path),
+            record_count=curated_result.record_count,
+            structured_records=curated_result.structured_records,
+            legacy_records=curated_result.legacy_records,
+            agents_without_evidence=[],
+            invalid_record_count=len(curated_result.invalid_records),
+            resumed=True,
+        )
+        update_stage(
+            manifest_path,
+            "evidence",
+            "complete",
+            evidence_records=curated_result.record_count,
+            resumed=True,
+        )
+        return
+
+    for stale_path, stale_contract in curation_outputs:
+        if validate_artifact(stale_path, stale_contract).valid:
+            _quarantine_partial_output(stale_path)
+
+    ledger_result = build_evidence_ledger(
+        selected_agents=spec.selected_research_agents,
+        stage1_dir=outputs_dir / "stage1",
+        output_path=ledger_path,
+        compatibility_path=compatibility_path,
+    )
+    # An evidence-free ledger remains a valid legacy handoff: the curator can
+    # still inspect briefs and explicitly report that the run lacks usable
+    # claim-level sources. Publication verification remains strict later.
+    ledger_contract = ArtifactContract("jsonl", min_records=0)
+    ledger_validation = validate_artifact(ledger_path, ledger_contract)
+    update_artifact(
+        manifest_path,
+        ledger_path,
+        ledger_validation,
+        artifact_id="evidence/ledger",
+        producer="orchestrator",
+        dependencies=build_dependency_fingerprint(
+            manifest_path, curation_dependencies
+        ),
+    )
+    compatibility_validation = validate_artifact(
+        compatibility_path, ledger_contract
+    )
+    update_artifact(
+        manifest_path,
+        compatibility_path,
+        compatibility_validation,
+        artifact_id="evidence/ledger-compatibility",
+        producer="orchestrator",
+        required=False,
+        dependencies=build_dependency_fingerprint(
+            manifest_path, curation_dependencies
+        ),
+    )
+    await emit(
+        "evidence_update",
+        ledger_path=str(ledger_path),
+        record_count=ledger_result.record_count,
+        structured_records=ledger_result.structured_records,
+        legacy_records=ledger_result.legacy_records,
+        agents_without_evidence=ledger_result.agents_without_evidence,
+        invalid_record_count=len(ledger_result.invalid_records),
+    )
+    step = next(item for item in PIPELINE_DEFINITION if item.id == "evidence-curation")
+    curator = by_name.get(step.agent) or by_name["strategist"]
+    curation_path = outputs_dir / step.output
+    prompt = (
+        f"Read `{run_file}`, `outputs/run-manifest.json`, every selected Stage 1 "
+        "brief declared there, `outputs/evidence-ledger.jsonl`, and "
+        "`outputs/context/airport-context.md`.\n\n"
+        "Act as the Council's evidence editor. Deduplicate findings; rank the "
+        "load-bearing evidence; identify contradictions, stale or weak sources, "
+        "missing denominators, and claims that are inference rather than fact. "
+        "Distinguish obvious observations from non-obvious insights. Produce an "
+        "argument kit containing the ten strongest evidence points, the strongest "
+        "counter-case, disagreements the Strategist must preserve, airport-specific "
+        "constraints, and a gap analysis.\n\n"
+        "For a small number of genuinely load-bearing gaps, conduct targeted research "
+        "against primary sources using your available tools. Normalize, deduplicate, "
+        "and update the canonical ledger in place at "
+        "`outputs/evidence-ledger.jsonl`, including any targeted evidence you find. "
+        "Never fill a gap with conjecture. Clearly list any gap that remains open.\n\n"
+        "Write the complete evidence curation and gap analysis to "
+        "`outputs/stage1/evidence-map.md`."
+    )
+    prompt += manifest_prompt_block(manifest_path, repo_root=outputs_dir.parent)
+    await _run_agent(
+        agent=curator,
+        user_prompt=prompt,
+        model=_model(step.model_role),
+        cwd=outputs_dir.parent,
+        step_label="evidence/evidence-curation",
+        tally=tally,
+        output_path=curation_path,
+        manifest_path=manifest_path,
+        artifact_id="evidence/curation",
+        dependency_inputs=curation_dependencies,
+    )
+
+    # The curator owns the final normalization and targeted gap-fill pass.
+    # Normalize aliases into the public v2 schema, then refresh the Stage 1
+    # compatibility mirror used by older prompts and archived tooling.
+    curated_result = normalise_evidence_ledger(ledger_path)
+    write_jsonl(compatibility_path, curated_result.records)
+    ledger_result.records = curated_result.records
+    ledger_result.structured_records = curated_result.structured_records
+    ledger_result.legacy_records = curated_result.legacy_records
+    ledger_result.invalid_records.extend(curated_result.invalid_records)
+    ledger_validation = validate_artifact(
+        ledger_path, EVIDENCE_LEDGER_CONTRACT
+    )
+    update_artifact(
+        manifest_path,
+        ledger_path,
+        ledger_validation,
+        artifact_id="evidence/ledger",
+        producer="evidence-curator",
+        dependencies=build_dependency_fingerprint(
+            manifest_path, curation_dependencies
+        ),
+    )
+    update_artifact(
+        manifest_path,
+        compatibility_path,
+        validate_artifact(compatibility_path, EVIDENCE_LEDGER_CONTRACT),
+        artifact_id="evidence/ledger-compatibility",
+        producer="evidence-curator",
+        required=False,
+        dependencies=build_dependency_fingerprint(
+            manifest_path, curation_dependencies
+        ),
+    )
+    await emit(
+        "evidence_update",
+        ledger_path=str(ledger_path),
+        record_count=ledger_result.record_count,
+        structured_records=ledger_result.structured_records,
+        legacy_records=ledger_result.legacy_records,
+        agents_without_evidence=ledger_result.agents_without_evidence,
+        invalid_record_count=len(ledger_result.invalid_records),
+    )
+    if not ledger_validation.valid:
+        raise RuntimeError(
+            "Evidence curation produced no valid claim-level ledger. "
+            + "; ".join(ledger_validation.errors)
+        )
+    update_stage(
+        manifest_path,
+        "evidence",
+        "complete",
+        evidence_records=ledger_result.record_count,
+        open_agent_gaps=len(ledger_result.agents_without_evidence),
+    )
 
 
 async def run_stage2(
@@ -516,13 +1928,14 @@ async def run_stage2(
     outputs_dir: Path,
     all_agents: list[Agent],
     tally: CostTally,
-    start_from: str = "strategist-v1",
+    manifest_path: Path,
+    start_from: str = "creative-director",
     v3_note: str = "",
 ) -> None:
     by_name = {a.name: a for a in all_agents}
-    strategist = by_name["strategist"]
-    red_team = by_name["red-team"]
-    prompts = _stage2_prompts(run_file)
+    prompts = _stage2_prompts(
+        run_file, manifest_path=manifest_path, repo_root=outputs_dir.parent
+    )
     if v3_note:
         prompts["strategist-v3"] += (
             "\n\nThe human operator reviewed the previous v3 and asked for this "
@@ -530,34 +1943,45 @@ async def run_stage2(
             "precedence over anything they conflict with:\n"
             f"{v3_note}"
         )
-    output_paths = {
-        "strategist-v1": outputs_dir / "stage2" / "strategist-draft-v1.md",
-        "red-team-v1": outputs_dir / "stage2" / "red-team-critique-v1.md",
-        "strategist-v2": outputs_dir / "stage2" / "strategist-draft-v2.md",
-        "red-team-v2": outputs_dir / "stage2" / "red-team-critique-v2.md",
-        "strategist-v3": outputs_dir / "stage2" / "strategist-draft-v3.md",
+    artifact_ids = {
+        "creative-director": "stage2/narrative-options",
+        "strategist-v1": "stage2/strategist-v1",
+        "evidence-prosecutor": "stage2/evidence-prosecutor",
+        "strategist-v2": "stage2/strategist-v2",
+        "airport-executive-review": "stage2/airport-executive-review",
+        "strategist-v3": "stage2/strategist-v3",
     }
-    sequence = [
-        ("strategist-v1", strategist, _model("synthesis")),
-        ("red-team-v1", red_team, _model("critique")),
-        ("strategist-v2", strategist, _model("synthesis")),
-        ("red-team-v2", red_team, _model("critique")),
-        ("strategist-v3", strategist, _model("synthesis")),
-    ]
+    update_stage(manifest_path, "synthesis", "running")
     started = False
-    for step_id, agent, model in sequence:
-        if not started and step_id != start_from:
+    for step in _pipeline_steps("synthesis"):
+        if not started and step.id != start_from:
             continue
         started = True
+        agent = by_name.get(step.agent)
+        if agent is None and step.id == "creative-director":
+            agent = by_name["strategist"]
+        elif agent is None and step.id in {
+            "evidence-prosecutor",
+            "airport-executive-review",
+        }:
+            agent = by_name["red-team"]
+        if agent is None:
+            raise RuntimeError(
+                f"Pipeline step {step.id} requires missing agent {step.agent}."
+            )
         await _run_agent(
             agent=agent,
-            user_prompt=prompts[step_id],
-            model=model,
+            user_prompt=prompts[step.id],
+            model=_model(step.model_role),
             cwd=outputs_dir.parent,
-            step_label=f"stage2/{step_id}",
+            step_label=f"stage2/{step.id}",
             tally=tally,
-            output_path=output_paths[step_id],
+            output_path=outputs_dir / step.output,
+            manifest_path=manifest_path,
+            artifact_id=artifact_ids[step.id],
+            dependency_inputs=step.inputs,
         )
+    update_stage(manifest_path, "synthesis", "complete")
 
 
 async def run_stage3(
@@ -565,39 +1989,761 @@ async def run_stage3(
     outputs_dir: Path,
     all_agents: list[Agent],
     tally: CostTally,
+    manifest_path: Path,
 ) -> None:
     by_name = {a.name: a for a in all_agents}
-    editor = by_name["editor"]
-    humanizer = by_name["humanizer"]
-    fact_checker = by_name["fact-checker"]
-    prompts = _stage3_prompts(run_file)
-    await _run_agent(
-        agent=editor,
-        user_prompt=prompts["editor"],
-        model=_model("editor"),
-        cwd=outputs_dir.parent,
-        step_label="stage3/editor",
-        tally=tally,
-        output_path=outputs_dir / "stage3" / "edited-draft.md",
+    prompts = _stage3_prompts(
+        run_file, manifest_path=manifest_path, repo_root=outputs_dir.parent
     )
-    await _run_agent(
-        agent=humanizer,
-        user_prompt=prompts["humanizer"],
-        model=_model("humanizer"),
-        cwd=outputs_dir.parent,
-        step_label="stage3/humanizer",
-        tally=tally,
-        output_path=outputs_dir / "stage3" / "humanized-draft.md",
+    artifact_ids = {
+        "editor": "stage3/edited",
+        "humanizer": "stage3/humanized",
+        "fact-checker": "stage3/final",
+    }
+    update_stage(manifest_path, "polish", "running")
+    for step in (
+        *_pipeline_steps("polish"),
+        *_pipeline_steps("verification"),
+    ):
+        if step.phase == "verification":
+            update_stage(manifest_path, "polish", "complete")
+            update_stage(manifest_path, "verification", "running")
+        agent = by_name[step.agent]
+        required_outputs: tuple[tuple[Path, ArtifactContract], ...] = ()
+        if step.agent == "editor":
+            editor_notes = outputs_dir / "stage3" / "editor-notes.md"
+            required_outputs = (
+                (editor_notes, contract_for_path(editor_notes)),
+            )
+        elif step.agent == "fact-checker":
+            required_outputs = (
+                (
+                    outputs_dir / "stage3" / "fact-check-report.md",
+                    contract_for_path(
+                        outputs_dir / "stage3" / "fact-check-report.md"
+                    ),
+                ),
+                (
+                    outputs_dir / "claim-lineage.jsonl",
+                    CLAIM_LINEAGE_AGENT_CONTRACT,
+                ),
+            )
+        await _run_agent(
+            agent=agent,
+            user_prompt=prompts[step.id],
+            model=_model(step.model_role),
+            cwd=outputs_dir.parent,
+            step_label=f"stage3/{step.id}",
+            tally=tally,
+            output_path=outputs_dir / step.output,
+            manifest_path=manifest_path,
+            artifact_id=artifact_ids[step.id],
+            required_outputs=required_outputs,
+            dependency_inputs=step.inputs,
+        )
+
+    fact_report = outputs_dir / "stage3" / "fact-check-report.md"
+    report_validation = validate_artifact(fact_report)
+    update_artifact(
+        manifest_path,
+        fact_report,
+        report_validation,
+        artifact_id="stage3/fact-check",
+        producer="fact-checker",
     )
-    await _run_agent(
-        agent=fact_checker,
-        user_prompt=prompts["fact-checker"],
-        model=_model("factcheck"),
-        cwd=outputs_dir.parent,
-        step_label="stage3/fact-checker",
-        tally=tally,
-        output_path=outputs_dir / "stage3" / "final-draft.md",
+    await emit(
+        "artifact_validated",
+        step="stage3/fact-check-report",
+        **report_validation.to_dict(),
     )
+    if not report_validation.valid:
+        raise RuntimeError(
+            "Fact-checker did not produce a valid verification report: "
+            + "; ".join(report_validation.errors)
+        )
+
+    lineage_path = outputs_dir / "claim-lineage.jsonl"
+    lineage, generated = ensure_claim_lineage(
+        final_draft=outputs_dir / "stage3" / "final-draft.md",
+        evidence_ledger=outputs_dir / "evidence-ledger.jsonl",
+        output_path=lineage_path,
+    )
+    lineage = bind_claim_lineage_to_draft(
+        final_draft=outputs_dir / "stage3" / "final-draft.md",
+        output_path=lineage_path,
+    )
+    lineage_validation = validate_artifact(lineage_path, CLAIM_LINEAGE_CONTRACT)
+    update_artifact(
+        manifest_path,
+        lineage_path,
+        lineage_validation,
+        artifact_id="verification/claim-lineage",
+        producer="orchestrator" if generated else "fact-checker",
+    )
+    await emit(
+        "evidence_update",
+        kind="claim_lineage",
+        lineage_path=str(lineage_path),
+        record_count=len(lineage),
+        generated_fallback=generated,
+    )
+    update_stage(
+        manifest_path,
+        "verification",
+        "complete",
+        claims=len(lineage),
+        lineage_fallback=generated,
+    )
+
+
+def _visual_brief_contract() -> ArtifactContract:
+    return ArtifactContract(
+        "json",
+        required_keys=(
+            "communication_job",
+            "audience",
+            "decision",
+            "decision_owner",
+            "approval_path",
+            "first_90_day_action",
+            "success_measures",
+            "deck_mode",
+            "visual_thesis",
+            "signature_visual",
+            "brand_profile",
+            "slides",
+            "report_visuals",
+            "source_appendix",
+            "accessibility_checks",
+            "asset_requests",
+        ),
+    )
+
+
+def _visual_inspection_contract() -> ArtifactContract:
+    return ArtifactContract(
+        "json",
+        required_keys=(
+            "schema_version",
+            "artifact",
+            "visual_brief",
+            "deck_mode",
+            "slide_count",
+            "rendered_slides",
+            "montage",
+            "signature_visual",
+            "inspection",
+        ),
+    )
+
+
+def _word_visual_inspection_contract() -> ArtifactContract:
+    return ArtifactContract(
+        "json",
+        required_keys=(
+            "schema_version",
+            "inspection_type",
+            "artifact",
+            "pdf",
+            "page_count",
+            "rendered_pages",
+            "montage",
+            "inspection",
+        ),
+    )
+
+
+def _validate_visual_brief(
+    *,
+    out_path: Path,
+    schema_path: Path,
+    evidence_ledger: Path,
+    requested_mode: str,
+):
+    """Apply the canonical schema and evidence referential-integrity gate."""
+
+    from jsonschema import Draft202012Validator
+
+    contract = _visual_brief_contract()
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    payload = json.loads(out_path.read_text(encoding="utf-8"))
+    schema_errors = [
+        f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: "
+        f"{error.message}"
+        for error in sorted(
+            Draft202012Validator(schema).iter_errors(payload),
+            key=lambda item: list(item.absolute_path),
+        )
+    ]
+    slides = payload.get("slides", []) if isinstance(payload, dict) else []
+    slide_numbers = [
+        slide.get("slide_number")
+        for slide in slides
+        if isinstance(slide, dict)
+    ]
+    if len(slide_numbers) != len(set(slide_numbers)):
+        schema_errors.append("slides: slide_number values must be unique")
+    if slide_numbers != list(range(1, len(slide_numbers) + 1)):
+        schema_errors.append(
+            "slides: slide_number values must be contiguous and ordered from 1"
+        )
+    if payload.get("deck_mode") != requested_mode:
+        schema_errors.append(
+            f"deck_mode: expected {requested_mode!r}, got "
+            f"{payload.get('deck_mode')!r}"
+        )
+    signature = (
+        payload.get("signature_visual")
+        if isinstance(payload, dict)
+        else None
+    )
+    signature_slide_number = (
+        signature.get("slide_number")
+        if isinstance(signature, dict)
+        else None
+    )
+    slides_by_number = {
+        slide.get("slide_number"): slide
+        for slide in slides
+        if isinstance(slide, dict)
+    }
+    signature_slide = slides_by_number.get(signature_slide_number)
+    if not isinstance(signature_slide_number, int) or signature_slide is None:
+        schema_errors.append(
+            "signature_visual.slide_number: must identify one canonical slide"
+        )
+    elif isinstance(signature, dict):
+        signature_evidence_values = signature.get("evidence_ids", [])
+        slide_evidence_values = signature_slide.get("evidence_ids", [])
+        signature_evidence = {
+            str(item)
+            for item in (
+                signature_evidence_values
+                if isinstance(signature_evidence_values, list)
+                else []
+            )
+        }
+        slide_evidence = {
+            str(item)
+            for item in (
+                slide_evidence_values
+                if isinstance(slide_evidence_values, list)
+                else []
+            )
+        }
+        missing_signature_evidence = sorted(
+            signature_evidence - slide_evidence
+        )
+        if missing_signature_evidence:
+            schema_errors.append(
+                "signature_visual.evidence_ids: target slide "
+                f"{signature_slide_number} omits "
+                + ", ".join(missing_signature_evidence)
+            )
+
+    if not evidence_ledger.is_file():
+        schema_errors.append(
+            f"evidence ledger is missing: {evidence_ledger}"
+        )
+    ledger_ids: set[str] = set()
+    if evidence_ledger.is_file():
+        for line in evidence_ledger.read_text(
+            encoding="utf-8", errors="replace"
+        ).splitlines():
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(record, dict) and record.get("evidence_id"):
+                ledger_ids.add(str(record["evidence_id"]))
+
+    visual_evidence_ids: set[str] = set()
+
+    def collect_evidence_ids(value: object) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key == "evidence_ids" and isinstance(child, list):
+                    visual_evidence_ids.update(str(item) for item in child)
+                else:
+                    collect_evidence_ids(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect_evidence_ids(child)
+
+    collect_evidence_ids(payload)
+    unknown_ids = sorted(visual_evidence_ids - ledger_ids)
+    if unknown_ids:
+        schema_errors.append(
+            "visual evidence IDs are absent from the canonical ledger: "
+            + ", ".join(unknown_ids)
+        )
+
+    visual_validation = validate_artifact(out_path, contract)
+    if schema_errors:
+        visual_validation.errors.extend(schema_errors)
+        visual_validation.valid = False
+    return visual_validation
+
+
+async def run_art_direction(
+    *,
+    spec: RunSpec,
+    run_file: Path,
+    outputs_dir: Path,
+    all_agents: list[Agent],
+    tally: CostTally,
+    manifest_path: Path,
+) -> Path | None:
+    """Create the visual contract used by both document and slide production."""
+
+    output_format = str(getattr(spec, "output_format", "report"))
+    needed = bool(getattr(spec, "want_pptx", False)) or output_format not in {
+        "brief",
+        "recommendations",
+    }
+    if not needed:
+        await emit(
+            "manifest_update",
+            path=str(manifest_path),
+            artifact="stage4/visual-brief.json",
+            status="skipped",
+            reason="short output format without a companion presentation",
+        )
+        return None
+
+    step = next(item for item in PIPELINE_DEFINITION if item.id == "art-director")
+    by_name = {agent.name: agent for agent in all_agents}
+    art_director = by_name.get(step.agent)
+    if art_director is None:
+        raise RuntimeError(
+            "Council v2 requires the art-director process agent for full reports "
+            "and presentations."
+        )
+    out_path = outputs_dir / step.output
+    decision_required = (
+        getattr(spec, "decision_required", "") or "Not specified in run prompt."
+    )
+    decision_owner = (
+        getattr(spec, "decision_owner", "")
+        or "Decision-critical unknown; establish from verified authority."
+    )
+    approval_path = (
+        getattr(spec, "approval_path", "")
+        or "Decision-critical unknown; establish from verified authority."
+    )
+    success_measure = (
+        getattr(spec, "success_measure", "")
+        or "Define a measurable acceptance and stop condition from verified evidence."
+    )
+    time_horizon = (
+        getattr(spec, "time_horizon", "") or "Not specified in run prompt."
+    )
+    prompt = (
+        f"Read `{run_file}`, `outputs/run-manifest.json`, "
+        "`outputs/context/airport-context.md`, `outputs/stage1/evidence-map.md`, "
+        "`outputs/evidence-ledger.jsonl`, "
+        "`outputs/claim-lineage.jsonl`, `outputs/stage3/final-draft.md`, and "
+        "`outputs/stage3/fact-check-report.md`.\n\n"
+        "Create the visual contract for the Word report and any companion deck. "
+        "Visuals must explain evidence rather than decorate it. Specify one signature "
+        "visual and bind it to one exact `slide_number`; that target slide must "
+        "carry the same evidence IDs and use the signature exhibit as its primary "
+        "visual. Specify airport maps or passenger/decision flows where relevant, quantitative "
+        "charts with evidence IDs, implementation timelines, recommendation callouts, "
+        "tables, section treatments, image/source rights notes, accessibility, and a "
+        "density budget. Do not invent a number or visual datum. Every factual visual "
+        "must name evidence IDs or verified claims.\n\n"
+        f"The requested presentation mode is "
+        f"`{getattr(spec, 'deck_mode', 'board') or 'board'}`. "
+        "Separate speaker-led board slides from read-ahead/appendix material.\n\n"
+        "Carry this run-prompt decision frame into the canonical top-level "
+        "fields. Preserve named authorities and thresholds exactly; qualify a "
+        "conflict instead of silently replacing it:\n"
+        f"- decision: {decision_required}\n"
+        f"- decision_owner: {decision_owner}\n"
+        f"- approval_path: {approval_path}\n"
+        f"- time horizon for the first action: {time_horizon}\n"
+        f"- first success measure: {success_measure}\n"
+        "Derive `first_90_day_action` from the verified draft and evidence. "
+        "Write `success_measures` as a non-empty array, beginning with the "
+        "run-prompt measure above when it was specified.\n\n"
+        "Write valid JSON—not markdown—to `outputs/stage4/visual-brief.json` with "
+        "top-level keys: `communication_job`, `audience`, `decision`, "
+        "`decision_owner`, `approval_path`, `first_90_day_action`, "
+        "`success_measures`, `deck_mode`, "
+        "`visual_thesis`, `signature_visual`, `brand_profile`, `slides`, "
+        "`report_visuals`, `source_appendix`, `accessibility_checks`, and "
+        "`asset_requests`. Validate it against "
+        "`assets/brand/visual-brief.schema.json` before finishing."
+    )
+    prompt += manifest_prompt_block(manifest_path, repo_root=outputs_dir.parent)
+    contract = _visual_brief_contract()
+    completion = await _run_agent(
+        agent=art_director,
+        user_prompt=prompt,
+        model=_model(step.model_role),
+        cwd=outputs_dir.parent,
+        step_label="stage4/art-director",
+        tally=tally,
+        output_path=out_path,
+        artifact_contract=contract,
+        manifest_path=manifest_path,
+        artifact_id="stage4/visual-brief",
+        dependency_inputs=step.inputs,
+        emit_completion=False,
+    )
+    schema_path = (
+        outputs_dir.parent / "assets" / "brand" / "visual-brief.schema.json"
+    )
+    requested_mode = str(getattr(spec, "deck_mode", "board_decision"))
+    visual_validation = _validate_visual_brief(
+        out_path=out_path,
+        schema_path=schema_path,
+        evidence_ledger=outputs_dir / "evidence-ledger.jsonl",
+        requested_mode=requested_mode,
+    )
+    update_artifact(
+        manifest_path,
+        out_path,
+        visual_validation,
+        artifact_id="stage4/visual-brief",
+        producer="art-director",
+    )
+    await emit(
+        "artifact_validated",
+        step="stage4/visual-brief-schema",
+        **visual_validation.to_dict(),
+    )
+    if not visual_validation.valid:
+        await emit(
+            "agent_error",
+            step="stage4/art-director",
+            agent=art_director.name,
+            error_type="VisualBriefContractError",
+            message="; ".join(visual_validation.errors[:8]),
+        )
+        _quarantine_partial_output(out_path)
+        raise RuntimeError(
+            "Art Director visual brief failed its canonical schema: "
+            + "; ".join(visual_validation.errors[:8])
+        )
+    if not completion.get("skipped"):
+        cost = completion.get("cost")
+        turns = completion.get("turns")
+        console.print(
+            f"  [green]✓ stage4/art-director done[/green] "
+            f"[dim](${float(cost or 0):.2f}, {turns or 0} turns)[/dim]"
+        )
+        await emit(
+            "agent_done",
+            step="stage4/art-director",
+            agent=art_director.name,
+            cost=cost,
+            turns=turns,
+            total=tally.total,
+            provider=completion.get("provider"),
+            billed_separately=completion.get("provider") == "openai",
+        )
+    return out_path
+
+
+async def run_word_visual_inspection(
+    *,
+    artifacts: list[Path],
+    outputs_dir: Path,
+    all_agents: list[Agent],
+    tally: CostTally,
+    manifest_path: Path | None,
+    step_label: str,
+    revision_state_path: Path | None = None,
+    revision_repo_root: Path | None = None,
+    revision_dependencies: tuple[RevisionDependency, ...] = (),
+    revision_receipt_inputs: tuple[Path, ...] = (),
+    revision_extra_values: dict[str, object] | None = None,
+) -> None:
+    """Require full-size visual inspection of every rendered Word page."""
+
+    from cli.publishing_quality import (
+        assert_quality,
+        qa_word_visual_inspection_receipt,
+    )
+
+    if not artifacts:
+        raise ValueError("Word visual inspection requires at least one document.")
+    art_director = {
+        agent.name: agent for agent in all_agents
+    }.get("art-director")
+    if art_director is None:
+        raise RuntimeError(
+            "Council production requires the art-director for Word page inspection."
+        )
+    receipts = [
+        artifact.with_name(
+            f"{artifact.stem}-word-visual-inspection.json"
+        )
+        for artifact in artifacts
+    ]
+    if (
+        revision_state_path is not None
+        and len(revision_receipt_inputs) != len(receipts)
+    ):
+        raise RuntimeError(
+            "Revision Word inspection requires one immutable input receipt "
+            "for every approved output receipt."
+        )
+    if revision_state_path is not None and revision_repo_root is None:
+        raise RuntimeError(
+            "Revision Word inspection requires an explicit repository root."
+        )
+
+    def inspection_reports():
+        return [
+            qa_word_visual_inspection_receipt(
+                receipt,
+                artifact=artifact,
+            )
+            for artifact, receipt in zip(artifacts, receipts, strict=True)
+        ]
+
+    reports = inspection_reports()
+    # Normal runs can trust the hash-bound receipt directly. Revisions also
+    # require the step-scoped execution receipt (model, charter, prompt, and
+    # upstream files), so route even a visually valid receipt through the
+    # revision wrapper; it will skip without spend only when both layers match.
+    already_complete = (
+        revision_state_path is None and all(report.ok for report in reports)
+    )
+    completion: dict[str, object]
+    if already_complete:
+        tally.consume_skipped_call()
+        completion = {"skipped": True, "provider": art_director.provider}
+        await emit(
+            "agent_skipped",
+            step=step_label,
+            agent=art_director.name,
+            path=str(receipts[0]),
+            reason="hash-bound Word page inspection already complete",
+        )
+    else:
+        if revision_state_path is None:
+            packets = "\n".join(
+                f"- Word artifact: `{artifact}`\n  Receipt: `{receipt}`"
+                for artifact, receipt in zip(
+                    artifacts, receipts, strict=True
+                )
+            )
+            receipt_instructions = (
+                "Do not edit the Word, PDF, page PNGs, montage, or any "
+                "hash/inventory field. If the exact rendered pages are clean, "
+                "edit only each receipt's `inspection` object: set "
+            )
+        else:
+            packets = "\n".join(
+                f"- Word artifact: `{artifact}`\n"
+                f"  Immutable input receipt: `{receipt_input}`\n"
+                f"  Approved receipt to write: `{receipt}`"
+                for artifact, receipt_input, receipt in zip(
+                    artifacts,
+                    revision_receipt_inputs,
+                    receipts,
+                    strict=True,
+                )
+            )
+            receipt_instructions = (
+                "Do not edit the Word, PDF, page PNGs, montage, immutable "
+                "input receipts, or any hash/inventory field. For each clean "
+                "document, write the named approved receipt as an exact copy "
+                "of its immutable input receipt except for the `inspection` "
+                "object. In that object, set "
+            )
+        prompt = (
+            "Act as the final visual inspector for these airport-executive Word "
+            "documents. Each receipt names the exact Word bytes, converted PDF, "
+            "every full-size page PNG, and a page-sequence montage:\n\n"
+            f"{packets}\n\n"
+            "Use Read to inspect every `rendered_pages[].path` image individually "
+            "at full size. Then inspect `montage.path` for pacing, page hierarchy, "
+            "and accidental blank or stranded pages. Check clipped text, split or "
+            "overflowing tables, broken figures, unreadable source notes, awkward "
+            "page breaks, inconsistent headers/footers, excessive whitespace, and "
+            "anything that would look unfinished to an airport CEO or board. "
+            "Do not approve conversion success by itself.\n\n"
+            f"{receipt_instructions}`full_size_each_page_inspected`, "
+            "`montage_inspected`, and `findings_resolved` to true; set `status` "
+            "to `pass`; leave `unresolved_findings` empty; and record observations "
+            "or resolved defects in `resolved_findings`. If a defect remains, keep "
+            "status pending and name it in `unresolved_findings` so release stops."
+        )
+        if revision_state_path is None:
+            completion = await _run_agent(
+                agent=art_director,
+                user_prompt=prompt,
+                model=_model("art_direction"),
+                cwd=outputs_dir.parent,
+                step_label=step_label,
+                tally=tally,
+                output_path=None,
+                emit_completion=False,
+            )
+        else:
+            assert revision_repo_root is not None
+            art_model = _model("art_direction")
+            bound_revision_dependencies = _revision_agent_dependencies(
+                repo_root=revision_repo_root,
+                agent=art_director,
+                inputs=revision_dependencies,
+            )
+            revision_values = _revision_call_values(
+                agent=art_director,
+                model=art_model,
+                prompt=prompt,
+                step_label=step_label,
+                extra=revision_extra_values,
+            )
+            inspection_outputs = (
+                (receipts[0], _word_visual_inspection_contract()),
+                *tuple(
+                    (receipt, _word_visual_inspection_contract())
+                    for receipt in receipts[1:]
+                ),
+            )
+            reusable, _ = revision_step_matches(
+                state_path=revision_state_path,
+                repo_root=revision_repo_root,
+                step_id="word-visual-inspection",
+                dependencies=bound_revision_dependencies,
+                values=revision_values,
+                outputs=inspection_outputs,
+            )
+            if not reusable:
+                # The approved receipt is both the inspector's result and a
+                # release gate, so never feed a stale approved receipt back to
+                # the model. Re-render exact Word bytes and prepare a separate
+                # immutable pending receipt for each document.
+                from cli.publishing_quality import (
+                    prepare_word_visual_inspection_receipt,
+                    render_office_artifact,
+                )
+
+                for artifact, receipt_input in zip(
+                    artifacts,
+                    revision_receipt_inputs,
+                    strict=True,
+                ):
+                    rendered, render_issues = render_office_artifact(
+                        artifact,
+                        artifact.parent / "qa" / artifact.stem,
+                        required=True,
+                    )
+                    if any(
+                        issue.severity == "error"
+                        for issue in render_issues
+                    ):
+                        raise RuntimeError(
+                            "Revision Word inspection could not prepare a "
+                            f"complete render packet for {artifact.name}."
+                        )
+                    prepare_word_visual_inspection_receipt(
+                        artifact=artifact,
+                        rendered_files=rendered,
+                        receipt_path=receipt_input,
+                    )
+            completion = await _run_revision_agent(
+                state_path=revision_state_path,
+                repo_root=revision_repo_root,
+                step_id="word-visual-inspection",
+                agent=art_director,
+                user_prompt=prompt,
+                model=art_model,
+                step_label=step_label,
+                tally=tally,
+                output_path=receipts[0],
+                artifact_contract=_word_visual_inspection_contract(),
+                required_outputs=tuple(
+                    (receipt, _word_visual_inspection_contract())
+                    for receipt in receipts[1:]
+                ),
+                dependencies=revision_dependencies,
+                emit_completion=False,
+                extra_values=revision_extra_values,
+            )
+        reports = inspection_reports()
+
+    inspection_metadata: list[dict[str, object]] = []
+    for artifact, receipt, report in zip(
+        artifacts, receipts, reports, strict=True
+    ):
+        if manifest_path is not None:
+            artifact_id = (
+                "stage4/executive-summary-visual-inspection"
+                if artifact.stem.endswith("-executive-summary")
+                else "stage4/word-visual-inspection"
+            )
+            validation = validate_artifact(
+                receipt,
+                _word_visual_inspection_contract(),
+            )
+            if not report.ok:
+                validation.valid = False
+                validation.errors.extend(
+                    f"{issue.code}: {issue.message}"
+                    for issue in report.errors
+                )
+            update_artifact(
+                manifest_path,
+                receipt,
+                validation,
+                artifact_id=artifact_id,
+                producer="art-director",
+            )
+            await emit(
+                "artifact_validated",
+                step=f"{step_label}/{artifact.stem}",
+                **validation.to_dict(),
+            )
+        assert_quality(report)
+        inspection_metadata.append(
+            {
+                "artifact": str(artifact),
+                "receipt": str(receipt),
+                **report.metadata,
+            }
+        )
+
+    quality_path = outputs_dir / "publishing-quality.json"
+    if quality_path.is_file():
+        quality_payload = json.loads(
+            quality_path.read_text(encoding="utf-8")
+        )
+        quality_payload.setdefault("metadata", {})[
+            "word_visual_inspections"
+        ] = inspection_metadata
+        temporary = quality_path.with_name(f".{quality_path.name}.tmp")
+        temporary.write_text(
+            json.dumps(quality_payload, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary, quality_path)
+
+    if not completion.get("skipped"):
+        cost = completion.get("cost")
+        turns = completion.get("turns")
+        console.print(
+            f"  [green]✓ {step_label} done[/green] "
+            f"[dim](${float(cost or 0):.2f}, {turns or 0} turns)[/dim]"
+        )
+        await emit(
+            "agent_done",
+            step=step_label,
+            agent=art_director.name,
+            cost=cost,
+            turns=turns,
+            total=tally.total,
+            provider=completion.get("provider"),
+            billed_separately=completion.get("provider") == "openai",
+        )
 
 
 async def run_presentation(
@@ -605,24 +2751,54 @@ async def run_presentation(
     outputs_dir: Path,
     all_agents: list[Agent],
     tally: CostTally,
+    manifest_path: Path,
 ) -> None:
     """Generate the companion executive PowerPoint via the presentation agent."""
     by_name = {a.name: a for a in all_agents}
     designer = by_name["presentation-designer"]
     out_path = outputs_dir / "stage4" / f"{spec.slug}.pptx"
+    receipt_path = (
+        outputs_dir / "stage4" / f"{spec.slug}-visual-inspection.json"
+    )
+    inspection_dir = outputs_dir / "stage4" / "inspection" / spec.slug
+    deck_mode = str(getattr(spec, "deck_mode", "board_decision"))
     prompt = (
         f"Build the companion executive presentation for the report titled "
         f"\"{spec.title}\".\n\n"
-        f"Source material (read all three):\n"
+        f"Source material (read all):\n"
         f"- Final draft: `outputs/stage3/final-draft.md`\n"
         f"- Fact-check report: `outputs/stage3/fact-check-report.md`\n"
+        f"- Art direction and slide contract: `outputs/stage4/visual-brief.json`\n"
+        f"- Claim lineage: `outputs/claim-lineage.jsonl`\n"
+        f"- Evidence ledger: `outputs/evidence-ledger.jsonl`\n"
+        f"- Airport context: `outputs/context/airport-context.md`\n"
+        f"- Run manifest: `outputs/run-manifest.json`\n"
         f"- Run prompt: `prompts/runs/{spec.slug}.md`\n\n"
         f"Save the finished deck to: `{out_path}`\n"
         f"The repo's Python interpreter with python-pptx installed is at "
-        f"`.venv/bin/python` — use it for your build script, and validate the "
-        f"deck opens cleanly before finishing."
+        f"`.venv/bin/python` — use it for your build script.\n\n"
+        "Your work is not complete when the PPTX merely opens. Run this exact "
+        "inspection-packet workflow after building it:\n\n"
+        f"`.venv/bin/python -m cli.presentation_qa \"{out_path}\" "
+        f"--mode {deck_mode} "
+        f"--visual-brief \"{outputs_dir / 'stage4' / 'visual-brief.json'}\" "
+        f"--json \"{inspection_dir / 'designer-qa.json'}\" "
+        f"--render-dir \"{inspection_dir}\" "
+        f"--prepare-inspection \"{receipt_path}\"`\n\n"
+        "Then inspect every rendered slide PNG individually at full size and "
+        "inspect `montage.png` for narrative rhythm. Fix every defect and rerun "
+        "the command if the deck bytes change. Only after the exact final bytes "
+        "are clean, confirm that the exact slide named by "
+        "`signature_visual.slide_number` contains the primary exhibit and name "
+        f"that exhibit or group with the reserved prefix "
+        f"`SIGNATURE VISUAL —`. Edit only the receipt's `inspection` object: set "
+        "`full_size_each_slide_inspected`, `montage_inspected`, and "
+        "`signature_exhibit_present`, `signature_exhibit_matches_brief`, and "
+        "`findings_resolved` to true; set `status` to `pass`; leave "
+        "`unresolved_findings` empty; and describe material fixes in "
+        "`resolved_findings`. The receipt hashes must never be edited by hand."
     )
-    await _run_agent(
+    completion = await _run_agent(
         agent=designer,
         user_prompt=prompt,
         model=_model("presentation"),
@@ -630,7 +2806,851 @@ async def run_presentation(
         step_label="stage4/presentation",
         tally=tally,
         output_path=out_path,
+        manifest_path=manifest_path,
+        artifact_id="stage4/presentation",
+        required_outputs=((receipt_path, _visual_inspection_contract()),),
+        dependency_inputs=tuple(
+            item.format(slug=spec.slug) for item in next(
+                step
+                for step in PIPELINE_DEFINITION
+                if step.id == "presentation"
+            ).inputs
+        ),
+        emit_completion=False,
     )
+    from cli.presentation_qa import (
+        qa_presentation,
+        qa_visual_inspection_receipt,
+    )
+    from cli.publishing_quality import assert_quality
+
+    qa_path = outputs_dir / "stage4" / f"{spec.slug}-qa.json"
+    qa_report = qa_presentation(
+        out_path,
+        render_dir=outputs_dir / "stage4" / "qa" / f"{spec.slug}-presentation",
+        deck_mode=deck_mode,
+        visual_brief=outputs_dir / "stage4" / "visual-brief.json",
+    )
+    inspection_report = qa_visual_inspection_receipt(
+        receipt_path,
+        artifact=out_path,
+        visual_brief=outputs_dir / "stage4" / "visual-brief.json",
+        deck_mode=deck_mode,
+    )
+    qa_report.issues.extend(inspection_report.issues)
+    qa_report.metadata["visual_inspection"] = inspection_report.metadata
+    qa_report.write_json(qa_path)
+    qa_contract = ArtifactContract(
+        "json",
+        required_keys=("artifact", "kind", "ok", "issues"),
+    )
+    qa_validation = validate_artifact(qa_path, qa_contract)
+    update_artifact(
+        manifest_path,
+        qa_path,
+        qa_validation,
+        artifact_id="stage4/presentation-qa",
+        producer="orchestrator",
+    )
+    await emit(
+        "render_qa",
+        artifact=str(out_path),
+        status="passed" if qa_report.ok else "failed",
+        issues=len(qa_report.issues),
+        errors=len(qa_report.errors),
+        warnings=len(qa_report.warnings),
+        rendered_files=qa_report.rendered_files,
+    )
+    if not qa_report.ok:
+        await emit(
+            "agent_error",
+            step="stage4/presentation",
+            agent=designer.name,
+            error_type="PresentationQAError",
+            message="; ".join(issue.message for issue in qa_report.errors[:8]),
+        )
+        _quarantine_partial_output(out_path)
+        _quarantine_partial_output(receipt_path)
+    assert_quality(qa_report)
+    if not completion.get("skipped"):
+        cost = completion.get("cost")
+        turns = completion.get("turns")
+        console.print(
+            f"  [green]✓ stage4/presentation done[/green] "
+            f"[dim](${float(cost or 0):.2f}, {turns or 0} turns)[/dim]"
+        )
+        await emit(
+            "agent_done",
+            step="stage4/presentation",
+            agent=designer.name,
+            cost=cost,
+            turns=turns,
+            total=tally.total,
+            provider=completion.get("provider"),
+            billed_separately=completion.get("provider") == "openai",
+        )
+
+
+def _remove_backfill_path(path: Path) -> None:
+    """Remove one transaction target without following directory symlinks."""
+
+    if path.is_symlink() or path.is_file():
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(path)
+
+
+def _backfill_render_hashes(render_dir: Path) -> dict[str, str | None]:
+    """Return a deterministic content inventory for a rendered deck."""
+
+    if not render_dir.is_dir():
+        return {}
+    return {
+        path.relative_to(render_dir).as_posix(): file_sha256(path)
+        for path in sorted(render_dir.rglob("*"))
+        if path.is_file()
+    }
+
+
+def _write_backfill_state(path: Path, payload: dict) -> None:
+    """Atomically persist resumable deck-backfill state."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+def _presentation_backfill_identity(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    art_director: Agent,
+    designer: Agent,
+) -> tuple[dict[str, object], str, dict[str, Path], str]:
+    """Recompute the complete deck-backfill identity from live disk."""
+
+    run_prompt = archive_dir / "run-prompt.md"
+    if not run_prompt.is_file():
+        run_prompt = repo_root / "prompts" / "runs" / f"{slug}.md"
+    ledger_path = archive_dir / "evidence-ledger.jsonl"
+    if not ledger_path.is_file():
+        ledger_path = archive_dir / "stage1" / "evidence-ledger.jsonl"
+    source_paths = {
+        "run_prompt": run_prompt,
+        "final_draft": archive_dir / "stage3" / "final-draft.md",
+        "fact_check_report": (
+            archive_dir / "stage3" / "fact-check-report.md"
+        ),
+        "evidence_ledger": ledger_path,
+        "claim_lineage": archive_dir / "claim-lineage.jsonl",
+        "airport_context": (
+            archive_dir / "context" / "airport-context.md"
+        ),
+        "archived_run_manifest": archive_dir / "run-manifest.json",
+    }
+    archived_manifest = source_paths["archived_run_manifest"]
+    deck_mode = "board_decision"
+    if archived_manifest.is_file():
+        try:
+            deck_mode = str(
+                json.loads(archived_manifest.read_text(encoding="utf-8"))
+                .get("run", {})
+                .get("deck_mode")
+                or deck_mode
+            )
+        except (OSError, json.JSONDecodeError):
+            pass
+    if deck_mode not in {
+        "board_decision",
+        "executive_briefing",
+        "technical_read_ahead",
+    }:
+        deck_mode = "board_decision"
+
+    def relative(path: Path) -> str:
+        try:
+            return path.relative_to(repo_root).as_posix()
+        except ValueError:
+            return str(path)
+
+    payload: dict[str, object] = {
+        "schema_version": "3.0",
+        "slug": slug,
+        "title": title,
+        "archive": str(archive_dir),
+        "deck_mode": deck_mode,
+        "sources": {
+            name: file_sha256(path)
+            for name, path in source_paths.items()
+        },
+        "models": {
+            "art_direction": _model("art_direction"),
+            "presentation": _model("presentation"),
+        },
+        "agent_charters": {
+            "art-director": {
+                "path": relative(art_director.path),
+                "sha256": file_sha256(art_director.path),
+            },
+            "presentation-designer": {
+                "path": relative(designer.path),
+                "sha256": file_sha256(designer.path),
+            },
+        },
+        "execution_contract": build_execution_contract_fingerprint(
+            repo_root
+        ),
+        "visual_inspection_contract": "1.0",
+    }
+    identity = hashlib.sha256(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    return payload, identity, source_paths, deck_mode
+
+
+def _assert_presentation_backfill_precommit(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    art_director: Agent,
+    designer: Agent,
+    expected_payload: dict[str, object],
+    expected_identity: str,
+    backfill_state: dict[str, object],
+    visual_path: Path,
+    out_path: Path,
+    qa_path: Path,
+    receipt_path: Path,
+    qa_render_dir: Path,
+    inspection_dir: Path,
+) -> None:
+    """Fail closed if any source, contract, or inspected output changed."""
+
+    current_payload, current_identity, _, _ = (
+        _presentation_backfill_identity(
+            archive_dir=archive_dir,
+            slug=slug,
+            title=title,
+            repo_root=repo_root,
+            art_director=art_director,
+            designer=designer,
+        )
+    )
+    if (
+        current_identity != expected_identity
+        or current_payload != expected_payload
+    ):
+        raise RuntimeError(
+            "Deck backfill source, model, charter, or execution identity "
+            "changed before publication."
+        )
+    expected_outputs = {
+        "visual_brief_sha256": file_sha256(visual_path),
+        "presentation_sha256": file_sha256(out_path),
+        "presentation_qa_sha256": file_sha256(qa_path),
+        "visual_inspection_sha256": file_sha256(receipt_path),
+        "qa_render_files": _backfill_render_hashes(qa_render_dir),
+        "inspection_render_files": _backfill_render_hashes(inspection_dir),
+    }
+    mismatched = [
+        key
+        for key, current in expected_outputs.items()
+        if backfill_state.get(key) != current
+    ]
+    if mismatched:
+        raise RuntimeError(
+            "Deck backfill inspected outputs changed before publication: "
+            + ", ".join(mismatched)
+        )
+
+
+def _publish_presentation_backfill_release(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    art_director: Agent,
+    designer: Agent,
+    expected_payload: dict[str, object],
+    expected_identity: str,
+    backfill_state: dict[str, object],
+    stage4: Path,
+    visual_path: Path,
+    out_path: Path,
+    qa_path: Path,
+    receipt_path: Path,
+    qa_render_dir: Path,
+    inspection_dir: Path,
+    release_dir: Path,
+    deck_mode: str,
+    out_dir: Path,
+) -> dict[str, Path]:
+    """Stage and promote a backfill only while its live identity is stable."""
+
+    from cli.publish import promote_release, stage_release_artifacts
+
+    guard = {
+        "archive_dir": archive_dir,
+        "slug": slug,
+        "title": title,
+        "repo_root": repo_root,
+        "art_director": art_director,
+        "designer": designer,
+        "expected_payload": expected_payload,
+        "expected_identity": expected_identity,
+        "backfill_state": backfill_state,
+        "visual_path": visual_path,
+        "out_path": out_path,
+        "qa_path": qa_path,
+        "receipt_path": receipt_path,
+        "qa_render_dir": qa_render_dir,
+        "inspection_dir": inspection_dir,
+    }
+    _assert_presentation_backfill_precommit(**guard)
+    if not _staged_presentation_release_matches_sources(
+        release_dir=release_dir,
+        staged_stage4=stage4,
+        slug=slug,
+    ):
+        stage_release_artifacts(
+            stage4_dir=stage4,
+            slug=slug,
+            release_dir=release_dir,
+            require_presentation=True,
+            include_roles={"presentation"},
+            presentation_mode=deck_mode,
+            visual_brief=visual_path,
+            require_visual_inspection=True,
+        )
+    _assert_presentation_backfill_precommit(**guard)
+    return promote_release(
+        release_dir=release_dir,
+        out_dir=out_dir,
+        release_manifest_name=f"{slug}-deck-release-manifest.json",
+        reconcile_roles=False,
+    )
+
+
+def _commit_presentation_backfill_archive(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    art_director: Agent,
+    designer: Agent,
+    expected_payload: dict[str, object],
+    expected_identity: str,
+    backfill_state: dict[str, object],
+    visual_path: Path,
+    out_path: Path,
+    qa_path: Path,
+    receipt_path: Path,
+    qa_render_dir: Path,
+    inspection_dir: Path,
+    staged_stage4: Path,
+    archive_stage4: Path,
+) -> dict[str, Path]:
+    """Recheck the paid work immediately before mutating the run archive."""
+
+    _assert_presentation_backfill_precommit(
+        archive_dir=archive_dir,
+        slug=slug,
+        title=title,
+        repo_root=repo_root,
+        art_director=art_director,
+        designer=designer,
+        expected_payload=expected_payload,
+        expected_identity=expected_identity,
+        backfill_state=backfill_state,
+        visual_path=visual_path,
+        out_path=out_path,
+        qa_path=qa_path,
+        receipt_path=receipt_path,
+        qa_render_dir=qa_render_dir,
+        inspection_dir=inspection_dir,
+    )
+    return _promote_archive_backfill(
+        staged_stage4=staged_stage4,
+        archive_stage4=archive_stage4,
+        slug=slug,
+    )
+
+
+def _assert_archive_allows_deck_backfill(
+    *,
+    archive_dir: Path,
+    slug: str,
+    staged_stage4: Path | None = None,
+) -> Path | None:
+    """Refuse replacement, while recognizing resumable manifest-last commits.
+
+    Returns the archived deck when a complete durable backfill is already
+    committed. A raw deck without its manifest is accepted only when an exact,
+    validated staging transaction remains available to finish the interrupted
+    commit.
+    """
+
+    release_manifest = archive_dir / "release" / "release-manifest.json"
+    if release_manifest.is_file():
+        try:
+            release_payload = json.loads(
+                release_manifest.read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError) as exc:
+            raise RuntimeError(
+                "Cannot establish deck-backfill eligibility because the "
+                "archived canonical release manifest is invalid."
+            ) from exc
+        if any(
+            str(item.get("role") or "") == "presentation"
+            for item in release_payload.get("artifacts", [])
+            if isinstance(item, dict)
+        ):
+            raise RuntimeError(
+                "This archive already has a canonical presentation. Deck "
+                "backfill only fills a missing deck; replacement requires an "
+                "explicit future replacement workflow."
+            )
+
+    archived_deck = archive_dir / "stage4" / f"{slug}.pptx"
+    if archived_deck.exists() or archived_deck.is_symlink():
+        if archived_deck.is_symlink():
+            raise RuntimeError(
+                "Archived presentation is a symlink; refusing deck recovery."
+            )
+        archived_backfill = (
+            archive_dir / "stage4" / f"{slug}-deck-backfill.json"
+        )
+        archived_supplement = (
+            archive_dir / "release-supplements" / "deck"
+        )
+        if (
+            archived_backfill.is_file()
+            and (archived_supplement / "release-manifest.json").is_file()
+        ):
+            from cli.publish import _verify_archived_deck_supplement_binding
+
+            _verify_archived_deck_supplement_binding(
+                archive_dir=archive_dir,
+                slug=slug,
+                deck_supplement=archived_supplement,
+            )
+            return archived_deck
+
+        if staged_stage4 is not None:
+            try:
+                _validate_staged_backfill(
+                    staged_stage4=staged_stage4,
+                    slug=slug,
+                )
+            except (OSError, RuntimeError, ValueError):
+                pass
+            else:
+                # Manifest-last archive commit was interrupted. The paid,
+                # hash-bound staging transaction is authoritative and can
+                # safely replace the partial archive targets on resume.
+                return None
+        raise RuntimeError(
+            "This archive already has a presentation. Deck backfill only "
+            "fills a missing deck; replacement requires an explicit future "
+            "replacement workflow."
+        )
+    return None
+
+
+def _validate_staged_backfill(
+    *,
+    staged_stage4: Path,
+    slug: str,
+) -> dict:
+    """Verify the hash-bound backfill record before archive mutation."""
+
+    manifest = staged_stage4 / f"{slug}-deck-backfill.json"
+    try:
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"Invalid staged deck backfill manifest: {exc}") from exc
+
+    expected_files = {
+        "visual_brief": (
+            "stage4/deck-backfill/visual-brief.json",
+            staged_stage4 / "deck-backfill" / "visual-brief.json",
+        ),
+        "presentation": (
+            f"stage4/{slug}.pptx",
+            staged_stage4 / f"{slug}.pptx",
+        ),
+        "presentation_qa": (
+            f"stage4/{slug}-qa.json",
+            staged_stage4 / f"{slug}-qa.json",
+        ),
+        "visual_inspection": (
+            f"stage4/{slug}-visual-inspection.json",
+            staged_stage4 / f"{slug}-visual-inspection.json",
+        ),
+    }
+    artifacts = payload.get("artifacts")
+    if payload.get("schema_version") != "3.0":
+        raise RuntimeError("Backfill manifest schema must be 3.0.")
+    if payload.get("slug") != slug or not isinstance(artifacts, dict):
+        raise RuntimeError("Backfill manifest has no artifact inventory.")
+    for role, (relative, path) in expected_files.items():
+        record = artifacts.get(role)
+        if (
+            not isinstance(record, dict)
+            or record.get("path") != relative
+            or not path.is_file()
+            or record.get("sha256") != file_sha256(path)
+        ):
+            raise RuntimeError(
+                f"Backfill artifact hash mismatch before archive commit: {role}"
+            )
+
+    render_dir = staged_stage4 / "qa" / f"{slug}-presentation"
+    render_record = artifacts.get("qa_render")
+    if (
+        not isinstance(render_record, dict)
+        or render_record.get("path")
+        != f"stage4/qa/{slug}-presentation"
+        or render_record.get("files") != _backfill_render_hashes(render_dir)
+    ):
+        raise RuntimeError(
+            "Backfill render inventory mismatch before archive commit."
+        )
+    inspection_dir = staged_stage4 / "inspection" / slug
+    inspection_record = artifacts.get("inspection_render")
+    if (
+        not isinstance(inspection_record, dict)
+        or inspection_record.get("path")
+        != f"stage4/inspection/{slug}"
+        or inspection_record.get("files")
+        != _backfill_render_hashes(inspection_dir)
+    ):
+        raise RuntimeError(
+            "Backfill visual-inspection inventory mismatch before archive "
+            "commit."
+        )
+    from cli.presentation_qa import qa_visual_inspection_receipt
+
+    inspection_report = qa_visual_inspection_receipt(
+        staged_stage4 / f"{slug}-visual-inspection.json",
+        artifact=staged_stage4 / f"{slug}.pptx",
+        visual_brief=(
+            staged_stage4 / "deck-backfill" / "visual-brief.json"
+        ),
+        deck_mode=str(payload.get("deck_mode") or ""),
+    )
+    if not inspection_report.ok:
+        raise RuntimeError(
+            "Backfill visual-inspection receipt is not passing: "
+            + "; ".join(
+                issue.message for issue in inspection_report.errors[:8]
+            )
+        )
+    if payload.get("qa_ok") is not True:
+        raise RuntimeError("Backfill manifest does not record passing QA.")
+    release_dir = staged_stage4.parent / "release"
+    release_record = artifacts.get("release_supplement")
+    if (
+        not isinstance(release_record, dict)
+        or release_record.get("path") != "release-supplements/deck"
+        or release_record.get("files")
+        != _backfill_render_hashes(release_dir)
+    ):
+        raise RuntimeError(
+            "Backfill release-supplement inventory mismatch before archive "
+            "commit."
+        )
+    from cli.publish import verify_release_bundle
+
+    release_payload = verify_release_bundle(
+        release_dir,
+        require_word_report=False,
+    )
+    if (
+        str(release_payload.get("slug") or "") != slug
+        or {
+            str(item.get("role") or "")
+            for item in release_payload.get("artifacts", [])
+        }
+        != {"presentation"}
+    ):
+        raise RuntimeError(
+            "Backfill release supplement is not a deck-only bundle for this "
+            "slug."
+        )
+    return payload
+
+
+def _staged_presentation_release_matches_sources(
+    *,
+    release_dir: Path,
+    staged_stage4: Path,
+    slug: str,
+) -> bool:
+    """Return whether a durable deck release still binds the exact sources.
+
+    A resumed backfill may have crossed the reports-promotion boundary but not
+    the archive-commit boundary. Rebuilding the release manifest in that case
+    changes its hash and creates a second immutable bundle for identical work.
+    Reuse is safe only when the complete bundle verifies and every
+    presentation-inspection source still matches the staged transaction.
+    """
+
+    from cli.publish import verify_release_bundle
+
+    try:
+        payload = verify_release_bundle(
+            release_dir,
+            require_word_report=False,
+        )
+        artifacts = payload.get("artifacts")
+        if (
+            payload.get("slug") != slug
+            or not isinstance(artifacts, list)
+            or len(artifacts) != 1
+        ):
+            return False
+        artifact = artifacts[0]
+        if (
+            not isinstance(artifact, dict)
+            or artifact.get("role") != "presentation"
+            or artifact.get("source_path") != f"stage4/{slug}.pptx"
+        ):
+            return False
+
+        presentation = staged_stage4 / f"{slug}.pptx"
+        visual_brief = (
+            staged_stage4 / "deck-backfill" / "visual-brief.json"
+        )
+        receipt = (
+            staged_stage4 / f"{slug}-visual-inspection.json"
+        )
+        inspection_dir = staged_stage4 / "inspection" / slug
+        if not all(
+            path.is_file()
+            for path in (presentation, visual_brief, receipt)
+        ) or not inspection_dir.is_dir():
+            return False
+        if artifact.get("source_sha256") != file_sha256(presentation):
+            return False
+
+        requirements = payload.get("requirements")
+        if not isinstance(requirements, dict) or not (
+            requirements.get("presentation") is True
+            and requirements.get("visual_inspection") is True
+            and requirements.get("word_visual_inspection") is False
+        ):
+            return False
+        inspection = artifact.get("visual_inspection")
+        if (
+            not isinstance(inspection, dict)
+            or inspection.get("type") != "presentation_slides"
+            or inspection.get("sha256") != file_sha256(receipt)
+            or inspection.get("visual_brief_sha256")
+            != file_sha256(visual_brief)
+        ):
+            return False
+
+        expected_files = {
+            (
+                Path("inspection")
+                / slug
+                / path.relative_to(inspection_dir)
+            ).as_posix(): (
+                file_sha256(path),
+                path.stat().st_size,
+            )
+            for path in sorted(inspection_dir.rglob("*"))
+            if path.is_file()
+        }
+        recorded_files = inspection.get("files")
+        if not isinstance(recorded_files, list):
+            return False
+        actual_files = {
+            str(item.get("path") or ""): (
+                str(item.get("sha256") or ""),
+                item.get("size_bytes"),
+            )
+            for item in recorded_files
+            if isinstance(item, dict)
+        }
+        return actual_files == expected_files
+    except (FileNotFoundError, OSError, RuntimeError, ValueError, TypeError):
+        return False
+
+
+def _promote_archive_backfill(
+    *,
+    staged_stage4: Path,
+    archive_stage4: Path,
+    slug: str,
+) -> dict[str, Path]:
+    """Commit a validated deck backfill to an archive with full rollback.
+
+    Only the deck-specific transaction targets are replaced. Existing Word
+    artifacts and all unrelated archived files remain untouched.
+    """
+
+    _validate_staged_backfill(staged_stage4=staged_stage4, slug=slug)
+    source_operations = [
+        (
+            "visual_brief",
+            staged_stage4 / "deck-backfill" / "visual-brief.json",
+            archive_stage4 / "deck-backfill" / "visual-brief.json",
+        ),
+        (
+            "presentation",
+            staged_stage4 / f"{slug}.pptx",
+            archive_stage4 / f"{slug}.pptx",
+        ),
+        (
+            "presentation_qa",
+            staged_stage4 / f"{slug}-qa.json",
+            archive_stage4 / f"{slug}-qa.json",
+        ),
+        (
+            "qa_render",
+            staged_stage4 / "qa" / f"{slug}-presentation",
+            archive_stage4 / "qa" / f"{slug}-presentation",
+        ),
+        (
+            "visual_inspection",
+            staged_stage4 / f"{slug}-visual-inspection.json",
+            archive_stage4 / f"{slug}-visual-inspection.json",
+        ),
+        (
+            "inspection_render",
+            staged_stage4 / "inspection" / slug,
+            archive_stage4 / "inspection" / slug,
+        ),
+        (
+            "release_supplement",
+            staged_stage4.parent / "release",
+            archive_stage4.parent / "release-supplements" / "deck",
+        ),
+        (
+            "backfill_manifest",
+            staged_stage4 / f"{slug}-deck-backfill.json",
+            archive_stage4 / f"{slug}-deck-backfill.json",
+        ),
+    ]
+    missing = [
+        str(source)
+        for _, source, _ in source_operations
+        if not source.exists()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            "Staged deck backfill is incomplete: " + ", ".join(missing)
+        )
+
+    archive_stage4.mkdir(parents=True, exist_ok=True)
+    transaction = Path(
+        tempfile.mkdtemp(prefix=f".{slug}-backfill-commit-", dir=archive_stage4)
+    )
+    backups = transaction / "backups"
+    backups.mkdir()
+    commit_staged = transaction / "staged"
+    commit_staged.mkdir()
+    operations: list[tuple[str, Path, Path]] = []
+    promoted: list[Path] = []
+    backed_up: list[tuple[Path, Path]] = []
+    created_parents: list[Path] = []
+    try:
+        # Copy every source into the commit transaction before touching the
+        # archive. The durable staging tree remains resumable even if the
+        # archive commit later fails.
+        for index, (role, source, destination) in enumerate(source_operations):
+            commit_source = commit_staged / f"{index:02d}-{source.name}"
+            if source.is_dir() and not source.is_symlink():
+                shutil.copytree(source, commit_source)
+                if _backfill_render_hashes(commit_source) != (
+                    _backfill_render_hashes(source)
+                ):
+                    raise RuntimeError(
+                        f"Backfill commit staging changed directory bytes: {role}"
+                    )
+            else:
+                shutil.copy2(source, commit_source)
+                if file_sha256(commit_source) != file_sha256(source):
+                    raise RuntimeError(
+                        f"Backfill commit staging changed file bytes: {role}"
+                    )
+            operations.append((role, commit_source, destination))
+
+        for index, (role, source, destination) in enumerate(operations):
+            parent = destination.parent
+            if not parent.exists():
+                parent.mkdir(parents=True)
+                created_parents.append(parent)
+            if destination.exists() or destination.is_symlink():
+                backup = backups / f"{index:02d}-{destination.name}"
+                os.replace(destination, backup)
+                backed_up.append((destination, backup))
+            os.replace(source, destination)
+            promoted.append(destination)
+
+        # Verify the exact committed bytes before the manifest-last operation
+        # is considered authoritative.
+        for (role, original, _), (_, _, destination) in zip(
+            source_operations,
+            operations,
+            strict=True,
+        ):
+            if original.is_dir() and not original.is_symlink():
+                matches = _backfill_render_hashes(destination) == (
+                    _backfill_render_hashes(original)
+                )
+            else:
+                matches = file_sha256(destination) == file_sha256(original)
+            if not matches:
+                raise RuntimeError(
+                    f"Backfill archive commit changed artifact bytes: {role}"
+                )
+
+        committed = {
+            role: destination
+            for role, _, destination in operations
+        }
+        # A hard process crash can strand a prior transaction directory.
+        # Once a complete newer supplement is committed, those backups are no
+        # longer authoritative and can be removed safely.
+        for stale in archive_stage4.glob(
+            f".{slug}-backfill-commit-*"
+        ):
+            if stale != transaction:
+                shutil.rmtree(stale, ignore_errors=True)
+        return committed
+    except Exception:
+        for destination in reversed(promoted):
+            if destination.exists() or destination.is_symlink():
+                _remove_backfill_path(destination)
+        for destination, backup in reversed(backed_up):
+            if backup.exists() or backup.is_symlink():
+                os.replace(backup, destination)
+        for parent in reversed(created_parents):
+            try:
+                parent.rmdir()
+            except OSError:
+                pass
+        raise
+    finally:
+        shutil.rmtree(transaction, ignore_errors=True)
 
 
 async def run_presentation_for_archive(
@@ -639,48 +3659,638 @@ async def run_presentation_for_archive(
     slug: str,
     title: str,
     repo_root: Path,
+    budget_usd: float | None = None,
 ) -> Path:
-    """Generate a companion deck for an already-archived run.
+    """Backfill a deck through a durable, resumable staging transaction."""
 
-    The deck is written into the archive's stage4/ and copied to reports/
-    for distribution. Returns the reports/ path.
-    """
-    from cli.publish import REPORTS_DIR
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,127}", slug):
+        raise ValueError(f"Unsafe deck-backfill slug: {slug!r}")
+    archive_dir = archive_dir.resolve()
+    staging_root = (
+        repo_root.resolve() / "logs" / "deck-backfills" / slug
+    ).resolve()
+    approved_root = (
+        repo_root.resolve() / "logs" / "deck-backfills"
+    ).resolve()
+    try:
+        staging_root.relative_to(approved_root)
+    except ValueError as exc:
+        raise ValueError(f"Unsafe deck-backfill slug: {slug!r}") from exc
+    committed_deck = _assert_archive_allows_deck_backfill(
+        archive_dir=archive_dir,
+        slug=slug,
+        staged_stage4=staging_root / "stage4",
+    )
+    if committed_deck is not None:
+        from cli.publish import REPORTS_DIR, promote_release
+
+        published = promote_release(
+            release_dir=(
+                archive_dir / "release-supplements" / "deck"
+            ),
+            out_dir=REPORTS_DIR,
+            release_manifest_name=f"{slug}-deck-release-manifest.json",
+            reconcile_roles=False,
+        )
+        shutil.rmtree(staging_root, ignore_errors=True)
+        return published["presentation"]
+    staging_root.mkdir(parents=True, exist_ok=True)
+    state_path = staging_root / "state.json"
+    try:
+        result = await _build_presentation_backfill(
+            archive_dir=archive_dir,
+            slug=slug,
+            title=title,
+            repo_root=repo_root.resolve(),
+            staging_root=staging_root,
+            budget_usd=budget_usd,
+        )
+    except BaseException as exc:
+        try:
+            state = (
+                json.loads(state_path.read_text(encoding="utf-8"))
+                if state_path.is_file()
+                else {}
+            )
+        except (OSError, json.JSONDecodeError):
+            state = {}
+        state.update(
+            {
+                "status": "interrupted",
+                "error_type": type(exc).__name__,
+                "updated_at": datetime.now()
+                .astimezone()
+                .isoformat(timespec="seconds"),
+            }
+        )
+        _write_backfill_state(state_path, state)
+        raise
+    shutil.rmtree(staging_root, ignore_errors=True)
+    return result
+
+
+async def _build_presentation_backfill(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    staging_root: Path,
+    budget_usd: float | None = None,
+) -> Path:
+    """Build and validate one deck in an isolated staging tree."""
+
+    from cli.presentation_qa import (
+        qa_presentation,
+        qa_visual_inspection_receipt,
+    )
+    from cli.publish import (
+        REPORTS_DIR,
+    )
+    from cli.publishing_quality import assert_quality
 
     all_agents = load_all_agents()
     by_name = {a.name: a for a in all_agents}
+    art_director = by_name["art-director"]
     designer = by_name["presentation-designer"]
-    tally = CostTally()
 
-    stage4 = archive_dir / "stage4"
+    def relative(path: Path) -> str:
+        try:
+            return path.relative_to(repo_root).as_posix()
+        except ValueError:
+            return str(path)
+
+    identity_payload, identity, source_paths, deck_mode = (
+        _presentation_backfill_identity(
+            archive_dir=archive_dir,
+            slug=slug,
+            title=title,
+            repo_root=repo_root,
+            art_director=art_director,
+            designer=designer,
+        )
+    )
+    run_prompt = source_paths["run_prompt"]
+    final_path = source_paths["final_draft"]
+    factcheck_path = source_paths["fact_check_report"]
+    ledger_path = source_paths["evidence_ledger"]
+    lineage_path = source_paths["claim_lineage"]
+    context_path = source_paths["airport_context"]
+    archived_manifest = source_paths["archived_run_manifest"]
+    if not final_path.is_file() or not ledger_path.is_file():
+        raise FileNotFoundError(
+            "Deck backfill requires the archived final draft and canonical "
+            f"evidence ledger; missing under {archive_dir}."
+        )
+    source_fingerprints = dict(identity_payload["sources"])
+    captured_art_model = str(
+        dict(identity_payload["models"])["art_direction"]
+    )
+    captured_presentation_model = str(
+        dict(identity_payload["models"])["presentation"]
+    )
+    state_path = staging_root / "state.json"
+    try:
+        prior_state = (
+            json.loads(state_path.read_text(encoding="utf-8"))
+            if state_path.is_file()
+            else {}
+        )
+    except (OSError, json.JSONDecodeError):
+        prior_state = {}
+    existing_staged_work = any(
+        (staging_root / name).exists()
+        or (staging_root / name).is_symlink()
+        for name in ("stage4", "release")
+    )
+    if (
+        existing_staged_work
+        and (
+            not prior_state
+            or prior_state.get("identity_sha256") != identity
+        )
+    ):
+        stale = (
+            staging_root
+            / "stale"
+            / datetime.now().strftime("%Y%m%dT%H%M%S%f")
+        )
+        stale.mkdir(parents=True, exist_ok=True)
+        for name in ("stage4", "release", "state.json"):
+            existing = staging_root / name
+            if existing.exists() or existing.is_symlink():
+                os.replace(existing, stale / name)
+        prior_state = {}
+    elif prior_state and prior_state.get("identity_sha256") != identity:
+        prior_state = {}
+
+    prior_costs = prior_state.get("cost_by_step", {})
+    tally = CostTally(
+        by_step={
+            str(step): float(cost)
+            for step, cost in (
+                prior_costs.items()
+                if isinstance(prior_costs, dict)
+                else ()
+            )
+        },
+        budget_usd=budget_usd,
+    )
+    tally.plan_calls(2)
+    stage4 = staging_root / "stage4"
     stage4.mkdir(parents=True, exist_ok=True)
+    visual_path = stage4 / "deck-backfill" / "visual-brief.json"
+    visual_path.parent.mkdir(parents=True, exist_ok=True)
     out_path = stage4 / f"{slug}.pptx"
-    final_rel = (archive_dir / "stage3" / "final-draft.md").relative_to(repo_root).as_posix()
-    factcheck_rel = (archive_dir / "stage3" / "fact-check-report.md").relative_to(repo_root).as_posix()
+    qa_path = stage4 / f"{slug}-qa.json"
+    receipt_path = stage4 / f"{slug}-visual-inspection.json"
+    inspection_dir = stage4 / "inspection" / slug
+    qa_render_dir = stage4 / "qa" / f"{slug}-presentation"
+
+    def invalidate_staged_deck() -> None:
+        for path in (out_path, qa_path, receipt_path):
+            _quarantine_partial_output(path)
+        for directory in (inspection_dir, qa_render_dir):
+            if directory.is_dir():
+                shutil.rmtree(directory)
+
+    recorded_visual_sha = str(
+        prior_state.get("visual_brief_sha256") or ""
+    )
+    if visual_path.is_file() and (
+        not recorded_visual_sha
+        or file_sha256(visual_path) != recorded_visual_sha
+    ):
+        _quarantine_partial_output(visual_path)
+        invalidate_staged_deck()
+
+    recorded_presentation_sha = str(
+        prior_state.get("presentation_sha256") or ""
+    )
+    recorded_qa_sha = str(
+        prior_state.get("presentation_qa_sha256") or ""
+    )
+    recorded_receipt_sha = str(
+        prior_state.get("visual_inspection_sha256") or ""
+    )
+    recorded_presentation_dependencies = str(
+        prior_state.get("presentation_dependencies_sha256") or ""
+    )
+    expected_presentation_dependencies = (
+        hashlib.sha256(
+            json.dumps(
+                {
+                    "backfill_identity_sha256": identity,
+                    "visual_brief_sha256": recorded_visual_sha,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        if recorded_visual_sha
+        else ""
+    )
+    if any(path.is_file() for path in (out_path, qa_path, receipt_path)):
+        state_bound = bool(
+            recorded_presentation_sha
+            and recorded_qa_sha
+            and recorded_receipt_sha
+            and file_sha256(out_path) == recorded_presentation_sha
+            and file_sha256(qa_path) == recorded_qa_sha
+            and file_sha256(receipt_path) == recorded_receipt_sha
+            and recorded_presentation_dependencies
+            == expected_presentation_dependencies
+            and _backfill_render_hashes(qa_render_dir)
+            == prior_state.get("qa_render_files")
+            and _backfill_render_hashes(inspection_dir)
+            == prior_state.get("inspection_render_files")
+        )
+        if not state_bound:
+            invalidate_staged_deck()
+
+    backfill_state = {
+        **identity_payload,
+        "identity_sha256": identity,
+        "status": "running",
+        "phase": prior_state.get("phase", "art_direction"),
+        "started_at": prior_state.get(
+            "started_at",
+            datetime.now().astimezone().isoformat(timespec="seconds"),
+        ),
+        "updated_at": datetime.now()
+        .astimezone()
+        .isoformat(timespec="seconds"),
+        "budget_usd": budget_usd,
+        "cost_by_step": tally.by_step,
+    }
+    _write_backfill_state(state_path, backfill_state)
+
+    def journal_backfill_cost(current_tally: CostTally) -> None:
+        backfill_state.update(
+            {
+                "cost_by_step": dict(current_tally.by_step),
+                "claude_cost_usd": current_tally.total,
+                "last_billed_at": datetime.now()
+                .astimezone()
+                .isoformat(timespec="seconds"),
+                "updated_at": datetime.now()
+                .astimezone()
+                .isoformat(timespec="seconds"),
+            }
+        )
+        _write_backfill_state(state_path, backfill_state)
+
+    art_prompt = (
+        f"Create the canonical visual contract for the archived Council report "
+        f"\"{title}\". Read these exact sources:\n"
+        f"- Run prompt: `{relative(run_prompt)}`\n"
+        f"- Final draft: `{relative(final_path)}`\n"
+        f"- Fact-check report: `{relative(factcheck_path)}` (if present)\n"
+        f"- Evidence ledger: `{relative(ledger_path)}`\n"
+        f"- Claim lineage: `{relative(lineage_path)}` (if present)\n"
+        f"- Airport context: `{relative(context_path)}` (if present)\n"
+        f"- Archived run manifest: `{relative(archived_manifest)}` (if present)\n\n"
+        f"The required deck mode is `{deck_mode}`. Define the visual argument "
+        "before slide production. Use only evidence IDs present in the archived "
+        "ledger. Include every field required by "
+        "`assets/brand/visual-brief.schema.json` and validate against that schema.\n\n"
+        f"Write valid JSON to: `{relative(visual_path)}`"
+    )
+    art_completion = await _run_agent(
+        agent=art_director,
+        user_prompt=art_prompt,
+        model=captured_art_model,
+        cwd=repo_root,
+        step_label=f"deck/{slug}/art-direction",
+        tally=tally,
+        output_path=visual_path,
+        artifact_contract=_visual_brief_contract(),
+        emit_completion=False,
+        cost_journal=journal_backfill_cost,
+    )
+    visual_validation = _validate_visual_brief(
+        out_path=visual_path,
+        schema_path=repo_root / "assets" / "brand" / "visual-brief.schema.json",
+        evidence_ledger=ledger_path,
+        requested_mode=deck_mode,
+    )
+    await emit(
+        "artifact_validated",
+        step=f"deck/{slug}/visual-brief",
+        **visual_validation.to_dict(),
+    )
+    if not visual_validation.valid:
+        await emit(
+            "agent_error",
+            step=f"deck/{slug}/art-direction",
+            agent=art_director.name,
+            error_type="VisualBriefContractError",
+            message="; ".join(visual_validation.errors[:8]),
+        )
+        _quarantine_partial_output(visual_path)
+        raise RuntimeError(
+            "Backfill Art Director brief failed the canonical contract: "
+            + "; ".join(visual_validation.errors[:8])
+        )
+    if not art_completion.get("skipped"):
+        await emit(
+            "agent_done",
+            step=f"deck/{slug}/art-direction",
+            agent=art_director.name,
+            cost=art_completion.get("cost"),
+            turns=art_completion.get("turns"),
+            total=tally.total,
+            provider=art_completion.get("provider"),
+            billed_separately=False,
+        )
+    current_visual_sha = file_sha256(visual_path)
+    if (
+        any(path.is_file() for path in (out_path, qa_path, receipt_path))
+        and current_visual_sha != recorded_visual_sha
+    ):
+        invalidate_staged_deck()
+    presentation_dependencies_sha256 = hashlib.sha256(
+        json.dumps(
+            {
+                "backfill_identity_sha256": identity,
+                "visual_brief_sha256": current_visual_sha,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    backfill_state.update(
+        {
+            "phase": "art_direction_complete",
+            "updated_at": datetime.now()
+            .astimezone()
+            .isoformat(timespec="seconds"),
+            "cost_by_step": tally.by_step,
+            "art_direction_dependencies_sha256": identity,
+            "visual_brief_sha256": current_visual_sha,
+            "presentation_dependencies_sha256": (
+                presentation_dependencies_sha256
+            ),
+        }
+    )
+    _write_backfill_state(state_path, backfill_state)
+
     prompt = (
         f"Build the companion executive presentation for the report titled "
         f"\"{title}\".\n\n"
-        f"Source material:\n"
-        f"- Final draft: `{final_rel}`\n"
-        f"- Fact-check report: `{factcheck_rel}` (read if present)\n"
-        f"- Run prompt: `prompts/runs/{slug}.md` (read if present)\n\n"
-        f"Save the finished deck to: `{out_path}`\n"
+        f"Source material (read all available files):\n"
+        f"- Final draft: `{relative(final_path)}`\n"
+        f"- Fact-check report: `{relative(factcheck_path)}`\n"
+        f"- Canonical Art Director brief: `{relative(visual_path)}`\n"
+        f"- Evidence ledger: `{relative(ledger_path)}`\n"
+        f"- Claim lineage: `{relative(lineage_path)}`\n"
+        f"- Airport context: `{relative(context_path)}`\n"
+        f"- Run prompt: `{relative(run_prompt)}`\n\n"
+        "Follow the Art Director brief exactly; do not author a replacement. "
+        "Use visible sources for every material number and attributed claim.\n\n"
+        f"Save the finished deck to: `{relative(out_path)}`\n"
         f"The repo's Python interpreter with python-pptx installed is at "
-        f"`.venv/bin/python` — use it for your build script, and validate the "
-        f"deck opens cleanly before finishing."
+        f"`.venv/bin/python` — use it for your build script.\n\n"
+        "Your work is not complete when the PPTX merely opens. Run this exact "
+        "inspection-packet workflow after building it:\n\n"
+        f"`.venv/bin/python -m cli.presentation_qa "
+        f"\"{relative(out_path)}\" --mode {deck_mode} "
+        f"--visual-brief \"{relative(visual_path)}\" "
+        f"--json \"{relative(inspection_dir / 'designer-qa.json')}\" "
+        f"--render-dir \"{relative(inspection_dir)}\" "
+        f"--prepare-inspection \"{relative(receipt_path)}\"`\n\n"
+        "Inspect every rendered slide PNG individually at full size and inspect "
+        "`montage.png` for narrative rhythm. Fix every defect and rerun the "
+        "command if the deck bytes change. Only after the exact final bytes are "
+        "clean, confirm that the exact slide named by "
+        "`signature_visual.slide_number` contains the primary exhibit named "
+        "`SIGNATURE VISUAL — <concept>`. Edit only the receipt's `inspection` "
+        "object: set "
+        "`full_size_each_slide_inspected`, `montage_inspected`, and "
+        "`signature_exhibit_present`, `signature_exhibit_matches_brief`, and "
+        "`findings_resolved` to true; set `status` to `pass`; leave "
+        "`unresolved_findings` empty; and record material corrections in "
+        "`resolved_findings`. Never edit the receipt hashes by hand."
     )
-    await _run_agent(
+    design_completion = await _run_agent(
         agent=designer,
         user_prompt=prompt,
-        model=_model("presentation"),
+        model=captured_presentation_model,
         cwd=repo_root,
         step_label=f"deck/{slug}",
         tally=tally,
         output_path=out_path,
+        required_outputs=((receipt_path, _visual_inspection_contract()),),
+        emit_completion=False,
+        cost_journal=journal_backfill_cost,
     )
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    deck_dst = REPORTS_DIR / f"{slug}.pptx"
-    shutil.copy2(out_path, deck_dst)
+    qa_report = qa_presentation(
+        out_path,
+        render_dir=stage4 / "qa" / f"{slug}-presentation",
+        deck_mode=deck_mode,
+        visual_brief=visual_path,
+    )
+    inspection_report = qa_visual_inspection_receipt(
+        receipt_path,
+        artifact=out_path,
+        visual_brief=visual_path,
+        deck_mode=deck_mode,
+    )
+    qa_report.issues.extend(inspection_report.issues)
+    qa_report.metadata["visual_inspection"] = inspection_report.metadata
+    qa_report.write_json(qa_path)
+    await emit(
+        "render_qa",
+        artifact=str(out_path),
+        status="passed" if qa_report.ok else "failed",
+        issues=len(qa_report.issues),
+        errors=len(qa_report.errors),
+        warnings=len(qa_report.warnings),
+        rendered_files=qa_report.rendered_files,
+    )
+    if not qa_report.ok:
+        await emit(
+            "agent_error",
+            step=f"deck/{slug}",
+            agent=designer.name,
+            error_type="PresentationQAError",
+            message="; ".join(issue.message for issue in qa_report.errors[:8]),
+        )
+        _quarantine_partial_output(out_path)
+        _quarantine_partial_output(receipt_path)
+    assert_quality(qa_report)
+    if not design_completion.get("skipped"):
+        await emit(
+            "agent_done",
+            step=f"deck/{slug}",
+            agent=designer.name,
+            cost=design_completion.get("cost"),
+            turns=design_completion.get("turns"),
+            total=tally.total,
+            provider=design_completion.get("provider"),
+            billed_separately=False,
+        )
+    backfill_state.update(
+        {
+            "phase": "presentation_qa_complete",
+            "updated_at": datetime.now()
+            .astimezone()
+            .isoformat(timespec="seconds"),
+            "cost_by_step": tally.by_step,
+            "presentation_sha256": file_sha256(out_path),
+            "presentation_qa_sha256": file_sha256(qa_path),
+            "visual_inspection_sha256": file_sha256(receipt_path),
+            "qa_render_files": _backfill_render_hashes(
+                stage4 / "qa" / f"{slug}-presentation"
+            ),
+            "inspection_render_files": _backfill_render_hashes(
+                inspection_dir
+            ),
+        }
+    )
+    _write_backfill_state(state_path, backfill_state)
+
+    release_dir = staging_root / "release"
+    # Publishing is the first irreversible boundary. Recompute the complete
+    # archived-source/model/charter/execution identity both before staging and
+    # immediately before promotion.
+    published = _publish_presentation_backfill_release(
+        archive_dir=archive_dir,
+        slug=slug,
+        title=title,
+        repo_root=repo_root,
+        art_director=art_director,
+        designer=designer,
+        expected_payload=identity_payload,
+        expected_identity=identity,
+        backfill_state=backfill_state,
+        visual_path=visual_path,
+        out_path=out_path,
+        qa_path=qa_path,
+        receipt_path=receipt_path,
+        qa_render_dir=qa_render_dir,
+        inspection_dir=inspection_dir,
+        release_dir=release_dir,
+        stage4=stage4,
+        deck_mode=deck_mode,
+        out_dir=REPORTS_DIR,
+    )
+    deck_dst = published["presentation"]
+    backfill_state.update(
+        {
+            "phase": "reports_promoted",
+            "updated_at": datetime.now()
+            .astimezone()
+            .isoformat(timespec="seconds"),
+            "cost_by_step": tally.by_step,
+            "published_release_manifest_sha256": file_sha256(
+                published["release_manifest"]
+            ),
+        }
+    )
+    _write_backfill_state(state_path, backfill_state)
+
+    render_dir = stage4 / "qa" / f"{slug}-presentation"
+    published_record = {}
+    for role, path in sorted(published.items()):
+        if path.is_file():
+            published_record[role] = {
+                "path": relative(path),
+                "sha256": file_sha256(path),
+            }
+        elif path.is_dir():
+            published_record[role] = {
+                "path": relative(path),
+                "files": _backfill_render_hashes(path),
+            }
+    backfill_record = {
+        "schema_version": "3.0",
+        "slug": slug,
+        "deck_mode": deck_mode,
+        "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "identity_sha256": identity,
+        "art_direction_dependencies_sha256": identity,
+        "presentation_dependencies_sha256": (
+            presentation_dependencies_sha256
+        ),
+        "sources": source_fingerprints,
+        "models": identity_payload["models"],
+        "agent_charters": identity_payload["agent_charters"],
+        "execution_contract": identity_payload["execution_contract"],
+        "artifacts": {
+            "visual_brief": {
+                "path": "stage4/deck-backfill/visual-brief.json",
+                "sha256": file_sha256(visual_path),
+            },
+            "presentation": {
+                "path": f"stage4/{out_path.name}",
+                "sha256": file_sha256(out_path),
+            },
+            "presentation_qa": {
+                "path": f"stage4/{qa_path.name}",
+                "sha256": file_sha256(qa_path),
+            },
+            "visual_inspection": {
+                "path": f"stage4/{receipt_path.name}",
+                "sha256": file_sha256(receipt_path),
+            },
+            "qa_render": {
+                "path": f"stage4/qa/{slug}-presentation",
+                "files": _backfill_render_hashes(render_dir),
+            },
+            "inspection_render": {
+                "path": f"stage4/inspection/{slug}",
+                "files": _backfill_render_hashes(inspection_dir),
+            },
+            "release_supplement": {
+                "path": "release-supplements/deck",
+                "files": _backfill_render_hashes(release_dir),
+            },
+        },
+        "published_release": published_record,
+        "qa_ok": qa_report.ok,
+        "claude_cost_usd": tally.total,
+    }
+    backfill_manifest = stage4 / f"{slug}-deck-backfill.json"
+    temporary_manifest = backfill_manifest.with_name(
+        f".{backfill_manifest.name}.tmp"
+    )
+    temporary_manifest.write_text(
+        json.dumps(backfill_record, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary_manifest, backfill_manifest)
+
+    _commit_presentation_backfill_archive(
+        archive_dir=archive_dir,
+        slug=slug,
+        title=title,
+        repo_root=repo_root,
+        art_director=art_director,
+        designer=designer,
+        expected_payload=identity_payload,
+        expected_identity=identity,
+        backfill_state=backfill_state,
+        visual_path=visual_path,
+        out_path=out_path,
+        qa_path=qa_path,
+        receipt_path=receipt_path,
+        qa_render_dir=qa_render_dir,
+        inspection_dir=inspection_dir,
+        staged_stage4=stage4,
+        archive_stage4=archive_dir / "stage4",
+    )
+    backfill_state.update(
+        {
+            "status": "complete",
+            "phase": "archive_committed",
+            "updated_at": datetime.now()
+            .astimezone()
+            .isoformat(timespec="seconds"),
+            "cost_by_step": tally.by_step,
+        }
+    )
+    _write_backfill_state(state_path, backfill_state)
     console.print(
         f"[green]Deck built:[/green] {deck_dst.relative_to(repo_root)} "
         f"[dim](${tally.total:.2f})[/dim]"
@@ -699,6 +4309,14 @@ def write_run_marker(outputs_dir: Path, spec: RunSpec) -> None:
         "started": datetime.now().isoformat(timespec="seconds"),
         "format": getattr(spec, "output_format", "report"),
         "want_pptx": getattr(spec, "want_pptx", False),
+        "deck_mode": getattr(spec, "deck_mode", "board"),
+        "decision_required": getattr(spec, "decision_required", ""),
+        "decision_owner": getattr(spec, "decision_owner", ""),
+        "time_horizon": getattr(spec, "time_horizon", ""),
+        "approval_path": getattr(spec, "approval_path", ""),
+        "success_measure": getattr(spec, "success_measure", ""),
+        "manifest": "run-manifest.json",
+        "pipeline_version": "council-v2",
     }
     (outputs_dir / ACTIVE_RUN_MARKER).write_text(
         json.dumps(marker, indent=2), encoding="utf-8"
@@ -715,6 +4333,38 @@ def read_run_marker(outputs_dir: Path) -> dict | None:
         return None
 
 
+def assert_resume_identity(outputs_dir: Path, expected_slug: str) -> None:
+    """Refuse to reuse artifacts unless marker and manifest name the same run."""
+
+    marker = read_run_marker(outputs_dir)
+    if not marker or not marker.get("slug"):
+        raise RuntimeError(
+            "Cannot resume safely: outputs/.active-run.json is missing or invalid. "
+            "The existing artifacts were left untouched."
+        )
+    marker_slug = str(marker["slug"])
+    manifest_path = outputs_dir / "run-manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_slug = str(manifest["run"]["slug"])
+    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+        raise RuntimeError(
+            "Cannot resume safely: outputs/run-manifest.json is missing or invalid. "
+            "The existing artifacts were left untouched."
+        ) from None
+    if marker_slug != manifest_slug:
+        raise RuntimeError(
+            "Cannot resume safely: the active-run marker names "
+            f"'{marker_slug}', but the manifest names '{manifest_slug}'. "
+            "The existing artifacts were left untouched."
+        )
+    if expected_slug != marker_slug:
+        raise RuntimeError(
+            f"Cannot resume '{expected_slug}': outputs/ belongs to "
+            f"'{marker_slug}'. The existing artifacts were left untouched."
+        )
+
+
 def _notify_done(title: str, message: str) -> None:
     """Best-effort completion signal: macOS notification + terminal bell."""
     try:
@@ -728,6 +4378,324 @@ def _notify_done(title: str, message: str) -> None:
     print("\a", end="", flush=True)
 
 
+def _persist_checkpoint_ratings(
+    outputs_dir: Path, checkpoint_result: object, *, review_id: str
+) -> None:
+    """Persist partial human rubric scores without coupling to the UI."""
+
+    ratings = getattr(checkpoint_result, "ratings", None)
+    if not ratings:
+        return
+    try:
+        from cli.evaluation import write_human_review
+    except ImportError:
+        console.print(
+            f"[yellow]Could not persist {review_id} ratings: "
+            "cli.evaluation is unavailable.[/yellow]"
+        )
+        return
+    write_human_review(outputs_dir, ratings, review_id=review_id)
+
+
+async def run_quality_gate_with_remediation(
+    *,
+    spec: RunSpec,
+    run_file: Path,
+    outputs_dir: Path,
+    all_agents: list[Agent],
+    tally: CostTally,
+    manifest_path: Path,
+    agent_names: list[str],
+) -> dict:
+    """Run the deterministic gate with one bounded verifier remediation pass."""
+
+    final_draft = outputs_dir / "stage3" / "final-draft.md"
+    lineage_path = outputs_dir / "claim-lineage.jsonl"
+    report_path = outputs_dir / "quality-gate.json"
+
+    def execute_gate() -> dict:
+        return run_publication_quality_gate(
+            final_draft=final_draft,
+            report_path=report_path,
+            evidence_ledger_path=outputs_dir / "evidence-ledger.jsonl",
+            agent_names=agent_names,
+            claim_lineage_path=lineage_path,
+            output_format=getattr(spec, "output_format", "report"),
+            length_instruction=getattr(spec, "length", ""),
+            raise_on_failure=True,
+        )
+
+    try:
+        payload = execute_gate()
+    except PublicationQualityError:
+        first_payload = json.loads(report_path.read_text(encoding="utf-8"))
+        first_validation = validate_artifact(report_path)
+        update_artifact(
+            manifest_path,
+            report_path,
+            first_validation,
+            artifact_id="verification/quality-gate",
+            producer="orchestrator",
+        )
+        await emit(
+            "quality_gate",
+            passed=False,
+            attempt=1,
+            remediation_pending=True,
+            error_count=first_payload.get("error_count", 1),
+            warning_count=first_payload.get("warning_count", 0),
+            report=str(report_path),
+        )
+
+        by_name = {agent.name: agent for agent in all_agents}
+        verifier = by_name["fact-checker"]
+        remediated_path = outputs_dir / "stage3" / "final-draft-remediated.md"
+        remediation_inputs = (
+            outputs_dir / "stage3" / "remediation-inputs"
+        )
+        remediation_inputs.mkdir(parents=True, exist_ok=True)
+        snapshot_final = remediation_inputs / "final-draft-before-gate.md"
+        snapshot_gate = remediation_inputs / "quality-gate-before-remediation.json"
+        snapshot_fact_report = (
+            remediation_inputs / "fact-check-report-before-gate.md"
+        )
+        snapshot_lineage = (
+            remediation_inputs / "claim-lineage-before-gate.jsonl"
+        )
+        fact_report = outputs_dir / "stage3" / "fact-check-report.md"
+        for source, snapshot, artifact_id in (
+            (
+                final_draft,
+                snapshot_final,
+                "verification/remediation-input/final-draft",
+            ),
+            (
+                report_path,
+                snapshot_gate,
+                "verification/remediation-input/quality-gate",
+            ),
+            (
+                fact_report,
+                snapshot_fact_report,
+                "verification/remediation-input/fact-check-report",
+            ),
+            (
+                lineage_path,
+                snapshot_lineage,
+                "verification/remediation-input/claim-lineage",
+            ),
+        ):
+            shutil.copy2(source, snapshot)
+            update_artifact(
+                manifest_path,
+                snapshot,
+                validate_artifact(snapshot),
+                artifact_id=artifact_id,
+                producer="orchestrator",
+                role="remediation_input",
+                required=True,
+            )
+        remediated_fact_report = (
+            outputs_dir / "stage3" / "fact-check-report-remediated.md"
+        )
+        remediated_lineage = (
+            outputs_dir / "stage3" / "claim-lineage-remediated.jsonl"
+        )
+        remediation_dependencies = (
+            "run-manifest.json",
+            "stage3/remediation-inputs/final-draft-before-gate.md",
+            "stage3/remediation-inputs/quality-gate-before-remediation.json",
+            "stage3/remediation-inputs/fact-check-report-before-gate.md",
+            "stage3/remediation-inputs/claim-lineage-before-gate.jsonl",
+            "evidence-ledger.jsonl",
+        )
+        blockers = [
+            issue
+            for issue in first_payload.get("issues", [])
+            if issue.get("severity") == "error"
+        ]
+        prompt = (
+            f"Read `{run_file}`, `outputs/run-manifest.json`, "
+            "`outputs/stage3/remediation-inputs/final-draft-before-gate.md`, "
+            "`outputs/stage3/remediation-inputs/quality-gate-before-remediation.json`, "
+            "`outputs/stage3/remediation-inputs/fact-check-report-before-gate.md`, "
+            "`outputs/stage3/remediation-inputs/claim-lineage-before-gate.jsonl`, "
+            "and `outputs/evidence-ledger.jsonl`.\n\n"
+            "This is the single bounded remediation pass after the deterministic "
+            "publication gate. Fix every listed blocker without adding new facts or "
+            "weakening a well-supported conclusion. Convert internal source tags to "
+            "reader-facing primary-source footnotes; repair footnote structure; "
+            "use numeric footnote labels only; "
+            "remove or accurately qualify unsupported claims; and re-open primary "
+            "sources whenever the lineage says they were not checked. A claim that "
+            "cannot be verified must be removed from the reader-facing draft, not "
+            "left with an internal tag. If the gate reports a word-count blocker, "
+            "restore the requested range using only explanation, implications, and "
+            "decision mechanics already supported by verified evidence; do not add "
+            "new factual claims.\n\n"
+            f"Gate blockers:\n{json.dumps(blockers, indent=2)}\n\n"
+            "Write the remediated reader-facing draft to "
+            "`outputs/stage3/final-draft-remediated.md`. Write the remediated "
+            "lineage to `outputs/stage3/claim-lineage-remediated.jsonl` using "
+            "the canonical fields: exact "
+            "`claim`, exact `citation`, `footnote_id`, `evidence_ids`, boolean "
+            "`retained`, boolean `primary_source_checked`, and statuses verified, "
+            "qualified, corrected, removed, or unverified. Write the complete "
+            "updated fact-check report, including a "
+            "`## Publication-gate remediation` section to "
+            "`outputs/stage3/fact-check-report-remediated.md` describing every "
+            "change. Do not modify the immutable remediation-input snapshots."
+        )
+        prompt += manifest_prompt_block(
+            manifest_path, repo_root=outputs_dir.parent
+        )
+        await _run_agent(
+            agent=verifier,
+            user_prompt=prompt,
+            model=_model("factcheck"),
+            cwd=outputs_dir.parent,
+            step_label="stage3/fact-check-remediation",
+            tally=tally,
+            output_path=remediated_path,
+            artifact_contract=contract_for_path(final_draft),
+            manifest_path=manifest_path,
+            artifact_id="verification/remediated-draft",
+            required_outputs=(
+                (
+                    remediated_lineage,
+                    CLAIM_LINEAGE_AGENT_CONTRACT,
+                ),
+                (
+                    remediated_fact_report,
+                    contract_for_path(remediated_fact_report),
+                ),
+            ),
+            dependency_inputs=remediation_dependencies,
+        )
+        shutil.copy2(remediated_path, final_draft)
+        shutil.copy2(remediated_fact_report, fact_report)
+        shutil.copy2(remediated_lineage, lineage_path)
+        bound_dependencies = build_dependency_fingerprint(
+            manifest_path, remediation_dependencies
+        )
+        final_validation = validate_artifact(final_draft)
+        update_artifact(
+            manifest_path,
+            final_draft,
+            final_validation,
+            artifact_id="stage3/final",
+            producer="fact-checker",
+            dependencies=bound_dependencies,
+        )
+        lineage, generated = ensure_claim_lineage(
+            final_draft=final_draft,
+            evidence_ledger=outputs_dir / "evidence-ledger.jsonl",
+            output_path=lineage_path,
+        )
+        lineage = bind_claim_lineage_to_draft(
+            final_draft=final_draft,
+            output_path=lineage_path,
+        )
+        lineage_validation = validate_artifact(
+            lineage_path, CLAIM_LINEAGE_CONTRACT
+        )
+        update_artifact(
+            manifest_path,
+            lineage_path,
+            lineage_validation,
+            artifact_id="verification/claim-lineage",
+            producer="orchestrator" if generated else "fact-checker",
+            dependencies=bound_dependencies,
+        )
+        await emit(
+            "evidence_update",
+            kind="claim_lineage",
+            lineage_path=str(lineage_path),
+            record_count=len(lineage),
+            generated_fallback=generated,
+            remediation=True,
+        )
+        fact_report_validation = validate_artifact(fact_report)
+        update_artifact(
+            manifest_path,
+            fact_report,
+            fact_report_validation,
+            artifact_id="stage3/fact-check",
+            producer="fact-checker",
+            dependencies=bound_dependencies,
+        )
+        await emit(
+            "artifact_validated",
+            step="stage3/fact-check-report-remediated",
+            **fact_report_validation.to_dict(),
+        )
+        if not fact_report_validation.valid:
+            raise RuntimeError(
+                "The remediated fact-check report failed its artifact contract: "
+                + "; ".join(fact_report_validation.errors)
+            )
+        try:
+            payload = execute_gate()
+        except PublicationQualityError:
+            second_payload = json.loads(report_path.read_text(encoding="utf-8"))
+            second_validation = validate_artifact(report_path)
+            update_artifact(
+                manifest_path,
+                report_path,
+                second_validation,
+                artifact_id="verification/quality-gate",
+                producer="orchestrator",
+            )
+            await emit(
+                "quality_gate",
+                passed=False,
+                attempt=2,
+                remediation_pending=False,
+                error_count=second_payload.get("error_count", 1),
+                warning_count=second_payload.get("warning_count", 0),
+                report=str(report_path),
+            )
+            raise
+        await emit(
+            "quality_gate",
+            passed=True,
+            attempt=2,
+            remediated=True,
+            error_count=payload.get("error_count", 0),
+            warning_count=payload.get("warning_count", 0),
+            report=str(report_path),
+        )
+    else:
+        await emit(
+            "quality_gate",
+            passed=True,
+            attempt=1,
+            remediated=False,
+            error_count=payload.get("error_count", 0),
+            warning_count=payload.get("warning_count", 0),
+            report=str(report_path),
+        )
+
+    validation = validate_artifact(report_path)
+    update_artifact(
+        manifest_path,
+        report_path,
+        validation,
+        artifact_id="verification/quality-gate",
+        producer="orchestrator",
+        dependencies=build_dependency_fingerprint(
+            manifest_path,
+            (
+                "run-manifest.json",
+                "stage3/final-draft.md",
+                "claim-lineage.jsonl",
+                "evidence-ledger.jsonl",
+            ),
+        ),
+    )
+    return payload
+
+
 async def run_pipeline(
     *,
     spec: RunSpec,
@@ -739,30 +4707,133 @@ async def run_pipeline(
 ) -> RunResult:
     from cli.checkpoints import checkpoint_after_stage2, checkpoint_after_stage3
     from cli.docx_builder import build_documents
-    from cli.archive import archive_run
+    from cli.archive import archive_run, reserve_archive_path
 
     outputs_dir = repo_root / "outputs"
+    if resume:
+        assert_resume_identity(outputs_dir, spec.slug)
     await prepare_outputs(outputs_dir, auto_approve=auto_approve, resume=resume)
-    write_run_marker(outputs_dir, spec)
     all_agents = load_all_agents()
     tally = CostTally(budget_usd=budget_usd)
+    by_agent_name = {agent.name: agent for agent in all_agents}
+    claude_research_calls = sum(
+        by_agent_name[name].provider != "openai"
+        for name in spec.selected_research_agents
+    )
+    output_format = str(getattr(spec, "output_format", "report"))
+    needs_art_direction = bool(getattr(spec, "want_pptx", False)) or (
+        output_format not in {"brief", "recommendations"}
+    )
+    regular_process_calls = 11
+    optional_production_calls = 1 + int(needs_art_direction) + int(
+        bool(getattr(spec, "want_pptx", False))
+    )
+    contingency_calls = 2  # one verifier remediation and one requested v3 redo
+    planned_claude_calls = (
+        claude_research_calls
+        + regular_process_calls
+        + optional_production_calls
+        + contingency_calls
+    )
+    tally.plan_calls(planned_claude_calls)
     result_out = RunResult(tally=tally)
+    active_pipeline_steps = tuple(
+        step
+        for step in PIPELINE_DEFINITION
+        if (
+            step.id != "art-director" or needs_art_direction
+        )
+        and (
+            step.id != "presentation"
+            or bool(getattr(spec, "want_pptx", False))
+        )
+    )
+    model_roles = {"research", *(step.model_role for step in active_pipeline_steps)}
+    model_assignments = {role: _model(role) for role in sorted(model_roles)}
+    manifest_path = create_run_manifest(
+        spec=spec,
+        run_file=run_file,
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        resume=resume,
+        pipeline_steps=active_pipeline_steps,
+        model_assignments=model_assignments,
+    )
+    # On resume, create_run_manifest re-fingerprints the run prompt, sources,
+    # roster, agent instructions, model routing, and pipeline. Do not refresh
+    # the active marker until that paid-work identity check has succeeded.
+    write_run_marker(outputs_dir, spec)
+    await emit(
+        "manifest_update",
+        path=str(manifest_path),
+        selected_agents=len(spec.selected_research_agents),
+        artifact_count=len(
+            json.loads(manifest_path.read_text(encoding="utf-8")).get(
+                "artifacts", []
+            )
+        ),
+    )
 
-    await emit("run_start", slug=spec.slug, title=spec.title,
-               agents=list(spec.selected_research_agents),
-               output_format=getattr(spec, "output_format", "report"),
-               resume=resume)
+    process_agent_names = list(
+        dict.fromkeys(step.agent for step in active_pipeline_steps)
+    )
+    await emit(
+        "run_start",
+        slug=spec.slug,
+        title=spec.title,
+        agents=[*spec.selected_research_agents, *process_agent_names],
+        output_format=getattr(spec, "output_format", "report"),
+        resume=resume,
+        manifest=str(manifest_path),
+        pipeline_version="council-v2",
+    )
+    await emit(
+        "budget_plan",
+        ceiling=budget_usd,
+        planned_claude_calls=planned_claude_calls,
+        openai_calls_excluded=sum(
+            by_agent_name[name].provider == "openai"
+            for name in spec.selected_research_agents
+        ),
+    )
+
+    console.rule("[bold]Context — airport and decision packet[/bold]")
+    await run_airport_context(
+        spec=spec,
+        run_file=run_file,
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=manifest_path,
+    )
 
     await emit("stage_start", stage=1, label="Research — parallel briefs")
     console.rule("[bold]Stage 1 — parallel research briefs[/bold]")
-    await run_stage1(spec, run_file, outputs_dir, all_agents, tally)
+    await run_stage1(
+        spec, run_file, outputs_dir, all_agents, tally, manifest_path
+    )
+
+    console.rule("[bold]Evidence curation & targeted gap analysis[/bold]")
+    await run_evidence_curation(
+        spec=spec,
+        run_file=run_file,
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=manifest_path,
+    )
 
     await emit("stage_start", stage=2, label="Synthesis & adversarial revision")
     console.rule("[bold]Stage 2 — synthesis & adversarial revision[/bold]")
-    await run_stage2(spec, run_file, outputs_dir, all_agents, tally)
+    await run_stage2(
+        spec, run_file, outputs_dir, all_agents, tally, manifest_path
+    )
 
     while True:
         result = await checkpoint_after_stage2(outputs_dir, auto_approve=auto_approve)
+        _persist_checkpoint_ratings(
+            outputs_dir, result, review_id="checkpoint-stage2"
+        )
         if result.approved:
             break
         if result.redo_from == "strategist-v3":
@@ -771,6 +4842,7 @@ async def run_pipeline(
                 v3_path.unlink()
             await run_stage2(
                 spec, run_file, outputs_dir, all_agents, tally,
+                manifest_path,
                 start_from="strategist-v3", v3_note=result.notes,
             )
             continue
@@ -779,56 +4851,315 @@ async def run_pipeline(
 
     await emit("stage_start", stage=3, label="Edit, humanize & fact-check")
     console.rule("[bold]Stage 3 — edit, humanize & fact-check[/bold]")
-    await run_stage3(run_file, outputs_dir, all_agents, tally)
+    await run_stage3(
+        run_file, outputs_dir, all_agents, tally, manifest_path
+    )
+
+    await run_quality_gate_with_remediation(
+        spec=spec,
+        run_file=run_file,
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=manifest_path,
+        agent_names=[
+            *spec.selected_research_agents,
+            *process_agent_names,
+        ],
+    )
 
     result = await checkpoint_after_stage3(outputs_dir, auto_approve=auto_approve)
+    _persist_checkpoint_ratings(
+        outputs_dir, result, review_id="checkpoint-stage3"
+    )
     if not result.approved:
         console.print("[yellow]Stopping at Stage 3. No Word docs generated.[/yellow]")
         return result_out
 
     await emit("stage_start", stage=4, label="Produce documents")
-    console.rule("[bold]Stage 4 — Word documents[/bold]")
-    build_documents(
+    update_stage(manifest_path, "production", "running")
+    console.rule("[bold]Stage 4 — art direction & documents[/bold]")
+    await run_art_direction(
+        spec=spec,
+        run_file=run_file,
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=manifest_path,
+    )
+    report_path, executive_path = build_documents(
         slug=spec.slug,
         title=spec.title,
         final_draft=outputs_dir / "stage3" / "final-draft.md",
         methodology=repo_root / "docs" / "methodology.md",
         out_dir=outputs_dir / "stage4",
         output_format=getattr(spec, "output_format", "report"),
+        visual_brief=(
+            outputs_dir / "stage4" / "visual-brief.json"
+            if (outputs_dir / "stage4" / "visual-brief.json").is_file()
+            else None
+        ),
+        decision_context={
+            "decision": getattr(spec, "decision_required", ""),
+            "decision_owner": getattr(spec, "decision_owner", ""),
+            "approval_path": getattr(spec, "approval_path", ""),
+            "time_horizon": getattr(spec, "time_horizon", ""),
+            "success_measure": getattr(spec, "success_measure", ""),
+        },
+    )
+    await run_word_visual_inspection(
+        artifacts=[
+            report_path,
+            *([executive_path] if executive_path is not None else []),
+        ],
+        outputs_dir=outputs_dir,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=manifest_path,
+        step_label="stage4/word-visual-inspection",
+    )
+    executive_required = getattr(spec, "output_format", "report") not in {
+        "brief",
+        "recommendations",
+    }
+    for artifact_path, artifact_id, role, required in (
+        (report_path, "stage4/word-report", "word_report", True),
+        (
+            executive_path,
+            "stage4/executive-summary",
+            "executive_summary",
+            executive_required,
+        ),
+    ):
+        if artifact_path is None:
+            continue
+        validation = validate_artifact(artifact_path)
+        update_artifact(
+            manifest_path,
+            artifact_path,
+            validation,
+            artifact_id=artifact_id,
+            producer="orchestrator",
+            role=role,
+            required=required,
+        )
+        await emit(
+            "artifact_validated",
+            step=f"stage4/{role}",
+            **validation.to_dict(),
+        )
+        if not validation.valid:
+            raise RuntimeError(
+                f"{artifact_path.name} failed its Office artifact contract: "
+                + "; ".join(validation.errors)
+            )
+
+    publishing_quality_path = outputs_dir / "publishing-quality.json"
+    publishing_quality_contract = ArtifactContract(
+        "json",
+        required_keys=("artifact", "kind", "ok", "issues"),
+    )
+    publishing_quality_validation = validate_artifact(
+        publishing_quality_path,
+        publishing_quality_contract,
+    )
+    update_artifact(
+        manifest_path,
+        publishing_quality_path,
+        publishing_quality_validation,
+        artifact_id="stage4/publishing-quality",
+        producer="orchestrator",
+    )
+    if not publishing_quality_validation.valid:
+        raise RuntimeError(
+            "Document publishing QA record is invalid: "
+            + "; ".join(publishing_quality_validation.errors)
+        )
+    publishing_payload = json.loads(
+        publishing_quality_path.read_text(encoding="utf-8")
+    )
+    if publishing_payload.get("ok") is not True:
+        raise RuntimeError(
+            "Document publishing QA contains release-blocking errors."
+        )
+    await emit(
+        "render_qa",
+        artifact=str(report_path),
+        status="passed",
+        issues=len(publishing_payload.get("issues", [])),
+        rendered_files=publishing_payload.get("rendered_files", []),
     )
 
     if getattr(spec, "want_pptx", False):
         console.rule("[bold]Companion PowerPoint[/bold]")
-        await run_presentation(spec, outputs_dir, all_agents, tally)
+        await run_presentation(
+            spec, outputs_dir, all_agents, tally, manifest_path
+        )
+    update_stage(manifest_path, "production", "complete")
+
+    # Release is a commit gate, not a best-effort postscript. Stage exact
+    # Stage 4 bytes, independently render/inspect them, bind the bundle to
+    # hashes in both manifests, and promote the complete set before archiving.
+    console.rule("[bold]Release[/bold]")
+    from cli.publish import (
+        REPORTS_DIR,
+        promote_release,
+        stage_release_artifacts,
+    )
+
+    release_dir = outputs_dir / "release"
+    release_payload = stage_release_artifacts(
+        stage4_dir=outputs_dir / "stage4",
+        slug=spec.slug,
+        release_dir=release_dir,
+        require_executive_summary=executive_required,
+        require_presentation=bool(getattr(spec, "want_pptx", False)),
+        presentation_mode=str(
+            getattr(spec, "deck_mode", "board_decision")
+        ),
+        visual_brief=outputs_dir / "stage4" / "visual-brief.json",
+        require_visual_inspection=bool(
+            getattr(spec, "want_pptx", False)
+        ),
+        require_word_visual_inspection=True,
+    )
+    release_ids = {
+        "word_report": ("release/word-report", "release/word-qa"),
+        "executive_summary": (
+            "release/executive-summary",
+            "release/executive-summary-qa",
+        ),
+        "presentation": (
+            "release/presentation",
+            "release/presentation-qa",
+        ),
+    }
+    for artifact in release_payload.get("artifacts", []):
+        role = str(artifact["role"])
+        artifact_id, qa_id = release_ids[role]
+        released_path = release_dir / str(artifact["path"])
+        released_validation = validate_artifact(released_path)
+        update_artifact(
+            manifest_path,
+            released_path,
+            released_validation,
+            artifact_id=artifact_id,
+            producer="orchestrator",
+        )
+        qa_path = release_dir / str(artifact["qa_path"])
+        qa_validation = validate_artifact(
+            qa_path,
+            ArtifactContract(
+                "json",
+                required_keys=("artifact", "kind", "ok", "issues"),
+            ),
+        )
+        update_artifact(
+            manifest_path,
+            qa_path,
+            qa_validation,
+            artifact_id=qa_id,
+            producer="orchestrator",
+        )
+        if role == "presentation":
+            inspection_record = artifact.get("visual_inspection")
+            if not isinstance(inspection_record, dict):
+                raise RuntimeError(
+                    "Presentation release has no hash-bound visual inspection."
+                )
+            inspection_path = release_dir / str(
+                inspection_record.get("path") or ""
+            )
+            inspection_validation = validate_artifact(
+                inspection_path,
+                _visual_inspection_contract(),
+            )
+            update_artifact(
+                manifest_path,
+                inspection_path,
+                inspection_validation,
+                artifact_id="release/visual-inspection",
+                producer="orchestrator",
+            )
+        elif role in {"word_report", "executive_summary"}:
+            inspection_record = artifact.get("visual_inspection")
+            if not isinstance(inspection_record, dict):
+                raise RuntimeError(
+                    f"{role} release has no hash-bound page inspection."
+                )
+            inspection_path = release_dir / str(
+                inspection_record.get("path") or ""
+            )
+            inspection_validation = validate_artifact(
+                inspection_path,
+                _word_visual_inspection_contract(),
+            )
+            update_artifact(
+                manifest_path,
+                inspection_path,
+                inspection_validation,
+                artifact_id=(
+                    "release/executive-summary-visual-inspection"
+                    if role == "executive_summary"
+                    else "release/word-visual-inspection"
+                ),
+                producer="orchestrator",
+            )
+        await emit(
+            "artifact_validated",
+            step=f"release/{role}",
+            **released_validation.to_dict(),
+        )
+    release_manifest_path = release_dir / "release-manifest.json"
+    release_manifest_validation = validate_artifact(
+        release_manifest_path,
+        ArtifactContract(
+            "json",
+            required_keys=("schema_version", "slug", "artifacts"),
+        ),
+    )
+    update_artifact(
+        manifest_path,
+        release_manifest_path,
+        release_manifest_validation,
+        artifact_id="release/manifest",
+        producer="orchestrator",
+    )
+    update_stage(manifest_path, "release", "complete")
+    assert_manifest_complete(manifest_path)
+
+    # Reject a same-day slug collision before reports/ is changed. The archive
+    # module still repeats this check at commit time.
+    reserve_archive_path(
+        repo_root=repo_root,
+        slug=spec.slug,
+        manifest_path=manifest_path,
+    )
+    published = promote_release(
+        release_dir=release_dir,
+        out_dir=REPORTS_DIR,
+    )
+    result_out.published_path = published["word_report"]
+    result_out.deck_path = published.get("presentation")
+    console.print(
+        f"[green]Published:[/green] "
+        f"{result_out.published_path.relative_to(repo_root)}"
+    )
+    if result_out.deck_path is not None:
+        console.print(
+            f"[green]Deck:[/green] {result_out.deck_path.relative_to(repo_root)}"
+        )
 
     console.rule("[bold]Archive[/bold]")
-    archive_path = archive_run(repo_root=repo_root, slug=spec.slug, tally=tally)
+    archive_path = archive_run(
+        repo_root=repo_root,
+        slug=spec.slug,
+        tally=tally,
+        run_file=run_file,
+        manifest_path=manifest_path,
+    )
     console.print(f"[green]Archived to:[/green] {archive_path}")
     result_out.archive_path = archive_path
-
-    # Final step: publish the polished, distribution-ready document. The run
-    # is complete without a separate `council --publish` invocation; that flag
-    # remains for re-publishing or backfilling older archives.
-    console.rule("[bold]Publish[/bold]")
-    from cli.publish import REPORTS_DIR, publish_all
-
-    for slug, out_path, status in publish_all(only_slug=spec.slug):
-        if status == "ok" and out_path is not None:
-            console.print(
-                f"[green]Published:[/green] {out_path.relative_to(repo_root)}"
-            )
-            result_out.published_path = out_path
-        else:
-            console.print(f"[yellow]Publish issue for {slug}: {status}[/yellow]")
-
-    # A companion deck archived with the run also belongs in reports/.
-    deck_src = archive_path / "stage4" / f"{spec.slug}.pptx"
-    if deck_src.is_file():
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-        deck_dst = REPORTS_DIR / f"{spec.slug}.pptx"
-        shutil.copy2(deck_src, deck_dst)
-        console.print(f"[green]Deck:[/green] {deck_dst.relative_to(repo_root)}")
-        result_out.deck_path = deck_dst
 
     result_out.completed = True
     await emit(
@@ -849,8 +5180,419 @@ async def run_pipeline(
 # reader feedback, reusing the original Stage 1 research briefs.
 # ----------------------------------------------------------------------------
 
-def _revision_prompts(base_rel: str, src_draft_rel: str, briefs_rel: str) -> dict[str, str]:
-    return {
+REVISION_EXECUTION_CONTRACTS: tuple[str, ...] = (
+    "AGENTS.md",
+    "CLAUDE.md",
+    "council.toml",
+    "cli/agents.py",
+    "cli/artifacts.py",
+    "cli/config.py",
+    "cli/orchestrator.py",
+    "cli/revision_state.py",
+)
+
+# The revision user prompt narrows generic normal-run charter examples to these
+# exact archive inputs. Keep this declarative: tests verify that every
+# charter-permitted read is both named to the model and hash-bound in the
+# corresponding step receipt.
+REVISION_SYSTEM_PROMPT_INPUTS: dict[str, tuple[str, ...]] = {
+    "strategist-a": (
+        "run_prompt",
+        "run_manifest",
+        "evidence_map",
+        "evidence_ledger",
+        "narrative_options",
+        "briefs",
+    ),
+    "strategist-b": (
+        "run_prompt",
+        "run_manifest",
+        "evidence_map",
+        "evidence_ledger",
+        "narrative_options",
+        "briefs",
+    ),
+    "red-team": (
+        "run_manifest",
+        "evidence_map",
+        "evidence_ledger",
+        "briefs",
+    ),
+    "fact-checker": (
+        "run_manifest",
+        "evidence_map",
+        "evidence_ledger",
+        "airport_context",
+        "context_sources",
+        "briefs",
+    ),
+    "fact-check-remediation": (
+        "run_manifest",
+        "evidence_ledger",
+    ),
+    "art-direction": (
+        "run_prompt",
+        "run_manifest",
+        "final_draft",
+        "fact_check_report",
+        "evidence_map",
+        "evidence_ledger",
+        "airport_context",
+        "context_sources",
+    ),
+}
+
+
+def _revision_system_dependencies(
+    step_id: str,
+    catalog: dict[str, RevisionDependency],
+) -> tuple[RevisionDependency, ...]:
+    keys = REVISION_SYSTEM_PROMPT_INPUTS[step_id]
+    missing = [key for key in keys if key not in catalog]
+    if missing:
+        raise RuntimeError(
+            f"Revision step {step_id!r} has no dependency mapping for: "
+            + ", ".join(missing)
+        )
+    return tuple(catalog[key] for key in keys)
+
+
+def _revision_system_prompt_block(
+    step_id: str,
+    catalog: dict[str, RevisionDependency],
+) -> str:
+    """Narrow normal-run charter examples to an exact revision read set."""
+
+    lines = [
+        "\n\n--- REVISION-MODE SYSTEM INPUT CONTRACT ---",
+        "For this assignment, the archived Council inputs your system charter "
+        "permits are exactly:",
+    ]
+    for key in REVISION_SYSTEM_PROMPT_INPUTS[step_id]:
+        dependency = catalog[key]
+        availability = "" if dependency.required else " (read only if present)"
+        lines.append(
+            f"- {key}: `{dependency.declaration}`{availability}"
+        )
+    lines.extend(
+        (
+            "Do not substitute normal-run `outputs/...` examples, discover a "
+            "newer draft, or read another archived Council artifact.",
+            "--- END REVISION-MODE SYSTEM INPUT CONTRACT ---",
+        )
+    )
+    return "\n".join(lines)
+
+
+def _revision_dependency(
+    repo_root: Path,
+    path: Path,
+    *,
+    required: bool = True,
+) -> RevisionDependency:
+    return RevisionDependency(
+        revision_repo_relative(repo_root, path),
+        required=required,
+    )
+
+
+def _revision_glob_dependency(
+    repo_root: Path,
+    directory: Path,
+    pattern: str,
+    *,
+    required: bool = True,
+) -> RevisionDependency:
+    relative = revision_repo_relative(repo_root, directory)
+    return RevisionDependency(
+        f"{relative}/{pattern}",
+        required=required,
+    )
+
+
+def _revision_agent_dependencies(
+    *,
+    repo_root: Path,
+    agent: Agent,
+    inputs: tuple[RevisionDependency, ...],
+) -> tuple[RevisionDependency, ...]:
+    """Add the executable and model-charter files every paid call consumes."""
+
+    static = tuple(
+        RevisionDependency(path, required=True)
+        for path in REVISION_EXECUTION_CONTRACTS
+    )
+    charter = _revision_dependency(repo_root, agent.path)
+    return tuple(dict.fromkeys((*inputs, charter, *static)))
+
+
+def _revision_call_values(
+    *,
+    agent: Agent,
+    model: str,
+    prompt: str,
+    step_label: str,
+    extra: dict[str, object] | None = None,
+) -> dict[str, object]:
+    values: dict[str, object] = {
+        "step_label": step_label,
+        "agent": agent.name,
+        "agent_provider": agent.provider,
+        "agent_model_override": agent.model_override,
+        "agent_tools": list(agent.tools),
+        "agent_system_prompt_sha256": hashlib.sha256(
+            agent.system_prompt.encode("utf-8")
+        ).hexdigest(),
+        "model": model,
+        "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+    }
+    values.update(extra or {})
+    return values
+
+
+def _revision_completion_outputs(
+    *,
+    output_path: Path,
+    artifact_contract: ArtifactContract | None,
+    required_outputs: tuple[tuple[Path, ArtifactContract], ...],
+) -> tuple[tuple[Path, ArtifactContract], ...]:
+    primary_contract = artifact_contract or contract_for_path(output_path)
+    return (
+        (output_path, primary_contract),
+        *tuple(
+            item for item in required_outputs if item[0] != output_path
+        ),
+    )
+
+
+async def _run_revision_agent(
+    *,
+    state_path: Path,
+    repo_root: Path,
+    step_id: str,
+    agent: Agent,
+    user_prompt: str,
+    model: str,
+    step_label: str,
+    tally: CostTally,
+    output_path: Path,
+    dependencies: tuple[RevisionDependency, ...],
+    artifact_contract: ArtifactContract | None = None,
+    required_outputs: tuple[tuple[Path, ArtifactContract], ...] = (),
+    emit_completion: bool = True,
+    extra_values: dict[str, object] | None = None,
+) -> dict[str, object]:
+    """Run one revision agent only when its exact receipt cannot be reused."""
+
+    bound_dependencies = _revision_agent_dependencies(
+        repo_root=repo_root,
+        agent=agent,
+        inputs=dependencies,
+    )
+    values = _revision_call_values(
+        agent=agent,
+        model=model,
+        prompt=user_prompt,
+        step_label=step_label,
+        extra=extra_values,
+    )
+    completion_outputs = _revision_completion_outputs(
+        output_path=output_path,
+        artifact_contract=artifact_contract,
+        required_outputs=required_outputs,
+    )
+    reusable, before = revision_step_matches(
+        state_path=state_path,
+        repo_root=repo_root,
+        step_id=step_id,
+        dependencies=bound_dependencies,
+        values=values,
+        outputs=completion_outputs,
+    )
+    if before.get("complete") is not True:
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        missing = [
+            str(item.get("declaration") or "")
+            for item in before.get("inputs", [])
+            if isinstance(item, dict) and item.get("error")
+        ]
+        raise RuntimeError(
+            f"{step_label} cannot start because a declared revision input is "
+            "missing or unsafe"
+            + (f": {', '.join(missing)}" if missing else ".")
+        )
+    if not reusable:
+        # A revision output set is one paid-work commit. Never let generic
+        # file-exists resume mix a stale primary with fresh companions.
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+
+    completion = await _run_agent(
+        agent=agent,
+        user_prompt=user_prompt,
+        model=model,
+        cwd=repo_root,
+        step_label=step_label,
+        tally=tally,
+        output_path=output_path,
+        artifact_contract=artifact_contract,
+        required_outputs=required_outputs,
+        emit_completion=emit_completion,
+    )
+    after = build_revision_dependency_fingerprint(
+        repo_root=repo_root,
+        dependencies=bound_dependencies,
+        values=values,
+    )
+    if (
+        after.get("complete") is not True
+        or after.get("sha256") != before.get("sha256")
+    ):
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        raise RuntimeError(
+            f"{step_label} inputs changed while the agent was running; its "
+            "outputs were quarantined instead of being mixed into the revision."
+        )
+    if reusable:
+        return completion
+    record_revision_step(
+        state_path=state_path,
+        repo_root=repo_root,
+        step_id=step_id,
+        dependencies=bound_dependencies,
+        values=values,
+        outputs=completion_outputs,
+        dependency_fingerprint=after,
+        metadata={
+            "agent": agent.name,
+            "model": model,
+            "provider": agent.provider,
+        },
+    )
+    return completion
+
+
+def _record_revision_agent_outputs(
+    *,
+    state_path: Path,
+    repo_root: Path,
+    step_id: str,
+    agent: Agent,
+    prompt: str,
+    model: str,
+    step_label: str,
+    dependencies: tuple[RevisionDependency, ...],
+    outputs: tuple[tuple[Path, ArtifactContract], ...],
+    extra_values: dict[str, object] | None = None,
+    metadata: dict[str, object] | None = None,
+) -> None:
+    """Refresh a receipt after deterministic canonicalization mutates output."""
+
+    bound_dependencies = _revision_agent_dependencies(
+        repo_root=repo_root,
+        agent=agent,
+        inputs=dependencies,
+    )
+    values = _revision_call_values(
+        agent=agent,
+        model=model,
+        prompt=prompt,
+        step_label=step_label,
+        extra=extra_values,
+    )
+    record_revision_step(
+        state_path=state_path,
+        repo_root=repo_root,
+        step_id=step_id,
+        dependencies=bound_dependencies,
+        values=values,
+        outputs=outputs,
+        metadata={
+            "agent": agent.name,
+            "model": model,
+            "provider": agent.provider,
+            **dict(metadata or {}),
+        },
+    )
+
+
+def _snapshot_revision_remediation_inputs(
+    *,
+    base: Path,
+    sources: dict[str, Path],
+) -> dict[str, Path]:
+    """Freeze self-mutating remediation inputs before the paid verifier call."""
+
+    destination_dir = base / "remediation-inputs"
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    snapshots: dict[str, Path] = {}
+    for name, source in sources.items():
+        if not source.is_file() or source.is_symlink():
+            raise RuntimeError(
+                f"Cannot snapshot revision remediation input: {source}"
+            )
+        destination = destination_dir / name
+        temporary = destination.with_name(f".{destination.name}.tmp")
+        shutil.copy2(source, temporary)
+        os.replace(temporary, destination)
+        snapshots[name] = destination
+    return snapshots
+
+
+def _publish_revision_release(
+    *,
+    state_path: Path,
+    repo_root: Path,
+    required_steps: set[str],
+    stage4_dir: Path,
+    slug: str,
+    release_dir: Path,
+    require_executive_summary: bool,
+    out_dir: Path,
+) -> dict[str, Path]:
+    """Apply live revision receipt barriers around release staging."""
+
+    from cli.publish import promote_release, stage_release_artifacts
+
+    assert_revision_state_current(
+        state_path=state_path,
+        repo_root=repo_root,
+        required_steps=required_steps,
+    )
+    stage_release_artifacts(
+        stage4_dir=stage4_dir,
+        slug=slug,
+        release_dir=release_dir,
+        require_executive_summary=require_executive_summary,
+        include_roles={
+            "word_report",
+            *(
+                {"executive_summary"}
+                if require_executive_summary
+                else set()
+            ),
+        },
+        require_word_visual_inspection=True,
+    )
+    assert_revision_state_current(
+        state_path=state_path,
+        repo_root=repo_root,
+        required_steps=required_steps,
+    )
+    return promote_release(release_dir=release_dir, out_dir=out_dir)
+
+
+def _revision_prompts(
+    base_rel: str,
+    src_draft_rel: str,
+    briefs_rel: str,
+    evidence_ledger_rel: str,
+    original_lineage_rel: str | None,
+    system_input_catalog: dict[str, RevisionDependency],
+) -> dict[str, str]:
+    prompts = {
         "strategist-a": (
             "You are revising an existing Council report in response to new reader "
             f"feedback. Read the current report draft at `{src_draft_rel}` and the "
@@ -884,7 +5626,8 @@ def _revision_prompts(base_rel: str, src_draft_rel: str, briefs_rel: str) -> dic
             f"Read `{base_rel}/revised-draft-b.md`. Tighten for executive tone and "
             "economy without adding content or changing claims. Kill buzzwords (see "
             "CLAUDE.md).\n"
-            f"Write the edited draft to: `{base_rel}/edited-draft.md`"
+            f"Write the edited draft to `{base_rel}/edited-draft.md` and a concise "
+            f"change log to `{base_rel}/editor-notes.md`."
         ),
         "humanizer": (
             f"Read `{base_rel}/edited-draft.md`. Refine tone, readability, and overall "
@@ -894,13 +5637,41 @@ def _revision_prompts(base_rel: str, src_draft_rel: str, briefs_rel: str) -> dic
             f"Write the refined draft to: `{base_rel}/humanized-draft.md`"
         ),
         "fact-checker": (
-            f"Read `{base_rel}/humanized-draft.md` and the original briefs in "
-            f"`{briefs_rel}/`. Verify every numerical and attributed claim against the "
-            "briefs. Tag anything you cannot verify with `[UNVERIFIED — HUMAN REVIEW]`. "
-            "You have veto power over unsourced claims.\n"
-            f"Write the final revised draft to: `{base_rel}/final-draft.md`"
+            f"Read `{base_rel}/humanized-draft.md`, the original briefs in "
+            f"`{briefs_rel}/`, and the canonical evidence ledger at "
+            f"`{evidence_ledger_rel}`."
+            + (
+                f" Read the original claim lineage at `{original_lineage_rel}` "
+                "as a starting map, not as proof."
+                if original_lineage_rel
+                else ""
+            )
+            + "\n\nVerify every numerical claim, attributed quote, and specific "
+            "assertion against the underlying source—not merely against a brief. "
+            "Open the cited URL or local source when possible and confirm the "
+            "number, denominator, date, locator, and wording. Remove or accurately "
+            "qualify anything that cannot be supported. The reader-facing revision "
+            "must contain no `[UNVERIFIED]` tag or internal Council path.\n\n"
+            f"Write the final revised draft to `{base_rel}/final-draft.md`.\n"
+            f"Write a verification log to `{base_rel}/fact-check-report.md`.\n"
+            f"Write canonical JSONL to `{base_rel}/claim-lineage.jsonl`, one "
+            "record per consequential claim, with exact `claim`, exact `citation`, "
+            "`footnote_id`, `evidence_ids`, boolean `retained`, "
+            "`verification_status`, boolean `primary_source_checked`, and "
+            "`verification_note`. Excluded unverified claims must use "
+            "`retained: false`; no markdown fence."
         ),
     }
+    for step_id in (
+        "strategist-a",
+        "red-team",
+        "strategist-b",
+        "fact-checker",
+    ):
+        prompts[step_id] += _revision_system_prompt_block(
+            step_id, system_input_catalog
+        )
+    return prompts
 
 
 async def run_revision_pipeline(
@@ -913,59 +5684,487 @@ async def run_revision_pipeline(
     import questionary as _q
 
     from cli.checkpoints import _read, _show_file_excerpt
-    from cli.publish import ReportSource, build_polished_report
+    from cli.docx_builder import build_documents
+    from cli.publish import (
+        REPORTS_DIR,
+        _detect_format,
+    )
 
     source = request.source
     version = request.version
     archive_dir = source.archive_dir
+    output_format = _detect_format(source)
+    length_instruction = ""
+    revision_decision_context: dict[str, str] = {}
+    if source.run_file is not None and source.run_file.is_file():
+        run_prompt_text = source.run_file.read_text(
+            encoding="utf-8", errors="ignore"
+        )
+        length_match = re.search(
+            r"(?ms)^## Length(?:\s+\([^)]*\))?\s*$\n"
+            r"(?P<body>.*?)(?=^##\s|\Z)",
+            run_prompt_text,
+        )
+        if length_match:
+            length_instruction = length_match.group("body").strip()
+        try:
+            from cli.runfile import parse_run_file
+
+            source_spec = parse_run_file(
+                source.run_file.name,
+                runs_dir=source.run_file.parent,
+            )
+        except (FileNotFoundError, ValueError):
+            # Legacy archives may predate the structured decision frame. Their
+            # verified prose remains publishable without inventing metadata.
+            pass
+        else:
+            revision_decision_context = {
+                "decision": source_spec.decision_required,
+                "decision_owner": source_spec.decision_owner,
+                "approval_path": source_spec.approval_path,
+                "time_horizon": source_spec.time_horizon,
+                "success_measure": source_spec.success_measure,
+            }
 
     from cli.revise import latest_draft_path
 
     base = archive_dir / "revisions" / f"v{version}"
     base.mkdir(parents=True, exist_ok=True)
-    (base / "feedback.md").write_text(
+    feedback_path = base / "feedback.md"
+    feedback_path.write_text(
         f"# Reader feedback — Revised v{version}\n\n{request.feedback}\n",
         encoding="utf-8",
     )
+    revision_state_path = base / REVISION_STATE_NAME
 
     src_draft = latest_draft_path(archive_dir)
+    # A same-version resume must never revise its own partially completed final
+    # draft. Pin vN to vN-1 (or the original) even if vN/final-draft.md exists.
+    if base.resolve() in src_draft.resolve().parents:
+        prior_revision = (
+            archive_dir
+            / "revisions"
+            / f"v{version - 1}"
+            / "final-draft.md"
+        )
+        src_draft = (
+            prior_revision
+            if version > 1 and prior_revision.is_file()
+            else archive_dir / "stage3" / "final-draft.md"
+        )
+    if not src_draft.is_file():
+        raise FileNotFoundError(
+            f"Revision source draft is missing: {src_draft}"
+        )
     briefs_dir = archive_dir / "stage1"
+    evidence_ledger = archive_dir / "evidence-ledger.jsonl"
+    if not evidence_ledger.is_file():
+        selected_agents = sorted(
+            path.name.removesuffix("-brief.md")
+            for path in briefs_dir.glob("*-brief.md")
+        )
+        evidence_ledger = base / "evidence-ledger.jsonl"
+        build_evidence_ledger(
+            selected_agents=selected_agents,
+            stage1_dir=briefs_dir,
+            output_path=evidence_ledger,
+        )
+    original_lineage = archive_dir / "claim-lineage.jsonl"
     base_rel = base.relative_to(repo_root).as_posix()
     src_draft_rel = src_draft.relative_to(repo_root).as_posix()
     briefs_rel = briefs_dir.relative_to(repo_root).as_posix()
+    evidence_ledger_rel = evidence_ledger.relative_to(repo_root).as_posix()
+    original_lineage_rel = (
+        original_lineage.relative_to(repo_root).as_posix()
+        if original_lineage.is_file()
+        else None
+    )
 
     all_agents = load_all_agents()
     by_name = {a.name: a for a in all_agents}
     tally = CostTally()
-    prompts = _revision_prompts(base_rel, src_draft_rel, briefs_rel)
+    tally.plan_calls(10)
+    brief_inputs = _revision_glob_dependency(
+        repo_root,
+        briefs_dir,
+        "*-brief.md",
+    )
+    source_library = _revision_glob_dependency(
+        repo_root,
+        archive_dir / "sources",
+        "**/*",
+        required=False,
+    )
+    original_lineage_input = _revision_dependency(
+        repo_root,
+        original_lineage,
+        required=False,
+    )
+    revision_system_catalog: dict[str, RevisionDependency] = {
+        "run_prompt": _revision_dependency(
+            repo_root,
+            (
+                source.run_file
+                if source.run_file is not None
+                else archive_dir / "run-prompt.md"
+            ),
+            required=(
+                source.run_file is not None
+                and source.run_file.is_file()
+            ),
+        ),
+        "run_manifest": _revision_dependency(
+            repo_root,
+            archive_dir / "run-manifest.json",
+            required=False,
+        ),
+        "evidence_map": _revision_dependency(
+            repo_root,
+            archive_dir / "stage1" / "evidence-map.md",
+            required=False,
+        ),
+        "evidence_ledger": _revision_dependency(
+            repo_root,
+            evidence_ledger,
+        ),
+        "narrative_options": _revision_dependency(
+            repo_root,
+            archive_dir / "stage2" / "narrative-options.md",
+            required=False,
+        ),
+        "airport_context": _revision_dependency(
+            repo_root,
+            archive_dir / "context" / "airport-context.md",
+            required=False,
+        ),
+        "context_sources": _revision_dependency(
+            repo_root,
+            archive_dir / "context" / "context-sources.jsonl",
+            required=False,
+        ),
+        "briefs": brief_inputs,
+        "final_draft": _revision_dependency(
+            repo_root,
+            base / "final-draft.md",
+        ),
+        "fact_check_report": _revision_dependency(
+            repo_root,
+            base / "fact-check-report.md",
+        ),
+    }
+    prompts = _revision_prompts(
+        base_rel,
+        src_draft_rel,
+        briefs_rel,
+        evidence_ledger_rel,
+        original_lineage_rel,
+        revision_system_catalog,
+    )
+    revision_dependencies: dict[str, tuple[RevisionDependency, ...]] = {
+        "strategist-a": (
+            _revision_dependency(repo_root, src_draft),
+            _revision_dependency(repo_root, feedback_path),
+            *_revision_system_dependencies(
+                "strategist-a", revision_system_catalog
+            ),
+        ),
+        "red-team": (
+            _revision_dependency(repo_root, base / "revised-draft-a.md"),
+            _revision_dependency(repo_root, feedback_path),
+            _revision_dependency(repo_root, src_draft),
+            *_revision_system_dependencies(
+                "red-team", revision_system_catalog
+            ),
+        ),
+        "strategist-b": (
+            _revision_dependency(repo_root, base / "revised-draft-a.md"),
+            _revision_dependency(repo_root, base / "red-team-critique.md"),
+            *_revision_system_dependencies(
+                "strategist-b", revision_system_catalog
+            ),
+        ),
+        "editor": (
+            _revision_dependency(repo_root, base / "revised-draft-b.md"),
+        ),
+        "humanizer": (
+            _revision_dependency(repo_root, base / "edited-draft.md"),
+        ),
+        "fact-checker": (
+            _revision_dependency(repo_root, base / "humanized-draft.md"),
+            original_lineage_input,
+            source_library,
+            *_revision_system_dependencies(
+                "fact-checker", revision_system_catalog
+            ),
+        ),
+    }
 
     console.rule(f"[bold]Revising '{source.slug}' → v{version}[/bold]")
     console.print(f"[dim]Revising from: {src_draft_rel}[/dim]")
     await emit("run_start", slug=source.slug, title=f"{source.slug} — Revision v{version}",
-               agents=["strategist", "red-team", "editor", "humanizer", "fact-checker"],
+               agents=[
+                   "strategist",
+                   "red-team",
+                   "editor",
+                   "humanizer",
+                   "fact-checker",
+                   "art-director",
+               ],
                mode="revise")
     await emit("stage_start", stage=2, label=f"Revising to v{version}")
 
+    factchecker_model = _model("factcheck")
     steps = [
-        ("strategist-a", by_name["strategist"], base / "revised-draft-a.md", _model("synthesis")),
-        ("red-team", by_name["red-team"], base / "red-team-critique.md", _model("critique")),
-        ("strategist-b", by_name["strategist"], base / "revised-draft-b.md", _model("synthesis")),
-        ("editor", by_name["editor"], base / "edited-draft.md", _model("editor")),
-        ("humanizer", by_name["humanizer"], base / "humanized-draft.md", _model("humanizer")),
-        ("fact-checker", by_name["fact-checker"], base / "final-draft.md", _model("factcheck")),
+        (
+            "strategist-a",
+            by_name["strategist"],
+            base / "revised-draft-a.md",
+            _model("synthesis"),
+        ),
+        (
+            "red-team",
+            by_name["red-team"],
+            base / "red-team-critique.md",
+            _model("critique"),
+        ),
+        (
+            "strategist-b",
+            by_name["strategist"],
+            base / "revised-draft-b.md",
+            _model("synthesis"),
+        ),
+        (
+            "editor",
+            by_name["editor"],
+            base / "edited-draft.md",
+            _model("editor"),
+        ),
+        (
+            "humanizer",
+            by_name["humanizer"],
+            base / "humanized-draft.md",
+            _model("humanizer"),
+        ),
+        (
+            "fact-checker",
+            by_name["fact-checker"],
+            base / "final-draft.md",
+            factchecker_model,
+        ),
     ]
+    revision_step_contracts: dict[str, ArtifactContract] = {
+        "strategist-a": ArtifactContract("markdown", min_words=250),
+        "strategist-b": ArtifactContract("markdown", min_words=250),
+    }
     for step_id, agent, out_path, model in steps:
-        await _run_agent(
+        required_outputs: tuple[tuple[Path, ArtifactContract], ...] = ()
+        if step_id == "editor":
+            required_outputs = (
+                (
+                    base / "editor-notes.md",
+                    contract_for_path(base / "editor-notes.md"),
+                ),
+            )
+        elif step_id == "fact-checker":
+            required_outputs = (
+                (
+                    base / "fact-check-report.md",
+                    contract_for_path(base / "fact-check-report.md"),
+                ),
+                (
+                    base / "claim-lineage.jsonl",
+                    CLAIM_LINEAGE_AGENT_CONTRACT,
+                ),
+            )
+        await _run_revision_agent(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id=step_id,
             agent=agent,
             user_prompt=prompts[step_id],
             model=model,
-            cwd=repo_root,
             step_label=f"revision-v{version}/{step_id}",
             tally=tally,
             output_path=out_path,
+            artifact_contract=revision_step_contracts.get(step_id),
+            required_outputs=required_outputs,
+            dependencies=revision_dependencies[step_id],
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+            },
         )
 
     final_draft = base / "final-draft.md"
+    revision_lineage = base / "claim-lineage.jsonl"
+    revision_gate = base / "quality-gate.json"
+    bind_claim_lineage_to_draft(
+        final_draft=final_draft,
+        output_path=revision_lineage,
+    )
+    factchecker_outputs = (
+        (final_draft, contract_for_path(final_draft)),
+        (
+            base / "fact-check-report.md",
+            contract_for_path(base / "fact-check-report.md"),
+        ),
+        (revision_lineage, CLAIM_LINEAGE_AGENT_CONTRACT),
+    )
+    _record_revision_agent_outputs(
+        state_path=revision_state_path,
+        repo_root=repo_root,
+        step_id="fact-checker",
+        agent=by_name["fact-checker"],
+        prompt=prompts["fact-checker"],
+        model=factchecker_model,
+        step_label=f"revision-v{version}/fact-checker",
+        dependencies=revision_dependencies["fact-checker"],
+        outputs=factchecker_outputs,
+        extra_values={
+            "revision": version,
+            "source_archive": archive_dir.name,
+            "output_format": output_format,
+        },
+        metadata={"canonicalized_claim_lineage": True},
+    )
+
+    def run_revision_gate() -> dict:
+        return run_publication_quality_gate(
+            final_draft=final_draft,
+            report_path=revision_gate,
+            evidence_ledger_path=evidence_ledger,
+            agent_names=[agent.name for agent in all_agents],
+            claim_lineage_path=revision_lineage,
+            output_format=output_format,
+            length_instruction=length_instruction,
+            raise_on_failure=True,
+        )
+
+    try:
+        run_revision_gate()
+    except PublicationQualityError:
+        remediation = base / "final-draft-remediated.md"
+        remediation_snapshots = _snapshot_revision_remediation_inputs(
+            base=base,
+            sources={
+                "final-draft.md": final_draft,
+                "quality-gate.json": revision_gate,
+                "fact-check-report.md": base / "fact-check-report.md",
+                "claim-lineage.jsonl": revision_lineage,
+            },
+        )
+        remediation_rel = (
+            (base / "remediation-inputs")
+            .relative_to(repo_root)
+            .as_posix()
+        )
+        remediation_prompt = (
+            f"Read `{remediation_rel}/final-draft.md`, "
+            f"`{remediation_rel}/quality-gate.json`, "
+            f"`{remediation_rel}/fact-check-report.md`, "
+            f"`{remediation_rel}/claim-lineage.jsonl`, "
+            f"and `{evidence_ledger_rel}`.\n\n"
+            "This is the revision's single publication-gate remediation pass. "
+            "Fix every blocker against the underlying source. Do not add facts. "
+            "Remove unsupported claims, repair exact footnote-to-claim lineage, "
+            "and leave no internal or unverified release tag.\n\n"
+            f"Write the remediated draft to `{base_rel}/final-draft-remediated.md`. "
+            f"Rewrite `{base_rel}/claim-lineage.jsonl` with exact claim text, "
+            "exact citation definitions, footnote IDs, evidence IDs, retained "
+            "booleans, source-check booleans, and canonical statuses. Append a "
+            f"remediation section to `{base_rel}/fact-check-report.md`."
+        )
+        remediation_prompt += _revision_system_prompt_block(
+            "fact-check-remediation", revision_system_catalog
+        )
+        remediation_dependencies = (
+            *tuple(
+                _revision_dependency(repo_root, path)
+                for path in remediation_snapshots.values()
+            ),
+            *_revision_system_dependencies(
+                "fact-check-remediation", revision_system_catalog
+            ),
+        )
+        remediation_outputs = (
+            (remediation, contract_for_path(final_draft)),
+            (revision_lineage, CLAIM_LINEAGE_AGENT_CONTRACT),
+            (
+                base / "fact-check-report.md",
+                contract_for_path(base / "fact-check-report.md"),
+            ),
+        )
+        await _run_revision_agent(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="fact-check-remediation",
+            agent=by_name["fact-checker"],
+            user_prompt=remediation_prompt,
+            model=factchecker_model,
+            step_label=f"revision-v{version}/fact-check-remediation",
+            tally=tally,
+            output_path=remediation,
+            artifact_contract=contract_for_path(final_draft),
+            required_outputs=remediation_outputs[1:],
+            dependencies=remediation_dependencies,
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+            },
+        )
+        shutil.copy2(remediation, final_draft)
+        bind_claim_lineage_to_draft(
+            final_draft=final_draft,
+            output_path=revision_lineage,
+        )
+        run_revision_gate()
+        # Canonicalization and promotion mutate the verifier's lineage/final
+        # bytes after both model calls. Refresh both receipts so a safe resume
+        # preserves the paid remediation instead of rerunning the verifier.
+        _record_revision_agent_outputs(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="fact-check-remediation",
+            agent=by_name["fact-checker"],
+            prompt=remediation_prompt,
+            model=factchecker_model,
+            step_label=f"revision-v{version}/fact-check-remediation",
+            dependencies=remediation_dependencies,
+            outputs=remediation_outputs,
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+            },
+            metadata={
+                "canonicalized_claim_lineage": True,
+                "promoted_to_final_draft": True,
+            },
+        )
+        _record_revision_agent_outputs(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="fact-checker",
+            agent=by_name["fact-checker"],
+            prompt=prompts["fact-checker"],
+            model=factchecker_model,
+            step_label=f"revision-v{version}/fact-checker",
+            dependencies=revision_dependencies["fact-checker"],
+            outputs=factchecker_outputs,
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+            },
+            metadata={
+                "canonicalized_claim_lineage": True,
+                "superseded_by": "fact-check-remediation",
+            },
+        )
+
     if not auto_approve:
         from cli.events import get_sink, request_checkpoint
         if get_sink() is not None:
@@ -992,19 +6191,386 @@ async def run_revision_pipeline(
                 )
                 return None, tally
 
-    # Build the polished docx, stamped with the revision label.
-    revised_source = ReportSource(
-        slug=source.slug,
-        archive_dir=archive_dir,
-        stage4_docx=source.stage4_docx,
-        final_md=final_draft,
-        run_file=source.run_file,
+    release_slug = f"{source.slug}-revised-v{version}"
+    title = source.slug.replace("-", " ").title()
+    if source.run_file is not None:
+        for line in source.run_file.read_text(
+            encoding="utf-8", errors="ignore"
+        ).splitlines():
+            if line.startswith("# Run:"):
+                title = line[len("# Run:"):].strip()
+                break
+
+    visual_path: Path | None = None
+    if output_format not in {"brief", "recommendations"}:
+        await emit(
+            "stage_start",
+            stage=4,
+            label=f"Art direction and release for revision v{version}",
+        )
+        visual_path = base / "visual-brief.json"
+        deck_mode = "board_decision"
+        archived_manifest = archive_dir / "run-manifest.json"
+        if archived_manifest.is_file():
+            try:
+                deck_mode = str(
+                    json.loads(
+                        archived_manifest.read_text(encoding="utf-8")
+                    )
+                    .get("run", {})
+                    .get("deck_mode")
+                    or deck_mode
+                )
+            except (OSError, json.JSONDecodeError):
+                pass
+        if deck_mode not in {
+            "board_decision",
+            "executive_briefing",
+            "technical_read_ahead",
+        }:
+            deck_mode = "board_decision"
+        visual_prompt = (
+            f"Create the canonical Word-report visual contract for revision "
+            f"v{version} of \"{title}\". Read `{base_rel}/feedback.md`, "
+            f"`{base_rel}/final-draft.md`, `{base_rel}/fact-check-report.md`, "
+            f"`{base_rel}/claim-lineage.jsonl`, and `{evidence_ledger_rel}`. "
+            "Read the original airport context and run prompt from the archive "
+            "when present. The revision may have changed the decision, so do not "
+            "reuse an old visual plan without checking it against the revised "
+            "draft. Use only canonical evidence IDs. Include every field in "
+            "`assets/brand/visual-brief.schema.json`; the deck_mode contract is "
+            f"`{deck_mode}` even though this revision currently releases Word. "
+            f"Write valid JSON to `{base_rel}/visual-brief.json`."
+        )
+        visual_prompt += _revision_system_prompt_block(
+            "art-direction", revision_system_catalog
+        )
+        art_dependencies: tuple[RevisionDependency, ...] = (
+            _revision_dependency(repo_root, feedback_path),
+            _revision_dependency(repo_root, revision_lineage),
+            *_revision_system_dependencies(
+                "art-direction", revision_system_catalog
+            ),
+            _revision_glob_dependency(
+                repo_root,
+                repo_root / "assets" / "brand",
+                "**/*",
+            ),
+        )
+        if visual_path.is_file():
+            try:
+                prior_visual = _validate_visual_brief(
+                    out_path=visual_path,
+                    schema_path=(
+                        repo_root
+                        / "assets"
+                        / "brand"
+                        / "visual-brief.schema.json"
+                    ),
+                    evidence_ledger=evidence_ledger,
+                    requested_mode=deck_mode,
+                )
+            except (OSError, ValueError, json.JSONDecodeError):
+                prior_visual = None
+            if prior_visual is None or not prior_visual.valid:
+                _quarantine_partial_output(visual_path)
+        art_model = _model("art_direction")
+        art_completion = await _run_revision_agent(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="art-direction",
+            agent=by_name["art-director"],
+            user_prompt=visual_prompt,
+            model=art_model,
+            step_label=f"revision-v{version}/art-direction",
+            tally=tally,
+            output_path=visual_path,
+            artifact_contract=_visual_brief_contract(),
+            dependencies=art_dependencies,
+            emit_completion=False,
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+                "deck_mode": deck_mode,
+                "title": title,
+            },
+        )
+        visual_validation = _validate_visual_brief(
+            out_path=visual_path,
+            schema_path=(
+                repo_root / "assets" / "brand" / "visual-brief.schema.json"
+            ),
+            evidence_ledger=evidence_ledger,
+            requested_mode=deck_mode,
+        )
+        await emit(
+            "artifact_validated",
+            step=f"revision-v{version}/visual-brief",
+            **visual_validation.to_dict(),
+        )
+        if not visual_validation.valid:
+            await emit(
+                "agent_error",
+                step=f"revision-v{version}/art-direction",
+                agent="art-director",
+                error_type="VisualBriefContractError",
+                message="; ".join(visual_validation.errors[:8]),
+            )
+            _quarantine_partial_output(visual_path)
+            raise RuntimeError(
+                "Revision Art Director brief failed the canonical contract: "
+                + "; ".join(visual_validation.errors[:8])
+            )
+        _record_revision_agent_outputs(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="art-direction",
+            agent=by_name["art-director"],
+            prompt=visual_prompt,
+            model=art_model,
+            step_label=f"revision-v{version}/art-direction",
+            dependencies=art_dependencies,
+            outputs=((visual_path, _visual_brief_contract()),),
+            extra_values={
+                "revision": version,
+                "source_archive": archive_dir.name,
+                "output_format": output_format,
+                "deck_mode": deck_mode,
+                "title": title,
+            },
+            metadata={"canonical_schema_validated": True},
+        )
+        if not art_completion.get("skipped"):
+            await emit(
+                "agent_done",
+                step=f"revision-v{version}/art-direction",
+                agent="art-director",
+                cost=art_completion.get("cost"),
+                turns=art_completion.get("turns"),
+                total=tally.total,
+                provider=art_completion.get("provider"),
+                billed_separately=False,
+            )
+
+    stage4_dir = base / "stage4"
+    report_path = stage4_dir / f"{release_slug}.docx"
+    executive_path = (
+        stage4_dir / f"{release_slug}-executive-summary.docx"
+        if output_format in {"report", "article"}
+        else None
     )
-    out_path = build_polished_report(
-        revised_source,
-        by_name,
-        revision_label=f"Revised — Version {version}",
-        out_name=f"{source.slug}-revised-v{version}.docx",
+    word_outputs = (
+        (report_path, contract_for_path(report_path)),
+        *(
+            ((executive_path, contract_for_path(executive_path)),)
+            if executive_path is not None
+            else ()
+        ),
     )
-    console.print(f"[green]Revised report built:[/green] {out_path.relative_to(repo_root)}")
+    word_build_dependencies: tuple[RevisionDependency, ...] = (
+        _revision_dependency(repo_root, final_draft),
+        *(
+            (_revision_dependency(repo_root, visual_path),)
+            if visual_path is not None
+            else ()
+        ),
+        *(
+            (
+                _revision_dependency(
+                    repo_root, repo_root / "docs" / "methodology.md"
+                ),
+            )
+            if output_format == "report"
+            else ()
+        ),
+        _revision_glob_dependency(
+            repo_root,
+            repo_root / "assets" / "brand",
+            "**/*",
+        ),
+        RevisionDependency("cli/docx_builder.py"),
+        RevisionDependency("cli/publishing_quality.py"),
+    )
+    word_build_values: dict[str, object] = {
+        "revision": version,
+        "source_archive": archive_dir.name,
+        "slug": release_slug,
+        "title": title,
+        "output_format": output_format,
+        "decision_context": revision_decision_context,
+        "revision_label": f"Revised — Version {version}",
+    }
+    word_build_reusable, word_build_fingerprint = revision_step_matches(
+        state_path=revision_state_path,
+        repo_root=repo_root,
+        step_id="word-production",
+        dependencies=word_build_dependencies,
+        values=word_build_values,
+        outputs=word_outputs,
+    )
+    if word_build_fingerprint.get("complete") is not True:
+        raise RuntimeError(
+            "Revision Word production cannot bind its source and design "
+            "contracts."
+        )
+    if not word_build_reusable:
+        for path, _ in word_outputs:
+            _quarantine_partial_output(path)
+            _quarantine_partial_output(
+                path.with_name(
+                    f"{path.stem}-word-visual-inspection.json"
+                )
+            )
+            _quarantine_partial_output(
+                path.with_name(
+                    f"{path.stem}-word-visual-inspection-input.json"
+                )
+            )
+        report_path, executive_path = build_documents(
+            slug=release_slug,
+            title=title,
+            final_draft=final_draft,
+            methodology=repo_root / "docs" / "methodology.md",
+            out_dir=stage4_dir,
+            output_format=output_format,
+            visual_brief=visual_path,
+            decision_context=revision_decision_context,
+            revision_label=f"Revised — Version {version}",
+        )
+        record_revision_step(
+            state_path=revision_state_path,
+            repo_root=repo_root,
+            step_id="word-production",
+            dependencies=word_build_dependencies,
+            values=word_build_values,
+            outputs=word_outputs,
+            metadata={"producer": "orchestrator"},
+        )
+    word_artifacts = [
+        report_path,
+        *([executive_path] if executive_path is not None else []),
+    ]
+    receipt_inputs = tuple(
+        artifact.with_name(
+            f"{artifact.stem}-word-visual-inspection-input.json"
+        )
+        for artifact in word_artifacts
+    )
+    word_inspection_dependencies: tuple[RevisionDependency, ...] = (
+        *tuple(
+            _revision_dependency(repo_root, artifact)
+            for artifact in word_artifacts
+        ),
+        *tuple(
+            _revision_dependency(
+                repo_root, receipt_input, required=False
+            )
+            for receipt_input in receipt_inputs
+        ),
+        *tuple(
+            _revision_glob_dependency(
+                repo_root,
+                artifact.parent / "qa" / artifact.stem,
+                "**/*",
+                required=False,
+            )
+            for artifact in word_artifacts
+        ),
+        RevisionDependency("cli/docx_builder.py"),
+        RevisionDependency("cli/publishing_quality.py"),
+    )
+    await run_word_visual_inspection(
+        artifacts=word_artifacts,
+        outputs_dir=base,
+        all_agents=all_agents,
+        tally=tally,
+        manifest_path=None,
+        step_label=f"revision-v{version}/word-visual-inspection",
+        revision_state_path=revision_state_path,
+        revision_repo_root=repo_root,
+        revision_dependencies=word_inspection_dependencies,
+        revision_receipt_inputs=receipt_inputs,
+        revision_extra_values={
+            "revision": version,
+            "source_archive": archive_dir.name,
+            "output_format": output_format,
+            "title": title,
+        },
+    )
+    required_revision_steps = {
+        "strategist-a",
+        "red-team",
+        "strategist-b",
+        "editor",
+        "humanizer",
+        "fact-checker",
+        "word-production",
+        "word-visual-inspection",
+    }
+    if visual_path is not None:
+        required_revision_steps.add("art-direction")
+    remediated_draft = base / "final-draft-remediated.md"
+    if (
+        remediated_draft.is_file()
+        and file_sha256(remediated_draft) == file_sha256(final_draft)
+    ):
+        required_revision_steps.add("fact-check-remediation")
+    release_dir = base / "release"
+    # Re-read every dependency and output before staging and again before
+    # promotion. A mutation cannot hide behind a once-valid receipt or the
+    # staged bundle's independent Office QA.
+    published = _publish_revision_release(
+        state_path=revision_state_path,
+        repo_root=repo_root,
+        required_steps=required_revision_steps,
+        stage4_dir=stage4_dir,
+        slug=release_slug,
+        release_dir=release_dir,
+        require_executive_summary=executive_path is not None,
+        out_dir=REPORTS_DIR,
+    )
+    out_path = published["word_report"]
+
+    revision_manifest = {
+        "schema_version": "1.0",
+        "slug": source.slug,
+        "revision": version,
+        "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "source_archive": archive_dir.name,
+        "source_draft_sha256": file_sha256(src_draft),
+        "feedback_sha256": file_sha256(base / "feedback.md"),
+        "final_draft_sha256": file_sha256(final_draft),
+        "claim_lineage_sha256": file_sha256(revision_lineage),
+        "quality_gate_sha256": file_sha256(revision_gate),
+        "visual_brief_sha256": (
+            file_sha256(visual_path) if visual_path is not None else None
+        ),
+        "word_report_sha256": file_sha256(report_path),
+        "executive_summary_sha256": (
+            file_sha256(executive_path)
+            if executive_path is not None
+            else None
+        ),
+        "release_manifest_sha256": file_sha256(
+            release_dir / "release-manifest.json"
+        ),
+        "revision_execution_sha256": file_sha256(revision_state_path),
+        "required_steps": sorted(required_revision_steps),
+        "claude_cost_usd": tally.total,
+        "status": "released",
+    }
+    revision_manifest_path = base / "revision-manifest.json"
+    temporary_revision_manifest = revision_manifest_path.with_name(
+        f".{revision_manifest_path.name}.tmp"
+    )
+    temporary_revision_manifest.write_text(
+        json.dumps(revision_manifest, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary_revision_manifest, revision_manifest_path)
+    console.print(
+        f"[green]Revised report released:[/green] "
+        f"{out_path.relative_to(repo_root)}"
+    )
     return out_path, tally

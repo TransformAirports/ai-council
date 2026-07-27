@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -23,11 +24,12 @@ from rich.text import Text
 
 from cli.agents import (
     load_all_agents,
+    process_agents,
     research_agents,
     standard_research_agents,
     supplemental_agents,
 )
-from cli.config import MODEL_CHOICES, get_config, save_config
+from cli.config import MODEL_CHOICES, choices_for_role, get_config, save_config
 from cli.sources import (
     DROPZONE,
     attach_sources,
@@ -66,12 +68,16 @@ def banner() -> None:
     agents = load_all_agents()
     n_standard = len(standard_research_agents(agents))
     n_suppl = len(supplemental_agents(agents))
+    n_process = len(process_agents(agents))
     n_archives, last = _archive_stats()
     body = Text()
     body.append("THE AI COUNCIL\n", style="bold white")
     body.append("Transform Airports — research, argued.\n\n", style="dim")
-    body.append(f"{n_standard} research lenses (+{n_suppl} supplemental) · "
-                f"6 process agents · {n_archives} completed runs", style="cyan")
+    body.append(
+        f"{n_standard} research lenses (+{n_suppl} supplemental) · "
+        f"{n_process} process agents · {n_archives} completed runs",
+        style="cyan",
+    )
     if last:
         body.append(f"\nlatest: {last}", style="dim")
     dropped = discover_dropzone()
@@ -141,6 +147,36 @@ def detect_interrupted_run() -> dict | None:
             "where": f"scope engagement — {built} of {planned or '?'} deliverables built",
             "age": age, "has_expensive_work": built > 0, "stage_counts": stage_counts,
             "mode": "scope",
+        }
+
+    if marker.get("mode") == "strengthen" and marker.get("slug"):
+        if stage_counts["stage4"]:
+            where = "argument deck production"
+        elif stage_counts["stage3"]:
+            where = "argument verification"
+        elif stage_counts["stage2"]:
+            where = "argument synthesis"
+        elif stage_counts["stage1"]:
+            where = f"argument research ({stage_counts['stage1']} artifacts saved)"
+        else:
+            where = "argument research startup"
+        if not newest and marker.get("started"):
+            try:
+                newest = datetime.fromisoformat(marker["started"]).timestamp()
+            except (ValueError, TypeError):
+                pass
+        age = ""
+        if newest:
+            hours = (datetime.now() - datetime.fromtimestamp(newest)).total_seconds() / 3600
+            age = f"{hours:.0f}h ago" if hours >= 1 else f"{hours * 60:.0f}m ago"
+        return {
+            "slug": marker["slug"],
+            "title": marker.get("title") or marker["slug"],
+            "where": where,
+            "age": age,
+            "has_expensive_work": bool(stage_counts["stage2"] or stage_counts["stage3"]),
+            "stage_counts": stage_counts,
+            "mode": "strengthen",
         }
 
     if stage_counts["stage3"]:
@@ -279,13 +315,13 @@ def _auth_lines(spec) -> list[tuple[str, str]]:
 
 
 def estimate_cost(spec) -> tuple[float, float]:
-    """Rough range calibrated against archived runs' actual tallies."""
+    """Rough Council v2 range, including curation and specialized reviews."""
     n = len([a for a in spec.selected_research_agents if a != "deep-research"])
-    low = 1.5 * n + 7
-    high = 4.0 * n + 19
+    low = 1.5 * n + 14
+    high = 4.0 * n + 36
     if getattr(spec, "want_pptx", False):
-        low += 1
-        high += 4
+        low += 3
+        high += 8
     return round(low), round(high)
 
 
@@ -343,6 +379,11 @@ def preflight(spec) -> dict | None:
         t.add_row("[bold]Checkpoints[/bold]", "on — pause for your review twice" if checkpoints_on else "off — fully autonomous")
         t.add_row("[bold]Budget ceiling[/bold]", f"${budget:.0f}" if budget else "none")
         t.add_row("[bold]Companion deck[/bold]", "yes" if getattr(spec, "want_pptx", False) else "no")
+        if getattr(spec, "want_pptx", False):
+            t.add_row(
+                "[bold]Deck mode[/bold]",
+                getattr(spec, "deck_mode", "board_decision").replace("_", " "),
+            )
         if getattr(spec, "source_paths", None):
             srcs = spec.source_paths
             preview = ", ".join(Path(p).name for p in srcs[:3])
@@ -378,6 +419,24 @@ def preflight(spec) -> dict | None:
         spec.want_pptx = bool(questionary.confirm(
             "Generate a companion executive deck?", default=getattr(spec, "want_pptx", False)
         ).ask())
+        if spec.want_pptx:
+            labels = {
+                "Board decision — 8–12 slides": "board_decision",
+                "Executive briefing — 12–18 slides": "executive_briefing",
+                "Technical read-ahead — 15–25 slides": "technical_read_ahead",
+            }
+            current = getattr(spec, "deck_mode", "board_decision")
+            default_label = next(
+                (label for label, value in labels.items() if value == current),
+                next(iter(labels)),
+            )
+            chosen = questionary.select(
+                "Deck mode:",
+                choices=list(labels),
+                default=default_label,
+            ).ask()
+            if chosen:
+                spec.deck_mode = labels[chosen]
 
 
 # ----------------------------------------------------------------------------
@@ -417,6 +476,7 @@ def post_run_menu(spec, result) -> None:
             result.deck_path = asyncio.run(run_presentation_for_archive(
                 archive_dir=result.archive_path, slug=spec.slug,
                 title=spec.title, repo_root=REPO_ROOT,
+                budget_usd=result.tally.budget_usd,
             ))
         elif choice.startswith("🗂"):
             _open(result.archive_path)
@@ -485,8 +545,9 @@ def new_run_flow() -> None:
         console.print(f"[dim]Slug '{spec.slug}' exists — using '{unique}'.[/dim]")
         spec.slug = unique
 
-    # Now that the slug is settled, move sources into outputs/sources/<slug>/
-    # and extract office formats. The drop zone is left empty for the next run.
+    # Now that the slug is settled, move sources into the durable
+    # sources/runs/<slug>/ library and extract office formats. The drop zone is
+    # left empty for the next run.
     if sources_to_attach:
         attached = attach_sources(spec.slug, sources_to_attach, REPO_ROOT / "outputs")
         spec.source_paths = [
@@ -571,20 +632,30 @@ def revise_flow(only_slug: str | None = None, auto_approve: bool = False) -> Non
             _open(out_path)
 
 
-def deck_flow() -> None:
+def deck_flow(
+    only_slug: str | None = None,
+    *,
+    budget_usd: float | None = None,
+) -> bool:
     from cli.orchestrator import run_presentation_for_archive
     from cli.publish import discover_reports
 
     sources = [s for s in discover_reports() if s.final_md is not None]
+    if only_slug is not None:
+        sources = [source for source in sources if source.slug == only_slug]
     if not sources:
-        console.print("[yellow]No archived runs available.[/yellow]")
-        return
-    pick = questionary.select(
-        "Build an executive deck for which report?",
-        choices=[s.slug for s in sources],
-    ).ask()
-    if pick is None:
-        return
+        target = f" matching '{only_slug}'" if only_slug else ""
+        console.print(f"[yellow]No archived runs{target} available.[/yellow]")
+        return False
+    if only_slug is None:
+        pick = questionary.select(
+            "Build an executive deck for which report?",
+            choices=[s.slug for s in sources],
+        ).ask()
+        if pick is None:
+            return False
+    else:
+        pick = only_slug
     src = next(s for s in sources if s.slug == pick)
     title = pick.replace("-", " ").title()
     if src.run_file is not None:
@@ -592,25 +663,56 @@ def deck_flow() -> None:
             if line.startswith("# Run:"):
                 title = line[len("# Run:"):].strip()
                 break
+    ceiling = (
+        get_config().default_budget_usd
+        if budget_usd is None
+        else budget_usd
+    )
+    if ceiling is not None and (
+        not math.isfinite(ceiling) or ceiling < 0
+    ):
+        raise ValueError(
+            "Deck budget must be a finite number, zero or greater."
+        )
     deck = asyncio.run(run_presentation_for_archive(
         archive_dir=src.archive_dir, slug=pick, title=title, repo_root=REPO_ROOT,
+        budget_usd=ceiling,
     ))
     if questionary.confirm("Open the deck?", default=True).ask():
         _open(deck)
+    return True
 
 
-def publish_flow(only_slug: str | None = None) -> None:
+def publish_flow(
+    only_slug: str | None = None,
+    *,
+    allow_legacy: bool = False,
+) -> bool:
     from cli.publish import publish_all
 
-    results = publish_all(only_slug=only_slug)
+    results = publish_all(
+        only_slug=only_slug,
+        allow_legacy=allow_legacy,
+    )
     if not results:
         console.print("[yellow]No matching archived runs found.[/yellow]")
-        return
+        return False
+    ok = True
     for slug, out_path, status in results:
-        if status == "ok" and out_path is not None:
-            console.print(f"  [green]✓[/green] {slug} → {out_path.relative_to(REPO_ROOT)}")
+        if status.startswith("ok") and out_path is not None:
+            qualifier = (
+                " [yellow](legacy bytes re-QA'd)[/yellow]"
+                if "legacy" in status
+                else ""
+            )
+            console.print(
+                f"  [green]✓[/green] {slug} → "
+                f"{out_path.relative_to(REPO_ROOT)}{qualifier}"
+            )
         else:
+            ok = False
             console.print(f"  [red]✗[/red] {slug} — {status}")
+    return ok
 
 
 def audit_flow() -> None:
@@ -629,8 +731,11 @@ def settings_menu() -> None:
     while True:
         cfg = get_config()
         t = Table(show_header=False, box=None, padding=(0, 2))
-        for role in ("research", "synthesis", "critique", "editor", "humanizer",
-                     "factcheck", "presentation", "openai_deep_research"):
+        for role in (
+            "context", "research", "curation", "creative", "synthesis", "critique",
+            "executive_review", "editor", "humanizer", "factcheck",
+            "art_direction", "presentation", "openai_deep_research",
+        ):
             t.add_row(f"[bold]{role}[/bold]", cfg.model(role))
         t.add_row("[bold]max_turns[/bold]", str(cfg.max_turns))
         t.add_row("[bold]default budget[/bold]", f"${cfg.default_budget_usd:g}")
@@ -647,13 +752,17 @@ def settings_menu() -> None:
         if choice.startswith("A model"):
             role = questionary.select(
                 "Which role?",
-                choices=["research", "synthesis", "critique", "editor",
-                         "humanizer", "factcheck", "presentation"],
+                choices=[
+                    "context", "research", "curation", "creative", "synthesis",
+                    "critique", "executive_review", "editor", "humanizer",
+                    "factcheck", "art_direction", "presentation",
+                    "openai_deep_research",
+                ],
             ).ask()
             if role is None:
                 continue
             model = questionary.select(
-                f"Model for {role}:", choices=MODEL_CHOICES + ["custom…"]
+                f"Model for {role}:", choices=choices_for_role(role) + ["custom…"]
             ).ask()
             if model == "custom…":
                 model = (questionary.text("Model ID:").ask() or "").strip()

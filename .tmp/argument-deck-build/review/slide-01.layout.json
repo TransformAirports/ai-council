@@ -1,0 +1,1212 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/uualuu",
+    "id": "uualuu",
+    "slide": 1,
+    "layoutId": "a879b18e-9705-4f37-b446-8ddf7d2e4512",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b5b590c8-6709-4642-a76d-37885f818c0c",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFFFF",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "+mn-lt"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "a879b18e-9705-4f37-b446-8ddf7d2e4512",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b5b590c8-6709-4642-a76d-37885f818c0c",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b5b590c8-6709-4642-a76d-37885f818c0c",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/18nmhw3q",
+      "id": "1",
+      "bbox": [
+        62,
+        50,
+        1156,
+        0
+      ],
+      "geometry": "line",
+      "lineColor": "#B7C4CC",
+      "lineWidth": 1
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/elwn6hkz",
+      "id": "2",
+      "bbox": [
+        62,
+        66,
+        1156,
+        104
+      ],
+      "geometry": "rect",
+      "text": "This ground is reserved capacity. A data center pours the option in concrete.",
+      "textPreview": "This ground is reserved capacity. A data center pours the option in concrete.",
+      "resolvedFontSize": 58.67,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 58.67,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "This ground is reserved capacity. A data"
+          },
+          {
+            "index": 2,
+            "text": "center pours the option in concrete."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "This ground is reserved capacity. A data center pours the option in concrete.",
+          "resolvedTextStyle": {
+            "fontSize": 58.67,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "This ground is reserved capacity. A data center pours the option in concrete.",
+              "fontSize": 58.67,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fm54fmlk",
+      "id": "3",
+      "bbox": [
+        112,
+        333,
+        952,
+        0
+      ],
+      "geometry": "line",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 5
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/oby5cb21",
+      "id": "4",
+      "bbox": [
+        99,
+        320,
+        26,
+        26
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 4
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pc7mlg3m",
+      "id": "5",
+      "bbox": [
+        54,
+        261,
+        116,
+        34
+      ],
+      "geometry": "rect",
+      "text": "1958",
+      "textPreview": "1958",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 32,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "1958"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "1958",
+          "resolvedTextStyle": {
+            "fontSize": 32,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "1958",
+              "fontSize": 32,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/29wna1kb",
+      "id": "6",
+      "bbox": [
+        24,
+        365,
+        176,
+        74
+      ],
+      "geometry": "rect",
+      "text": "Fifth runway enters\nDulles designs",
+      "textPreview": "Fifth runway enters | Dulles designs",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 21.33,
+        "typeface": "+mn-lt",
+        "color": "#17232D",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Fifth runway"
+          },
+          {
+            "index": 2,
+            "text": "enters"
+          },
+          {
+            "index": 3,
+            "text": "Dulles designs"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Fifth runway enters",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Fifth runway enters",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "Dulles designs",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Dulles designs",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3ap4j6lw",
+      "id": "7",
+      "bbox": [
+        337,
+        320,
+        26,
+        26
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 4
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4ful072x",
+      "id": "8",
+      "bbox": [
+        292,
+        261,
+        116,
+        34
+      ],
+      "geometry": "rect",
+      "text": "1985",
+      "textPreview": "1985",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 32,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "1985"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "1985",
+          "resolvedTextStyle": {
+            "fontSize": 32,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "1985",
+              "fontSize": 32,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5g3m9c3i",
+      "id": "9",
+      "bbox": [
+        262,
+        365,
+        176,
+        74
+      ],
+      "geometry": "rect",
+      "text": "Capacity carried in\nthe master plan",
+      "textPreview": "Capacity carried in | the master plan",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 21.33,
+        "typeface": "+mn-lt",
+        "color": "#17232D",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Capacity carried"
+          },
+          {
+            "index": 2,
+            "text": "in"
+          },
+          {
+            "index": 3,
+            "text": "the master plan"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Capacity carried in",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Capacity carried in",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "the master plan",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "the master plan",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pgzqhofu",
+      "id": "10",
+      "bbox": [
+        575,
+        320,
+        26,
+        26
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 4
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ofq98jep",
+      "id": "11",
+      "bbox": [
+        530,
+        261,
+        116,
+        34
+      ],
+      "geometry": "rect",
+      "text": "2005",
+      "textPreview": "2005",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 32,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2005"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2005",
+          "resolvedTextStyle": {
+            "fontSize": 32,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2005",
+              "fontSize": 32,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/neh8fex4",
+      "id": "12",
+      "bbox": [
+        500,
+        365,
+        176,
+        74
+      ],
+      "geometry": "rect",
+      "text": "FAA approves fourth\nand fifth runways",
+      "textPreview": "FAA approves fourth | and fifth runways",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 21.33,
+        "typeface": "+mn-lt",
+        "color": "#17232D",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "FAA approves"
+          },
+          {
+            "index": 2,
+            "text": "fourth"
+          },
+          {
+            "index": 3,
+            "text": "and fifth"
+          },
+          {
+            "index": 4,
+            "text": "runways"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "FAA approves fourth",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "FAA approves fourth",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "and fifth runways",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "and fifth runways",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2d8r69wj",
+      "id": "13",
+      "bbox": [
+        813,
+        320,
+        26,
+        26
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#FFFFFF",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 4
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xkjqlof6",
+      "id": "14",
+      "bbox": [
+        768,
+        261,
+        116,
+        34
+      ],
+      "geometry": "rect",
+      "text": "2024",
+      "textPreview": "2024",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 32,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2024"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2024",
+          "resolvedTextStyle": {
+            "fontSize": 32,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2024",
+              "fontSize": 32,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/cja9c3el",
+      "id": "15",
+      "bbox": [
+        738,
+        365,
+        176,
+        74
+      ],
+      "geometry": "rect",
+      "text": "27.25M passengers;\nUnited ≈70% of flights",
+      "textPreview": "27.25M passengers; | United ≈70% of flights",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 21.33,
+        "typeface": "+mn-lt",
+        "color": "#17232D",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "27.25M"
+          },
+          {
+            "index": 2,
+            "text": "passengers;"
+          },
+          {
+            "index": 3,
+            "text": "United ≈70% of"
+          },
+          {
+            "index": 4,
+            "text": "flights"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "27.25M passengers;",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "27.25M passengers;",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "United ≈70% of flights",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "United ≈70% of flights",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/bih8jyx0",
+      "id": "16",
+      "bbox": [
+        1051,
+        320,
+        26,
+        26
+      ],
+      "geometry": "ellipse",
+      "fillColor": "#D4A24C",
+      "lineColor": "#0B2D4D",
+      "lineWidth": 4
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ah8ratwf",
+      "id": "17",
+      "bbox": [
+        1006,
+        261,
+        116,
+        34
+      ],
+      "geometry": "rect",
+      "text": "2025",
+      "textPreview": "2025",
+      "resolvedFontSize": 32,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 32,
+        "typeface": "+mn-lt",
+        "color": "#D4A24C",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "2025"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "2025",
+          "resolvedTextStyle": {
+            "fontSize": 32,
+            "color": "#D4A24C",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "2025",
+              "fontSize": 32,
+              "color": "#D4A24C",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lojqp8f2",
+      "id": "18",
+      "bbox": [
+        976,
+        365,
+        176,
+        74
+      ],
+      "geometry": "rect",
+      "text": "Board reaffirms path\ntoward ≈90M passengers",
+      "textPreview": "Board reaffirms path | toward ≈90M passengers",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 21.33,
+        "typeface": "+mn-lt",
+        "color": "#17232D",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 4,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Board reaffirms"
+          },
+          {
+            "index": 2,
+            "text": "path"
+          },
+          {
+            "index": 3,
+            "text": "toward ≈90M"
+          },
+          {
+            "index": 4,
+            "text": "passengers"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Board reaffirms path",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Board reaffirms path",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        },
+        {
+          "index": 2,
+          "text": "toward ≈90M passengers",
+          "resolvedTextStyle": {
+            "fontSize": 21.33,
+            "color": "#17232D",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "toward ≈90M passengers",
+              "fontSize": 21.33,
+              "color": "#17232D",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kna9g3ex",
+      "id": "19",
+      "bbox": [
+        72,
+        500,
+        1136,
+        104
+      ],
+      "geometry": "rect",
+      "fillColor": "#EDF3F6",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4ritc7mt",
+      "id": "20",
+      "bbox": [
+        72,
+        500,
+        8,
+        104
+      ],
+      "geometry": "rect",
+      "fillColor": "#D4A24C",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5sralc3e",
+      "id": "21",
+      "bbox": [
+        100,
+        518,
+        1082,
+        66
+      ],
+      "geometry": "rect",
+      "text": "The parcel sits inside the RWY 1L approach and RWY 19R departure surfaces of a growing airfield.",
+      "textPreview": "The parcel sits inside the RWY 1L approach and RWY 19R departure surfaces of a growing airfield.",
+      "resolvedFontSize": 33.33,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 33.33,
+        "typeface": "+mn-lt",
+        "color": "#0B2D4D",
+        "bold": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The parcel sits inside the RWY 1L approach and RWY 19R"
+          },
+          {
+            "index": 2,
+            "text": "departure surfaces of a growing airfield."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The parcel sits inside the RWY 1L approach and RWY 19R departure surfaces of a growing airfield.",
+          "resolvedTextStyle": {
+            "fontSize": 33.33,
+            "color": "#0B2D4D",
+            "bold": true,
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The parcel sits inside the RWY 1L approach and RWY 19R departure surfaces of a growing airfield.",
+              "fontSize": 33.33,
+              "color": "#0B2D4D",
+              "bold": true,
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ip0bah4n",
+      "id": "22",
+      "bbox": [
+        62,
+        674,
+        1156,
+        0
+      ],
+      "geometry": "line",
+      "lineColor": "#B7C4CC",
+      "lineWidth": 1
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jq9sj2l8",
+      "id": "23",
+      "bbox": [
+        62,
+        680,
+        1156,
+        24
+      ],
+      "geometry": "rect",
+      "text": "Sources: MWAA master-plan update (2025); FAA Record of Decision (2005); FFXnow passenger record; Simple Flying market-share analysis.",
+      "textPreview": "Sources: MWAA master-plan update (2025); FAA Record of Decision (2005); FFXnow passenger record; Simple Flying market-share analysis.",
+      "resolvedFontSize": 12,
+      "resolvedTextStyle": {
+        "anchor": 2,
+        "fontSize": 12,
+        "typeface": "+mn-lt",
+        "color": "#415669",
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "insets": {
+          "top": 4.8,
+          "right": 9.6,
+          "bottom": 4.8,
+          "left": 9.6
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Sources: MWAA master-plan update (2025); FAA Record of Decision (2005); FFXnow passenger record; Simple Flying market-share analysis."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Sources: MWAA master-plan update (2025); FAA Record of Decision (2005); FFXnow passenger record; Simple Flying market-share analysis.",
+          "resolvedTextStyle": {
+            "fontSize": 12,
+            "color": "#415669",
+            "alignment": "center"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Sources: MWAA master-plan update (2025); FAA Record of Decision (2005); FFXnow passenger record; Simple Flying market-share analysis.",
+              "fontSize": 12,
+              "color": "#415669",
+              "alignment": "center"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

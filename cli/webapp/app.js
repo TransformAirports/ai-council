@@ -4,13 +4,36 @@ const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 const NS = "http://www.w3.org/2000/svg";
 
+function tabClientId() {
+  const key = "council-client-id";
+  try {
+    const existing = sessionStorage.getItem(key);
+    if (/^[A-Za-z0-9_-]{16,128}$/.test(existing || "")) return existing;
+    const generated = crypto.randomUUID();
+    sessionStorage.setItem(key, generated);
+    return generated;
+  } catch (_) {
+    // The ID separates browser tabs; the server token remains the credential.
+    return `tab_${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}`;
+  }
+}
+
 const state = {
   meta: {}, groups: [], formats: [], selectedFormat: "report",
-  seated: new Set(), ws: null, reviseSlug: null, resultSlug: null, step: 1, home: null,
+  seated: new Set(), ws: null, reviseSlug: null, resultSlug: null,
+  argumentSeated: new Set(), argumentUploads: [], argumentUploading: 0,
+  resultReviseSlug: null, resultMode: "report", step: 1, home: null,
+  sessionToken: null, clientId: tabClientId(),
 };
 
 const CX = 400, CY = 252, OUTER_RX = 312, OUTER_RY = 188, INNER_RX = 210, INNER_RY = 124;
-const PROCESS_SLOTS = { "strategist": -90, "red-team": 90, "fact-checker": 30, "humanizer": 150, "editor": 210, "presentation-designer": -30 };
+const PROCESS_SLOTS = {
+  "airport-context-builder": -175, "evidence-curator": -145,
+  "creative-director": -115, "strategist": -85,
+  "evidence-prosecutor": -55, "airport-executive-reviewer": -20,
+  "editor": 20, "humanizer": 55, "fact-checker": 90,
+  "art-director": 125, "presentation-designer": 155, "red-team": 180,
+};
 const STAGE_FILL = { 1: 15, 2: 45, 3: 75, 4: 92 };
 const constellation = { nodes: {}, svg: null };
 
@@ -27,10 +50,15 @@ async function init() {
   state.authOk = metaRes.auth_ok; state.authMsg = metaRes.auth_message;
   state.sources = metaRes.sources || []; state.defaultBudget = metaRes.default_budget ?? 80;
   state.modelsCfg = metaRes.models || {};
+  state.activeRun = Boolean(metaRes.active_run);
+  state.sessionToken = metaRes.session_token || null;
 
-  buildFormats(); buildAgentGroups(); applyPreset("default");
+  buildFormats(); buildAgentGroups(); buildArgumentAgentGroups();
+  applyPreset("default"); applyArgumentPreset("default");
   wireUI(); buildHeroDots(); setHeroStats(agentsRes);
-  await loadHome(); nav("home");
+  await loadHome();
+  if (state.activeRun) startRun({ type: "attach" });
+  else nav("home");
 }
 
 function modelShort(id) {
@@ -70,10 +98,13 @@ function nav(view) {
   const views = $$(".workspace > .view");
   if (!views.some((el) => el.id === "view-" + view)) { console.warn("nav: unknown view", view); return; }
   views.forEach((el) => el.classList.toggle("hidden", el.id !== "view-" + view));
-  $$(".side-link").forEach((l) => l.classList.toggle("active", l.dataset.nav === view));
+  $$(".side-link, .mobile-nav button").forEach((l) =>
+    l.classList.toggle("active", l.dataset.nav === view)
+  );
   $(".workspace").scrollTo(0, 0);
   if (view === "configure") goStep(1);
   if (view === "scope") prepScopeView();
+  if (view === "strengthen") prepArgumentView();
   if (view === "library") loadLibrary();
   if (view === "audit") loadAudit();
 }
@@ -83,6 +114,7 @@ async function prepScopeView() {
   try {
     const meta = await fetch("/api/meta").then((r) => r.json());
     state.sources = meta.sources || [];
+    state.sessionToken = meta.session_token || state.sessionToken;
   } catch (_) {}
   const has = state.sources.length > 0;
   const note = $("#scope-sources"), warn = $("#scope-nosources");
@@ -92,16 +124,28 @@ async function prepScopeView() {
   $("#scope-launch").disabled = !has || !state.authOk;
 }
 
+function prepArgumentView() {
+  $("#argument-launch").disabled = !state.authOk || state.argumentUploading > 0;
+  const auth = $("#argument-auth");
+  auth.classList.toggle("hidden", Boolean(state.authOk));
+  if (!state.authOk) auth.textContent = "⚠ " + state.authMsg + " — run `claude login` in your terminal, then reload.";
+}
+
 function wireUI() {
   $$("[data-nav]").forEach((b) => (b.onclick = () => nav(b.dataset.nav)));
   $("#home-new").onclick = () => nav("configure");
   $$("[data-preset]").forEach((b) => (b.onclick = () => applyPreset(b.dataset.preset)));
+  $$("[data-argument-preset]").forEach((b) => (b.onclick = () => applyArgumentPreset(b.dataset.argumentPreset)));
   $("#wiz-back").onclick = () => goStep(state.step - 1);
   $("#wiz-next").onclick = () => { if (state.step < 3) goStep(state.step + 1); else launchNew(); };
-  $("#cancel-btn").onclick = () => state.ws?.send(JSON.stringify({ type: "cancel" }));
-  $("#result-new").onclick = () => nav("configure");
-  $("#result-revise").onclick = () => openReviseModal(state.resultSlug);
-  $("#result-deck").onclick = () => startRun({ type: "start", mode: "deck", slug: state.resultSlug });
+  $("#cancel-btn").onclick = () => sendControl({ type: "cancel" });
+  $("#result-new").onclick = () => nav(state.resultMode === "strengthen" ? "strengthen" : "configure");
+  $("#result-quality-save").onclick = saveFinalQuality;
+  $("#result-revise").onclick = () => openReviseModal(state.resultReviseSlug || state.resultSlug);
+  $("#result-deck").onclick = () => startRun({
+    type: "start", mode: "deck", slug: state.resultSlug,
+    budget: state.defaultBudget,
+  });
   $("#revise-cancel").onclick = () => $("#revise-overlay").classList.add("hidden");
   $("#revise-go").onclick = submitRevise;
   $("#f-pptx").onchange = () => { if (state.step === 3) buildReview(); };
@@ -111,9 +155,28 @@ function wireUI() {
     startRun({
       type: "start", mode: "scope", title, notes: $("#s-notes").value.trim(),
       auto_approve: !$("#s-review").checked,
-      budget: parseFloat($("#s-budget").value) || null,
+      budget: readBudget("#s-budget"),
     });
   };
+  const dropzone = $("#argument-dropzone"), fileInput = $("#a-files");
+  dropzone.onclick = () => fileInput.click();
+  dropzone.onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+  };
+  fileInput.onchange = () => { uploadArgumentFiles(fileInput.files); fileInput.value = ""; };
+  ["dragenter", "dragover"].forEach((name) => dropzone.addEventListener(name, (e) => {
+    e.preventDefault(); dropzone.classList.add("dragging");
+  }));
+  ["dragleave", "drop"].forEach((name) => dropzone.addEventListener(name, (e) => {
+    e.preventDefault(); dropzone.classList.remove("dragging");
+  }));
+  dropzone.addEventListener("drop", (e) => uploadArgumentFiles(e.dataTransfer.files));
+  $("#a-pptx").onchange = () => {
+    $("#argument-slide-field").classList.toggle("hidden", !$("#a-pptx").checked);
+    $("#a-pptx").closest(".argument-output-card").classList.toggle("selected", $("#a-pptx").checked);
+    updateArgumentCount();
+  };
+  $("#argument-launch").onclick = launchArgument;
   $("#guide-btn").onclick = openGuide;
   $("#guide-close").onclick = () => $("#guide-overlay").classList.add("hidden");
   $("#guide-overlay").onclick = (e) => { if (e.target === $("#guide-overlay")) $("#guide-overlay").classList.add("hidden"); };
@@ -123,6 +186,7 @@ function wireUI() {
   if (!state.authOk) { const b = $("#auth-banner"); b.textContent = "⚠ " + state.authMsg + "  —  run `claude login` in your terminal, then reload."; b.classList.remove("hidden"); }
   if (state.sources.length) { const n = $("#sources-note"); n.textContent = `📎 ${state.sources.length} source file(s) staged — they'll be attached: ` + state.sources.map((s) => s.name).join(", "); n.classList.remove("hidden"); }
   $("#f-budget").value = state.defaultBudget;
+  $("#a-budget").value = Math.min(state.defaultBudget, 60);
 }
 
 // ─────────── wizard ───────────
@@ -139,7 +203,15 @@ function goStep(n) {
   $("#wiz-next").disabled = n === 3 && !state.authOk;
   if (n === 3) buildReview();
 }
-function flash(el, msg) { const o = el.textContent; el.textContent = msg; el.style.color = "var(--red)"; setTimeout(() => { el.style.color = ""; updateCount(); }, 1800); }
+function flash(el, msg) {
+  const original = el.innerHTML; el.textContent = msg; el.style.color = "var(--red)";
+  setTimeout(() => {
+    el.style.color = "";
+    if (el.id === "seated-count") updateCount();
+    else if (el.id === "argument-seated-count") updateArgumentCount();
+    else el.innerHTML = original;
+  }, 1800);
+}
 
 function buildReview() {
   const fmtLabel = (state.formats.find((f) => f.key === state.selectedFormat) || {}).label || state.selectedFormat;
@@ -154,6 +226,17 @@ function buildReview() {
   ];
   if (scope.length) rows.push(["Scope", scope.map(escapeHtml).join(" · ")]);
   if (avoid.length) rows.push(["Avoid", avoid.map(escapeHtml).join(" · ")]);
+  const decision = $("#f-decision").value.trim();
+  const owner = $("#f-owner").value.trim();
+  if (decision || owner) {
+    rows.push(["Decision", escapeHtml(
+      [decision || "To be established", owner ? `Owner: ${owner}` : ""]
+        .filter(Boolean).join(" · ")
+    )]);
+  }
+  if ($("#f-pptx").checked) {
+    rows.push(["Deck", escapeHtml($("#f-deck-mode").selectedOptions[0]?.textContent || "Board decision")]);
+  }
   if (state.sources.length) rows.push(["Sources", state.sources.map((s) => escapeHtml(s.name)).join(", ")]);
   const e = estimateCost($("#f-pptx").checked);
   rows.push(["Est. cost", `<span class="est">$${e.low}–$${e.high}</span>` +
@@ -183,20 +266,28 @@ async function loadLibrary() {
 }
 function renderArchives(root, archives) {
   root.innerHTML = "";
-  if (!archives.length) { root.innerHTML = `<p class="muted">No completed reports yet. Begin your first one.</p>`; return; }
+  if (!archives.length) { root.innerHTML = `<p class="muted">No completed work yet. Begin your first Council run.</p>`; return; }
   archives.forEach((a, idx) => {
     const card = document.createElement("div"); card.className = "archive-card";
     card.style.animationDelay = (idx * 0.05).toFixed(2) + "s";
     const dls = a.downloads.map((d) => `<a class="ac-btn" href="${d.url}">⤓ ${escapeHtml(d.label)}</a>`).join("");
     const rev = a.revisions > 0 ? `<span class="ac-badge">v${a.revisions}</span>` : "";
+    const read = a.can_read === false ? "" : `<button class="ac-btn" data-read="${a.slug}">Read</button>`;
+    const revise = a.can_revise === false ? "" : `<button class="ac-btn" data-revise="${a.revise_slug || a.slug}">Revise</button>`;
+    const deck = a.can_build_deck === false || a.has_deck ? "" : `<button class="ac-btn" data-deck="${a.slug}">Build deck</button>`;
     card.innerHTML = `<div class="ac-date">${escapeHtml(a.date)} · ${escapeHtml(a.format)}</div>
       <div class="ac-title">${escapeHtml(a.title)}${rev}</div>
-      <div class="ac-actions"><button class="ac-btn" data-read="${a.slug}">Read</button>${dls}
-        <button class="ac-btn" data-revise="${a.slug}">Revise</button>
-        ${a.has_deck ? "" : `<button class="ac-btn" data-deck="${a.slug}">Build deck</button>`}</div>`;
-    card.querySelector("[data-read]").onclick = () => openReport(a.slug, a.title);
-    card.querySelector("[data-revise]").onclick = () => openReviseModal(a.slug);
-    const dk = card.querySelector("[data-deck]"); if (dk) dk.onclick = () => startRun({ type: "start", mode: "deck", slug: a.slug });
+      <div class="ac-actions">${read}${dls}${revise}${deck}</div>`;
+    const reader = card.querySelector("[data-read]");
+    if (reader) reader.onclick = () => openReport(
+      a.slug, a.title, a.revise_slug || a.slug, a.can_build_deck !== false, a.mode || "report"
+    );
+    const reviser = card.querySelector("[data-revise]");
+    if (reviser) reviser.onclick = () => openReviseModal(a.revise_slug || a.slug);
+    const dk = card.querySelector("[data-deck]"); if (dk) dk.onclick = () => startRun({
+      type: "start", mode: "deck", slug: a.slug,
+      budget: state.defaultBudget,
+    });
     root.appendChild(card);
   });
 }
@@ -205,11 +296,18 @@ async function loadAudit() {
   const data = await fetch("/api/audit").then((r) => r.json());
   $("#audit-body").innerHTML = renderMarkdown(data.markdown);
 }
-async function openReport(slug, title) {
+async function openReport(slug, title, reviseSlug = slug, canBuildDeck = true, mode = "report") {
   state.resultSlug = slug;
+  state.resultReviseSlug = reviseSlug;
   const data = await fetch(`/api/report/${slug}`).then((r) => r.json());
-  $("#result-badge").textContent = "Archived report";
+  state.resultMode = data.mode || mode;
+  state.resultReviseSlug = data.revise_slug || reviseSlug;
+  $("#result-badge").textContent = state.resultMode === "strengthen" ? "Archived argument" : "Archived report";
   $("#result-title").textContent = title; $("#result-cost").textContent = "From the library";
+  $("#result-revise").classList.toggle("hidden", state.resultMode === "strengthen");
+  $("#result-deck").classList.toggle("hidden", !canBuildDeck || state.resultMode === "strengthen");
+  $("#result-quality").classList.toggle("hidden", state.resultMode === "strengthen");
+  $("#result-new").textContent = state.resultMode === "strengthen" ? "Strengthen another argument" : "New report";
   $("#result-body").innerHTML = renderMarkdown(data.markdown || ""); buildTOC();
   renderDownloads(data.downloads); nav("result");
 }
@@ -229,29 +327,54 @@ function buildAgentGroups() {
   state.groups.forEach((g) => {
     const label = document.createElement("div"); label.className = "agent-group-label"; label.textContent = g.label; root.appendChild(label);
     const grid = document.createElement("div"); grid.className = "agent-grid";
-    g.members.forEach((m, i) => { const chip = agentChip(m); chip.style.animation = `itemin .5s var(--ease) ${(i * 0.03).toFixed(2)}s backwards`; grid.appendChild(chip); });
+    g.members.forEach((m, i) => { const chip = agentChip(m, "report"); chip.style.animation = `itemin .5s var(--ease) ${(i * 0.03).toFixed(2)}s backwards`; grid.appendChild(chip); });
     root.appendChild(grid);
   });
 }
-function agentChip(m) {
-  const chip = document.createElement("div"); chip.className = "agent-chip"; chip.dataset.name = m.name;
+function buildArgumentAgentGroups() {
+  const root = $("#argument-agent-groups"); root.innerHTML = "";
+  state.groups.forEach((g) => {
+    const label = document.createElement("div"); label.className = "agent-group-label"; label.textContent = g.label; root.appendChild(label);
+    const grid = document.createElement("div"); grid.className = "agent-grid";
+    g.members.forEach((m, i) => { const chip = agentChip(m, "argument"); chip.style.animation = `itemin .5s var(--ease) ${(i * 0.03).toFixed(2)}s backwards`; grid.appendChild(chip); });
+    root.appendChild(grid);
+  });
+}
+function agentChip(m, picker = "report") {
+  const chip = document.createElement("div"); chip.className = "agent-chip"; chip.dataset.name = m.name; chip.dataset.picker = picker;
   chip.innerHTML = `<div class="agent-check">✓</div><div><div class="agent-name">${escapeHtml(m.display)}${m.gated ? '<span class="agent-gated">needs OpenAI key</span>' : ""}</div><div class="agent-desc">${escapeHtml(m.description)}</div></div>`;
-  chip.onclick = () => { if (state.seated.has(m.name)) { state.seated.delete(m.name); chip.classList.remove("on"); } else { state.seated.add(m.name); chip.classList.add("on"); } updateCount(); };
+  chip.onclick = () => {
+    const selected = picker === "argument" ? state.argumentSeated : state.seated;
+    if (selected.has(m.name)) { selected.delete(m.name); chip.classList.remove("on"); }
+    else { selected.add(m.name); chip.classList.add("on"); }
+    if (picker === "argument") updateArgumentCount(); else updateCount();
+  };
   return chip;
 }
-function setSeated(names) { state.seated = new Set(names); $$(".agent-chip").forEach((c) => c.classList.toggle("on", state.seated.has(c.dataset.name))); updateCount(); }
+function setSeated(names) { state.seated = new Set(names); $$("#agent-groups .agent-chip").forEach((c) => c.classList.toggle("on", state.seated.has(c.dataset.name))); updateCount(); }
 function applyPreset(which) {
   const all = Object.values(state.meta).filter((m) => !m.process);
   if (which === "none") return setSeated([]);
   if (which === "default") return setSeated(all.filter((m) => m.default).map((m) => m.name));
   if (which === "all") return setSeated(all.filter((m) => !m.gated && !m.supplemental).map((m) => m.name));
 }
+function setArgumentSeated(names) {
+  state.argumentSeated = new Set(names);
+  $$("#argument-agent-groups .agent-chip").forEach((c) => c.classList.toggle("on", state.argumentSeated.has(c.dataset.name)));
+  updateArgumentCount();
+}
+function applyArgumentPreset(which) {
+  const all = Object.values(state.meta).filter((m) => !m.process);
+  if (which === "none") return setArgumentSeated([]);
+  if (which === "default") return setArgumentSeated(all.filter((m) => m.default).map((m) => m.name));
+  if (which === "all") return setArgumentSeated(all.filter((m) => !m.gated && !m.supplemental).map((m) => m.name));
+}
 // Cost estimate — mirrors cli/menu.py estimate_cost so web and terminal agree.
 function estimateCost(includeDeck) {
   const hasDeep = state.seated.has("deep-research");
   const n = state.seated.size - (hasDeep ? 1 : 0); // Deep Research bills to OpenAI, not here
-  let low = 1.5 * n + 7, high = 4.0 * n + 19;
-  if (includeDeck) { low += 1; high += 4; }
+  let low = 1.5 * n + 14, high = 4.0 * n + 36;
+  if (includeDeck) { low += 3; high += 8; }
   return { low: Math.round(low), high: Math.round(high), deep: hasDeep };
 }
 function updateCount() {
@@ -262,6 +385,97 @@ function updateCount() {
   if (e.deep) html += ` <span class="est-note">+ OpenAI deep research, billed separately</span>`;
   $("#seated-count").innerHTML = html;
 }
+function estimateArgumentCost() {
+  const hasDeep = state.argumentSeated.has("deep-research");
+  const n = state.argumentSeated.size - (hasDeep ? 1 : 0);
+  let low = 1.1 * n + 7, high = 3.2 * n + 22;
+  if ($("#a-pptx")?.checked) { low += 3; high += 9; }
+  return { low: Math.round(low), high: Math.round(high), deep: hasDeep };
+}
+function updateArgumentCount() {
+  const n = state.argumentSeated.size, e = estimateArgumentCost();
+  let html = `<b>${n}</b> agent${n === 1 ? "" : "s"} seated`;
+  if (n) html += ` &middot; est. <span class="est">$${e.low}–$${e.high}</span>`;
+  if (e.deep) html += ` <span class="est-note">+ OpenAI deep research, billed separately</span>`;
+  $("#argument-seated-count").innerHTML = html;
+}
+
+function argumentHeaders(extra = {}) {
+  return {
+    "x-council-session": state.sessionToken,
+    "x-council-client": state.clientId,
+    ...extra,
+  };
+}
+function renderArgumentFiles() {
+  const root = $("#argument-files"); root.innerHTML = "";
+  state.argumentUploads.forEach((file) => {
+    const row = document.createElement("div"); row.className = "argument-file";
+    row.innerHTML = `<div><b>${escapeHtml(file.name)}</b><span>${escapeHtml(file.size || file.status || "")}</span></div>`;
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "argument-file-remove"; remove.textContent = "Remove";
+    remove.onclick = () => removeArgumentFile(file.token);
+    row.appendChild(remove); root.appendChild(row);
+  });
+  if (state.argumentUploading) {
+    const pending = document.createElement("div"); pending.className = "argument-file pending";
+    pending.textContent = `Uploading ${state.argumentUploading} file${state.argumentUploading === 1 ? "" : "s"}…`;
+    root.appendChild(pending);
+  }
+  prepArgumentView();
+}
+async function uploadArgumentFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  state.argumentUploading += files.length; renderArgumentFiles();
+  for (const file of files) {
+    try {
+      if (file.size > 40 * 1024 * 1024) throw new Error(`${file.name} exceeds the 40 MB file limit.`);
+      const res = await fetch(`/api/argument-source?name=${encodeURIComponent(file.name)}`, {
+        method: "POST", headers: argumentHeaders({ "content-type": "application/octet-stream" }), body: file,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `Could not upload ${file.name}.`);
+      state.argumentUploads.push(data);
+    } catch (error) {
+      alert(error.message || String(error));
+    } finally {
+      state.argumentUploading -= 1; renderArgumentFiles();
+    }
+  }
+}
+async function removeArgumentFile(token) {
+  try {
+    const res = await fetch(`/api/argument-source?token=${encodeURIComponent(token)}`, {
+      method: "DELETE", headers: argumentHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not remove the file.");
+    state.argumentUploads = state.argumentUploads.filter((file) => file.token !== token);
+    renderArgumentFiles();
+  } catch (error) { alert(error.message || String(error)); }
+}
+function launchArgument() {
+  const title = $("#a-title").value.trim();
+  const argumentText = $("#a-text").value.trim();
+  if (!title) { $("#a-title").focus(); $("#a-title").style.borderColor = "var(--red)"; return; }
+  if (!argumentText && !state.argumentUploads.length) {
+    $("#a-text").focus(); flash($(".argument-required-note"), "Paste text or attach a document."); return;
+  }
+  if (!state.argumentSeated.size) { flash($("#argument-seated-count"), "Seat at least one agent."); return; }
+  const wantPptx = $("#a-pptx").checked;
+  const slideCount = Number($("#a-slide-count").value);
+  if (wantPptx && (!Number.isInteger(slideCount) || slideCount < 3 || slideCount > 30)) {
+    $("#a-slide-count").focus(); $("#a-slide-count").style.borderColor = "var(--red)"; return;
+  }
+  startRun({
+    type: "start", mode: "strengthen", title,
+    argument_text: argumentText, research_goal: $("#a-goal").value.trim(),
+    audience: $("#a-audience").value.trim(), agents: Array.from(state.argumentSeated),
+    source_tokens: state.argumentUploads.map((file) => file.token),
+    want_pptx: wantPptx, slide_count: wantPptx ? slideCount : null,
+    budget: readBudget("#a-budget"),
+  });
+}
 
 // ─────────── launch ───────────
 function launchNew() {
@@ -269,20 +483,57 @@ function launchNew() {
     type: "start", mode: "new",
     spec: { title: $("#f-title").value.trim() || $("#f-thesis").value.trim().slice(0, 60), thesis: $("#f-thesis").value.trim(),
       scope: linesOf($("#f-scope").value), avoid: linesOf($("#f-avoid").value), output_format: state.selectedFormat,
-      agents: Array.from(state.seated), want_pptx: $("#f-pptx").checked, use_sources: true },
-    auto_approve: !$("#f-review").checked, budget: parseFloat($("#f-budget").value) || null,
+      operator_context: $("#f-operator-context").value.trim(),
+      decision_required: $("#f-decision").value.trim(), decision_owner: $("#f-owner").value.trim(),
+      time_horizon: $("#f-horizon").value.trim(), approval_path: $("#f-approval").value.trim(),
+      success_measure: $("#f-success-measure").value.trim(),
+      agents: Array.from(state.seated), want_pptx: $("#f-pptx").checked,
+      deck_mode: $("#f-deck-mode").value, use_sources: true },
+    auto_approve: !$("#f-review").checked, budget: readBudget("#f-budget"),
   });
 }
+
+function readBudget(selector) {
+  const raw = $(selector).value.trim();
+  if (raw === "") return null;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+function authenticatedControl(payload) {
+  return {
+    ...payload,
+    client_id: state.clientId,
+    session_token: state.sessionToken,
+  };
+}
+function sendControl(payload) {
+  if (state.ws?.readyState === WebSocket.OPEN) {
+    state.ws.send(JSON.stringify(authenticatedControl(payload)));
+  }
+}
 function startRun(payload) {
+  if (!state.sessionToken) {
+    alert("The local Council session could not be authenticated. Reload the app and try again.");
+    return;
+  }
   nav("run");
   $("#side-run").classList.remove("hidden");
-  $("#sr-fill").style.width = "0%"; $("#sr-cost").textContent = "$0.00"; $("#sr-stage").textContent = "Starting…";
+  $("#sr-fill").style.width = "0%"; $("#sr-cost").textContent = "Claude $0.00"; $("#sr-stage").textContent = "Starting…";
   $("#activity-log").innerHTML = "";
-  $("#run-title").textContent = payload.spec?.title || payload.slug || "Council run";
-  buildStageRail(); resetConstellation(payload.spec?.title || payload.slug || "");
+  $("#tm-evidence").textContent = "—"; $("#tm-artifacts").textContent = "0";
+  $("#tm-gaps").textContent = "—"; $("#tm-gate").textContent = "Pending";
+  state.validatedArtifacts = 0;
+  state.validatedArtifactPaths = new Set();
+  state.lastEventSeq = 0;
+  $("#run-title").textContent = payload.spec?.title || payload.title || payload.slug || "Council run";
+  buildStageRail(); resetConstellation(payload.spec?.title || payload.title || payload.slug || "");
   const proto = location.protocol === "https:" ? "wss" : "ws";
-  const ws = new WebSocket(`${proto}://${location.host}/ws`); state.ws = ws;
-  ws.onopen = () => ws.send(JSON.stringify(payload));
+  const query = new URLSearchParams({
+    token: state.sessionToken,
+    client_id: state.clientId,
+  });
+  const ws = new WebSocket(`${proto}://${location.host}/ws?${query}`); state.ws = ws;
+  ws.onopen = () => ws.send(JSON.stringify(authenticatedControl(payload)));
   ws.onmessage = (ev) => handleEvent(JSON.parse(ev.data));
   ws.onclose = () => log("Connection closed.", "warn");
 }
@@ -346,8 +597,9 @@ function placeNode(name) {
   const node = { g, beam, cost, x, y }; constellation.nodes[name] = node; return node;
 }
 function buildConstellation(names) { state._researchOrder = names.filter((n) => !(n in PROCESS_SLOTS)); state._researchOrder.forEach((n) => placeNode(n)); }
-function nodeState(name, cls) { const n = placeNode(name); n.g.classList.remove("queued", "running", "done"); n.g.classList.add(cls);
-  if (cls === "running") n.beam.classList.add("active"); if (cls === "done") { n.beam.classList.remove("active"); n.beam.classList.add("delivered"); } }
+function nodeState(name, cls) { const n = placeNode(name); n.g.classList.remove("queued", "running", "done", "error"); n.g.classList.add(cls);
+  if (cls === "running") n.beam.classList.add("active"); else n.beam.classList.remove("active");
+  if (cls === "done") n.beam.classList.add("delivered"); else n.beam.classList.remove("delivered"); }
 function showTip(e, meta) {
   const tip = $("#node-tooltip"); tip.innerHTML = `<div class="nt-name">${escapeHtml(meta.display || "")}</div><div class="nt-desc">${escapeHtml(meta.description || "")}</div>`;
   const wrap = $(".constellation-wrap").getBoundingClientRect();
@@ -357,10 +609,13 @@ function hideTip() { $("#node-tooltip").classList.add("hidden"); }
 
 // ─────────── events ───────────
 function handleEvent(e) {
+  if (e.seq && e.seq <= (state.lastEventSeq || 0)) return;
+  if (e.seq) state.lastEventSeq = e.seq;
   switch (e.type) {
     case "run_start":
       if (e.stages) buildStageRail(e.stages);
       buildConstellation(e.agents || []);
+      $("#run-title").textContent = e.title || e.slug || "Council run";
       log("Council convened: " + e.title, "ok"); break;
     case "deliverable_done":
       log(`📦 ${e.id} — ${e.title} → ${e.file}  (${e.done}/${e.total})`, "ok");
@@ -374,12 +629,53 @@ function handleEvent(e) {
     case "agent_start": nodeState(e.agent, "running"); log(`▶ ${e.display || e.agent} started · ${modelShort(e.model)}`); break;
     case "agent_tool": if (e.target) log(`  ${e.tool}: ${shortPath(e.target)}`); break;
     case "agent_done": {
-      const node = constellation.nodes[e.agent]; if (node) { node.cost.textContent = "$" + e.cost.toFixed(2); flyEvidence(node); }
-      nodeState(e.agent, "done"); $("#sr-cost").textContent = "$" + (e.total || 0).toFixed(2);
-      log(`✓ ${state.meta[e.agent]?.display || e.agent} — $${e.cost.toFixed(2)}`, "ok"); break;
+      const separatelyBilled = e.billed_separately || e.cost == null;
+      const costLabel = separatelyBilled ? "separate billing" : "$" + Number(e.cost).toFixed(2);
+      const node = constellation.nodes[e.agent]; if (node) { node.cost.textContent = separatelyBilled ? "separate" : costLabel; flyEvidence(node); }
+      nodeState(e.agent, "done"); $("#sr-cost").textContent = "Claude $" + Number(e.total || 0).toFixed(2);
+      log(`✓ ${state.meta[e.agent]?.display || e.agent} — ${costLabel}`, "ok"); break;
     }
+    case "artifact_validated":
+      if (!state.validatedArtifactPaths) state.validatedArtifactPaths = new Set();
+      {
+        const artifactKey = e.path || e.artifact || e.step || `event-${e.seq || 0}`;
+        if (e.valid === false) state.validatedArtifactPaths.delete(artifactKey);
+        else state.validatedArtifactPaths.add(artifactKey);
+        state.validatedArtifacts = state.validatedArtifactPaths.size;
+        $("#tm-artifacts").textContent = state.validatedArtifacts;
+      }
+      log(`${e.valid === false ? "⚠" : "✓"} Artifact validated · ${e.path || e.artifact || e.label || "output"}${e.word_count != null ? ` · ${e.word_count} words` : ""}`, e.valid === false ? "warn" : "ok"); break;
+    case "evidence_update":
+      $("#tm-evidence").textContent = e.record_count ?? "—";
+      $("#tm-gaps").textContent = (e.agents_without_evidence || []).length;
+      log(`◈ Evidence ledger · ${e.record_count ?? e.count ?? e.records ?? "updated"} records${e.invalid_record_count ? ` · ${e.invalid_record_count} invalid` : ""}`, e.invalid_record_count ? "warn" : "ok"); break;
+    case "quality_gate":
+      $("#tm-gate").textContent = e.passed ? "Passed" : "Failed";
+      $("#tm-gate").className = e.passed ? "tm-pass" : "tm-fail";
+      log(`${e.passed ? "✓" : "⚠"} Publishing gate · ${e.passed ? "passed" : "failed"} · ${e.error_count || 0} error(s), ${e.warning_count || 0} warning(s)`, e.passed ? "ok" : "err"); break;
+    case "render_qa":
+      log(`▣ Visual QA · ${e.status || "complete"}${e.issues != null ? ` · ${e.issues} issue(s)` : ""}`, e.status === "failed" ? "err" : "ok"); break;
+    case "manifest_update": {
+      const selectedCount = Array.isArray(e.selected_agents)
+        ? e.selected_agents.length
+        : Number(e.selected_agents || 0);
+      log(`▤ Run manifest · ${selectedCount} research agents · ${e.artifact_count ?? 0} artifacts`, "ok"); break;
+    }
+    case "phase_start":
+      log(`◇ ${e.label || e.phase}`); break;
+    case "research_swarm_start":
+      log(`⚡ Parallel research swarm · ${e.total} agents · ${e.concurrency}-wide`); break;
+    case "research_swarm_complete":
+      log(`✓ Research swarm complete · ${e.total} briefs`, "ok"); break;
+    case "agent_skipped":
+      nodeState(e.agent, "done"); log(`↷ ${state.meta[e.agent]?.display || e.agent} resumed from ${shortPath(e.path || "")}`); break;
+    case "agent_error":
+      nodeState(e.agent, "error");
+      log(`✕ ${state.meta[e.agent]?.display || e.agent} — ${e.message || e.error_type || "agent failed"}`, "err"); break;
     case "checkpoint": showCheckpoint(e); break;
     case "run_complete": showResult(e); break;
+    case "control_error":
+      log("Control denied: " + e.message, "err"); break;
     case "run_error": log("Error: " + e.message, "err"); alert("The run hit an error:\n\n" + e.message + "\n\nCompleted work is saved — resume from Home."); loadHome(); break;
     case "run_stopped": log("Run stopped.", "warn"); $("#side-run").classList.add("hidden"); break;
     case "stream_end": state.ws?.close(); break;
@@ -399,12 +695,22 @@ function showCheckpoint(e) {
   e.documents.forEach((doc, i) => { const tab = document.createElement("div"); tab.className = "cp-tab" + (i === 0 ? " active" : ""); tab.textContent = doc.name;
     tab.onclick = () => { $$(".cp-tab").forEach((t) => t.classList.remove("active")); tab.classList.add("active"); content.innerHTML = renderMarkdown(doc.content); content.scrollTop = 0; }; tabs.appendChild(tab); });
   content.innerHTML = renderMarkdown(e.documents[0]?.content || "");
+  const rubric = $("#cp-rubric"); rubric.innerHTML = "";
+  if ((e.rubric || []).length) {
+    rubric.innerHTML = `<div class="cp-rubric-title">Quick quality signal <span>optional · 1 weak, 5 exceptional</span></div>` +
+      e.rubric.map((r) => `<label>${escapeHtml(r.label)}<select data-rating="${escapeHtml(r.key)}">
+        <option value="">—</option><option value="1">1</option><option value="2">2</option>
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+      </select></label>`).join("");
+    rubric.classList.remove("hidden");
+  } else rubric.classList.add("hidden");
   const notes = $("#cp-notes"); notes.classList.add("hidden"); notes.value = "";
   const actions = $("#cp-actions"); actions.innerHTML = "";
   const defs = { continue: { label: "Approve → continue", cls: "primary" }, approve: { label: "Approve → produce documents", cls: "primary" }, redo: { label: "Redo with notes", cls: "warn" }, abort: { label: "Stop the run", cls: "ghost" } };
   e.actions.forEach((a) => { const btn = document.createElement("button"); btn.className = "cp-btn " + (defs[a]?.cls || "ghost"); btn.textContent = defs[a]?.label || a;
     btn.onclick = () => { if (a === "redo" && notes.classList.contains("hidden")) { notes.classList.remove("hidden"); notes.focus(); btn.textContent = "Submit redo"; return; }
-      state.ws?.send(JSON.stringify({ type: "checkpoint", id: e.id, action: a, notes: notes.value.trim() })); $("#checkpoint-overlay").classList.add("hidden");
+      const ratings = {}; $$("[data-rating]").forEach((s) => { if (s.value) ratings[s.dataset.rating] = Number(s.value); });
+      sendControl({ type: "checkpoint", id: e.id, action: a, notes: notes.value.trim(), ratings }); $("#checkpoint-overlay").classList.add("hidden");
       log(a === "redo" ? "Redo requested." : a === "abort" ? "Aborted." : "Checkpoint approved.", a === "abort" ? "warn" : "ok"); };
     actions.appendChild(btn); });
   $("#checkpoint-overlay").classList.remove("hidden");
@@ -428,10 +734,16 @@ async function openGuide() {
 function openReviseModal(slug) { state.reviseSlug = slug; $("#revise-target").textContent = slug; $("#revise-feedback").value = ""; $("#revise-overlay").classList.remove("hidden"); }
 function submitRevise() { const f = $("#revise-feedback").value.trim(); if (!f) { $("#revise-feedback").focus(); return; } $("#revise-overlay").classList.add("hidden"); startRun({ type: "start", mode: "revise", slug: state.reviseSlug, feedback: f, auto_approve: false }); }
 async function showResult(e) {
-  setStage(5); state.resultSlug = e.slug; $("#side-run").classList.add("hidden");
+  setStage(5); state.resultSlug = e.slug; state.resultMode = e.mode || "report";
+  state.resultReviseSlug = e.revise_slug || e.slug;
+  $("#side-run").classList.add("hidden");
   $("#result-badge").textContent = "✓ Complete"; $("#result-title").textContent = e.title;
-  $("#result-cost").textContent = `Total cost $${(e.total || 0).toFixed(2)} · archived to runs/`;
+  $("#result-cost").textContent = `Total cost $${(e.total || 0).toFixed(2)} · archived to ${e.archive || "runs/"}`;
   if (e.mode === "scope") {
+    $("#result-new").textContent = "New report";
+    $("#result-revise").classList.add("hidden");
+    $("#result-deck").classList.add("hidden");
+    $("#result-quality").classList.add("hidden");
     // Engagement result: the deliverable manifest + the zip.
     let md = `# Deliverables\n\n`;
     (e.deliverables || []).forEach((d) => { md += `- **${d.id}** — ${d.title} (\`${d.file}\`)\n`; });
@@ -443,9 +755,57 @@ async function showResult(e) {
     if (e.zip) { const a = document.createElement("a"); a.className = "dl-btn"; a.href = e.zip; a.textContent = "⤓ All deliverables (.zip)"; dl.appendChild(a); }
     await loadHome(); nav("result"); return;
   }
-  try { const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json()); $("#result-body").innerHTML = renderMarkdown(data.markdown || ""); buildTOC(); renderDownloads(data.downloads); }
+  if (e.mode === "strengthen") {
+    $("#result-revise").classList.add("hidden");
+    $("#result-deck").classList.add("hidden");
+    $("#result-quality").classList.add("hidden");
+    $("#result-new").textContent = "Strengthen another argument";
+    try {
+      const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json());
+      $("#result-body").innerHTML = renderMarkdown(data.markdown || "");
+      buildTOC(); renderDownloads(data.downloads);
+    } catch (_) { $("#result-body").textContent = "Strengthened argument saved to the library."; }
+    state.argumentUploads = []; renderArgumentFiles();
+    await loadHome(); nav("result"); return;
+  }
+  $("#result-new").textContent = "New report";
+  $("#result-revise").classList.remove("hidden");
+  $("#result-deck").classList.toggle("hidden", e.mode === "revision");
+  $("#result-quality").classList.remove("hidden");
+  try { const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json()); state.resultReviseSlug = data.revise_slug || state.resultReviseSlug; $("#result-body").innerHTML = renderMarkdown(data.markdown || ""); buildTOC(); renderDownloads(data.downloads); }
   catch (_) { $("#result-body").textContent = "Report saved to runs/."; }
   await loadHome(); nav("result");
+}
+async function saveFinalQuality() {
+  if (!state.resultSlug) return;
+  const ratings = {};
+  $$("[data-final-rating]").forEach((s) => {
+    if (s.value) ratings[s.dataset.finalRating] = Number(s.value);
+  });
+  const status = $("#result-quality-status");
+  if (!Object.keys(ratings).length) {
+    status.textContent = "Choose at least one score.";
+    return;
+  }
+  status.textContent = "Saving…";
+  try {
+    const res = await fetch(`/api/review/${encodeURIComponent(state.resultSlug)}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-council-session": state.sessionToken,
+        "x-council-client": state.clientId,
+      },
+      body: JSON.stringify({
+        ratings,
+        notes: $("#result-quality-notes").value.trim(),
+      }),
+    });
+    if (!res.ok) throw new Error("save failed");
+    status.textContent = "Saved.";
+  } catch (_) {
+    status.textContent = "Could not save.";
+  }
 }
 function renderDownloads(downloads) { const dl = $("#result-downloads"); dl.innerHTML = ""; (downloads || []).forEach((d) => { const a = document.createElement("a"); a.className = "dl-btn"; a.href = d.url; a.textContent = "⤓ " + d.label; dl.appendChild(a); }); }
 function buildTOC() {
@@ -461,9 +821,19 @@ function linesOf(t) { return t.split("\n").map((s) => s.replace(/^[-*•]\s*/, "
 function shortPath(p) { const x = String(p).split("/"); return x.length > 2 ? ".../" + x.slice(-2).join("/") : p; }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function renderMarkdown(md) {
-  if (!md) return ""; const lines = md.replace(/<!--[\s\S]*?-->/g, "").split("\n");
+  if (!md) return "";
+  // Readers never see internal provenance tags from older runs.
+  md = md.replace(/\s?\[[^\]]*\b(?:brief|Stage\s*1)\b[^\]]*\]/gi, "");
+  // Footnote definitions become a Notes section; markers become superscripts.
+  const notes = [];
+  md = md.split("\n").filter((ln) => {
+    const m = ln.trim().match(/^\[\^(\d+)\]:\s*(.*)$/);
+    if (m) { notes.push([m[1], m[2]]); return false; }
+    return true;
+  }).join("\n");
+  const lines = md.replace(/<!--[\s\S]*?-->/g, "").split("\n");
   let html = "", inList = false, inQuote = false, i = 0;
-  const inline = (t) => escapeHtml(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>").replace(/`([^`]+)`/g, "<code>$1</code>");
+  const inline = (t) => escapeHtml(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>").replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\[\^(\d+)\]/g, '<sup class="fn">$1</sup>');
   const cl = () => { if (inList) { html += "</ul>"; inList = false; } }; const cq = () => { if (inQuote) { html += "</blockquote>"; inQuote = false; } };
   const cells = (row) => row.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
   while (i < lines.length) {
@@ -485,6 +855,12 @@ function renderMarkdown(md) {
     else if (line.trim() === "") { cl(); cq(); } else { cl(); cq(); html += `<p>${inline(line)}</p>`; }
     i++;
   }
-  cl(); cq(); return html;
+  cl(); cq();
+  if (notes.length) {
+    html += `<div class="notes"><div class="notes-h">Notes</div>`;
+    notes.forEach(([n, t]) => { html += `<div class="note"><sup>${n}</sup> ${inline(t)}</div>`; });
+    html += `</div>`;
+  }
+  return html;
 }
 init();

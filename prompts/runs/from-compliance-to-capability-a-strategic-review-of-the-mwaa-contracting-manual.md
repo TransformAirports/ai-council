@@ -34,7 +34,7 @@ report
 
 Operator-supplied files attached to this run. Read them before conducting your own research; treat them as the primary starting point and quote them directly. Where the source material conflicts with your default evidence base, name the conflict in your brief.
 
-- `outputs/sources/from-compliance-to-capability-a-strategic-review-of-the-mwaa-contracting-manual/Contracting_Manual-v6_0-05-20-2026-2.pdf.extracted.md`
+- `sources/runs/from-compliance-to-capability-a-strategic-review-of-the-mwaa-contracting-manual/Contracting_Manual-v6_0-05-20-2026-2.pdf.extracted.md`
 
 ## What this is NOT
 

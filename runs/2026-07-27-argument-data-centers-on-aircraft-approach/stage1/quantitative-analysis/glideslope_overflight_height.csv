@@ -1,0 +1,8 @@
+distance_from_threshold_ft,aircraft_height_agl_ft_3deg_tch50,control_critical_below_500ft
+1000,102,yes
+2000,155,yes
+3000,207,yes
+4000,260,yes
+5000,312,yes
+7000,417,yes
+10000,574,no

@@ -22,6 +22,6 @@ reports/
 council.toml
 logs/
 
-# Operator-supplied source material drop zone — populated and emptied by the
-# CLI's New-run flow; never committed.
+# Operator-supplied source material — the drop zone is emptied into the
+# durable local sources/runs/<slug>/ library; source bytes are never committed.
 sources/

@@ -1,106 +1,201 @@
 # Orchestration — Transform Airports AI Council
 
-<!--
-This file is the canonical four-stage sequence. It's read by Claude Code, not
-pasted by the user. The user triggers a run by saying "run <filename>" — see
-CLAUDE.md for how that's wired.
+This is the canonical operating contract for a report run. The user triggers it
+with `run <filename>`. The executable implementation is
+`cli/orchestrator.py`; this document explains how Codex or Claude should launch,
+monitor, and hand off that implementation. Do not reconstruct the pipeline by
+manually invoking a fixed roster of agents.
 
-If you need to edit the stage sequence itself, open a PR against this file so
-the change is versioned.
--->
+## Resolve and validate the run
 
-You are running the Council on the thesis described in a run-prompt file in `prompts/runs/`. The user has pointed you at that file. Your job is to execute the four-stage sequence below end-to-end, with two human checkpoints, and archive the result.
+1. Resolve the name inside `prompts/runs/`, accepting the directory prefix and
+   `.md` as optional.
+2. Run the deterministic prompt preflight. It must reject unresolved
+   `{{...}}` tokens, missing required sections, an invalid output or deck mode,
+   a missing supplied source, and an empty research roster.
+3. Read the prompt and confirm the thesis, decision frame, selected research
+   lenses, requested deliverables, and configured budget with the user. Make
+   clear that this is a paid, multi-model run. Do not quote a fixed time or cost
+   for every roster.
+4. After confirmation, launch the exact file:
 
-## Preconditions
+   ```bash
+   ./council --run prompts/runs/<slug>.md
+   ```
 
-Before Stage 1:
+   Keep the process attached and monitor it. Use `--no-review` only when the
+   user explicitly authorizes an autonomous run. Use `--budget USD` when the
+   user specifies a ceiling.
 
-1. Read the run prompt file the user named. Confirm it has no `{{...}}` placeholders, all required sections are filled, and the thesis is a sharp claim (not a topic). If anything is missing, stop and tell the user what's unfilled.
-2. Derive the slug from the filename (basename without `.md`).
-3. Confirm with the user in one sentence: the thesis as you understand it, estimated wall-clock (2-4 hours), estimated cost ($40-60). Proceed on their confirmation.
-4. If `outputs/` contains artifacts from a previous incomplete run, move them aside or clear them — each run starts clean.
+The command is responsible for authentication checks, model routing, typed
+artifact validation, budget enforcement, checkpoint state, resume behavior,
+publishing, archiving, and cleanup. If it stops, preserve `outputs/` and resume
+with `./council --resume <slug>`. Reuse a completed artifact only when its
+validated bytes, declared upstream dependency receipt, run identity, and
+fingerprinted Council code/prompt/design contract still match; otherwise
+quarantine and regenerate it.
 
-## Stage 1 — Research (parallel)
+## Public stage 1 — context, parallel research, and curation
 
-Invoke these eight research agents concurrently. Each agent's full system prompt is in `.claude/agents/<name>.md` — invoke via the Agent tool with `subagent_type: general-purpose` and pass the agent's full prompt in the task prompt, plus: (a) the path to the run file for framing, and (b) an instruction not to read other Stage 1 agents' output (independent evidence is a design feature).
+1. Create `outputs/run-manifest.json`. It records the decision frame, selected
+   research and process agents, actual models, prompt hashes, contracts,
+   artifacts, dependency receipts, Council execution-contract fingerprints,
+   and stage state.
+2. Invoke the Airport Context Builder. It writes:
+   - `outputs/context/airport-context.md`
+   - `outputs/context/context-sources.jsonl`
+3. Invoke every selected research agent as an independent **parallel research
+   swarm**. The roster comes from the manifest; never assume a fixed number or
+   filename list. A researcher may read the run prompt, shared context, and
+   supplied sources, but not another researcher’s output.
+4. Each researcher writes:
+   - `outputs/stage1/<agent>-brief.md`
+   - `outputs/stage1/<agent>-evidence.jsonl`
+5. Build and normalize `outputs/evidence-ledger.jsonl`. Evidence IDs must be
+   unique across the run and trace to source and researcher provenance.
+6. Invoke the Evidence Curator. It deduplicates evidence, preserves genuine
+   conflict, ranks load-bearing records, closes only focused gaps, and writes
+   `outputs/stage1/evidence-map.md`.
 
-- `infrastructure-economist` → `outputs/stage1/infrastructure-economist-brief.md`
-- `operations-analyst` → `outputs/stage1/operations-analyst-brief.md`
-- `technology-scout` → `outputs/stage1/technology-scout-brief.md`
-- `contrarian` → `outputs/stage1/contrarian-brief.md`
-- `chief-engineer` → `outputs/stage1/chief-engineer-brief.md`
-- `airline-commercial-strategist` → `outputs/stage1/airline-commercial-strategist-brief.md`
-- `regulatory-political-analyst` → `outputs/stage1/regulatory-political-analyst-brief.md`
-- `aviation-historian` → `outputs/stage1/aviation-historian-brief.md`
+The stage fails when a required brief or typed artifact is missing or invalid.
+Missing optional structured evidence is visible as a telemetry gap; it is not
+silently treated as success.
 
-Use Sonnet for Stage 1 research agents (research-heavy, cost-efficient).
+## Public stage 2 — creative framing and adversarial synthesis
 
-Wait for all eight briefs. Confirm each file exists and has material content before proceeding.
+Run the declared sequence from the manifest:
 
-## Stage 2 — Synthesis & Debate
+1. Creative Director → `outputs/stage2/narrative-options.md`
+2. Strategist v1 → `outputs/stage2/strategist-draft-v1.md`
+3. Evidence Prosecutor → `outputs/stage2/red-team-critique-v1.md`
+4. Strategist v2 → `outputs/stage2/strategist-draft-v2.md`
+5. Airport Executive Reviewer →
+   `outputs/stage2/red-team-critique-v2.md`
+6. Strategist v3 → `outputs/stage2/strategist-draft-v3.md`
 
-Sequential:
+The first reviewer prosecutes source use, arithmetic, causality, stale data,
+missing counterevidence, and unsupported narrative. The second reviewer tests
+airport executability: authority, board and airline response, finance,
+procurement, regulation, staffing, delivery, peak-hour operations, measures,
+and stop conditions. These are different jobs and neither substitutes for the
+other.
 
-1. Invoke `strategist` → `outputs/stage2/strategist-draft-v1.md`
-2. Invoke `red-team` → `outputs/stage2/red-team-critique-v1.md`
-3. Invoke `strategist` → `strategist-draft-v2.md` (revised per critique; agent must address every v1 critique item)
-4. Invoke `red-team` → `red-team-critique-v2.md`
-5. Invoke `strategist` → `strategist-draft-v3.md`
+### Human checkpoint 1
 
-Use Opus for Strategist and Red Team (reasoning quality matters most here).
+Present v3 and both specialized critiques. Summarize what changed, which
+findings were answered or defended, and what weaknesses remain. Ask the user to
+score any of originality, airport specificity, decision usefulness, and
+writing on the 1–5 rubric. Persist the scores as structured evaluation data.
 
-**★ Stop. Human checkpoint #1.**
+Do not continue without approval unless the run was explicitly launched with
+`--no-review`. A requested redo resumes from the smallest affected synthesis
+step.
 
-Present v3 and both critiques to the user. Summarize: what changed across the three drafts, which Red Team issues the Strategist pushed back on and why, any weaknesses the Strategist explicitly disclosed in the v3 handoff. Do not proceed to Stage 3 without the user's explicit approval. If they ask for targeted revisions, loop back to the appropriate step.
+## Public stage 3 — edit, verify, and release gate
 
-## Stage 3 — Polish
+1. Editor → `outputs/stage3/edited-draft.md`
+2. Humanizer → `outputs/stage3/humanized-draft.md`
+3. Source Verifier writes:
+   - `outputs/stage3/fact-check-report.md`
+   - `outputs/stage3/final-draft.md`
+   - `outputs/claim-lineage.jsonl`
+4. Deterministic publication gate → `outputs/quality-gate.json`
 
-After user approval:
+The Source Verifier checks the reader-facing claim against the underlying
+source, not merely an internal brief. Canonical lineage statuses are
+`verified`, `qualified`, `corrected`, `removed`, and `unverified`. An
+`unverified` claim may remain in the verification record only when it was
+excluded from the final draft. The reader-facing draft cannot contain an
+`[UNVERIFIED]` release tag.
 
-1. Invoke `editor` → `outputs/stage3/edited-draft.md` and `editor-notes.md` (cut 15-25% of word count; kill buzzwords; flag hedges for the Fact-checker).
-2. Invoke `fact-checker` → `outputs/stage3/fact-check-report.md` and `final-draft.md` (verify every number against Stage 1 briefs; tag unverifiable claims with `[UNVERIFIED — HUMAN REVIEW]`; has veto power over unsourced claims).
+Every retained lineage record must also contain the exact claim text, the
+`footnote_id` placed immediately after that claim, a `citation` exactly equal
+to the reader-facing footnote definition, evidence IDs that identify that
+same source, `retained: true`, and `primary_source_checked: true`. Excluded
+records use `retained: false`. The orchestrator binds the record to the exact
+final-draft hash only after those relationships match.
 
-Use Opus for both (the Editor makes judgment calls; the Fact-checker needs to reason carefully about whether a number matches).
+The publication gate blocks unresolved placeholders, leaked internal paths or
+brief labels, broken footnotes, invalid lineage, and unsupported numeric
+claims. A failed gate is a remediation event, not a publishable result.
 
-**★ Stop. Human checkpoint #2.**
+### Human checkpoint 2
 
-Present the final draft and fact-check report. Do not proceed to Stage 4 without the user's explicit approval.
+Present the final draft, fact-check report, claim-lineage coverage, and release
+gate result. Persist optional writing, airport-specificity, and
+decision-usefulness scores. Do not begin production without approval unless
+the user explicitly disabled checkpoints.
 
-## Stage 4 — Word documents
+## Public stage 4 — art direction, Office production, and visual QA
 
-After user approval, use the `docx` skill to produce two files in `outputs/stage4/`:
+1. Invoke the Art Director for every full report or article and for every
+   requested presentation. It writes
+   `outputs/stage4/visual-brief.json` using the brand visual contract.
+2. Build the Word executive packet from the verified draft, methodology,
+   evidence, and visual brief.
+3. If requested, build `outputs/stage4/<slug>.pptx` in `board_decision`,
+   `executive_briefing`, or `technical_read_ahead` mode.
+4. Reopen every Office package and validate its structure. Render pages and
+   slides, then inspect overflow, clipping, density, source readability,
+   hierarchy, accessibility, and internal-content leakage. Inspect every slide
+   individually at full size and inspect a montage for narrative rhythm.
+   PowerPoint production is incomplete until a passing inspection receipt is
+   bound to the exact deck, visual brief, canonical signature slide, slide
+   renders, and montage hashes. Word production is incomplete until an
+   independent inspector has reviewed every full-size page and the sequence
+   montage and passed a receipt bound to the exact DOCX, PDF, and page hashes.
+5. Record structural and rendered QA artifacts in the run manifest. A required
+   document, presentation, inspection receipt, or QA report left pending or
+   invalid means production is not complete. Missing render tooling is
+   release-blocking.
 
-1. **Full report:** `<slug>.docx` — cover page (title and subtitle derived from the thesis, "Transform Airports AI Council", today's date, DRAFT notice), table of contents, full body of `final-draft.md`, and the methodology appendix from `docs/methodology.md` with bracketed fields left blank for the human reviewer to fill in.
-2. **Executive summary:** `<slug>-executive-summary.docx` — a ~1,100-word, three-page standalone distillation. Calibri typography, elegant layout, centered title block, letter-spaced section headers. Preserve every `[UNVERIFIED — HUMAN REVIEW]` tag. Every claim must trace to the full final draft.
+Reader-facing citations name regulations, datasets, reports, official
+documents, and other underlying sources. They never name agents, stages, or
+research briefs. Visuals that contain data cite evidence IDs internally and
+reader-facing sources in the finished artifact.
 
-Preserve inline source citations (e.g., `[Economist brief, Finding 3]`) in the full report. Strip them from the executive summary unless the user asks to keep them.
+## Completion, publishing, and archive
 
-Validate both .docx files before returning.
+A run is complete only after every required manifest artifact and release gate
+passes.
 
-## After Stage 4 — archive
+1. Copy the exact Stage 4 Office packages into `outputs/release/`, render and
+   inspect them independently, and bind each package and QA sidecar to SHA-256
+   in `release-manifest.json`.
+2. Revalidate every required run-manifest artifact against its current bytes.
+3. Reserve the dated archive destination before changing distribution files.
+4. Promote the release as an immutable, hash-named bundle under
+   `reports/releases/`; replace the compact current-release manifest last and
+   keep top-level filenames only as convenience copies. Never rebuild an
+   approved Office package from Markdown during publishing.
+5. Atomically archive the complete active-run state to
+   `runs/YYYY-MM-DD-<slug>/`, including the exact run prompt, context, supplied
+   sources, manifests, evidence, lineage, human reviews, drafts, critiques,
+   verification, release bundle, Office files, QA, cost, and retrospective.
+6. Clear the temporary `outputs/` state only after the archive has been
+   promoted into place, then report the archive path, published files, actual
+   Claude cost, separately billed provider use, and any material limitation.
 
-Without being asked:
+If publishing fails, surface the failure and leave the run resumable. Do not
+emit a successful `run_complete` event or mark the run complete merely because
+research and writing finished.
 
-1. Create `runs/YYYY-MM-DD-<slug>/` using today's date.
-2. Copy all four stage subdirectories from `outputs/` into that folder.
-3. Write a short `retrospective.md` in the archive folder: what worked, what didn't, which agent file behaviors to watch for in the next run, approximate cost and runtime.
-4. Clear `outputs/` — remove the four stage subdirectories so the next run starts clean. Preserve `outputs/.gitkeep`.
-5. Tell the user: archive path, both .docx filenames, one sentence on total cost and runtime.
+## Rules throughout the run
 
-## Rules that apply through the whole run
-
-- Every numerical claim cites a source, either a Stage 1 brief or a clearly labeled analyst construction.
-- Every unverified or analyst-derived claim in the final draft carries a `[UNVERIFIED — HUMAN REVIEW]` tag.
-- No banned words (see `CLAUDE.md`).
-- No hedging qualifiers when a specific number exists.
-- Short paragraphs. Active voice. Specific examples over abstractions.
-- Agents never edit each other's files. Agents never edit themselves. Behavior changes go through human PRs against `.claude/agents/`.
-
-## Model guidance summary
-
-| Stage | Agents | Model |
-|---|---|---|
-| 1 | 8 research agents | Sonnet |
-| 2 | Strategist, Red Team | Opus |
-| 3 | Editor, Fact-checker | Opus |
-| 4 | docx skill driver | whatever is needed |
+- Use the manifest roster and paths; never hard-code a researcher count.
+- Respect role-based model assignments in `council.toml`.
+- Keep research independent until curation.
+- Treat briefs as analysis and the evidence ledger as provenance; cite the
+  underlying source to the reader.
+- Preserve counterevidence and distinguish observation, inference,
+  calculation, and professional judgment.
+- Do not invent airport authority, agreement terms, funding, cost, traffic,
+  approval, security, or operating facts.
+- Material recommendations identify an owner, decision, approval route, first
+  action, horizon, measure, failure mode, stop condition, and evidence that
+  would change the recommendation.
+- Short paragraphs. Active voice. Specific examples. No banned consultant
+  language from `AGENTS.md` or `CLAUDE.md`.
+- Agents never edit their own or another agent’s definition. Behavior changes
+  are reviewed changes to `.claude/agents/`, followed by generated Codex mirror
+  synchronization.

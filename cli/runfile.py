@@ -5,6 +5,7 @@ Claude Code "run <filename>" flow can read it identically to a hand-written file
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from cli.agents import RESEARCH_AGENT_NAMES, SUPPLEMENTAL_AGENT_NAMES
@@ -15,6 +16,22 @@ ALL_SEATABLE_NAMES: tuple[str, ...] = RESEARCH_AGENT_NAMES + SUPPLEMENTAL_AGENT_
 from cli.interactive import RunSpec
 
 RUNS_DIR = Path(__file__).resolve().parent.parent / "prompts" / "runs"
+REQUIRED_SECTIONS: tuple[str, ...] = (
+    "Thesis",
+    "Audience",
+    "Tone",
+    "Length",
+    "What this is NOT",
+    "What this IS",
+    "Success criteria",
+    "Research agent overrides",
+)
+VALID_DECK_MODES: frozenset[str] = frozenset(
+    {"board_decision", "executive_briefing", "technical_read_ahead"}
+)
+AGENT_OVERRIDE_RE = re.compile(
+    r"^\s*-\s+\*\*([^*]+?):\*\*\s*(.*?)\s*$"
+)
 
 
 def render_run_file(spec: RunSpec) -> str:
@@ -81,6 +98,32 @@ def render_run_file(spec: RunSpec) -> str:
         lines.append(spec.operator_context)
         lines.append("")
 
+    decision_fields = [
+        ("Decision required", spec.decision_required),
+        ("Decision owner", spec.decision_owner),
+        ("Time horizon", spec.time_horizon),
+        ("Approval path", spec.approval_path),
+        ("Success measure", spec.success_measure),
+    ]
+    if any(value.strip() for _, value in decision_fields):
+        lines.append("## Decision frame")
+        lines.append("")
+        lines.append(
+            "The finished work must help an airport executive make or prepare "
+            "this decision. Blank fields are research questions, not license "
+            "to invent operator-specific facts."
+        )
+        lines.append("")
+        for label, value in decision_fields:
+            lines.append(f"- **{label}:** {value.strip() or '(research and state explicitly)'}")
+        lines.append("")
+
+    if spec.want_pptx:
+        lines.append("## Presentation mode")
+        lines.append("")
+        lines.append(spec.deck_mode)
+        lines.append("")
+
     lines.append("## Success criteria")
     lines.append("")
     for item in spec.success_criteria:
@@ -135,15 +178,148 @@ def write_run_file(spec: RunSpec, runs_dir: Path = RUNS_DIR) -> Path:
     return path
 
 
+def resolve_run_file(
+    identifier: str | Path,
+    *,
+    runs_dir: Path = RUNS_DIR,
+) -> Path:
+    """Resolve ``run foo`` and explicit run-prompt paths to one safe file.
+
+    Run prompts are executable configuration, so the direct-run entry point
+    deliberately accepts files only from ``prompts/runs/``.
+    """
+
+    raw = Path(identifier)
+    if raw.suffix == "":
+        raw = raw.with_suffix(".md")
+    if raw.is_absolute():
+        candidate = raw.resolve()
+    elif len(raw.parts) == 1:
+        candidate = (runs_dir / raw).resolve()
+    else:
+        candidate = (RUNS_DIR.parent.parent / raw).resolve()
+    root = runs_dir.resolve()
+    if not candidate.is_relative_to(root):
+        raise ValueError(f"Run file must be inside {root}")
+    if not candidate.is_file():
+        raise FileNotFoundError(f"Run file not found: {candidate}")
+    return candidate
+
+
+def validate_run_file(path: Path) -> list[str]:
+    """Return actionable preflight errors without invoking any model."""
+
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        return [f"could not read the run file as UTF-8: {exc}"]
+
+    errors: list[str] = []
+    placeholders = sorted(set(re.findall(r"\{\{.*?\}\}", text, flags=re.DOTALL)))
+    if placeholders:
+        preview = ", ".join(
+            " ".join(placeholder.split())[:120] for placeholder in placeholders[:3]
+        )
+        suffix = f" (+{len(placeholders) - 3} more)" if len(placeholders) > 3 else ""
+        errors.append(f"unresolved template placeholders: {preview}{suffix}")
+
+    for header in REQUIRED_SECTIONS:
+        body = _section_body(text, header)
+        if not _meaningful_markdown(body):
+            errors.append(f"missing or empty `## {header}` section")
+
+    title = next(
+        (
+            line[len("# Run:") :].strip()
+            for line in text.splitlines()
+            if line.startswith("# Run:")
+        ),
+        "",
+    )
+    if not title:
+        errors.append("missing `# Run: <title>` heading")
+
+    output_format = _section_body(text, "Output format").strip().lower()
+    if output_format and output_format not in {
+        "report",
+        "article",
+        "brief",
+        "recommendations",
+    }:
+        errors.append(
+            "`## Output format` must be report, article, brief, or recommendations"
+        )
+
+    presentation_mode = _section_body(text, "Presentation mode").strip()
+    if presentation_mode and presentation_mode not in VALID_DECK_MODES:
+        errors.append(
+            "`## Presentation mode` must be board_decision, "
+            "executive_briefing, or technical_read_ahead"
+        )
+
+    overrides_body = _section_body(text, "Research agent overrides")
+    entries, malformed = _agent_override_entries(overrides_body)
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    unknown: set[str] = set()
+    for name, _ in entries:
+        if name in seen:
+            duplicates.add(name)
+        seen.add(name)
+        if name not in ALL_SEATABLE_NAMES:
+            unknown.add(name)
+    if duplicates:
+        errors.append(
+            "duplicate research agent entries: " + ", ".join(sorted(duplicates))
+        )
+    if unknown:
+        errors.append(
+            "unknown research agent names: " + ", ".join(sorted(unknown))
+        )
+    if malformed:
+        errors.append(
+            "malformed research agent entries (expected "
+            "`- **agent-name:** (default)`): "
+            + "; ".join(malformed[:3])
+        )
+
+    try:
+        spec = parse_run_file(path.stem, runs_dir=path.parent)
+    except Exception as exc:  # noqa: BLE001 - convert parser failures to preflight
+        errors.append(f"could not parse run configuration: {exc}")
+        return errors
+    if not spec.selected_research_agents:
+        errors.append(
+            "no research agents are seated under `## Research agent overrides`"
+        )
+    missing_sources = [
+        source
+        for source in spec.source_paths
+        if not (
+            Path(source).is_file()
+            or (RUNS_DIR.parent.parent / source).is_file()
+        )
+    ]
+    if missing_sources:
+        errors.append(
+            "source material not found: " + ", ".join(missing_sources[:5])
+        )
+    return errors
+
+
 def _section_body(text: str, header: str) -> str:
     """Extract the body under a `## header` until the next `## ` heading."""
     lines = text.splitlines()
-    target = f"## {header}"
     out: list[str] = []
     capturing = False
     for line in lines:
-        if line.strip().startswith("## "):
-            if line.strip() == target:
+        stripped = line.strip()
+        if stripped.startswith("## "):
+            # The hand-written template adds hints such as "(optional)" and
+            # "(recommended)" to headings. Generated files omit them. Treat
+            # both forms as the same machine-readable section.
+            heading = re.sub(r"\s+\([^)]*\)\s*$", "", stripped[3:]).strip()
+            if heading == header:
                 capturing = True
                 continue
             if capturing:
@@ -151,6 +327,40 @@ def _section_body(text: str, header: str) -> str:
         if capturing:
             out.append(line)
     return "\n".join(out).strip()
+
+
+def _meaningful_markdown(body: str) -> str:
+    """Return content after removing comments and empty Markdown scaffolding."""
+
+    without_comments = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
+    meaningful: list[str] = []
+    for raw in without_comments.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        # A bare list marker or formatting delimiter is not configuration.
+        if re.fullmatch(r"(?:[-*+]\s*|#+\s*|[_*`~]+)", line):
+            continue
+        meaningful.append(line)
+    return "\n".join(meaningful).strip()
+
+
+def _agent_override_entries(body: str) -> tuple[list[tuple[str, str]], list[str]]:
+    """Parse structured roster bullets and retain malformed roster-like lines."""
+
+    entries: list[tuple[str, str]] = []
+    malformed: list[str] = []
+    without_comments = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
+    for raw in without_comments.splitlines():
+        line = raw.strip()
+        if not line or not line.startswith("-"):
+            continue
+        match = AGENT_OVERRIDE_RE.match(line)
+        if match:
+            entries.append((match.group(1).strip(), match.group(2).strip()))
+        elif "**" in line:
+            malformed.append(line[:160])
+    return entries, malformed
 
 
 def _bullets(body: str) -> list[str]:
@@ -161,16 +371,34 @@ def _bullets(body: str) -> list[str]:
     ]
 
 
+def _named_bold_item(body: str, label: str) -> str:
+    """Read `- **Label:** value` from a structured markdown section."""
+    prefix = f"- **{label}:**"
+    for raw in body.splitlines():
+        line = raw.strip()
+        if line.startswith(prefix):
+            value = line[len(prefix):].strip()
+            return "" if value == "(research and state explicitly)" else value
+    return ""
+
+
 def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
     """Reconstruct a RunSpec from an existing prompts/runs/<slug>.md file.
 
     Used by `council --resume <slug>` so the orchestrator can pick up a partial
     run without re-prompting the operator for inputs already captured on disk.
     """
-    path = runs_dir / f"{slug}.md"
+    root = runs_dir.resolve()
+    raw = Path(slug)
+    if raw.suffix == "":
+        raw = raw.with_suffix(".md")
+    path = raw.resolve() if raw.is_absolute() else (root / raw).resolve()
+    if not path.is_relative_to(root):
+        raise ValueError(f"Run file must be inside {root}")
     if not path.is_file():
         raise FileNotFoundError(f"Run file not found: {path}")
     text = path.read_text(encoding="utf-8")
+    resolved_slug = path.stem
 
     title = ""
     for line in text.splitlines():
@@ -178,23 +406,24 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
             title = line[len("# Run:") :].strip()
             break
     if not title:
-        title = slug.replace("-", " ").title()
+        title = resolved_slug.replace("-", " ").title()
 
     overrides_body = _section_body(text, "Research agent overrides")
     selected: list[str] = []
     overrides: dict[str, str] = {}
-    for line in overrides_body.splitlines():
-        if not line.strip().startswith("- **"):
-            continue
-        try:
-            name = line.split("**", 2)[1].rstrip(":")
-            after_name = line.split(":**", 1)[1].strip() if ":**" in line else ""
-        except IndexError:
-            continue
-        if name in ALL_SEATABLE_NAMES:
-            selected.append(name)
-            if after_name and after_name != "(default)":
-                overrides[name] = after_name
+    entries, malformed = _agent_override_entries(overrides_body)
+    if malformed:
+        raise ValueError(
+            "Malformed research agent entries: " + "; ".join(malformed[:3])
+        )
+    for name, after_name in entries:
+        if name not in ALL_SEATABLE_NAMES:
+            raise ValueError(f"Unknown research agent name: {name}")
+        if name in selected:
+            raise ValueError(f"Duplicate research agent entry: {name}")
+        selected.append(name)
+        if after_name and after_name != "(default)":
+            overrides[name] = after_name
 
     length = _section_body(text, "Length")
     output_format = _section_body(text, "Output format").strip().lower()
@@ -218,7 +447,7 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
 
     return RunSpec(
         title=title,
-        slug=slug,
+        slug=resolved_slug,
         thesis=_section_body(text, "Thesis"),
         audience=_section_body(text, "Audience"),
         tone=_section_body(text, "Tone"),
@@ -227,8 +456,28 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
         is_not=_bullets(_section_body(text, "What this is NOT")),
         is_yes=_bullets(_section_body(text, "What this IS")),
         operator_context=_section_body(text, "Operator-specific framing"),
+        decision_required=_named_bold_item(
+            _section_body(text, "Decision frame"), "Decision required"
+        ),
+        decision_owner=_named_bold_item(
+            _section_body(text, "Decision frame"), "Decision owner"
+        ),
+        time_horizon=_named_bold_item(
+            _section_body(text, "Decision frame"), "Time horizon"
+        ),
+        approval_path=_named_bold_item(
+            _section_body(text, "Decision frame"), "Approval path"
+        ),
+        success_measure=_named_bold_item(
+            _section_body(text, "Decision frame"), "Success measure"
+        ),
         success_criteria=_bullets(_section_body(text, "Success criteria")),
         selected_research_agents=selected,
         agent_overrides=overrides,
         source_paths=source_paths,
+        want_pptx=bool(_section_body(text, "Presentation mode")),
+        deck_mode=(
+            _section_body(text, "Presentation mode").strip()
+            or "board_decision"
+        ),
     )

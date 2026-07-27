@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-07-27T19:19:50+00:00",
+  "final_draft": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+  "passed": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "artifact_validation": {
+    "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+    "valid": true,
+    "kind": "markdown",
+    "errors": [],
+    "warnings": [],
+    "size_bytes": 10848,
+    "word_count": 1716,
+    "record_count": 0,
+    "sha256": "3ee693d3beb2f978759ce361191949834721a3291e4ef915f3f643141be93bf2"
+  },
+  "reader_word_count": 1029,
+  "word_count_bounds": {
+    "minimum": 250,
+    "maximum": 1500
+  },
+  "evidence_records": 128,
+  "claim_lineage_records": 17,
+  "issues": []
+}

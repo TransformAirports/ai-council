@@ -47,26 +47,67 @@ async def request_checkpoint(kind: str, payload: dict) -> dict | None:
 
 
 class WebSink:
-    """Per-run event queue + pending-checkpoint registry."""
+    """Per-run sequenced event log plus pending-checkpoint registry."""
 
     def __init__(self) -> None:
-        self.queue: asyncio.Queue[dict] = asyncio.Queue()
         self._pending: dict[str, asyncio.Future] = {}
+        self._condition = asyncio.Condition()
+        self._events: list[dict] = []
+        self._sequence = 0
         self.closed = False
+        self.run_start_event: dict | None = None
+        self.last_stage_event: dict | None = None
+        self.pending_checkpoint: dict | None = None
+        self.agent_events: dict[str, dict] = {}
+        self.quality_events: dict[str, dict] = {}
+        self.artifact_events: dict[str, dict] = {}
 
     async def emit(self, event_type: str, data: dict) -> None:
-        await self.queue.put({"type": event_type, **data})
+        self._sequence += 1
+        event = {"type": event_type, "seq": self._sequence, **data}
+        if event_type == "run_start":
+            self.run_start_event = event
+        elif event_type == "stage_start":
+            self.last_stage_event = event
+        elif event_type in {
+            "agent_start",
+            "agent_done",
+            "agent_error",
+            "agent_skipped",
+        } and event.get("agent"):
+            self.agent_events[str(event["agent"])] = event
+        elif event_type in {
+            "quality_gate", "artifact_validated", "evidence_update",
+            "render_qa",
+        }:
+            self.quality_events[event_type] = event
+            if event_type == "artifact_validated":
+                key = str(
+                    event.get("path")
+                    or event.get("artifact")
+                    or event.get("step")
+                    or event["seq"]
+                )
+                self.artifact_events[key] = event
+        async with self._condition:
+            self._events.append(event)
+            self._condition.notify_all()
 
     async def checkpoint(self, kind: str, payload: dict) -> dict:
         cid = uuid.uuid4().hex
         loop = asyncio.get_event_loop()
         fut: asyncio.Future = loop.create_future()
         self._pending[cid] = fut
-        await self.queue.put({"type": "checkpoint", "id": cid, "kind": kind, **payload})
+        await self.emit(
+            "checkpoint",
+            {"id": cid, "kind": kind, **payload},
+        )
+        self.pending_checkpoint = self._events[-1]
         try:
             return await fut
         finally:
             self._pending.pop(cid, None)
+            self.pending_checkpoint = None
 
     def resolve(self, cid: str, decision: dict) -> bool:
         fut = self._pending.get(cid)
@@ -75,10 +116,32 @@ class WebSink:
             return True
         return False
 
+    def events_after(self, sequence: int = 0) -> list[dict]:
+        """Return each event exactly once after a caller-owned cursor."""
+
+        return [
+            event for event in self._events
+            if int(event.get("seq", 0)) > sequence
+        ]
+
+    async def wait_after(self, sequence: int = 0) -> list[dict]:
+        async with self._condition:
+            await self._condition.wait_for(
+                lambda: bool(self.events_after(sequence)) or self.closed
+            )
+            return self.events_after(sequence)
+
+    def snapshot(self) -> list[dict]:
+        """Backward-compatible full replay; sequence IDs make it deduplicable."""
+
+        return self.events_after(0)
+
     async def close(self) -> None:
-        self.closed = True
-        # Wake any waiting consumer.
-        await self.queue.put({"type": "stream_end"})
+        if not self.closed:
+            await self.emit("stream_end", {})
+            self.closed = True
+            async with self._condition:
+                self._condition.notify_all()
         # Fail any still-pending checkpoints so the pipeline can unwind.
         for fut in list(self._pending.values()):
             if not fut.done():

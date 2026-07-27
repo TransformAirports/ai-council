@@ -1,90 +1,197 @@
-# MWAA AI Council — Setup & Run Instructions
+# Council setup and operating reference
 
-## Context
+This repository is the Transform Airports AI Council: a multi-agent system for
+airport-industry research, adversarial analysis, and executive publishing.
+The web app is the normal operating surface. Codex can also create, launch,
+resume, revise, publish, and audit runs from the repository.
 
-You are helping build and operate a multi-agent AI system (internally called "the Council") that produces rigorous, executive-grade analytical reports on airport industry topics. The Council consists of specialized agents that research independently, debate, critique each other, and produce a final polished Word document.
+## Operating principles
 
-The first run will produce a provocative thought piece with the working thesis: **"Airports are over-investing in infrastructure and under-investing in operational intelligence."** This thesis was proposed by MWAA leadership and should be treated as the sharp angle to pursue, while honestly steelmanning the counter-argument.
+1. **Frame a decision.** A contested thesis plus an owner, horizon, approval
+   path, and success measure produces a usable answer.
+2. **Protect research independence.** Swarm researchers do not read one
+   another’s briefs before evidence curation.
+3. **Preserve disagreement.** The Curator reconciles duplicates, not legitimate
+   conflicts in evidence or professional judgment.
+4. **Separate review jobs.** Evidence integrity and airport executability are
+   different failure modes and receive different adversarial reviewers.
+5. **Verify the underlying source.** An internal brief is provenance, not
+   reader-facing authority.
+6. **Make release mechanical.** Typed artifact validation, lineage checks, copy
+   linting, Office-package inspection, and rendered visual QA complement model
+   judgment.
+7. **Keep humans accountable.** Two checkpoints and final human approval remain
+   part of the method.
 
-## Principles (read before building)
+## Install and launch
 
-1. **Runtime is not quality.** The goal is depth of disagreement between agents, not clock time. A well-orchestrated 90-minute run beats a sloppy 6-hour one. If agents are echoing each other, something is wrong.
+Requirements:
 
-2. **Steelman the counter-argument.** A provocative piece that only stacks evidence for the thesis is a polemic. The best version presents the strongest case against, then dismantles it. That's what makes it credible to sophisticated readers.
+- macOS or Linux
+- Python 3.11 or newer
+- Claude access or an `ANTHROPIC_API_KEY`
+- Optional `OPENAI_API_KEY` for the Deep Research lens
 
-3. **Versioned human editing is the improvement loop.** Agents get better through committed PRs against their markdown files after each run — not through self-modification. Never let an agent edit another agent's file.
+From the repository root:
 
-4. **Every numerical claim must be sourced.** The Fact-checker has veto power. Unsourced numbers get flagged or removed.
-
-5. **No buzzwords, no hedging, no motivational language.** The user (Christian) is an experienced airport operations leader. Output should be tight, plain, and direct. "Absolutely" is banned. So is "leverage synergies" and similar.
-
-6. **Disclose the methodology.** Every final output carries a methodology appendix explaining the multi-agent process.
-
-## Repository Structure
-
-```
-mwaa-ai-council/
-├── .claude/
-│   └── agents/
-│       ├── infrastructure-economist.md
-│       ├── operations-analyst.md
-│       ├── technology-scout.md
-│       ├── contrarian.md
-│       ├── strategist.md
-│       ├── red-team.md
-│       ├── editor.md
-│       └── fact-checker.md
-├── prompts/
-│   └── runs/
-│       └── infrastructure-vs-intelligence.md
-├── outputs/                    # gitignored
-├── runs/                       # manually curated notable runs
-├── docs/
-│   ├── claude-code-setup.md    # this file
-│   ├── how-to-run.md
-│   ├── how-to-propose-an-agent-change.md
-│   └── methodology.md
-├── .gitignore
-└── README.md
+```bash
+./council
 ```
 
-## Orchestration — How to Actually Run It
+The launcher creates `.venv`, installs dependencies, and opens the browser app.
+Copy `.env.example` to `.env` for local credentials. The file is ignored by
+Git, and shell environment variables take precedence.
 
-Once all agent files are committed to the repo, here's the run sequence. You can kick this off from Claude Code with a top-level prompt:
+Useful headless commands:
 
-The orchestration prompt is now maintained as a modular template at [`prompts/orchestration.md`](../prompts/orchestration.md). To kick off a run:
+```bash
+./council --run prompts/runs/<name>.md --budget 80
+./council --terminal
+./council --dry-run
+./council --resume [SLUG]
+./council --revise [SLUG]
+./council --publish [SLUG]
+./council --pptx
+./council --audit
+```
 
-1. Copy [`prompts/runs/_template.md`](../prompts/runs/_template.md) to `prompts/runs/<your-slug>.md` and fill in the sections.
-2. Open `prompts/orchestration.md` and replace the two values at the top: `{{RUN_FILE}}` (path to your new run file) and `{{RUN_SLUG}}` (used for the archive folder name).
-3. Copy the orchestration body (from "I'm ready to execute..." to the end) and paste into a fresh Claude Code session in the repo root.
+`--run` first performs a no-model-call preflight. It rejects unresolved
+placeholders, unsafe paths, duplicate or unknown agent names, missing sources,
+and incomplete required sections. `--dry-run` creates a new run file; it
+cannot be combined with `--run`. A zero budget permits no Claude calls. The
+optional OpenAI Deep Research lens is billed separately from that ceiling.
 
-The orchestration file is the source of truth for the four-stage sequence, the model guidance, and the rules for the whole run. If you need to edit the sequence itself, open a PR against `prompts/orchestration.md` so the change is versioned.
+## Architecture
 
-## Methodology Appendix (to include in the final Word doc)
+```text
+Run prompt + supplied sources
+            │
+            ▼
+Airport context ──► parallel research swarm
+                           │
+                           ▼
+                  structured evidence ledger
+                           │
+                           ▼
+Creative frame ──► Strategist draft
+                           │
+                  Evidence Prosecutor
+                           │
+                    Strategist revision
+                           │
+                Airport Executive Reviewer
+                           │
+                    Strategist revision
+                           │
+                    Human checkpoint 1
+                           │
+              Editor ─► Humanizer ─► Source Verifier
+                           │
+                 lineage + publication gate
+                           │
+                    Human checkpoint 2
+                           │
+          Art direction ─► Word / PowerPoint production
+                           │
+                   structural + render QA
+                           │
+                 archive + publish + audit
+```
 
-Every final output should include an appendix along these lines:
+The executable pipeline lives in `cli/orchestrator.py`. The operator contract
+lives in [`prompts/orchestration.md`](../prompts/orchestration.md). Agent
+behavior is defined in `.claude/agents/`. `.codex/agents/` is generated from
+that source with:
 
-> **Methodology**
->
-> This document was produced by a multi-agent AI system operated by [name/role]. The system consisted of eight specialized agents running on Anthropic's Claude platform: four research agents (Infrastructure Economist, Operations Analyst, Technology Scout, Contrarian) that independently gathered evidence; a Strategist that synthesized their findings into a draft argument; a Red Team agent that critiqued the draft across multiple revision rounds; an Editor that tightened the final prose; and a Fact-checker that verified numerical claims against source briefs.
->
-> Total agent runtime: [X] hours. Human review occurred at two checkpoints. All numerical claims were verified against primary research briefs or flagged for human review. Agent definitions are maintained as versioned markdown files in a private repository and are edited by human reviewers via pull request.
->
-> The final text was reviewed and approved by [name] before release. AI-assisted production does not reduce human accountability for the arguments and claims in this document.
+```bash
+.venv/bin/python scripts/sync_codex_agents.py
+```
 
-## Before You Run
+Do not edit generated Codex mirrors by hand.
 
-Checklist:
-- [ ] All 8 agent files committed to `.claude/agents/`
-- [ ] Run prompt committed to `prompts/runs/`
-- [ ] `outputs/` directory exists and is in `.gitignore`
-- [ ] You have API budget — estimate $30-100 for a full run depending on research depth
-- [ ] You have 3-4 hours of soft monitoring time available (you don't need to watch it, but you should check in at checkpoints)
-- [ ] You've read the thesis carefully and are prepared to push back on the Strategist if the argument goes somewhere you disagree with
+## Contracts and provenance
 
-## After the Run
+Each run creates a versioned manifest containing selected agents, process
+agents, model assignments, prompt hashes, stage state, artifact paths, and
+validation results. Research agents emit both a brief and JSONL evidence
+records. The evidence ledger gives each record a stable ID and carries source
+type, source URL, dates, claim, limitations, and agent provenance.
 
-- [ ] Commit notable intermediate artifacts to `runs/YYYY-MM-DD-<slug>/` for archival
-- [ ] Write 3-5 sentences of post-run notes in `runs/YYYY-MM-DD-<slug>/retrospective.md`: what worked, what didn't, which agent files should be revised
-- [ ] Open PRs against the agent files for any refinements identified in the retrospective
-- [ ] Do a final human pass on the Word doc before sending anywhere — AI output is 85%, your judgment is the last 15%
+The final verification pass writes claim lineage. Audit attribution follows
+those IDs; it never infers contribution by searching prose for an agent’s
+display name.
+
+Interrupted runs resume only from artifacts that pass their contract. Budget
+ceilings are enforced between model calls.
+
+## Model routing
+
+`council.toml` maps roles—not individual hard-coded stages—to models:
+
+- context
+- research
+- curation
+- creative framing
+- synthesis
+- evidence critique
+- executive review
+- editing
+- humanization
+- source verification
+- art direction
+- presentation
+
+This is multi-model orchestration: the system assigns each kind of reasoning to
+the configured model instead of assuming one model is best at every job. The
+manifest records what actually ran.
+
+## Source material
+
+Put PDFs, Word documents, PowerPoints, spreadsheets, or text files in
+`sources/` before launch. The source-ingestion layer converts supported
+material for agent reading and archives the originals with the run. Prompts
+must distinguish:
+
+- facts supplied by the operator,
+- claims found in public sources,
+- reproducible calculations,
+- and analyst judgment.
+
+Never fabricate authority-specific data to fill a gap.
+
+## Repository map
+
+| Path | Purpose |
+|---|---|
+| `.claude/agents/` | Human-maintained agent definitions |
+| `.codex/agents/` | Generated Codex-native mirrors |
+| `assets/brand/` | Brand tokens, visual-contract schema, and production assets |
+| `cli/` | Orchestrator, contracts, evidence, evaluation, publishing, and web app |
+| `prompts/runs/` | One decision frame per Council run |
+| `prompts/research-contract.md` | Required brief and evidence-record contract |
+| `outputs/` | Temporary active-run artifacts |
+| `runs/` | Complete immutable run archives |
+| `reports/` | Distribution-ready Word and PowerPoint files |
+| `tests/` | Deterministic contract and regression tests |
+| `council.toml` | Models, budgets, and defaults |
+
+## Validation before merging a Council change
+
+```bash
+.venv/bin/python -m compileall -q cli scripts tests
+.venv/bin/python -m unittest discover -s tests -v
+node --check cli/webapp/app.js
+git diff --check
+```
+
+If agent definitions changed, sync the Codex mirrors and rerun the tests.
+Publishing changes also require a scratch document or deck build followed by
+rendered visual inspection.
+
+## Governance
+
+Agents never edit themselves or one another. Change behavior through reviewed
+edits to `.claude/agents/`; see
+[`how-to-propose-an-agent-change.md`](how-to-propose-an-agent-change.md).
+Finished documents disclose AI assistance and retain named human
+accountability. The complete method is in [`methodology.md`](methodology.md).

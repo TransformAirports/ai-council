@@ -1,0 +1,60 @@
+{
+  "name": "Transform Airports AI Research Council",
+  "version": "2.0",
+  "purpose": "Airport executive reports, board presentations, and technical evidence appendices",
+  "colors": {
+    "runway_navy": "#0B2D4D",
+    "terminal_blue": "#2E84A5",
+    "guidance_gold": "#D4A24C",
+    "operations_slate": "#415669",
+    "cloud_white": "#FFFFFF",
+    "apron_fog": "#EDF3F6",
+    "signal_green": "#24745C",
+    "alert_red": "#A6413A",
+    "ink": "#17232D"
+  },
+  "typography": {
+    "display": "Georgia",
+    "body": "Aptos",
+    "body_fallback": "Calibri",
+    "powerpoint": {
+      "deck_title_min_pt": 50,
+      "slide_title_min_pt": 35,
+      "subheading_min_pt": 24,
+      "body_min_pt": 16,
+      "source_min_pt": 9
+    },
+    "word": {
+      "cover_title_pt": 30,
+      "heading_1_pt": 19,
+      "heading_2_pt": 14,
+      "body_pt": 10.5,
+      "note_pt": 8.5
+    }
+  },
+  "layout": {
+    "slide_aspect_ratio": "16:9",
+    "slide_margin_inches": 0.55,
+    "word_margin_inches": 0.7,
+    "density": "one decision or claim per slide; no more than 70 visible words unless the slide is explicitly an appendix",
+    "composition": "flat editorial canvas; avoid dashboard card grids"
+  },
+  "visual_language": {
+    "priority": [
+      "airport-specific map or annotated plan",
+      "quantitative chart",
+      "passenger, aircraft, baggage, curb, or decision flow",
+      "implementation timeline",
+      "before-and-after operating model",
+      "document excerpt or primary-source evidence"
+    ],
+    "photography": "Use real, licensed airport imagery only when it contributes evidence or place specificity.",
+    "signature_visual": "Every board deck must contain one memorable evidence-bearing visual that explains the central insight."
+  },
+  "accessibility": {
+    "minimum_contrast_ratio": 4.5,
+    "never_encode_by_color_alone": true,
+    "charts_require_units_denominators_and_source": true,
+    "alt_text_required_for_material_images": true
+  }
+}

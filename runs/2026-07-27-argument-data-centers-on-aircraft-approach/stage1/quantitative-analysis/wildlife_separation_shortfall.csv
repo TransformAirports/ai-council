@@ -1,0 +1,4 @@
+standard,required_separation_ft,assumed_actual_separation_ft,shortfall_ft,percent_inside_standard
+turbine_aircraft_AOA_separation,10000,500,9500,95
+turbine_aircraft_AOA_separation_generous,10000,2000,8000,80
+movement_into_approach_departure_airspace_5SM,26400,500,25900,98

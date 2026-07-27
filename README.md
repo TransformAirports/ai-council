@@ -1,38 +1,88 @@
 # The Transform Airports AI Council
 
-**Ask one sharp question about the airport industry. Get back an executive-grade report that was researched, argued, attacked, rewritten, and fact-checked — by a council of 43 AI agents working together.**
+**Ask one sharp question about the airport industry. Get back an
+executive-grade decision package built by an independent research swarm,
+curated evidence, two different adversarial reviews, primary-source
+verification, and visual production QA.**
 
-The Council exists because a single AI, asked to write a long analytical piece, produces something fluent and subtly useless: it hedges, it flatters the question, and it smooths over every objection. The Council is built to prevent that. Research agents investigate independently and are never allowed to see each other's work. A Red Team exists only to attack the draft. A fact-checker cuts any number it can't trace to a source. You review the result at two checkpoints before anything is final.
+The Council exists because a single AI, asked to write a long analytical
+piece, can produce something fluent and subtly useless: it hedges, flatters the
+question, and smooths over objections. The Council is designed to prevent that.
+Researchers investigate independently. Their findings become a structured
+evidence ledger. One reviewer prosecutes the evidence; another tests whether
+the recommendations survive airport governance and operating reality. A source
+verifier checks the final reader-facing draft. Deterministic gates stop
+publishing defects.
 
-The deliverables are polished Word documents — a full report and an executive summary — plus, on request, a boardroom-ready PowerPoint.
+The deliverables form an executive packet: a polished read-ahead, a concise
+decision brief, a technical evidence appendix, and—on request—a board decision,
+executive briefing, or technical PowerPoint.
 
 ---
 
 ## How a run works
 
-1. **You frame the question.** A short thesis — a claim someone could disagree with, not a topic. The app guides you through it.
-2. **You choose your council.** Pick which research agents sit on the panel for this question, from the roster below. Seven clicks or one preset.
-3. **The council investigates — live.** Each seated agent researches the question from its own angle, in parallel, without seeing the others' work. You watch it happen in real time: agents light up as they work, evidence flows in, the cost ticks.
-4. **The argument gets forged.** A Strategist writes the case from all the research. The Red Team attacks it. The Strategist revises. Twice. You review the result and can send it back with notes.
-5. **The polish and the proof.** An Editor tightens it, the Humanizer rewrites it to magazine quality, and the Fact-checker verifies every number against the research — cutting anything it can't source. You approve, and finished documents land in your library.
+1. **Frame the decision.** State a contested thesis, the airport decision it
+   should inform, the likely owner, horizon, approval route, and definition of
+   success.
+2. **Assemble current airport context.** The Context Builder reads supplied
+   material and authoritative public records before the swarm begins.
+3. **Run the independent research swarm.** Every seated researcher writes a
+   brief and structured evidence records without reading the others.
+4. **Curate and challenge the evidence.** The Evidence Curator deduplicates,
+   ranks, and reconciles the record, then closes only load-bearing gaps.
+5. **Choose a creative frame.** The Creative Director proposes board-ready,
+   counterintuitive, and operational narrative options grounded in the same
+   evidence.
+6. **Write, prosecute, and revise.** The Strategist drafts; the Evidence
+   Prosecutor attacks source use and reasoning; the Strategist revises; the
+   Airport Executive Reviewer attacks feasibility; the Strategist revises
+   again.
+7. **Edit and verify.** The Editor and Humanizer refine the prose. The Source
+   Verifier checks the underlying evidence and primary sources, then creates
+   claim lineage.
+8. **Produce and inspect.** Publishing gates block internal labels,
+   placeholders, citation defects, and release errors. The Art Director and
+   production agents build the executive packet and render it for QA.
 
-A full run takes two to four hours and produces work that would take a consulting team weeks. You can leave it running — it notifies you when it's done or when it needs your review.
+The web app streams agent, artifact, evidence, cost, and quality-gate telemetry.
+A refreshed browser can reconnect to a live run.
+
+In plain English, the architecture uses:
+
+- **Parallel research swarm** — independent specialists investigate the same
+  decision at the same time, without copying one another.
+- **Adversarial synthesis loop** — the argument is written, attacked from two
+  different directions, and rewritten after each attack.
+- **Multi-model orchestration** — different model families are assigned to
+  research, writing, critique, and verification so one model does not grade
+  all of its own work.
+- **Live agent telemetry** — the operator sees who is working, what passed
+  validation, where evidence is thin, and what has been spent while the run is
+  happening.
 
 ---
 
 ## Meet the Council
 
-Forty-three agents, three kinds: a permanent **writing & quality team** that works on every report, nineteen **research lenses** you choose from per question, and eighteen **supplemental thinkers** for when a question deserves a perspective from outside the industry entirely.
+The repository defines 54 agents: 20 airport research lenses, 18 supplemental
+thinkers, and 16 process agents for context, curation, writing, review,
+verification, design, production, revision, and scope fulfillment.
 
 ### The writing & quality team — on every report
 
 | Agent | Role |
 |---|---|
-| **The Strategist** | Reads every research brief and writes the argument. Revises it after each Red Team attack. The author. |
-| **The Red Team** | Exists only to break the draft — weak claims, logical gaps, unsupported assertions. Attacks twice, in writing, point by point. |
+| **Airport Context Builder** | Assembles current governance, finance, capital, airline, regulatory, and operating facts from supplied and authoritative sources. |
+| **Evidence Curator** | Normalizes the swarm's structured evidence, ranks what is load-bearing, preserves disagreement, and closes targeted gaps. |
+| **Creative Director** | Develops three truthful narrative and visual approaches before the report's structure hardens. |
+| **The Strategist** | Builds the argument from curated evidence and revises it after each specialized adversarial review. |
+| **Evidence Prosecutor** | Attacks source quality, arithmetic, causal claims, stale data, cherry-picking, and missing counterevidence. |
+| **Airport Executive Reviewer** | Tests ownership, approvals, funding, airline response, procurement, delivery, and peak-hour operating reality. |
 | **The Editor** | Cuts 15–25% of the word count, kills jargon and filler, sharpens every sentence. Adds nothing. |
 | **The Humanizer** | Rewrites the edited draft to the standard of a Harvard Business Review feature — so the final piece reads like one excellent writer produced it, not a committee. |
-| **The Fact-Checker** | Verifies every number, quote, and claim against the underlying research. Anything it can't trace gets cut or flagged for your review. It has veto power, and it runs last. |
+| **The Source Verifier** | Verifies the final draft against the evidence ledger and underlying primary sources. Anything unsupported gets cut, qualified, or flagged. |
+| **The Art Director** | Defines the visual argument, signature exhibit, slide density, report visuals, sources, and accessibility checks. |
 | **The Presentation Designer** | On request, distills the finished report into an elegant executive slide deck. |
 
 ### The research lenses — you choose who sits
@@ -51,6 +101,7 @@ Forty-three agents, three kinds: a permanent **writing & quality team** that wor
 | Agent | What they bring |
 |---|---|
 | **Operations Analyst** | Throughput, delays, gate utilization — and whether the real bottleneck is infrastructure or how it's operated. |
+| **Quantitative Analyst** | Reproducible calculations, scenarios, sensitivity tests, and chart-ready airport data with explicit inputs and formulas. |
 | **Chief Engineer** | Twenty-five years of program delivery: constructability, lifecycle cost, design standards, and how megaprojects actually fail. |
 | **Technology Scout** | What airport technology — sensors, biometrics, predictive analytics — actually costs and actually returns once deployed, versus what the brochure said. |
 | **Architectural Historian** | Airport terminals as architecture: the design intent behind the great buildings, and what gets lost when operations forget it. |
@@ -115,10 +166,17 @@ For questions that deserve a perspective from outside aviation, you can seat leg
 
 ## What you get
 
-- **A full report** (Word) — professionally formatted with a cover page, abstract, a page explaining exactly how it was produced and which agents worked on it, and page numbers. Available in four lengths: full research report, long-form article, brief, or a concise set of recommendations.
-- **An executive summary** (Word) — a standalone three-page distillation.
-- **A companion deck** (PowerPoint, optional) — the argument as an executive would present it to a board.
-- **Full provenance** — every run's research briefs, draft history, critiques, and fact-check report are archived, so anyone can see how a conclusion was reached.
+- **Executive read-ahead** (Word) — the polished argument, cases, citations,
+  decision cards, and methodology.
+- **Decision brief** (Word) — the decision, evidence, recommendation, risks,
+  owner, approval route, first 90 days, and measures.
+- **Technical evidence appendix** (Word) — sources, assumptions, evidence gaps,
+  calculations, and verification record.
+- **Companion deck** (PowerPoint, optional) — board decision, executive
+  briefing, or technical read-ahead mode.
+- **Full internal provenance** — run manifest, airport context, briefs,
+  evidence ledger, narrative options, drafts, critiques, claim lineage,
+  verification, quality gates, human scores, and cost.
 
 Every report ends with a clear disclaimer that it was produced by AI, and every number in it traces to a source or is flagged for human review.
 
@@ -139,7 +197,10 @@ Your browser opens to the Council's web app. From there, everything is guided:
 - **The live run** — watch the council work as a constellation: agents light up as they research, evidence streams toward the center, the cost ticks in real time. When it's your turn to review, the draft and critiques appear side by side for your decision.
 - **The result** — read the finished report right in the app, download the documents, revise it from feedback, or build the deck.
 
-A typical full run costs $20–60 in AI usage and takes 2–4 hours. The app shows a cost estimate before you launch and enforces a budget ceiling you set.
+The app estimates cost from the selected council before launch and enforces the
+budget ceiling between steps. Council v2 spends more of the budget on
+curation, verification, and production instead of simply adding research
+volume.
 
 **The one skill worth learning:** how you frame the question determines everything. The short version — make a claim someone could disagree with, not a topic. The full craft is in [Writing effective run prompts](docs/writing-effective-run-prompts.md), and the same guidance is built into the app.
 
@@ -163,7 +224,12 @@ Copy `.env.example` to `.env` at the repo root and fill in what you use. The CLI
 
 ### Model routing
 
-Research and synthesis run on Claude Opus 4.8. The editorial tier — Red Team, Editor, Humanizer, presentation — runs on Claude Fable 5. The Fact-checker stays on Opus deliberately, keeping verification on a different model family than the agents that wrote the text. The optional Deep Research lens runs on OpenAI's `o3-deep-research`. All assignments live in `council.toml`, editable from the app's Settings.
+Every process role has an explicit model assignment in `council.toml`: context,
+research, curation, creative framing, synthesis, evidence critique, executive
+review, editing, humanization, source verification, art direction, and
+presentation. The defaults deliberately vary model families across writing and
+verification. The optional Deep Research lens runs on OpenAI's
+`o3-deep-research`.
 
 ### Command-line deep links
 
@@ -171,17 +237,20 @@ Research and synthesis run on Claude Opus 4.8. The editorial tier — Red Team, 
 
 | Flag | Effect |
 |---|---|
+| `--run FILE` | Validate and execute a prepared file inside `prompts/runs/` through the canonical pipeline. |
+| `--budget USD` | Set a finite Claude-spend ceiling for `--run` or `--pptx`; zero permits no Claude calls. OpenAI Deep Research is billed separately. |
 | `--terminal` | The full menu in the terminal instead of the browser (SSH / no-browser use). |
 | `--resume [SLUG]` | Resume an interrupted run; auto-detects if no slug given. Completed steps are never re-run or re-billed. |
 | `--revise [SLUG]` | Revise an existing report from reader feedback. |
-| `--publish [SLUG]` | Re-publish polished documents from the archives. |
-| `--pptx` | Build an executive deck for a finished run. |
-| `--audit` | Score every agent's contribution across all archived runs. |
-| `--dry-run` | Write the run file and stop before any AI calls. |
+| `--publish [SLUG]` | Re-publish the exact QA-approved Office artifacts from the latest matching archive. |
+| `--allow-legacy-publish` | With `--publish`, explicitly permit a pre-v2 archive with no hash-bound release; the Office file is rendered and QA'd again before publication. |
+| `--pptx [SLUG]` | Build an executive deck for a finished run. Failed deck builds resume from durable, input-bound staging instead of repeating completed paid work. |
+| `--audit` | Evaluate evidence lineage, primary-source coverage, verification outcomes, cost, completion, and human quality scores across archived runs. |
+| `--dry-run` | Create a new run file interactively and stop before any AI calls. It cannot be combined with `--run`. |
 
 ### Source material
 
-Drop PDFs, Word docs, decks, or spreadsheets into `sources/` before launching. The app detects them, attaches them to the run, converts them to text the agents can read, and instructs every researcher to treat them as the primary starting point. Sources are archived with the run.
+Drop PDFs, Word docs, decks, or spreadsheets into `sources/` before launching. The app detects them, moves them into the durable `sources/runs/<slug>/` library, converts them to text the agents can read, and instructs every researcher to treat them as the primary starting point. Symlinks and path escapes are rejected. The same source bytes are fingerprinted, rechecked before release, and copied into the archive, so the saved run prompt remains rerunnable after `outputs/` is cleared.
 
 ### Scope mode — fulfilling an entire engagement
 
@@ -193,31 +262,92 @@ Beyond single reports, the Council can fulfill a full scope of work. Drop the sc
 4. **Scope Builders** produce every artifact — Word documents and PowerPoint decks — in dependency order, aligning each with the artifacts it builds on. Missing client-specific material becomes marked `[AUTHORITY-SPECIFIC — INSERT: …]` placeholders, never invented content.
 5. A **Scope QA** agent audits the finished set against the original scope — a requirement-by-requirement acceptance trace — and you review it before packaging.
 
-Everything lands in `reports/scope-<name>/` plus a single zip, with a manifest and the QA report. Re-running the same engagement title resumes: completed deliverables are never rebuilt or re-billed. Headless: `./council --scope "Engagement name" --no-review`.
+Everything lands in `reports/scope-<name>/` plus a single zip, with a manifest
+and the QA report. The app authorizes that ZIP through a dedicated hash-bound
+Scope pointer and keeps the engagement in the Library after reload; it never
+opens a general ZIP download path. Re-running the same engagement title safely
+resumes paid work only when the exact source bytes, operator notes, plan,
+research, dependent artifacts, model route, agent charter, and execution
+contract still match. A changed input quarantines and rebuilds only the
+affected work; packaging and archiving are hash-verified before `outputs/` is
+cleared. Headless: `./council --scope "Engagement name" --no-review`.
 
 Scope engagements are large runs — budget accordingly (the default ceiling for scope mode is $250) and treat the output as consultant-grade *drafts*: AI-produced engagement materials that need subject-matter-expert review before client delivery.
 
+### Argument mode — strengthening a focused case
+
+Open **Strengthen an argument** in the app when the desired outcome is a
+concise case rather than a long-form report. Paste the existing argument,
+attach supporting documents, or do both; describe what needs stronger proof;
+then choose the research agents whose lenses fit the question. The Council
+runs those agents independently, reconciles their evidence and
+counterevidence, and releases a source-checked Markdown argument.
+
+A PowerPoint is optional. When selected, the operator supplies an exact slide
+count from 3 to 30. The presentation contract, production checks, and release
+gate all enforce that count. Argument releases are hash-bound, archived, and
+kept in the Library alongside report and scope releases.
+
 ### The pipeline, precisely
 
-Four stages: (1) parallel independent research — seated agents write briefs concurrently, forbidden from reading each other's output; (2) synthesis and adversarial debate — Strategist v1 → Red Team → v2 → Red Team → v3, then **human checkpoint #1**; (3) Editor → Humanizer → Fact-checker (verification runs last so it covers the final text), then **human checkpoint #2**; (4) document production, archive to `runs/YYYY-MM-DD-<slug>/`, and automatic publishing to `reports/`. Budget ceilings are enforced between steps; interrupted runs resume from the last completed artifact.
+Four public stages, with typed artifacts between them:
+
+1. **Context, research, and curation:** Airport Context Builder → parallel
+   independent research briefs plus per-agent evidence JSONL → evidence ledger
+   and evidence map.
+2. **Creative synthesis and two adversarial reviews:** Creative Director →
+   Strategist v1 → Evidence Prosecutor → Strategist v2 → Airport Executive
+   Reviewer → Strategist v3 → **human checkpoint #1**.
+3. **Edit and source verification:** Editor → Humanizer → Source Verifier →
+   claim lineage and publishing quality gate → **human checkpoint #2**.
+4. **Production and release:** Art Director → Word executive packet → full-size
+   Word page and sequence inspection with a hash-bound receipt → optional
+   PowerPoint → mode-specific structural QA → canonical signature-slide,
+   full-size slide, and montage inspection with a hash-bound receipt → exact-byte release staging
+   and hash verification → archive-destination reservation → immutable,
+   hash-named release bundle plus an atomic current-release manifest →
+   atomic archive and retry-safe workspace cleanup.
+
+The run manifest records every selected agent, model, input, output,
+validation result, dependency receipt, and stage status. It also fingerprints
+the Council code, agent charters, research contract, and visual design system
+that shaped the run. Budget ceilings are enforced between calls; interrupted
+runs resume only when both the artifact bytes and the exact upstream bytes
+still match. A partial run cannot silently combine outputs from two Council
+versions.
 
 ### Revising a report
 
-A revision doesn't re-run the council. It reuses the original research and runs a focused loop — Strategist revises against the feedback, Red Team checks the revision, Editor/Humanizer/Fact-checker re-verify — producing `reports/<slug>-revised-vN.docx`, stamped as a numbered revision. Revisions chain: v2 builds on v1.
+A revision doesn't re-run the research swarm. It reuses the archived evidence
+and runs a focused loop—Strategist revision, adversarial review,
+Editor/Humanizer, fresh source verification, deterministic release gate, new
+Art Director brief, rendered Word QA, and exact-byte release—producing
+`reports/<slug>-revised-vN.docx` and, for full reports, a revised executive
+summary. Revisions chain: v2 builds on v1. Each released version appears as its
+own Library entry with its revised reader-facing draft and hash-verified
+downloads; the **Revise** action still targets the original archive so the
+next version follows the verified revision chain.
 
 ### The council audit
 
-`--audit` (or the Audit tab in the app) scores every agent across all archived runs — how often the Strategist actually used each agent's work per 1,000 words of brief written — and recommends roster changes. The default preset is tuned from this data.
+`--audit` never searches public prose for agent names. It attributes an agent's
+contribution only when an evidence ID connects that agent's record to a final
+claim. It reports commissioned and used evidence, primary-source-checked claim
+coverage, verified/qualified/removed/unverified outcomes, correction rate,
+cost, stage completion, and human scores for originality, airport specificity,
+decision usefulness, writing, and visual quality. Legacy runs remain visible
+and say "data unavailable" where they lack structured provenance.
 
 ### Where things live
 
 | Path | Contents |
 |---|---|
-| `.claude/agents/` | All 43 agent definitions — versioned markdown, human-edited only |
+| `.claude/agents/` | All 54 agent definitions — versioned markdown, human-edited source of truth |
+| `.codex/agents/` | Generated Codex-native mirrors of the same definitions |
 | `cli/` | The engine and web app (`cli/server.py`, `cli/webapp/`) |
 | `prompts/runs/` | One run-prompt file per question |
 | `docs/` | The [writing guide](docs/writing-effective-run-prompts.md) and the [methodology](docs/methodology.md) that appears in every report |
-| `runs/` | Complete archives of every run — briefs, drafts, critiques, fact-checks, documents |
+| `runs/` | Complete archives: manifest, context, evidence, lineage, reviews, drafts, critiques, verification, QA, and documents |
 | `reports/` | Polished, distribution-ready documents (regenerated on demand; not committed) |
 | `council.toml` | Operator config: models per role, budgets, defaults |
 

@@ -1,118 +1,193 @@
-# How to Run the Council
+# How to run the Council
 
-A practical operator's guide. Two or three minutes to read before your first run.
+The Council turns a contested airport question into a sourced executive
+decision package. You frame the decision, choose the research lenses, and
+review two checkpoints. The system handles research, synthesis, challenge,
+source verification, document production, visual QA, archiving, and cleanup.
 
-## The mental model
+## Start with a decision, not a topic
 
-Treat the repo like a Claude Code app. You write a run-prompt file describing what you want to think about. You tell Claude Code to run it. It runs for 2-4 hours. You show up twice to review and approve. It hands you back two Word documents and a fully archived run folder.
+A useful run prompt answers six questions:
 
-Everything else — research, adversarial revision, editing, fact-checking, Word generation, archiving — is the Council's job, not yours.
+1. What claim should the Council test?
+2. What airport decision should the work inform?
+3. Who owns that decision?
+4. What is the time horizon?
+5. What approvals or stakeholders can change the outcome?
+6. What observable result would count as success?
 
-## The flow, end to end
+“Airport biometrics” is a topic. “Large hubs should stop treating biometrics as
+a checkpoint project and fund it as shared passenger-processing
+infrastructure” is a thesis. The second gives researchers something to test and
+executives something to decide.
 
-### Step 1. Write the run-prompt file
+Use the guided **New report** flow in the web app, copy
+[`prompts/runs/_template.md`](../prompts/runs/_template.md), or describe the
+question conversationally and ask Codex to create a run.
 
-Copy [`prompts/runs/_template.md`](../prompts/runs/_template.md). Rename the copy to something short and descriptive: `airline-consolidation.md`, `biometric-risk.md`, `cargo-revenue-collapse.md`. Fill in every section in your editor of choice. The sections are: thesis, audience, tone, length, what it is NOT, what it IS, optional operator-specific framing, success criteria, optional research-agent overrides.
+Place useful source files in `sources/` before launch. The Airport Context
+Builder will use them as the starting record and distinguish supplied facts
+from public-source research.
 
-The most important field is the **thesis**. A sharp falsifiable claim produces a sharp argument. A topic produces a generic summary. If you find yourself writing "an overview of..." or "trends in...", stop and sharpen.
+## Launch
 
-If you'd rather dictate the thesis conversationally instead of editing a file, skip step 1 and say "let's do a new Council run" in Claude Code. Claude will interview you and write the file for you.
+From the repository root:
 
-### Step 2. Trigger the run
+```bash
+./council
+```
 
-In Claude Code in this repo, say:
+The browser app guides framing, council selection, cost estimation, launch,
+live monitoring, checkpoint review, and download.
 
-> `run <your-filename>`
+To trigger a prepared run conversationally, say:
 
-You can write it with or without the `.md` extension, with or without the `prompts/runs/` prefix. All of these work:
+> `run <filename>`
 
-- `run airline-consolidation`
-- `run prompts/runs/airline-consolidation.md`
-- `let's run the airline-consolidation file`
+The filename may include or omit `prompts/runs/` and `.md`. The system validates
+the prompt before it spends money. The direct headless equivalent is:
 
-Claude confirms the thesis in one sentence and an estimate of time and cost, then kicks off Stage 1.
+```bash
+./council --run prompts/runs/<name>.md --budget 80
+```
 
-### Step 3. Stage 1 runs (parallel research, ~60-90 min)
+`--budget` is a finite Claude-spend ceiling shared across the parallel swarm
+and downstream process calls. OpenAI Deep Research is billed separately. An
+explicit zero permits no Claude calls. `--dry-run` is a different mode: it
+creates a new run file interactively without model calls and cannot be
+combined with `--run`.
 
-Eight agents research independently — they do not read each other's work.
+## What happens during a run
 
-- `infrastructure-economist` — airport CapEx, cost overruns, debt service
-- `operations-analyst` — delay data, throughput, latent capacity
-- `technology-scout` — what operational technology actually costs and returns
-- `contrarian` — the strongest case against the thesis
-- `chief-engineer` — constructability, lifecycle cost, design standards
-- `airline-commercial-strategist` — carrier economics, hub decisions, CPE sensitivity
-- `regulatory-political-analyst` — FAA, TSA, CBP, Congress, local politics
-- `aviation-historian` — long-cycle industry arcs, pattern-matching
+### 1. Context, research, and evidence curation
 
-**What to look for:** eight briefs, each 1,500-2,500 words, each with inline source citations. If any brief is shorter, has no sources, or reads like a summary of a summary, Claude should re-run that agent before proceeding.
+The Airport Context Builder assembles the decision environment: governance,
+capital program, airline agreements, finance, regulation, procurement,
+operating constraints, and supplied facts.
 
-### Step 4. Stage 2 runs (synthesis and adversarial debate, ~60-90 min)
+The selected researchers then run as a **parallel research swarm**. That means
+several specialists investigate the same question at the same time, from
+different professional viewpoints, without reading one another’s conclusions.
+Each produces a narrative brief and structured evidence records.
 
-- Strategist produces draft v1
-- Red Team critiques v1
-- Strategist revises to v2
-- Red Team critiques v2
-- Strategist produces v3
+The Evidence Curator combines those records into an evidence ledger,
+deduplicates sources, preserves genuine disagreement, scores source strength,
+and commissions only targeted gap-filling research.
 
-**★ Human checkpoint #1.** Read v3. Read both critiques. Decide whether to continue.
+### 2. Creative framing and adversarial synthesis
 
-Questions to ask yourself at this checkpoint:
+The Creative Director proposes several truthful ways to tell the story,
+including a counterintuitive frame, an airport-operating frame, and a
+board-decision frame.
 
-- Is the thesis still sharp, or has the argument softened into mush?
-- Did the Strategist actually address the Contrarian's strongest points, or did it steamroll them?
-- Are there any numerical claims that raise an eyebrow? (Flag them for the Fact-checker.)
-- Is the operator-specific implications section specific enough, or is it generic consultant-speak?
+The **adversarial synthesis loop** then develops the report:
 
-If anything is off, redirect before approving. Tell Claude what to change and it will loop back to the right step.
+1. The Strategist drafts from the context and curated evidence.
+2. The Evidence Prosecutor attacks source quality, arithmetic, causal logic,
+   and omitted counterevidence.
+3. The Strategist revises.
+4. The Airport Executive Reviewer attacks feasibility: authority, airline
+   response, funding, procurement, staffing, approvals, and peak-hour
+   operations.
+5. The Strategist revises again.
 
-### Step 5. Stage 3 runs (polish, ~30-60 min)
+This is adversarial because the reviewers are assigned to find failure, not to
+agree politely. It is a loop because the writer must answer the findings in a
+new draft.
 
-- Editor cuts 15-25% and kills buzzwords
-- Fact-checker verifies every number, tags `[UNVERIFIED — HUMAN REVIEW]` on analyst-derived claims
+**Human checkpoint 1:** review the argument before editorial polish. Score
+originality, airport specificity, decision usefulness, and writing. Ask:
 
-**★ Human checkpoint #2.** Read the fact-check report. Decide whether to proceed to Word generation or push back for another revision.
+- Is the recommendation a decision, or merely an aspiration?
+- Does the evidence change what an airport executive should do?
+- Did the report preserve the strongest counterargument?
+- Are owner, approval route, timing, operating consequence, and success
+  measure explicit?
 
-### Step 6. Stage 4 runs (Word documents, ~5 min)
+### 3. Editing, source verification, and release gate
 
-Two deliverables land in `outputs/stage4/`:
+The Editor cuts repetition and consultant language. The Humanizer makes the
+piece read as one authoritative writer rather than a committee transcript.
 
-- `<slug>.docx` — full report with cover page, table of contents, body, methodology appendix
-- `<slug>-executive-summary.docx` — three-page standalone distillation
+The Source Verifier checks reader-facing claims against the evidence ledger and
+the underlying primary sources. It records claim-to-evidence lineage and marks
+each claim verified, qualified, removed, or unresolved.
 
-### Step 7. Archive (automatic)
+A deterministic publication gate then blocks unresolved placeholders, leaked
+internal filenames, broken footnotes, unsupported numeric claims, and other
+release defects.
 
-Claude copies `outputs/` to `runs/YYYY-MM-DD-<slug>/`, writes a short `retrospective.md`, and clears `outputs/` for the next run. You don't have to do any of this manually.
+**Human checkpoint 2:** review the final argument, source-verification report,
+and remaining limitations before approving production.
+
+### 4. Executive production and visual QA
+
+The Art Director creates a visual contract: information hierarchy, signature
+exhibit, source treatment, chart plan, accessibility, and slide-density rules.
+The production layer builds the Word package and, when requested, a PowerPoint
+in board-decision, executive-briefing, or technical-read-ahead mode.
+
+Every generated Office file is reopened and structurally checked. Rendered
+pages and slides are inspected for overflow, clipping, weak hierarchy,
+unreadable density, and accidental internal content. A release fails when a
+hard defect remains.
+
+## Live agent telemetry
+
+The run screen shows **live agent telemetry**: which agent is working, which
+artifact it is producing, how the evidence ledger is changing, current cost,
+and the state of each quality gate. It is the Council’s instrument panel. If
+the browser refreshes, it reconnects to the active run without restarting
+completed work.
+
+The Council also uses **multi-model orchestration**. Different jobs can be
+routed to different model families: research, synthesis, source verification,
+and design do not necessarily use the same model. The run manifest records the
+actual model and prompt hash for every commissioned agent.
 
 ## What good looks like
 
-- **Eight genuinely different briefs.** If two briefs are saying the same thing, the research phase failed.
-- **A Contrarian brief you actually have to wrestle with.** If the Strategist can dismiss it in a paragraph, the Contrarian agent is broken or the thesis is too weak to publish.
-- **Numerical specificity.** "12 of the 30 large US hubs," not "many airports." If the Editor and Fact-checker can't deliver this, they're not working.
-- **A finished document a skeptical executive would not dismiss in the first 500 words.** This is the real bar.
+- Independent briefs disagree for intelligible reasons.
+- The evidence ledger distinguishes primary evidence, secondary reporting,
+  calculations, and analyst judgment.
+- The strongest objection changes the final recommendation.
+- Airport authority, airline behavior, financing, procurement, regulation,
+  and day-of-operations consequences are named where they matter.
+- Recommendations identify an owner, approval route, first action, time
+  horizon, measure, and stop or reconsider condition.
+- Visuals explain a comparison, sequence, tradeoff, or decision; they do not
+  merely decorate the page.
+- Every consequential number reaches a primary source or is explicitly
+  qualified.
 
 ## What bad looks like
 
-- **Agent echo.** Multiple Stage 1 briefs citing the same sources and reaching the same conclusion.
-- **Polite Red Team.** Critiques that say "consider adding" instead of "this claim is unsupported, cut it."
-- **Hedged Strategist.** "It is important to note that many factors contribute to..." — kill this before it spreads.
-- **Vague implications.** "The operator should consider adopting operational intelligence tools." Useless.
+- Multiple agents repeat the same source and conclusion.
+- Critiques say “consider adding” without naming the defect and remedy.
+- The report offers generic “airports should” advice with no accountable owner.
+- A chart lacks a source, unit, date, or decision point.
+- The prose names agents, briefs, stages, or internal files.
+- The deck is a document pasted onto slides.
 
-## Kill criteria
+## After completion
 
-Stop the run and fix the agent files (not the output) if you see:
+The Council automatically archives the complete internal record under
+`runs/YYYY-MM-DD-<slug>/`, publishes distribution-ready files to `reports/`,
+writes a retrospective, and clears the working output area.
 
-- An agent refusing to take a position
-- An agent inventing statistics
-- The Strategist ignoring the Contrarian or the Regulatory/Political analyst
-- The Editor adding new content instead of cutting
-- The Fact-checker rubber-stamping unverified claims
+Published downloads come from a hash-verified, immutable release bundle. If a
+deck is added later, its Art Director brief, package, rendered QA, and release
+record are staged durably under `logs/deck-backfills/<slug>/`; a failed build
+resumes there under the same budget and does not partially rewrite the archive.
+Pre-v2 archives without this release record are refused by default. Use
+`--allow-legacy-publish` only when you intentionally want the system to render
+and QA an older Office file again.
 
-In all these cases, the fix is in the markdown in `.claude/agents/`, not in the prose. See [`how-to-propose-an-agent-change.md`](how-to-propose-an-agent-change.md).
+Before external release, a named human remains accountable for the argument,
+source choices, redactions, and recommendations. Record the five quality
+ratings—originality, airport specificity, decision usefulness, writing, and
+visual quality—so the audit can show whether the system is improving across
+runs.
 
-## After the run
-
-- Read the auto-generated retrospective in `runs/YYYY-MM-DD-<slug>/retrospective.md`. Add anything the Council missed about what worked or didn't.
-- Fill the blanks in the Word document's methodology appendix (operator name/role, total runtime, your name as reviewer).
-- Verify the `[UNVERIFIED — HUMAN REVIEW]` tagged claims against authoritative sources before anything goes external.
-- Open PRs against agent files for any patterns you noticed across runs. Every run should produce at least one improvement to the system, or you're not learning anything.
+Use `./council --audit` to review evidence use, primary-source coverage,
+verification outcomes, corrections, cost, completion, and human quality scores.

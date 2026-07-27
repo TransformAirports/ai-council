@@ -82,6 +82,10 @@ any adjustments}}
 {{FINAL DOCUMENT LENGTH — for example: "8,000-10,000 words for the full report;
 ~1,100-word executive summary. This is a substantive piece, not a blog post."}}
 
+## Output format
+
+{{report | article | brief | recommendations}}
+
 ## What this is NOT
 
 <!--
@@ -112,6 +116,26 @@ thesis applies to" section instead.
 
 {{OPERATOR CONTEXT — or delete this section if the run is industry-wide}}
 
+## Decision frame (recommended)
+
+<!--
+This is the Council v2 difference between an interesting report and an
+assignable airport decision. Fill what you know. Use "(research and state
+explicitly)" for anything the Council should establish from evidence.
+-->
+
+- **Decision required:** {{WHAT CHOICE SHOULD THIS WORK ENABLE?}}
+- **Decision owner:** {{CEO, COO, BOARD, VP, PROGRAM EXECUTIVE, OR OTHER OWNER}}
+- **Time horizon:** {{90 DAYS, FY BUDGET CYCLE, NEXT USE AGREEMENT, ETC.}}
+- **Approval path:** {{BOARD, AIRLINE MII, FAA, PROCUREMENT, LABOR, OTHER}}
+- **Success measure:** {{WHAT MEASURABLE CONDITION WOULD SHOW IT WORKED?}}
+
+## Presentation mode (optional)
+
+<!-- Delete this section if no deck is wanted. -->
+
+{{board_decision | executive_briefing | technical_read_ahead}}
+
 ## Success criteria
 
 <!--
@@ -127,10 +151,9 @@ agents. Keep them specific.
 ## Research agent overrides (optional — leave blank for most runs)
 
 <!--
-The Council's eight research agents have defaults tuned for the airport
-industry. For most airport theses, those defaults work. Use this section only
-if a specific agent should focus on something unusual for this run. Leave
-blank otherwise.
+The Council's research roster is selected per run. Each seated researcher has
+a default tuned for its specialty. Use this section only if a specific agent
+should focus on something unusual. Remove unseated agents.
 
 If this run needs a fundamentally different set of agents, don't override here —
 open a PR against `.claude/agents/` with new agents. See
@@ -140,6 +163,7 @@ open a PR against `.claude/agents/` with new agents. See
 - **infrastructure-economist:** {{BLANK = USE DEFAULT}}
 - **operations-analyst:** {{BLANK = USE DEFAULT}}
 - **technology-scout:** {{BLANK = USE DEFAULT}}
+- **quantitative-analyst:** {{BLANK = USE DEFAULT}}
 - **contrarian:** {{BLANK = USE DEFAULT}}
 - **chief-engineer:** {{BLANK = USE DEFAULT}}
 - **airline-commercial-strategist:** {{BLANK = USE DEFAULT}}

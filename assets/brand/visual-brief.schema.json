@@ -1,0 +1,567 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://transformairports.com/schemas/council-visual-brief-v2.json",
+  "title": "Council Visual Brief",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "communication_job",
+    "audience",
+    "decision",
+    "decision_owner",
+    "approval_path",
+    "first_90_day_action",
+    "success_measures",
+    "deck_mode",
+    "visual_thesis",
+    "signature_visual",
+    "brand_profile",
+    "slides",
+    "report_visuals",
+    "source_appendix",
+    "accessibility_checks",
+    "asset_requests"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "deck_mode": {
+            "const": "board_decision"
+          }
+        },
+        "required": [
+          "deck_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "slides": {
+            "minItems": 8,
+            "maxItems": 12
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "deck_mode": {
+            "const": "executive_briefing"
+          }
+        },
+        "required": [
+          "deck_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "slides": {
+            "minItems": 12,
+            "maxItems": 18
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "deck_mode": {
+            "const": "technical_read_ahead"
+          }
+        },
+        "required": [
+          "deck_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "slides": {
+            "minItems": 15,
+            "maxItems": 25
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "deck_mode": {
+            "const": "argument_brief"
+          }
+        },
+        "required": [
+          "deck_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "slides": {
+            "minItems": 3,
+            "maxItems": 30
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "exhibitColumn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "exhibitRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "values"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "tabularExhibit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "exhibit_type",
+        "takeaway",
+        "evidence_ids",
+        "source_note",
+        "row_header",
+        "columns",
+        "rows"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "exhibit_type": {
+          "enum": [
+            "table",
+            "comparison"
+          ]
+        },
+        "takeaway": {
+          "type": "string",
+          "minLength": 10
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_note": {
+          "type": "string",
+          "minLength": 3
+        },
+        "row_header": {
+          "type": "string",
+          "minLength": 1
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "$ref": "#/$defs/exhibitColumn"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/exhibitRow"
+          }
+        }
+      }
+    },
+    "flowExhibit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "exhibit_type",
+        "takeaway",
+        "evidence_ids",
+        "source_note",
+        "steps"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "exhibit_type": {
+          "const": "flow"
+        },
+        "takeaway": {
+          "type": "string",
+          "minLength": 10
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_note": {
+          "type": "string",
+          "minLength": 3
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "label",
+              "detail"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 3
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 2
+              },
+              "trigger": {
+                "type": "string",
+                "minLength": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "timelineExhibit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "exhibit_type",
+        "takeaway",
+        "evidence_ids",
+        "source_note",
+        "milestones"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "exhibit_type": {
+          "const": "timeline"
+        },
+        "takeaway": {
+          "type": "string",
+          "minLength": 10
+        },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_note": {
+          "type": "string",
+          "minLength": 3
+        },
+        "milestones": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "period",
+              "action"
+            ],
+            "properties": {
+              "period": {
+                "type": "string",
+                "minLength": 1
+              },
+              "action": {
+                "type": "string",
+                "minLength": 3
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 3
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 2
+              },
+              "success_measure": {
+                "type": "string",
+                "minLength": 3
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "2.0"
+    },
+    "communication_job": {
+      "type": "string",
+      "minLength": 20
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 3
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 3
+    },
+    "decision_owner": {
+      "type": "string",
+      "minLength": 3
+    },
+    "approval_path": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 3
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 2
+          }
+        }
+      ]
+    },
+    "first_90_day_action": {
+      "type": "string",
+      "minLength": 3
+    },
+    "success_measures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 3
+      }
+    },
+    "deck_mode": {
+      "enum": [
+        "board_decision",
+        "executive_briefing",
+        "technical_read_ahead",
+        "argument_brief"
+      ]
+    },
+    "visual_thesis": {
+      "type": "string",
+      "minLength": 10
+    },
+    "signature_visual": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "slide_number",
+        "concept",
+        "visual_type",
+        "evidence_ids"
+      ],
+      "properties": {
+        "slide_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "concept": {
+          "type": "string"
+        },
+        "visual_type": {
+          "type": "string"
+        },
+        "visual_spec": {
+          "type": "string"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_note": {
+          "type": "string"
+        },
+        "asset_source": {
+          "type": "string"
+        }
+      }
+    },
+    "brand_profile": {
+      "type": [
+        "string",
+        "object"
+      ]
+    },
+    "slides": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "slide_number",
+          "narrative_job",
+          "headline",
+          "evidence_ids",
+          "visual_type",
+          "visual_spec",
+          "source_note",
+          "density_budget",
+          "speaker_note"
+        ],
+        "properties": {
+          "slide_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "narrative_job": {
+            "type": "string"
+          },
+          "headline": {
+            "type": "string",
+            "minLength": 5
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visual_type": {
+            "type": "string"
+          },
+          "visual_spec": {
+            "type": "string"
+          },
+          "source_note": {
+            "type": "string"
+          },
+          "density_budget": {
+            "type": [
+              "string",
+              "integer"
+            ]
+          },
+          "speaker_note": {
+            "type": "string"
+          },
+          "asset_source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "report_visuals": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/tabularExhibit"
+          },
+          {
+            "$ref": "#/$defs/flowExhibit"
+          },
+          {
+            "$ref": "#/$defs/timelineExhibit"
+          }
+        ]
+      }
+    },
+    "source_appendix": {
+      "type": [
+        "array",
+        "object",
+        "string"
+      ]
+    },
+    "accessibility_checks": {
+      "type": [
+        "array",
+        "object"
+      ]
+    },
+    "asset_requests": {
+      "type": "array",
+      "items": {
+        "type": [
+          "object",
+          "string"
+        ]
+      }
+    }
+  }
+}

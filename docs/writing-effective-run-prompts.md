@@ -2,7 +2,9 @@
 
 How to frame a Title, Thesis, Scope, and Avoid so the Council produces its best work.
 
-The Council amplifies whatever you give it. A sharp thesis gets nineteen agents arguing about something worth deciding; a vague one gets nineteen agents politely summarizing the industry. Every weak report this system has produced traces back to the framing, not the agents. This guide is how to get the framing right.
+The Council amplifies whatever you give it. A sharp thesis gives the research
+swarm something worth deciding; a vague one produces a polite industry
+summary. This guide is how to get the framing right.
 
 **The one rule that governs everything: topics produce summaries. Theses produce arguments.** "An overview of airport IoT trends" is a topic. "Most airport IoT deployments are stranded within five years — not because the sensors fail, but because the surrounding decisions were made for a pilot and never re-made for scale" is a thesis. The first gives the Council nothing to test. The second gives the Contrarian something to attack, the Fact-checker something to verify, and the Strategist something to defend or concede.
 
@@ -18,6 +20,8 @@ These aren't just form fields. Each one is wired into the pipeline differently, 
 | **Thesis** | Read by every research agent before they search, by the Strategist before every draft, by the Red Team before every critique. It is the single most-read sentence in the run. |
 | **Scope** | Each line becomes a success criterion the run is judged against, and research agents treat the list as their assignment sheet. What you don't list, they may not cover. |
 | **Avoid** | Each line becomes a "what this is NOT" constraint. The Red Team attacks drafts that drift toward these; the Editor cuts in their direction. |
+| **Decision frame** | Grounds the research in an owner, approval path, time horizon, and measurable outcome. The Airport Executive Reviewer uses it to reject recommendations that cannot be assigned or approved. |
+| **Presentation mode** | Chooses a board decision deck, executive briefing, or technical read-ahead. The Art Director adjusts narrative density and visual treatment accordingly. |
 
 ---
 
@@ -116,6 +120,49 @@ Two or four lines is plenty. A ten-line Avoid list reads as anxiety and constrai
 
 ---
 
+## Decision frame
+
+This section is optional in the form and load-bearing in the output. It tells
+the Council which decision the research is meant to improve.
+
+Fill what you know:
+
+- **Decision required:** the choice, authorization, or posture the work should
+  enable.
+- **Decision owner:** the executive, board, program, or operating owner who can
+  act.
+- **Time horizon:** the budget cycle, agreement window, project milestone, or
+  operating deadline.
+- **Approval path:** board, airline majority-in-interest, FAA, TSA, procurement,
+  labor, host jurisdiction, or another dependency.
+- **Success measure:** the observable condition that would show the decision
+  worked.
+
+Unknowns are acceptable. Write "research and state explicitly" rather than
+guessing. The airport context packet and executive review will try to close the
+gap and will preserve it as a named dependency if public evidence cannot.
+
+A useful decision frame:
+
+> **Decision required:** Whether to pilot a non-sterile visitor-access program
+> at one terminal before the FY28 checkpoint expansion.
+>
+> **Decision owner:** COO, with CEO and TSA concurrence.
+>
+> **Time horizon:** Pilot decision within 90 days; operating test before the
+> holiday peak.
+>
+> **Approval path:** TSA security plan amendment, airport police, airlines,
+> concessions, and terminal operations.
+>
+> **Success measure:** Visitor demand served without reducing passenger
+> throughput or increasing checkpoint incidents.
+
+This is more useful than "provide recommendations." It gives the Council
+something it can assign, sequence, and test.
+
+---
+
 ## A worked example, annotated
 
 The strongest run prompt this Council has executed, with the moves labeled:
@@ -139,6 +186,8 @@ Thirty seconds before you hit Convene:
 - [ ] Is there at least one number, date, or named case an agent can check?
 - [ ] Does each scope item name what to compare, where to look, or what would settle it?
 - [ ] Is there a scope item tying the run to the decision you actually face?
+- [ ] Does the decision frame identify an owner, horizon, and approval path—or
+      mark them as research gaps?
 - [ ] Does the Avoid list name this topic's specific lazy failure modes?
 - [ ] Is the title short enough to live in a filename?
 

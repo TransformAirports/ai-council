@@ -8,6 +8,7 @@ same flows for scripting and muscle memory.
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import sys
 import traceback
@@ -72,11 +73,21 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--dry-run", action="store_true",
                    help="Deep link: collect a new run spec, write the run file, stop.")
     p.add_argument("--skip-prompts", action="store_true", help="Alias for --dry-run.")
+    p.add_argument("--run", metavar="FILE",
+                   help="Run an existing prompt from prompts/runs/ through the canonical pipeline.")
+    p.add_argument("--budget", type=float, metavar="USD",
+                   help="Budget ceiling for --run; defaults to council.toml.")
     p.add_argument("--resume", nargs="?", const="__detect__", metavar="SLUG",
                    help="Deep link: resume an interrupted run (auto-detected if no slug).")
     p.add_argument("--audit", action="store_true", help="Deep link: council audit.")
     p.add_argument("--publish", nargs="?", const="__all__", metavar="SLUG",
                    help="Deep link: re-publish archived runs (all, or one slug).")
+    p.add_argument(
+        "--allow-legacy-publish",
+        action="store_true",
+        help="Allow --publish to re-QA and publish a pre-v2 archive that has "
+        "no hash-bound release bundle.",
+    )
     p.add_argument("--pptx", nargs="?", const="__pick__", metavar="SLUG",
                    help="Deep link: build an executive deck for a finished run.")
     p.add_argument("--revise", nargs="?", const="__pick__", metavar="SLUG",
@@ -118,17 +129,111 @@ def main(argv: list[str] | None = None) -> int:
     from cli import menu
 
     try:
+        if args.run and (args.dry_run or args.skip_prompts):
+            console.print(
+                "[red]--run cannot be combined with --dry-run or "
+                "--skip-prompts.[/red] No model calls were made."
+            )
+            return 2
+
         if args.audit:
             menu.audit_flow()
             return 0
 
         if args.publish:
-            menu.publish_flow(only_slug=None if args.publish == "__all__" else args.publish)
-            return 0
+            published = menu.publish_flow(
+                only_slug=None if args.publish == "__all__" else args.publish,
+                allow_legacy=args.allow_legacy_publish,
+            )
+            return 0 if published else 1
+
+        if args.allow_legacy_publish:
+            console.print(
+                "[red]--allow-legacy-publish is valid only with --publish.[/red]"
+            )
+            return 2
+
+        if args.run:
+            import asyncio
+
+            from cli.config import get_config
+            from cli.orchestrator import run_pipeline
+            from cli.runfile import (
+                parse_run_file,
+                resolve_run_file,
+                validate_run_file,
+            )
+
+            try:
+                run_file = resolve_run_file(args.run)
+            except (FileNotFoundError, ValueError) as exc:
+                console.print(
+                    Panel(
+                        str(exc),
+                        border_style="red",
+                        title="Run prompt not found",
+                    )
+                )
+                return 2
+            errors = validate_run_file(run_file)
+            if errors:
+                console.print(Panel(
+                    "\n".join(f"• {error}" for error in errors),
+                    border_style="red",
+                    title="Run prompt is not ready",
+                ))
+                return 2
+            spec = parse_run_file(run_file.stem, runs_dir=run_file.parent)
+            if "deep-research" in spec.selected_research_agents and not os.environ.get(
+                "OPENAI_API_KEY"
+            ):
+                console.print(
+                    "[red]Deep Research is seated, but OPENAI_API_KEY is not set.[/red]"
+                )
+                return 2
+            auth_ok, auth_message = menu.check_claude_auth()
+            if not auth_ok:
+                console.print(
+                    Panel(auth_message, border_style="red", title="Authentication required")
+                )
+                return 2
+            ceiling = args.budget
+            if ceiling is None:
+                ceiling = get_config().default_budget_usd
+            if ceiling is not None and (
+                not math.isfinite(ceiling) or ceiling < 0
+            ):
+                console.print(
+                    "[red]--budget must be a finite number, zero or greater.[/red]"
+                )
+                return 2
+            result = asyncio.run(run_pipeline(
+                spec=spec,
+                run_file=run_file,
+                repo_root=REPO_ROOT,
+                auto_approve=args.no_review,
+                budget_usd=ceiling,
+            ))
+            return 0 if result.completed else 1
 
         if args.pptx:
-            menu.deck_flow()
-            return 0
+            from cli.config import get_config
+
+            ceiling = args.budget
+            if ceiling is None:
+                ceiling = get_config().default_budget_usd
+            if ceiling is not None and (
+                not math.isfinite(ceiling) or ceiling < 0
+            ):
+                console.print(
+                    "[red]--budget must be a finite number, zero or greater.[/red]"
+                )
+                return 2
+            built = menu.deck_flow(
+                only_slug=None if args.pptx == "__pick__" else args.pptx,
+                budget_usd=ceiling,
+            )
+            return 0 if built else 1
 
         if args.revise:
             menu.revise_flow(
@@ -139,9 +244,19 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.resume:
             if args.resume != "__detect__":
-                info = menu.detect_interrupted_run() or {}
-                info["slug"] = args.resume
-                menu.resume_flow(info if info.get("slug") else None)
+                info = menu.detect_interrupted_run()
+                if info is None:
+                    console.print("[yellow]No interrupted run found in outputs/.[/yellow]")
+                    return 2
+                active_slug = info.get("slug")
+                if active_slug != args.resume:
+                    console.print(
+                        "[red]Resume refused:[/red] outputs/ belongs to "
+                        f"`{active_slug or 'an unidentified legacy run'}`, not "
+                        f"`{args.resume}`. Existing artifacts were left untouched."
+                    )
+                    return 2
+                menu.resume_flow(info)
             else:
                 menu.resume_flow()
             return 0

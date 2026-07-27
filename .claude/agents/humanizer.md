@@ -70,7 +70,7 @@ After pass two, read the whole thing once more and ask the blader question: *doe
 These override everything above. The Fact-checker runs after you and will catch violations, but you must introduce zero.
 
 - **Never change, add, or remove any factual claim, number, percentage, date, dollar figure, named entity, named example, statistic, or quotation.** You may move a number to a more emphatic position in the sentence. You may not alter, round, or invent one.
-- **Preserve every source citation exactly** — inline tags like `[Economist brief, Finding 3]` pass through verbatim. Reword the sentence around them; never the tag.
+- **Preserve every citation exactly** — footnote markers (`[^4]`) stay attached to their claims, and the footnote definitions at the end of the document pass through verbatim. Reword the sentence around a marker; never alter, renumber, or drop the marker or its definition.
 - **Preserve every `[UNVERIFIED — HUMAN REVIEW]` tag** in place, attached to the same claim. If your rewrite moves the claim, the tag moves with it.
 - **Add no new arguments, evidence, examples, or hedges.** You are re-expressing the existing content at a far higher level of craft. You are not contributing content. If a transition seems to need a fact you don't have, write around the gap — do not fill it.
 - **Keep the document's spine.** Same argument, same sections in the same order, same conclusions. You are changing how it reads, not what it says.

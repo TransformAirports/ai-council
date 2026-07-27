@@ -17,24 +17,38 @@ CONFIG_PATH = REPO_ROOT / "council.toml"
 # Research and synthesis run on Opus 4.8. The editorial tier — the agents
 # that work AFTER the research briefs land (Red Team critique, Editor,
 # Humanizer, presentation) — runs on Fable 5 for stronger critique and
-# editorial performance. The Fact-checker stays on Opus deliberately:
-# verification benefits from a different model family than the ones that
-# wrote and polished the text it is checking.
+# editorial performance. The Fact-checker uses a fresh Sonnet context so the
+# final source check is not performed by the Opus writer or the Fable polisher.
 DEFAULT_MODELS: dict[str, str] = {
+    "context": "claude-opus-4-8",
     "research": "claude-opus-4-8",
+    "curation": "claude-opus-4-8",
+    "creative": "claude-fable-5",
     "synthesis": "claude-opus-4-8",
     "critique": "claude-fable-5",
+    "executive_review": "claude-opus-4-8",
     "editor": "claude-fable-5",
     "humanizer": "claude-fable-5",
-    "factcheck": "claude-opus-4-8",
+    "factcheck": "claude-sonnet-4-6",
+    "art_direction": "claude-fable-5",
     "presentation": "claude-fable-5",
-    # OpenAI's deep-research model. Use `o3-deep-research` for the heavyweight
-    # long-horizon sweep (slower, more expensive); switch to
-    # `o4-mini-deep-research` from Settings for a faster/cheaper pass.
+    # OpenAI's deep-research model. `o3-deep-research` is the heavyweight
+    # long-horizon sweep; `o4-mini-deep-research` is the faster/cheaper pass.
+    # NOTE: OpenAI's purpose-built deep-research family is only these two —
+    # there is no gpt-5.x deep-research model. Verified against the live
+    # models list 2026-07-20; the undated alias tracks the newest snapshot.
     "openai_deep_research": "o3-deep-research",
 }
 
 MODEL_CHOICES = ["claude-opus-4-8", "claude-fable-5", "claude-sonnet-4-6"]
+
+# The OpenAI-hosted Deep Research role takes different models than the
+# Claude-hosted roles.
+OPENAI_DR_CHOICES = ["o3-deep-research", "o4-mini-deep-research"]
+
+
+def choices_for_role(role: str) -> list[str]:
+    return OPENAI_DR_CHOICES if role == "openai_deep_research" else MODEL_CHOICES
 
 # Models that are not currently available. When a saved council.toml names one
 # (selected before a block landed, or committed by a teammate), the loader

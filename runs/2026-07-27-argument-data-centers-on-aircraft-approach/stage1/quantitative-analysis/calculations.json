@@ -1,0 +1,131 @@
+{
+  "run": "data-centers-on-aircraft-approach",
+  "analyst": "quantitative-analyst",
+  "date": "2026-07-27",
+  "airport": "Washington Dulles International (IAD/KIAD)",
+  "purpose": "Quantify the airspace-surface, wildlife-separation, thermal-plume, and federal-investment claims in the argument recommending against a data center off the RWY 01L/19R end.",
+  "raw_inputs": {
+    "iad_rwy_01L_19R": {
+      "value": "9,400 ft x 150 ft; RWY 01L threshold elev 296 ft, RWY 19R threshold elev 277 ft",
+      "source": "FlightAware KIAD runway 01L/19R (reflecting FAA airport record)",
+      "source_url": "https://www.flightaware.com/resources/airport/KIAD/runway/01L/19R",
+      "vintage": "2026 airport record",
+      "note": "01C/19C is 11,500 ft; 01L/19R is the runway referenced in the argument."
+    },
+    "part77_precision_approach_surface": {
+      "primary_surface_width_ft": 1000,
+      "primary_surface_extends_beyond_runway_end_ft": 200,
+      "approach_inner_width_ft": 1000,
+      "approach_outer_width_ft": 16000,
+      "inner_slope": "50:1 for first 10,000 ft",
+      "outer_slope": "40:1 for next 40,000 ft",
+      "source": "14 CFR 77.19 (civil airport imaginary surfaces)",
+      "source_url": "https://www.ecfr.gov/current/title-14/chapter-I/subchapter-E/part-77/subpart-C/section-77.19",
+      "source_type": "primary_regulation"
+    },
+    "faa_departure_surface_slope": {
+      "value": "40:1 (1 ft rise per 40 ft horizontal) departure/takeoff clearance surface",
+      "source": "FAA AC 150/5300-13B, Airport Design (departure surface); TERPS 40:1 OCS",
+      "source_type": "primary_faa_guidance",
+      "confidence": "medium_cite_current_AC_table"
+    },
+    "wildlife_separation": {
+      "piston_ft": 5000,
+      "turbine_ft": 10000,
+      "approach_departure_airspace_statute_miles": 5,
+      "source": "FAA AC 150/5200-33 (Hazardous Wildlife Attractants On or Near Airports)",
+      "source_url": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_150_5200-33B.pdf",
+      "source_type": "primary_faa_guidance"
+    },
+    "thermal_plume_criterion": {
+      "critical_vertical_velocity_m_s": 4.3,
+      "jurisdiction": "Australia CASA (no equivalent codified FAA numeric threshold)",
+      "source": "CASA Advisory Circular 139.E-02, Plume rise assessments",
+      "source_url": "https://www.casa.gov.au/sites/default/files/2023-03/advisory-circular-139e-02-plume-rise-assessments.PDF",
+      "source_type": "primary_foreign_regulator",
+      "note": "Best-available published numeric threshold; used here as a reference anchor, not a US standard."
+    },
+    "alsf2_length_ft": {
+      "value": "2,400 ft (3,000 ft where glideslope < 2.75 deg); lights at 100 ft spacing from threshold outward",
+      "source": "FAA ALSF-2 description / FAA Order 6850.2B",
+      "source_url": "https://www.faa.gov/about/office_org/headquarters_offices/ato/service_units/techops/navservices/lsg/als",
+      "source_type": "primary_faa_guidance"
+    },
+    "data_center_power": {
+      "hyperscale_campus_MW_range": "100 to 500 (next-gen 500 to 1000+)",
+      "backup_generator_unit_MW": "2.25 to 4 per unit, many in parallel",
+      "fuel": "on-site diesel and/or piped natural gas; some gigawatt-class gas turbines",
+      "source": "Industry syntheses (C&C Technology Group; Woodstock Power; Mitsubishi Power; USPE Global)",
+      "source_type": "secondary_industry",
+      "confidence": "range_only"
+    },
+    "iad_recent_federal_grants": {
+      "concourse_e_grant_usd": 41800000,
+      "concourse_e_grant_date": "2026-05",
+      "aig_fy2026_usd": 22121621,
+      "source": "FFXnow (Concourse E $41.8M); FAA AIG FY2026 award",
+      "source_url": "https://www.ffxnow.com/2026/05/20/dulles-airport-lands-41m-federal-grant-for-concourse-e-construction/",
+      "source_type": "secondary_news_plus_faa",
+      "note": "Recent grants only; cumulative decades-long AIP total not compiled here (requires FAA grant history)."
+    }
+  },
+  "calculations": [
+    {
+      "id": "C1_approach_surface_height_limit",
+      "question": "How much vertical clearance does the Part 77 precision approach surface allow at a given distance off the runway end?",
+      "formula": "max_height_above_runway_end_elev_ft = distance_from_surface_origin_ft / 50   (first 10,000 ft, 50:1)",
+      "assumptions": ["Surface origin is 200 ft beyond runway end at runway-end elevation (Part 77).", "Flat terrain approximation; actual clearance depends on ground elevation under the object."],
+      "outputs_ft": {"500": 10, "1000": 20, "1500": 30, "2000": 40, "2500": 50, "3000": 60, "4000": 80, "5000": 100, "10000": 200},
+      "takeaway": "A 50 ft object reaches the approach surface only ~2,500 ft from the surface origin (~2,700 ft from the runway end). Data-hall roofs plus mechanical/exhaust stacks routinely exceed 50 ft, so 'does not penetrate' is a razor-thin margin, not a comfortable one.",
+      "label": "analyst_construction_from_regulatory_slope"
+    },
+    {
+      "id": "C2_departure_surface_height_limit",
+      "question": "Height limit under the 40:1 departure surface off the RWY 19R departure end.",
+      "formula": "max_height_ft = distance_from_departure_end_ft / 40",
+      "assumptions": ["40:1 departure surface begins at the departure end of runway at runway-end elevation."],
+      "outputs_ft": {"1000": 25, "2000": 50, "3000": 75, "5000": 125},
+      "takeaway": "The departure surface is even more restrictive close in (25 ft at 1,000 ft). A structure sited near the departure end has very little permissible height.",
+      "label": "analyst_construction_from_regulatory_slope"
+    },
+    {
+      "id": "C3_glideslope_overflight_height",
+      "question": "At what altitude does an aircraft on a standard 3-degree approach overfly a given distance from the threshold? (Bounds where a thermal plume or light source would intersect the flight path.)",
+      "formula": "height_AGL_ft = TCH + distance_from_threshold_ft * tan(3deg) = 50 + distance * 0.05241",
+      "assumptions": ["3.0 degree glidepath.", "Threshold crossing height (TCH) 50 ft.", "Straight-in approach."],
+      "outputs_ft": {"1000": 102, "2000": 155, "3000": 207, "5000": 312, "10000": 574},
+      "takeaway": "Within ~3,000 ft of the threshold the aircraft is below ~210 ft AGL - the control-critical, least-recoverable band. Any plume rise or glare source near the approach lights intersects the flight path exactly where a pilot has the least margin.",
+      "label": "analyst_construction_standard_geometry"
+    },
+    {
+      "id": "C4_wildlife_separation_shortfall",
+      "question": "How far short of FAA separation guidance is a stormwater retention pond sited adjacent to the runway end?",
+      "formula": "shortfall_ft = required_separation_ft - actual_separation_ft",
+      "inputs": {"required_turbine_ft": 10000, "required_if_movement_into_airspace_statute_miles": 5, "actual_ft_estimate": "0 to ~1000 (adjacent to development at runway end)"},
+      "outputs": {"shortfall_vs_10000ft_standard_ft": "~9,000 to 10,000", "shortfall_vs_5SM_trigger_ft": "~25,400 to 26,400 (5 SM = 26,400 ft)"},
+      "takeaway": "A wildlife-attracting water feature adjacent to the approach/departure end is not marginally non-compliant - it is inside the innermost few percent of the FAA-recommended 10,000 ft turbine separation, and squarely under the airspace the 5-statute-mile trigger is written to protect.",
+      "label": "analyst_construction_actual_distance_needs_site_plan"
+    },
+    {
+      "id": "C5_federal_investment_floor",
+      "question": "Order-of-magnitude of the prior federal investment Grant Assurance 29(C) protects.",
+      "formula": "documented_recent_floor = sum(recent identifiable federal grants)",
+      "inputs_usd": {"concourse_e_2026": 41800000, "aig_fy2026": 22121621},
+      "output_usd": 63921621,
+      "takeaway": "Just two 2026 federal awards total ~$64M. Decades of AIP/PFC/BIL investment in the airfield and NAVAIDs run far higher; Grant Assurance 29(C) attaches to that stack. Precise cumulative figure requires FAA grant history (operator/FAA data).",
+      "label": "documented_floor_not_cumulative_total"
+    }
+  ],
+  "sensitivities": {
+    "C1_object_height": "If the parapet-to-tallest-appurtenance height is 70 ft (data-hall + rooftop chillers/stacks), the surface is reached at 3,500 ft from origin, not 2,500 ft - meaning any siting closer than ~3,700 ft from the runway end penetrates.",
+    "C3_glidepath": "At a 2.75 deg glidepath (flatter, and the case that lengthens ALSF-2 to 3,000 ft) overflight heights drop ~8 percent, putting aircraft even lower over the same ground point.",
+    "C4_actual_distance": "Even at a generous 2,000 ft actual separation, the pond is still 80 percent inside the 10,000 ft standard."
+  },
+  "data_gaps_requiring_operator_input": [
+    "Data-center site plan: exact structure footprint, parapet and tallest-appurtenance elevations, and ground elevation vs. runway-end elevation (to run a true Part 77 / AC 150/5300-13 penetration test).",
+    "On-site generation stack parameters (count, MW, exhaust velocity, temperature, stack height) to run a CASA-style plume-rise model against the 4.3 m/s criterion.",
+    "Exact horizontal distance from the stormwater facility to the Air Operations Area and to the approach/departure surfaces.",
+    "IAD cumulative federal grant history (AIP + BIL + PFC on airfield/NAVAIDs) for a defensible Grant Assurance 29(C) exposure figure.",
+    "The specific approach category per runway end (confirm RWY 01L/19R precision-instrument status driving the 50:1 surface)."
+  ]
+}

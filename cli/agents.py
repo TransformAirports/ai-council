@@ -19,6 +19,7 @@ RESEARCH_AGENT_NAMES: tuple[str, ...] = (
     "infrastructure-economist",
     "operations-analyst",
     "technology-scout",
+    "quantitative-analyst",
     "contrarian",
     "chief-engineer",
     "airline-commercial-strategist",
@@ -38,11 +39,17 @@ RESEARCH_AGENT_NAMES: tuple[str, ...] = (
 )
 
 PROCESS_AGENT_NAMES: tuple[str, ...] = (
+    "airport-context-builder",
+    "evidence-curator",
+    "creative-director",
     "strategist",
+    "evidence-prosecutor",
+    "airport-executive-reviewer",
     "red-team",
     "editor",
     "humanizer",
     "fact-checker",
+    "art-director",
     "presentation-designer",
     # Scope-fulfillment mode: turn a client scope of work into every
     # deliverable it requires.

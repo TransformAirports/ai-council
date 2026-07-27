@@ -1,45 +1,148 @@
 # Methodology
 
-This file documents how the Council produces its outputs. It is the source of truth for the methodology appendix that must appear in every published document.
+This file is the source of truth for the Council's public methodology
+disclosure. The run manifest supplies the actual roster, models, artifacts, and
+quality results for each report.
 
-## Why a methodology disclosure
+## Public disclosure
 
-An executive-grade piece produced with AI assistance is only credible if the reader understands how it was made. Hiding the method invites suspicion; disclosing it cleanly disarms the objection. The methodology appendix is not a disclaimer. It is a statement of process.
-
-## The canonical appendix
-
-Paste this into every final document. Fill the bracketed fields before publishing.
-
-> **Methodology**
+> **How this report was produced**
 >
-> This document was produced by the Transform Airports AI Council, a multi-agent system operated by [name / role]. The Council consists of twelve specialized agents running on Anthropic's Claude platform:
+> This document was produced by the Transform Airports AI Research Council, a
+> multi-agent analytical system operated with human review. The Council does
+> not ask one model to research, write, and approve its own answer.
 >
-> - **Eight research agents** — Infrastructure Economist, Operations Analyst, Technology Scout, Contrarian, Chief Engineer, Airline Commercial Strategist, Regulatory/Political Analyst, and Aviation Historian — that independently gathered evidence without reading each other's work.
-> - **A Strategist** that synthesized the eight briefs into a single argumentative draft.
-> - **A Red Team** that attacked the Strategist's drafts across multiple revision rounds.
-> - **An Editor** that tightened the final prose without adding new content or claims.
-> - **A Fact-checker** that verified every numerical and attributed claim against the research briefs. Unverifiable claims were removed or flagged for human review.
+> The named airport's current governance, financial, capital, airline,
+> regulatory, and operating context was assembled first from operator-supplied
+> files and authoritative public records. A run-specific group of research
+> agents then investigated the thesis independently. They could read the shared
+> context packet but not one another's work.
 >
-> Total agent runtime: [X] hours. Human review occurred at two checkpoints: after the third Strategist draft and after the Fact-checker's report. Agent definitions are maintained as versioned markdown files and are edited only by human reviewers via pull request — agents do not modify themselves or each other.
+> Each researcher produced both an analytical brief and structured evidence
+> records. A research editor deduplicated those records, ranked the
+> load-bearing evidence, preserved disagreement, and identified gaps. A
+> Creative Director proposed several truthful narrative approaches before the
+> Strategist selected and wrote the argument.
 >
-> The final text was reviewed and approved by [name] before release. AI-assisted production does not reduce human accountability for the arguments and claims in this document.
+> The draft passed through two different adversarial reviews. An Evidence
+> Prosecutor tested sources, numbers, causality, and counterevidence. An Airport
+> Executive Reviewer tested decision clarity, governance, finance, airline
+> response, procurement, delivery, and operating feasibility. The Strategist
+> revised after each.
+>
+> An Editor tightened the work and a Humanizer refined its voice without
+> changing facts. A source verifier then checked load-bearing claims against the
+> evidence ledger and underlying primary sources, removed or qualified
+> unsupported claims, and created a machine-readable claim-to-source lineage
+> record.
+>
+> Before publication, deterministic quality gates checked citations, internal
+> provenance leakage, unresolved placeholders, footnote integrity, and other
+> release defects. When a presentation was requested, an Art Director defined
+> the visual argument. Every final slide was rendered and inspected at full
+> size, then the complete deck was inspected as a montage for narrative rhythm.
+> A SHA-256-bound inspection receipt records the exact deck, visual brief,
+> slide renders, montage, canonical signature slide, resolved findings, and
+> inspector attestation. Every Word page was likewise rendered, inspected at
+> full size and in sequence, and bound to its own inspection receipt.
+>
+> Human review occurred after adversarial synthesis and after source
+> verification. The report's run archive preserves its roster, research,
+> evidence ledger, drafts, critiques, verification log, quality results, and
+> model-cost record. AI-assisted production does not reduce the named human
+> reviewer's responsibility for what is released.
 
-## Principles behind the design
+## Design principles
 
-**Independent research beats coordinated research.** The eight Stage 1 agents do not share a context. They cannot see each other's briefs. Each one argues from a different lens — economics, operations, technology, opposition, engineering, airline commercial strategy, regulation, history — and each has a default stance, not a neutral posture. This forces genuine variance in the evidence pool. A pipeline in which agents share drafts tends to converge early and lose the friction that produces a good final argument.
+### Independent research prevents early convergence
 
-**Steelmanning is mandatory.** The Contrarian agent is not a token skeptic. Its job is to make the strongest possible case against the thesis. If the Strategist can beat the Contrarian only by ignoring it, the thesis is not ready to publish.
+Researchers share the question and the airport context packet, not one
+another's conclusions. This preserves genuinely different lines of inquiry.
+The evidence curator reconciles them only after the swarm finishes.
 
-**Adversarial revision is the engine.** The Strategist writes. The Red Team attacks. The Strategist revises. The Red Team attacks again. Each round strips away a layer of unsupported claim or weak rhetoric. Two rounds is enough to catch most problems without exhausting the argument.
+### Evidence is a typed artifact
 
-**Fact-checking has veto power.** Every number in the final document must trace to a Stage 1 brief. If a claim cannot be traced, it either gets cut or gets marked for human review. No exceptions.
+A research brief is analysis, not proof. Source-bearing findings live in an
+evidence ledger with stable IDs, source metadata, dates, units, denominators,
+caveats, and confidence. The final claim-lineage file records which evidence
+supports each load-bearing claim and what the verifier did with it. For a
+retained claim, the lineage must match the exact sentence or table row, its
+adjacent footnote marker, the exact reader-facing citation, an evidence-ledger
+record for that same source, and the final document hash. Unsupported claims
+can remain in the audit record only when marked as excluded from the final
+draft.
 
-**Version control is the improvement loop.** Agents get better through edits to their markdown files, reviewed and merged by humans. Agents never modify themselves. Agents never modify each other. This sounds slow; it is the only way to keep the system accountable across many runs.
+### Counterevidence is part of the record
 
-**The final human review is load-bearing.** AI output is 85%. The last 15% is the judgment of the person whose name goes on the document. The Council is a tool for drafting quickly and arguing rigorously. It is not a tool for replacing that judgment.
+The Contrarian research lens and the Evidence Prosecutor preserve the strongest
+case against the thesis. Disagreement is not averaged away. A conclusion is
+stronger when the reader can see the conditions under which it would fail.
 
-## What this methodology is not
+### Creativity enters before the prose hardens
 
-- Not an evaluation framework for AI output quality. We do not score agents. We observe their behavior across runs and edit their prompts.
-- Not a guarantee of correctness. The Fact-checker catches numerical mismatches against the briefs. It does not catch errors in the briefs themselves. Primary source review is the reader's responsibility.
-- Not a substitute for a subject-matter author. The Council amplifies a human's argument. It does not replace one.
+The Creative Director proposes three narrative spines: board-ready,
+counterintuitive, and operational. Each must cite the same evidence ledger.
+This gives the work a chance to surprise without giving it permission to
+invent.
+
+### Airport recommendations must be assignable
+
+Material recommendations identify an owner, approval route, first 90-day
+action, cost order of magnitude, funding source, dependencies, leading
+indicator, failure mode, stop condition, and the evidence that would change the
+recommendation. Missing operator facts remain named gaps.
+
+### Verification is independent and source-facing
+
+The final verifier reviews the reader-facing draft after editing. A brief can
+locate a source but cannot certify its own interpretation. When a brief and the
+underlying source disagree, the source wins.
+
+Every generated artifact carries a dependency receipt for the exact upstream
+files its prompt and agent charter permit it to read. Glob membership, bytes,
+and the stable run identity are hash-bound. The run identity also fingerprints
+the local orchestration code, research contract, agent charters, and brand
+rules. Resume therefore fails closed when an upstream artifact or Council
+version changes; it does not join old synthesis to newly generated research.
+Publication-gate remediation reads immutable snapshots and writes separate
+outputs before promotion, preserving a checkable before-and-after chain.
+
+### Publishing is a quality-controlled stage
+
+Word and PowerPoint files are treated as professional products. Internal agent
+names and stage labels cannot appear in reader-facing text. Decks use
+evidence-bearing visuals, readable sources, mode-specific slide and typography
+limits, and a rendered visual QA loop. Conversion alone is not inspection:
+PowerPoint release requires a passing receipt bound to every full-size slide
+render, the narrative montage, and the visual brief's exact signature slide.
+Word release requires a second inspector to review every full-size page plus
+the page-sequence montage and attest a receipt bound to the exact DOCX, PDF,
+and page renders. Missing render tools are a release error, not a warning.
+The exact Office packages that pass QA are copied into a SHA-256-bound release
+bundle and independently rendered once more. Distribution uses an immutable,
+hash-named bundle plus a compact current-release manifest replaced only after
+the full bundle is ready. The UI advertises only files whose package and QA
+hashes still match that manifest. Only a complete release is archived and
+marked finished; the system does not rebuild approved documents from Markdown
+after review.
+
+### Human judgment remains load-bearing
+
+The Council records optional human scores for originality, airport specificity,
+decision usefulness, writing, and visual quality. Those signals help improve
+the system; they do not transfer accountability from the person or institution
+that publishes the work.
+
+## Limitations
+
+- Public records may omit confidential airline, security, labor, commercial,
+  or procurement information.
+- A source can be authentic and still be incomplete, outdated, or methodically
+  weak.
+- Primary-source verification reduces factual risk; it does not guarantee that
+  an inference or recommendation is correct.
+- Model behavior and web access can change. Each run's manifest records what
+  actually executed.
+- The Council produces decision-quality drafts. Subject-matter, legal,
+  security, financial, and executive review remain necessary where the stakes
+  require them.

@@ -19,7 +19,9 @@ Do **not** open a PR to fix a one-off bad output. Re-run first. If the defect sh
 
 1. **Create a branch** named `agent/<agent-name>/<short-description>`. Example: `agent/contrarian/stronger-political-economy-argument`.
 
-2. **Edit the relevant file in `.claude/agents/`.** Keep the YAML frontmatter intact. Edit the system prompt.
+2. **Edit the relevant file in `.claude/agents/`.** Keep the YAML
+   frontmatter intact. This directory is the source of truth; do not hand-edit
+   `.codex/agents/`.
 
 3. **Write the commit message in terms of behavior, not text.** Bad: "Updated contrarian prompt." Good: "Contrarian: require at least one case where ops-intel investment failed to deliver, to force Strategist to concede real ground."
 
@@ -29,9 +31,18 @@ Do **not** open a PR to fix a one-off bad output. Re-run first. If the defect sh
    - The specific behavior change you expect after the edit
    - Any second-order effects to watch for (e.g., "this may make the Contrarian brief longer; may need to trim elsewhere")
 
-5. **Review.** Another human — ideally someone who read the run output — reviews the PR. The review question is always: *will this make the next run's output better, or just different?*
+5. **Sync and test.** Run
+   `.venv/bin/python scripts/sync_codex_agents.py`, then
+   `.venv/bin/python -m unittest discover -s tests -v`. The generated Codex
+   mirror must match the markdown source.
 
-6. **Merge and re-run.** The next run uses the updated agent file. Log the change in the relevant run's retrospective.
+6. **Review.** Another human — ideally someone who read the run output —
+   reviews the PR. The review question is always: *will this make the next
+   run's output better, or just different?*
+
+7. **Merge and re-run.** Compare the next run using prompt hashes, structured
+   evidence lineage, and human quality scores. Do not judge the change by word
+   count or agent-name mentions.
 
 ## What Not to Change
 
@@ -46,9 +57,13 @@ Adding an agent is a bigger decision than editing one. The test: if you cannot e
 
 When adding:
 1. Create the file in `.claude/agents/`
-2. Update `docs/how-to-run.md` to include the new agent in the run sequence
-3. Update the orchestration prompt in `claude-code-setup.md`
-4. Run once and include the output in the PR so reviewers can see the agent's real behavior before approving
+2. Register it in `cli/agents.py` as a research or process agent
+3. Add its model role to `cli/config.py` and `council.toml` when needed
+4. Update a council preset only if the new lens belongs there by default
+5. Run `scripts/sync_codex_agents.py`
+6. Add or update tests and public documentation
+7. Run once and include the manifest, evidence/lineage metrics, and human review
+   with the PR
 
 ## What Not to Do
 

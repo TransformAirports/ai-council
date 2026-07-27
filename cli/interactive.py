@@ -94,25 +94,23 @@ DEFAULT_SUCCESS_CRITERIA = [
 # Council presets.
 # ----------------------------------------------------------------------------
 
-# Audit-tuned default council. Each agent in this list returned at least 2.8
-# citations per 1,000 brief words across the first four archived runs (see
-# `council --audit` for current scores). The agents dropped from the prior
-# "Default Eight" roster — chief-engineer, aviation-historian, and
-# regulatory-political-analyst — wrote substantial briefs but the Strategist
-# rarely surfaced their content. Re-run the audit periodically and update this
-# list as the data evolves; this is meant to be tuned, not frozen.
+# Balanced airport council. This is a deliberate coverage preset—not a ranking
+# inferred from mentions in past final drafts. Evidence-lineage telemetry can
+# inform future changes once enough comparable, human-scored runs exist.
 PRESET_DEFAULT: tuple[str, ...] = (
-    "technology-scout",              # 14.0 cites / 1k brief words
-    "contrarian",                    # 13.1
-    "airport-ceo",                   # 9.8
-    "airport-coo",                   # 8.3
-    "infrastructure-economist",      # 5.5
-    "operations-analyst",            # 4.9
-    "airline-commercial-strategist", # 2.8
+    "technology-scout",
+    "quantitative-analyst",
+    "contrarian",
+    "airport-ceo",
+    "airport-coo",
+    "infrastructure-economist",
+    "operations-analyst",
+    "airline-commercial-strategist",
 )
 
 PRESET_OPERATIONAL: tuple[str, ...] = (
     "operations-analyst",
+    "quantitative-analyst",
     "chief-engineer",
     "technology-scout",
     "airport-coo",
@@ -122,6 +120,7 @@ PRESET_OPERATIONAL: tuple[str, ...] = (
 
 PRESET_STRATEGIC: tuple[str, ...] = (
     "airport-ceo",
+    "quantitative-analyst",
     "airport-coo",
     "regulatory-political-analyst",
     "airline-commercial-strategist",
@@ -138,6 +137,7 @@ AGENT_GROUPS: list[tuple[str, list[str]]] = [
     ]),
     ("Operations & Engineering", [
         "operations-analyst",
+        "quantitative-analyst",
         "chief-engineer",
         "technology-scout",
         "architectural-historian",
@@ -201,10 +201,16 @@ class RunSpec:
     is_not: list[str] = field(default_factory=list)
     is_yes: list[str] = field(default_factory=list)
     operator_context: str = ""
+    decision_required: str = ""
+    decision_owner: str = ""
+    time_horizon: str = ""
+    approval_path: str = ""
+    success_measure: str = ""
     success_criteria: list[str] = field(default_factory=list)
     selected_research_agents: list[str] = field(default_factory=list)
     agent_overrides: dict[str, str] = field(default_factory=dict)
     want_pptx: bool = False
+    deck_mode: str = "board_decision"
     output_format: str = "report"  # report | article | brief | recommendations
     source_paths: list[str] = field(default_factory=list)  # readable paths for sources
 
@@ -386,7 +392,7 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     default_count = len([n for n in PRESET_DEFAULT if n in {a.name for a in research}])
     preset_options = [
         f"All standard lenses ({standard_count} agents)",
-        f"Default {default_count} (audit-tuned contributors)",
+        f"Balanced {default_count} (evidence, operations, commercial, opposition)",
         "Operational focus (Ops, Engineering, COO, Public Safety, EM)",
         "Strategic focus (CEO, COO, Regulatory, Commercial, Econ, History)",
         "Custom — pick from grouped checklist (includes Deep Research)",

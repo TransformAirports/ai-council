@@ -22,6 +22,7 @@
     <nav class="side-nav">
       <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New report</button>
       <button class="side-link" data-nav="scope"><span class="sl-ic">⛭</span> Fulfill a scope</button>
+      <button class="side-link" data-nav="strengthen"><span class="sl-ic">◆</span> Strengthen an argument</button>
       <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
       <button class="side-link" data-nav="audit"><span class="sl-ic">◎</span> Council audit</button>
     </nav>
@@ -32,11 +33,11 @@
       <div class="sr-label">Run in progress</div>
       <div class="sr-stage" id="sr-stage">—</div>
       <div class="sr-bar"><div id="sr-fill" class="sr-fill"></div></div>
-      <div class="sr-cost" id="sr-cost">$0.00</div>
+      <div class="sr-cost" id="sr-cost">Claude $0.00</div>
     </div>
 
     <div class="side-status">
-      <div class="ss-row"><b id="ss-agents">43</b> agents</div>
+      <div class="ss-row"><b id="ss-agents">54</b> agents</div>
       <div class="ss-row"><b id="ss-runs">0</b> reports produced</div>
       <div class="ss-foot" id="ss-models">—</div>
     </div>
@@ -44,6 +45,14 @@
 
   <!-- ───────────── WORKSPACE ───────────── -->
   <main class="workspace">
+    <nav class="mobile-nav" aria-label="Council navigation">
+      <button class="mobile-brand" data-nav="home" aria-label="Council home">▲</button>
+      <button data-nav="configure"><span>✦</span>New</button>
+      <button data-nav="scope"><span>⛭</span>Scope</button>
+      <button data-nav="strengthen"><span>◆</span>Argument</button>
+      <button data-nav="library"><span>▦</span>Library</button>
+      <button data-nav="audit"><span>◎</span>Audit</button>
+    </nav>
 
     <!-- HOME -->
     <section id="view-home" class="view">
@@ -65,8 +74,8 @@
         </div>
         <button id="home-new" class="btn-primary big">Begin a new report →</button>
         <div class="hero-stats">
-          <span><b id="stat-agents">43</b> agents</span><i></i>
-          <span><b id="stat-lenses">19</b> research lenses</span><i></i>
+          <span><b id="stat-agents">54</b> agents</span><i></i>
+          <span><b id="stat-lenses">20</b> research lenses</span><i></i>
           <span><b>2</b> adversarial rounds</span><i></i>
           <span><b>2</b> human checkpoints</span>
         </div>
@@ -147,6 +156,33 @@
             </div>
           </div>
 
+          <details class="decision-frame">
+            <summary>Decision frame <span class="opt">recommended for airport-specific work</span></summary>
+            <p class="field-hint">These fields force the Council to produce an assignable decision, not a generic conclusion. Leave an unknown blank and the research team will identify it as a gap.</p>
+            <label class="field-label" for="f-operator-context">Airport or operator context</label>
+            <textarea id="f-operator-context" class="text-input" rows="3" placeholder="Named airport or authority, current program, constraints, attached plans, agreements, financial documents, or operating conditions."></textarea>
+            <div class="two-col">
+              <div>
+                <label class="field-label" for="f-decision">Decision required</label>
+                <input id="f-decision" class="text-input" placeholder="What choice should this work enable?" />
+              </div>
+              <div>
+                <label class="field-label" for="f-owner">Decision owner</label>
+                <input id="f-owner" class="text-input" placeholder="CEO, COO, Board, VP, program executive..." />
+              </div>
+              <div>
+                <label class="field-label" for="f-horizon">Time horizon</label>
+                <input id="f-horizon" class="text-input" placeholder="90 days, FY27 budget, next use agreement..." />
+              </div>
+              <div>
+                <label class="field-label" for="f-approval">Approval path</label>
+                <input id="f-approval" class="text-input" placeholder="Board, airline MII, FAA, procurement..." />
+              </div>
+            </div>
+            <label class="field-label" for="f-success-measure">Success measure</label>
+            <input id="f-success-measure" class="text-input" placeholder="The measurable condition that would prove the decision worked" />
+          </details>
+
           <label class="field-label">Output format</label>
           <div id="format-pills" class="pill-row"></div>
           <div id="sources-note" class="sources-note hidden"></div>
@@ -156,7 +192,7 @@
         <div class="wiz-panel hidden" data-panel="2">
           <div class="panel-head"><h2>Compose the council</h2><p class="muted" id="seated-count">0 agents seated</p></div>
           <div class="preset-row">
-            <button class="ghost-btn" data-preset="default">Audit-tuned default</button>
+            <button class="ghost-btn" data-preset="default">Balanced airport council</button>
             <button class="ghost-btn" data-preset="all">All standard</button>
             <button class="ghost-btn" data-preset="none">Clear</button>
           </div>
@@ -169,8 +205,15 @@
           <div id="review-summary" class="review-summary"></div>
           <div class="launch-row">
             <label class="toggle"><input type="checkbox" id="f-pptx" /> <span>Companion executive deck</span></label>
+            <label class="deck-mode-label" for="f-deck-mode">Deck mode
+              <select id="f-deck-mode" class="select-input">
+                <option value="board_decision">Board decision · 8–12 slides</option>
+                <option value="executive_briefing">Executive briefing · 12–18 slides</option>
+                <option value="technical_read_ahead">Technical read-ahead · 15–25 slides</option>
+              </select>
+            </label>
             <label class="toggle"><input type="checkbox" id="f-review" checked /> <span>Pause at the two checkpoints</span></label>
-            <div class="budget-field"><label for="f-budget">Budget ceiling&nbsp;$</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
+            <div class="budget-field"><label for="f-budget">Claude budget ceiling&nbsp;$</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
           </div>
           <div id="auth-banner" class="auth-banner hidden"></div>
         </div>
@@ -196,16 +239,92 @@
         <textarea id="s-notes" class="text-input" rows="3" placeholder="Anything the scope doesn't say — priorities, constraints, what the client cares about most."></textarea>
         <div class="launch-row" style="justify-content:flex-start;">
           <label class="toggle"><input type="checkbox" id="s-review" checked /> <span>Pause at plan approval &amp; final QA</span></label>
-          <div class="budget-field"><label for="s-budget">Budget ceiling&nbsp;$</label><input id="s-budget" class="num-input" type="number" min="0" step="25" value="250" /></div>
+          <div class="budget-field"><label for="s-budget">Claude budget ceiling&nbsp;$</label><input id="s-budget" class="num-input" type="number" min="0" step="25" value="250" /></div>
         </div>
         <p class="field-hint">A multi-deliverable engagement is a large run — expect several hours and substantially more than a single report. The plan checkpoint shows you exactly what will be built before production spends anything.</p>
         <button id="scope-launch" class="btn-primary big">⛭&nbsp; Plan the engagement</button>
       </div>
     </section>
 
+    <!-- STRENGTHEN AN ARGUMENT -->
+    <section id="view-strengthen" class="view hidden">
+      <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Strengthen an argument</h1></div>
+      <div class="panel argument-intro">
+        <p class="muted">Give the Council an argument in text, supporting documents, or both. The research lenses you choose find the evidence and counterevidence that matter; the Council returns one concise, source-checked argument. It can also turn that argument into a presentation with exactly the slide count you specify.</p>
+      </div>
+
+      <div class="panel">
+        <div class="section-head sub"><h3>1 · Supply the argument</h3><span class="muted argument-required-note">Text or documents required</span></div>
+        <div class="two-col">
+          <div>
+            <label class="field-label" for="a-title">Title <span class="req">required</span></label>
+            <input id="a-title" class="text-input" maxlength="160" placeholder="A short name for this argument" />
+          </div>
+          <div>
+            <label class="field-label" for="a-audience">Audience</label>
+            <input id="a-audience" class="text-input" placeholder="Airport board, executive team, policy readers…" value="Airport executives and sophisticated aviation readers" />
+          </div>
+        </div>
+        <label class="field-label" for="a-text">Current argument <span class="opt">paste text here</span></label>
+        <textarea id="a-text" class="text-input argument-text" rows="9" placeholder="Paste the claim, draft, email, talking points, or rough argument you want the Council to strengthen."></textarea>
+        <label class="field-label" for="a-goal">Research direction <span class="opt">optional</span></label>
+        <textarea id="a-goal" class="text-input" rows="3" maxlength="4000" placeholder="What needs strengthening? For example: prove the mechanism, find airport precedents, quantify the exposure, or answer a specific objection."></textarea>
+
+        <label class="field-label">Supplemental documents <span class="opt">optional</span></label>
+        <div id="argument-dropzone" class="argument-dropzone" tabindex="0" role="button" aria-controls="a-files">
+          <input id="a-files" class="hidden" type="file" multiple accept=".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv,.json,.yaml,.yml" />
+          <div class="argument-drop-icon">＋</div>
+          <div><b>Choose files or drop them here</b><span>PDF, Word, PowerPoint, Excel, Markdown, or text · 40 MB each</span></div>
+        </div>
+        <div id="argument-files" class="argument-file-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head argument-council-head">
+          <div><h2>2 · Choose the research lenses</h2><p class="muted" id="argument-seated-count">0 agents seated</p></div>
+          <div class="preset-row">
+            <button class="ghost-btn" data-argument-preset="default">Balanced airport council</button>
+            <button class="ghost-btn" data-argument-preset="all">All standard</button>
+            <button class="ghost-btn" data-argument-preset="none">Clear</button>
+          </div>
+        </div>
+        <div id="argument-agent-groups"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head sub"><h3>3 · Choose the output</h3></div>
+        <div class="argument-output-grid">
+          <div class="argument-output-card selected">
+            <div class="argument-output-check">✓</div>
+            <div><b>Strengthened argument</b><span>Always included · concise Markdown, not a long-form report</span></div>
+          </div>
+          <label class="argument-output-card optional" for="a-pptx">
+            <input type="checkbox" id="a-pptx" />
+            <div><b>PowerPoint presentation</b><span>Optional · built from the verified argument</span></div>
+          </label>
+        </div>
+        <div id="argument-slide-field" class="argument-slide-field hidden">
+          <label for="a-slide-count">Exact slide count</label>
+          <input id="a-slide-count" class="num-input" type="number" min="3" max="30" step="1" value="10" />
+          <span>3–30 slides; the production contract enforces this exact number.</span>
+        </div>
+        <div class="launch-row argument-launch-row">
+          <div class="budget-field"><label for="a-budget">Claude budget ceiling&nbsp;$</label><input id="a-budget" class="num-input" type="number" min="0" step="5" value="60" /></div>
+          <button id="argument-launch" class="btn-primary big">◆&nbsp; Strengthen the argument</button>
+        </div>
+        <div id="argument-auth" class="auth-banner hidden"></div>
+      </div>
+    </section>
+
     <!-- RUN -->
     <section id="view-run" class="view hidden">
       <div id="stage-rail" class="stage-rail"></div>
+      <div class="telemetry-strip" aria-label="Live run quality telemetry">
+        <div><span>Evidence records</span><b id="tm-evidence">—</b></div>
+        <div><span>Artifacts validated</span><b id="tm-artifacts">0</b></div>
+        <div><span>Agents missing evidence</span><b id="tm-gaps">—</b></div>
+        <div><span>Publishing gate</span><b id="tm-gate">Pending</b></div>
+      </div>
       <section class="constellation-wrap panel">
         <div class="run-meta"><div class="run-title" id="run-title">—</div><div class="run-stage" id="run-stage">Preparing…</div></div>
         <button id="cancel-btn" class="ghost-btn danger run-cancel">Cancel</button>
@@ -231,6 +350,20 @@
             <button id="result-deck" class="ghost-btn">📊 Build a deck</button>
             <button id="result-new" class="ghost-btn">New report</button>
           </div>
+          <details id="result-quality" class="result-quality">
+            <summary>Rate this Council output</summary>
+            <p class="muted">Optional. These scores improve the Council’s prompts and roster; they do not train a model.</p>
+            <div class="result-rating-grid">
+              <label>Originality <select data-final-rating="originality"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+              <label>Airport specificity <select data-final-rating="airport_specificity"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+              <label>Decision usefulness <select data-final-rating="decision_usefulness"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+              <label>Writing quality <select data-final-rating="writing"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+              <label>Visual quality <select data-final-rating="visual_quality"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+            </div>
+            <textarea id="result-quality-notes" class="text-input" rows="2" placeholder="What made it strong—or what should change next time?"></textarea>
+            <button id="result-quality-save" class="ghost-btn">Save quality signal</button>
+            <span id="result-quality-status" class="muted"></span>
+          </details>
           <hr class="reader-rule" />
           <div id="result-body" class="report-body"></div>
         </article>
@@ -261,6 +394,7 @@
     <p class="muted" id="cp-subtitle"></p>
     <div id="cp-tabs" class="cp-tabs"></div>
     <div id="cp-content" class="cp-content"></div>
+    <div id="cp-rubric" class="cp-rubric hidden"></div>
     <textarea id="cp-notes" class="text-input hidden" rows="3" placeholder="Notes for the redo — what should the next draft do differently?"></textarea>
     <div id="cp-actions" class="cp-actions"></div>
   </div>

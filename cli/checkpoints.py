@@ -28,6 +28,7 @@ class CheckpointResult:
     approved: bool
     redo_from: str | None = None  # optional name of a step to redo
     notes: str = ""               # operator notes to inject into the redo prompt
+    ratings: dict[str, int] | None = None
 
 
 def _show_file_excerpt(path: Path, max_lines: int = 60) -> None:
@@ -70,14 +71,22 @@ async def checkpoint_after_stage2(
                 {"name": "Red Team critique v1", "content": _read(stage2 / "red-team-critique-v1.md")},
             ],
             "actions": ["continue", "redo", "abort"],
+            "rubric": [
+                {"key": "originality", "label": "Originality"},
+                {"key": "airport_specificity", "label": "Airport specificity"},
+                {"key": "decision_usefulness", "label": "Decision usefulness"},
+            ],
         }) or {"action": "abort"}
         action = decision.get("action", "abort")
         if action == "continue":
-            return CheckpointResult(approved=True)
+            return CheckpointResult(
+                approved=True, ratings=_clean_ratings(decision.get("ratings"))
+            )
         if action == "redo":
             return CheckpointResult(
                 approved=False, redo_from="strategist-v3",
                 notes=str(decision.get("notes", "")).strip(),
+                ratings=_clean_ratings(decision.get("ratings")),
             )
         return CheckpointResult(approved=False)
 
@@ -129,11 +138,32 @@ async def checkpoint_after_stage3(
                 {"name": "Fact-check report", "content": _read(stage3 / "fact-check-report.md")},
             ],
             "actions": ["approve", "abort"],
+            "rubric": [
+                {"key": "writing", "label": "Writing quality"},
+                {"key": "airport_specificity", "label": "Airport specificity"},
+                {"key": "decision_usefulness", "label": "Decision usefulness"},
+            ],
         }) or {"action": "abort"}
-        return CheckpointResult(approved=decision.get("action") == "approve")
+        return CheckpointResult(
+            approved=decision.get("action") == "approve",
+            ratings=_clean_ratings(decision.get("ratings")),
+        )
 
     answer = await questionary.confirm(
         "Generate the Word documents and archive the run?",
         default=True,
     ).ask_async()
     return CheckpointResult(approved=bool(answer))
+
+
+def _clean_ratings(value: object) -> dict[str, int]:
+    """Keep only integer 1–5 rubric scores from an untrusted UI payload."""
+    if not isinstance(value, dict):
+        return {}
+    cleaned: dict[str, int] = {}
+    for key, raw in value.items():
+        if not isinstance(key, str) or not isinstance(raw, int):
+            continue
+        if 1 <= raw <= 5:
+            cleaned[key] = raw
+    return cleaned

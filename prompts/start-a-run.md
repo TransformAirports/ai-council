@@ -18,18 +18,39 @@ If they give you just a topic ("something on airline consolidation"), push once 
 
 If they resist being pushed, pick a sharp thesis on their behalf from what they said, show it to them, and ask whether you nailed it. Do not run a generic "topic-level" piece — the Council produces bad output from vague inputs.
 
-## Step 2 — Defaults (use silently unless the user specifies otherwise)
+## Step 2 — Infer the decision frame and defaults
+
+From the user's description, infer:
+
+- The airport, authority, program, or industry segment
+- The decision the work should enable
+- The likely executive owner
+- The useful time horizon
+- The approvals or external parties likely to matter
+- The measurable definition of success
+
+Do not interrogate the user for fields you can reasonably infer. Mark unknown
+operator-specific facts as research questions in the run file; never invent
+them.
+
+Use these defaults silently unless the user specifies otherwise:
 
 - **Audience:** MWAA leadership, airport planners, and policy readers. Assume sophistication and skepticism.
 - **Tone:** Direct. Evidence-dense. Intellectually honest about the counter-argument. Slightly provocative but not polemical. Think Matt Levine on aviation, not a consultant deck.
 - **Length:** 8,000-10,000 words for the full report; ~1,100-word executive summary.
-- **Research agent overrides:** none (use the defaults in `.claude/agents/`).
+- **Council:** balanced airport council unless the thesis clearly requires a
+  specialist roster.
+- **Research agent overrides:** none.
+- **Deck mode:** board decision when a deck is requested.
 
 Ask about these only if the user asks first, or if the thesis falls outside the Council's core airport-industry specialization (in which case: flag the mismatch and ask whether to proceed anyway or edit the agent files).
 
 ## Step 3 — Write the run file
 
-Pick a short kebab-case slug based on the thesis (e.g. `airline-consolidation`, `biometric-risk`, `cargo-revenue-collapse`). Write the run file to `prompts/runs/<slug>.md` using the same section structure as the template (thesis, audience, tone, length, what it is NOT, what it IS, success criteria) — but in clean prose, not `{{...}}` placeholder syntax. The file should read like a finished brief, not a fill-in-the-blanks form.
+Pick a short kebab-case slug based on the thesis. Write the run file to
+`prompts/runs/<slug>.md` using the template's current structure, including the
+decision frame and selected council. Write clean prose, not placeholder syntax.
+The file should read like a finished commission.
 
 ## Step 4 — Confirm, then run
 
@@ -40,25 +61,30 @@ Thesis:    <1-2 sentence version>
 Audience:  <short>
 Tone:      <short>
 Length:    <short>
+Decision:  <decision and owner, or "to be established by the research">
 Slug:      <kebab-case>
 ```
 
 Ask: "Ready to run?"
 
-On confirmation, execute the standard four-stage sequence from [`prompts/orchestration.md`](orchestration.md). You already have the run file path and slug — you wrote them. The user does not need to paste anything further.
+On confirmation, execute the canonical Council v2 pipeline from
+[`prompts/orchestration.md`](orchestration.md) through
+`./council --run <run-file-path>`. You already have the run file path and slug
+— you wrote them. The user does not need to paste anything further.
 
-## Standard four-stage execution (reminder)
-
-- **Stage 1:** Four research agents (`infrastructure-economist`, `operations-analyst`, `technology-scout`, `contrarian`) invoked in parallel. Outputs to `outputs/stage1/`. Use Sonnet.
-- **Stage 2:** `strategist` v1 → `red-team` v1 → `strategist` v2 → `red-team` v2 → `strategist` v3. Outputs to `outputs/stage2/`. Use Opus. **Stop for human checkpoint.**
-- **Stage 3:** `editor` → `fact-checker`. Outputs to `outputs/stage3/`. Use Opus for editor, Sonnet or Opus for fact-checker. **Stop for human checkpoint.**
-- **Stage 4:** `docx` skill produces `outputs/stage4/<slug>.docx` (full report with cover, TOC, body, methodology appendix) and `<slug>-executive-summary.docx` (3-page standalone distillation).
-
-After Stage 4: remind the user to archive the run to `runs/YYYY-MM-DD-<slug>/` and write a brief retrospective.
+Execute the canonical Council v2 pipeline from
+[`prompts/orchestration.md`](orchestration.md). Do not copy an older roster or
+stage sequence into the conversation. The CLI owns model routing, manifests,
+resume behavior, quality gates, archiving, and publishing.
 
 ## Rules that apply to any run
 
-- Every numerical claim cites a source from a Stage 1 brief or is clearly tagged `[UNVERIFIED — HUMAN REVIEW]`.
+- Every load-bearing claim traces through the claim-lineage file to a structured
+  evidence record and an underlying source.
+- Reader-facing citations name primary sources, never agents or briefs.
+- Every recommendation identifies an owner, approval path, first 90-day move,
+  dependencies, leading measure, failure mode, and stop condition—or explicitly
+  labels the missing operator fact.
 - No buzzwords in output prose (see `CLAUDE.md` for the banned list).
 - Agents never edit each other's files or their own files. Behavior changes go through human PRs against `.claude/agents/`.
 
