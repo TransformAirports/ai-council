@@ -1,0 +1,214 @@
+# Quantitative Analyst Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Analyst:** quantitative-analyst
+**Run:** quiet-by-design-standards-for-mwaa-terminals-2
+**Date:** 2026-08-10
+**Companion files:** `outputs/stage1/quantitative-analyst-evidence.jsonl`,
+`outputs/stage1/quantitative-analysis/calculations.json`, and five exhibit
+CSVs in `outputs/stage1/quantitative-analysis/`.
+
+## Purpose
+
+Turn the "quiet-by-design" thesis into arithmetic MWAA can defend at a Board
+table and in front of a signatory-carrier majority-in-interest. I do not argue
+for or against the standard. I size the decision, price the compliance floor,
+and label every input as a source, an assumption, or a computation.
+
+## Bottom lines a decision-maker can hold
+
+- **The economic case for specifying at design time, not retrofit, is
+  quantitatively obvious for MWAA's current program.** Acoustic ceiling
+  treatment costs $5–$15 per square foot in new construction and $18–$45 per
+  square foot as retrofit — a 2× to 4× premium once finishes are installed.
+  Applied to Concourse E's 435,000-square-foot envelope, that is $1.3M–$17.4M
+  in avoided rework, before the larger IAD program lands. See Exhibit E1.
+- **The floor of "quiet" is set by code, not by aspiration.** NFPA 72
+  Chapter 24 requires an average Speech Transmission Index of at least 0.50
+  per Acoustically Distinguishable Space with at least 90% of measurement
+  points at or above 0.45 for voice evacuation and mass notification.
+  IEC 60268-16 targets STI 0.50 for non-emergency voice-address. ACRP
+  Report 175 recommends STI 0.46 to 0.53 with a target of 0.50 for terminal
+  PA and at least 10 dB(A) announcement-to-ambient in pier-style departure
+  lounges. A MWAA standard cannot go below these numbers. It can, and
+  should, be measurably better than them. See Exhibit E3.
+- **The all-in incremental capital cost is a rounding error against the
+  program.** My order-of-magnitude range for a MWAA-wide quiet-by-design
+  stack — ceiling-treatment premium plus system-wide FIDS redundancy plus a
+  mobile notification platform — is $12M–$40M one-time. Against the
+  announced $20B+ IAD program, that is 0.06% to 0.20% of program. Against
+  the MWAA-projected 2030 CPE of $20.71, the CPE impact is $0.03 to $0.11
+  per enplanement, or 0.16% to 0.54% of the projected CPE. See Exhibit E6.
+- **The affordability debate is not the debate.** The numbers do not support
+  an affordability argument in either direction. They support a timing
+  argument: specify now, or pay 2× to 4× later. That is a governance choice
+  MWAA can defend on the record.
+
+## What I actually computed and why
+
+### Exhibit E1 — Acoustic treatment: design-time vs. retrofit
+
+Commercial contractor benchmarks put acoustic ceiling tile in new
+construction at $5–$15 per square foot installed (basic to premium NRC,
+including grid and labor), and acoustic panel retrofit at $18–$45 per square
+foot installed. Applied to the 435,000-square-foot Concourse E envelope, the
+absolute delta is $1.3M to $17.4M and the midpoint is $6.8M. Even at the
+narrowest — treating only 50% of the envelope, the holdrooms and circulation
+— the delta is $0.65M to $8.7M. These numbers do not include after-hours
+badging premium, escort, or the airport-specific complications that make
+real airside retrofit more expensive than a commercial reference case, so
+treat them as conservative.
+
+The point is not the dollars in isolation. The point is that MWAA is
+approving concourse-scale scope right now. Every square foot that ships
+without STI, SNR, and PA-zoning language written into the contract is a
+square foot MWAA will pay 2× to 4× to fix.
+
+### Exhibit E2 — Acoustic share of terminal cost
+
+Concourse E's public cost figures range from ~$500M to ~$900M depending on
+reporting date and phasing, against 435,000 square feet — an all-in cost
+range of ~$1,150 to ~$2,070 per square foot. The acoustic ceiling package
+alone is 0.24% to 1.31% of that. Even a full acoustic package (ceiling,
+wall absorption, PA zoning hardware) is under 5% of program in any
+plausible scenario. If the standard is what determines whether a project is
+affordable, the project was already the wrong project.
+
+### Exhibit E3 — Intelligibility criteria a MWAA standard must inherit
+
+The design-manual language MWAA writes here is genuinely one paragraph:
+average STI ≥ 0.50 per ADS, ≥ 0.45 at 90% of measurement points, SNR ≥ 10
+dB(A) in holdrooms and passenger-processing zones, commissioned per ADS at
+opening and re-verified every five years or after any material acoustic
+change. That paragraph is the code floor for emergency (NFPA 72) plus the
+consensus floor for non-emergency voice-address (IEC 60268-16), plus the
+airport-specific evidence base from ACRP Report 175. It is defensible in
+front of a Fire Marshal, an ADA plaintiff, and a bond-covenant lawyer at
+the same time.
+
+The one MWAA-specific addition worth naming is a sensory-quiet zone target:
+LAeq ≤ 40 dBA during typical operating hours, no PA except emergency, NC
+30–35 background criterion. This is analyst-recommended, not code-mandated,
+and its cost is mostly a matter of siting rather than construction.
+
+### Exhibit E4 — Announcement-density arithmetic
+
+The Helsinki and London City claims are supported by press releases and
+passenger surveys, not by published intelligibility or announcement
+telemetry. So I sized the operational input, not the claimed acoustic
+result. A typical US-hub boarding call sequence — pre-boarding, priority,
+four zones — is on the order of 6 announcements per gate boarding at
+~20 seconds each, which is 120 seconds of PA per gate per hour, a 3.3%
+duty cycle. A Helsinki/London-City-style reduced practice — final-call
+plus all-zones-open — is on the order of 40 seconds per gate per hour, a
+1.1% duty cycle. The reduction is roughly 67% of PA time. A lower duty
+cycle permits softer per-announcement gain, which is what actually
+improves intelligibility for the announcements that do run. This exhibit
+is entirely assumption-driven and collapses to a fact the moment MWAA
+supplies paging-system telemetry.
+
+### Exhibit E5 — Cost of the redundant channels
+
+A quiet standard fails on accessibility grounds unless it mandates
+equivalent-or-better information delivery through non-audio channels.
+Rough sizing: MWAA-wide gate-area FIDS redundancy at ~198 combined gates
+is $1.6M to $3.6M capex; a mobile notification platform integrated with
+airline flight ops is on the order of $500K/year opex, or $2.5M five-year
+TCO. Combined five-year range: $4.1M to $6.1M. The real question is not
+affordability — this is 0.02% to 0.03% of the announced IAD program — but
+ownership. Gate FIDS is often MWAA IT; boarding-call PA is often
+airline-controlled. A standard without a governance model for the split
+does not ship.
+
+### Exhibit E6 — CPE sensitivity
+
+If MWAA prices the incremental capital at $12M–$40M and finances it as a
+typical MWAA AMT revenue bond (roughly 7.5 cents of annual debt service
+per dollar of principal, informed by the 2025 issuance), annual debt
+service is $0.9M–$3.0M and the CPE impact is $0.03 to $0.11 per
+enplanement against ~27M combined enplanements — 0.16% to 0.54% of the
+projected 2030 CPE ceiling of $20.71. Doubling the capex range doubles
+the CPE impact. If the standard applies only to new construction bundled
+into the announced $20B+ program, the standalone CPE effect approaches
+zero because it is already inside the program financing plan the airlines
+will consent (or not consent) to as a package.
+
+### Exhibit E7 — Why the standard is common but the prescriptions diverge
+
+IAD is running 29.0M passengers in 2025, up 6.4% year-over-year and heading
+toward a 90M master-plan envelope, dominated by international content
+(10.5M international), on a footprint that is largely under redesign. DCA
+is running 24.9M passengers, down 5.4% from 2024, near its physical
+envelope, on a footprint that is half-Bolling (1941, Historic District)
+and half-Pelli (1997, strong architectural intent). One STI target, one
+SNR target, one commissioning protocol — three different toolkits to hit
+them. At IAD, designers pick ceiling systems ex ante. At DCA, retrofit
+means absorptive-object placement, PA re-aiming, and directional
+loudspeakers because ceiling replacement is often not available. This is
+the operational reason a "common standard" cannot mean "identical
+products."
+
+## What I am not claiming
+
+I am not claiming the peer-airport branding is quantitatively verified. I
+did not find published STI, LAeq, or missed-boarding data behind the
+Schiphol, Helsinki, London City, or Copenhagen "silent airport" narrative
+— only press statements, passenger-satisfaction scores, and secondary
+reporting. The operations research agent, working independently, may find
+primary measurement I could not; if not, treat those airports as
+instructive operating models rather than measured proof points.
+
+I am not claiming the missed-boarding downside of a reduced-PA regime is
+zero. The airline industry's 5–18% no-show range conflates true no-shows
+(never at the airport) with missed-at-gate. Neither number is the control
+number MWAA needs. That number lives in airline gate logs and, if MWAA
+runs a pilot, in MWAA data.
+
+I am not claiming the $12M–$40M range is a bid estimate. It is the
+order-of-magnitude range within which the standard's incremental capital
+almost certainly falls. A bid estimate requires actual scope, actual finish
+palette, actual PA system architecture, and actual FIDS integration — none
+of which exists at the standard-drafting stage.
+
+## What operator data would change these numbers
+
+Five inputs would move this analysis from assumption-driven to measured:
+
+1. **The MWAA Design Manual and Tenant Design Handbook** — current
+   provisions on acoustics, ambient sound, PA zoning, FIDS, and audio
+   commissioning. Absence of a published standard is itself the operative
+   fact for this run.
+2. **Measured STI, LAeq, and RT60 at existing IAD and DCA holdrooms and
+   passenger-processing zones.** MWAA Engineering likely holds this for
+   recent construction packages.
+3. **PA telemetry** — announcements per hour, per gate, by category — from
+   MWAA's paging system. This collapses Exhibit E4 from assumption to
+   fact.
+4. **Airline gate-by-gate missed-boarding logs.** Without them, the
+   operational downside of reduced PA cannot be priced.
+5. **Financing structure for the July 29, 2026 Dulles $20B+ program** —
+   bond series, federal grant share, and any P3 participation — which
+   determines whether the standard rides inside program financing or shows
+   up as a discrete CPE line.
+
+Every `ASSUMPTION` label in `calculations.json` is the specific line that
+would be replaced when the corresponding operator input becomes available.
+
+## Recommended framing for Stage 2 synthesis
+
+- **Frame the decision as discipline, not affordability.** The numbers do
+  not support an affordability argument in either direction. They support
+  a timing argument: specify now, or pay 2× to 4× later. That is a
+  governance choice MWAA can defend.
+- **Anchor the standard to code, not to peer branding.** NFPA 72 + IEC
+  60268-16 + ACRP 175 give a defensible floor and a defensible ceiling
+  ("no quieter than sensory-quiet-zone criteria, no less intelligible
+  than emergency-comms STI") in one page.
+- **Keep the common/varied line clear.** Common: intelligibility targets,
+  commissioning protocol, sensory-quiet-zone definition, communication
+  channel redundancy requirements. Varied: implementation toolkit, driven
+  by whether the terminal is new-build (IAD concourses) or
+  preserved-envelope (DCA Terminals 1 and 2).
+- **Do not commit to a missed-boarding claim in either direction** without
+  either MWAA pilot data or airline log data. That is the single most
+  abused number in the "silent airport" literature and the one most likely
+  to embarrass MWAA if wrong.

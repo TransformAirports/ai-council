@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from docx import Document
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
@@ -24,6 +25,7 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
 from cli.publishing_quality import (
+    QualityIssue,
     QualityReport,
     assert_quality,
     lint_markdown,
@@ -51,6 +53,7 @@ HORIZONTAL_RULE_RE = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
 # document end. Rendered as superscript numbers plus a styled Notes section.
 FOOTNOTE_DEF_RE = re.compile(r"^\[\^(\d+)\]:\s*(.*)$")
 FOOTNOTE_MARK_RE = re.compile(r"\[\^(\d+)\]")
+SOURCE_URL_RE = re.compile(r"https?://[^\s]+")
 
 # Legacy internal-provenance tags from older runs ("[Economist brief,
 # Finding 3]"). These name the Council's machinery, not a source — strip them
@@ -107,6 +110,26 @@ def sanitize_reader_markdown(text: str) -> str:
     text = strip_internal_citations(text)
     text = LEGACY_SOURCE_TAG_RE.sub("", text)
     return re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
+
+
+def _compact_argument_memo_source_urls(markdown: str) -> str:
+    """Keep one-page memo citations traceable without printing long raw URLs."""
+
+    def compact(match: re.Match[str]) -> str:
+        raw = match.group(0)
+        clean = raw.rstrip(".,;")
+        trailing = raw[len(clean):]
+        host = urlsplit(clean).netloc.casefold()
+        if host.startswith("www."):
+            host = host[4:]
+        return (host or clean) + trailing
+
+    lines: list[str] = []
+    for line in markdown.splitlines():
+        if FOOTNOTE_DEF_RE.match(line.strip()):
+            line = SOURCE_URL_RE.sub(compact, line)
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def _add_inline(paragraph, text: str, base_size: int = 11, font: str = "Calibri") -> None:
@@ -2372,6 +2395,193 @@ def _build_compact_output(
     )
     _markdown_to_docx(doc, final_draft_md, body_size=10)
     doc.save(out_path)
+
+
+def _build_one_page_argument_memo_document(
+    *,
+    title: str,
+    final_draft_md: str,
+    out_path: Path,
+    body_size: float,
+    line_spacing: float,
+) -> None:
+    """Build the restrained memo used by the focused argument workflow."""
+
+    assert_quality(lint_markdown(final_draft_md, location="final draft"))
+    doc = Document()
+    _configure_document(doc, compact=True)
+    _set_default_font(doc, BODY_FONT, body_size)
+    section = doc.sections[0]
+    section.top_margin = Inches(0.52)
+    section.bottom_margin = Inches(0.52)
+    section.left_margin = Inches(0.68)
+    section.right_margin = Inches(0.68)
+    section.header_distance = Inches(0.18)
+    section.footer_distance = Inches(0.18)
+
+    eyebrow = doc.add_paragraph()
+    eyebrow.paragraph_format.space_after = Pt(2)
+    run = eyebrow.add_run("EXECUTIVE MEMO  /  FOR DECISION")
+    run.bold = True
+    run.font.name = BODY_FONT
+    run.font.size = Pt(8.5)
+    run.font.color.rgb = TERMINAL_BLUE
+
+    heading = doc.add_paragraph()
+    heading.paragraph_format.space_after = Pt(2)
+    run = heading.add_run(title)
+    run.bold = True
+    run.font.name = DISPLAY_FONT
+    run.font.size = Pt(20)
+    run.font.color.rgb = RUNWAY_NAVY
+
+    meta = doc.add_paragraph()
+    meta.paragraph_format.space_after = Pt(5)
+    run = meta.add_run(
+        date.today().strftime("%B %d, %Y")
+        + "  •  Transform Airports AI Council"
+    )
+    run.font.name = BODY_FONT
+    run.font.size = Pt(8.5)
+    run.font.color.rgb = OPERATIONS_SLATE
+    p_pr = meta._p.get_or_add_pPr()
+    borders = OxmlElement("w:pBdr")
+    bottom = OxmlElement("w:bottom")
+    bottom.set(qn("w:val"), "single")
+    bottom.set(qn("w:sz"), "6")
+    bottom.set(qn("w:space"), "4")
+    bottom.set(qn("w:color"), "D4A24C")
+    borders.append(bottom)
+    p_pr.append(borders)
+
+    accountability = doc.add_paragraph()
+    accountability.paragraph_format.space_after = Pt(4)
+    run = accountability.add_run(
+        "AI-assisted decision support. The accountable human owner must verify "
+        "the sources, local fit, and any action."
+    )
+    run.font.name = BODY_FONT
+    run.font.size = Pt(8)
+    run.font.color.rgb = OPERATIONS_SLATE
+
+    memo_markdown = re.sub(
+        r"\A\s*#\s+[^\n]+\n+",
+        "",
+        sanitize_reader_markdown(final_draft_md),
+        count=1,
+    )
+    memo_markdown = _compact_argument_memo_source_urls(memo_markdown)
+    body_start = len(doc.paragraphs)
+    _markdown_to_docx(
+        doc,
+        memo_markdown,
+        body_size=body_size,
+        font=BODY_FONT,
+    )
+    sources_started = False
+    for paragraph in doc.paragraphs[body_start:]:
+        style_name = str(getattr(paragraph.style, "name", "") or "")
+        if style_name.startswith("Heading"):
+            size = 11.5 if style_name == "Heading 2" else 10.5
+            if paragraph.text.strip() == "Notes":
+                paragraph.runs[0].text = "Sources"
+                size = 9
+                sources_started = True
+            for heading_run in paragraph.runs:
+                heading_run.font.size = Pt(size)
+            paragraph.paragraph_format.space_before = Pt(3 if sources_started else 5)
+            paragraph.paragraph_format.space_after = Pt(1 if sources_started else 2)
+            paragraph.paragraph_format.keep_with_next = True
+        elif sources_started:
+            paragraph.paragraph_format.line_spacing = 0.92
+            paragraph.paragraph_format.space_after = Pt(0.5)
+            for source_run in paragraph.runs:
+                source_run.font.size = Pt(6.75)
+        else:
+            paragraph.paragraph_format.line_spacing = line_spacing
+            paragraph.paragraph_format.space_after = Pt(3.5)
+
+    footer = section.footer
+    footer_p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+    footer_p.text = ""
+    footer_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    run = footer_p.add_run("HUMAN REVIEW REQUIRED  •  ")
+    run.font.name = BODY_FONT
+    run.font.size = Pt(8)
+    run.font.color.rgb = OPERATIONS_SLATE
+    _add_page_field(footer_p)
+    doc.save(out_path)
+
+
+def build_one_page_argument_memo(
+    *,
+    slug: str,
+    title: str,
+    final_draft: Path,
+    out_dir: Path,
+) -> tuple[Path, Path]:
+    """Build, render, and page-bind an exact one-page executive memo."""
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    final_draft_md = final_draft.read_text(encoding="utf-8")
+    memo_path = out_dir / f"argument-{slug}-memo.docx"
+    render_dir = out_dir / "qa" / memo_path.stem
+    rendered: list[Path] = []
+    render_issues: list[QualityIssue] = []
+    page_count = 0
+    for body_size, line_spacing in ((10.25, 1.08), (9.5, 1.04)):
+        _build_one_page_argument_memo_document(
+            title=title,
+            final_draft_md=final_draft_md,
+            out_path=memo_path,
+            body_size=body_size,
+            line_spacing=line_spacing,
+        )
+        rendered, render_issues = render_office_artifact(
+            memo_path,
+            render_dir,
+            required=True,
+        )
+        page_count = len(
+            [path for path in rendered if path.suffix.lower() == ".png"]
+        )
+        if page_count == 1 or any(issue.severity == "error" for issue in render_issues):
+            break
+
+    report = qa_docx(memo_path)
+    report.issues.extend(render_issues)
+    report.rendered_files.extend(str(path) for path in rendered)
+    if page_count != 1:
+        report.issues.append(
+            QualityIssue(
+                code="memo_page_count",
+                severity="error",
+                message=f"Strengthened-argument memo must render to exactly one page; got {page_count}.",
+                location=str(memo_path),
+            )
+        )
+
+    receipt_path = out_dir / f"{memo_path.stem}-word-visual-inspection.json"
+    if report.ok:
+        prepare_word_visual_inspection_receipt(
+            artifact=memo_path,
+            rendered_files=rendered,
+            receipt_path=receipt_path,
+        )
+    bundle = QualityReport(
+        artifact=str(memo_path),
+        kind="argument_memo_bundle",
+        issues=list(report.issues),
+        metadata={
+            "output_format": "one_page_memo",
+            "page_count": page_count,
+            "visual_inspection_receipt": str(receipt_path),
+        },
+        rendered_files=list(report.rendered_files),
+    )
+    bundle.write_json(out_dir.parent / "publishing-quality.json")
+    assert_quality(bundle)
+    return memo_path, receipt_path
 
 
 def _build_brief(

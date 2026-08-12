@@ -1,0 +1,419 @@
+{
+  "schema_version": "1.0",
+  "slug": "quiet-by-design-standards-for-mwaa-terminals-2",
+  "created_at": "2026-08-12T12:38:55-04:00",
+  "source_stage4": "stage4",
+  "requirements": {
+    "executive_summary": true,
+    "presentation": true,
+    "visual_inspection": true,
+    "word_visual_inspection": true
+  },
+  "artifacts": [
+    {
+      "role": "word_report",
+      "kind": "docx",
+      "source_path": "stage4/quiet-by-design-standards-for-mwaa-terminals-2.docx",
+      "path": "quiet-by-design-standards-for-mwaa-terminals-2.docx",
+      "required": true,
+      "size_bytes": 206230,
+      "source_sha256": "5c4371c404fa1c7bde628e0161fc64cba0e83669abf37946ded561a8bcb47063",
+      "sha256": "5c4371c404fa1c7bde628e0161fc64cba0e83669abf37946ded561a8bcb47063",
+      "qa_path": "qa/quiet-by-design-standards-for-mwaa-terminals-2.docx.qa.json",
+      "qa_sha256": "7fdd279f78610da89a85cb0fa782307b18833852a594b8471cad41673b64f9c9",
+      "qa_ok": true,
+      "qa_errors": 0,
+      "qa_warnings": 0,
+      "rendered_files": [
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+          "sha256": "127af1a962fed6f7f3faec2d4e7a97b13fc9c11a04b8e1bb3438c44a9bb9bb64",
+          "size_bytes": 210149
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+          "sha256": "6537f80ed82b660f9c2fabd02a33a17f6c538ab56e3c9b752b475335aa173598",
+          "size_bytes": 139582
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+          "sha256": "1a2504ddc0243d94b18cf707236a6a6fa5f015e36798cc6ad4c26add8782177f",
+          "size_bytes": 411365
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+          "sha256": "480dd3e5ef72479f8842ca8ea5bc793a1405f6d8913de0cbfd5bb0e6a259b3dc",
+          "size_bytes": 490294
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+          "sha256": "bb7bef0c89413066ea883af6d4aa4b260da5f3552ef5a83010d7a35948b1e0c5",
+          "size_bytes": 487586
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+          "sha256": "2c374704f78138ec1a54667b5e06bd4266440171edcd7a99e4345eae77fc2ec1",
+          "size_bytes": 457659
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+          "sha256": "a18f1217ae0a0487ab381619502fd98a7cfd4f446859585a876f9815fc3c0221",
+          "size_bytes": 496592
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-7.png",
+          "sha256": "f8571b24cfbdbfec1546821092deb527a044ce0f0376a0c2c4b2bd6c87acd11c",
+          "size_bytes": 213982
+        }
+      ],
+      "visual_inspection": {
+        "type": "word_pages",
+        "path": "quiet-by-design-standards-for-mwaa-terminals-2-word-visual-inspection.json",
+        "sha256": "53ada572700c5722f8463cefbc86820a6ff9957fc28105635d8e8b9c10b40f40",
+        "files": [
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/montage.png",
+            "sha256": "4aafd3c16dc3d6ded076e93e767ed4179078e618713fda2126be1d1dba254020",
+            "size_bytes": 910752
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+            "sha256": "6537f80ed82b660f9c2fabd02a33a17f6c538ab56e3c9b752b475335aa173598",
+            "size_bytes": 139582
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+            "sha256": "1a2504ddc0243d94b18cf707236a6a6fa5f015e36798cc6ad4c26add8782177f",
+            "size_bytes": 411365
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+            "sha256": "480dd3e5ef72479f8842ca8ea5bc793a1405f6d8913de0cbfd5bb0e6a259b3dc",
+            "size_bytes": 490294
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+            "sha256": "bb7bef0c89413066ea883af6d4aa4b260da5f3552ef5a83010d7a35948b1e0c5",
+            "size_bytes": 487586
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+            "sha256": "2c374704f78138ec1a54667b5e06bd4266440171edcd7a99e4345eae77fc2ec1",
+            "size_bytes": 457659
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+            "sha256": "a18f1217ae0a0487ab381619502fd98a7cfd4f446859585a876f9815fc3c0221",
+            "size_bytes": 496592
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-7.png",
+            "sha256": "f8571b24cfbdbfec1546821092deb527a044ce0f0376a0c2c4b2bd6c87acd11c",
+            "size_bytes": 213982
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+            "sha256": "4814bfd60819743dd3a702517f7aebf4b28a9f5f0c2fd8e4eb8998133430b19a",
+            "size_bytes": 210149
+          }
+        ]
+      }
+    },
+    {
+      "role": "executive_summary",
+      "kind": "docx",
+      "source_path": "stage4/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx",
+      "path": "quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx",
+      "required": true,
+      "size_bytes": 199495,
+      "source_sha256": "054b546184476f3d75fbac57b688a173f5709d1eeeddfa226a204c4161fd7216",
+      "sha256": "054b546184476f3d75fbac57b688a173f5709d1eeeddfa226a204c4161fd7216",
+      "qa_path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx.qa.json",
+      "qa_sha256": "b6b9b7a7f951c3f3f9acfd4cee18d3b4cc3a1c3ea28cdb2709129b2b3b37c7a5",
+      "qa_ok": true,
+      "qa_errors": 0,
+      "qa_warnings": 0,
+      "rendered_files": [
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-docx/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.pdf",
+          "sha256": "dbbca426c3b15c84b3fc0a6b4709b00a2bed2192b8a7a2a2acbf223fde6c660b",
+          "size_bytes": 170796
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-docx/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-1.png",
+          "sha256": "9135ba74e17350171d83c5126a3c616c3119f5f008295ec1be4404068d0376fd",
+          "size_bytes": 291169
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-docx/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-2.png",
+          "sha256": "ef9cfd4b017d8667e928ddb60200d09b68adaefd6d822c8eea98872332784051",
+          "size_bytes": 315406
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-docx/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-3.png",
+          "sha256": "c5574f58f508aa92cf2c054b854f3c42e7142bd5351f997ce081bfe2242baec1",
+          "size_bytes": 226645
+        }
+      ],
+      "visual_inspection": {
+        "type": "word_pages",
+        "path": "quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-word-visual-inspection.json",
+        "sha256": "9328e52838a2d7d2d56596b7630a6eacddb2a22de6ca603b312b39f8f1a4dba0",
+        "files": [
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/montage.png",
+            "sha256": "3fe0ddbe319120ac550e1aceaf43dcca63eea4a00e34c1e6878059b23df1b4c8",
+            "size_bytes": 269911
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-1.png",
+            "sha256": "9135ba74e17350171d83c5126a3c616c3119f5f008295ec1be4404068d0376fd",
+            "size_bytes": 291169
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-2.png",
+            "sha256": "ef9cfd4b017d8667e928ddb60200d09b68adaefd6d822c8eea98872332784051",
+            "size_bytes": 315406
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-3.png",
+            "sha256": "c5574f58f508aa92cf2c054b854f3c42e7142bd5351f997ce081bfe2242baec1",
+            "size_bytes": 226645
+          },
+          {
+            "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.pdf",
+            "sha256": "c88ebd1c6a79e66abe045f2d3f5d289b92ca14102e02845117af627ec059de5d",
+            "size_bytes": 170796
+          }
+        ]
+      }
+    },
+    {
+      "role": "presentation",
+      "kind": "pptx",
+      "source_path": "stage4/quiet-by-design-standards-for-mwaa-terminals-2.pptx",
+      "path": "quiet-by-design-standards-for-mwaa-terminals-2.pptx",
+      "required": true,
+      "size_bytes": 93802,
+      "source_sha256": "ddb16fb33e8e1b0276607445075253956707412beefff77a610d7f36faf400f8",
+      "sha256": "ddb16fb33e8e1b0276607445075253956707412beefff77a610d7f36faf400f8",
+      "qa_path": "qa/quiet-by-design-standards-for-mwaa-terminals-2.pptx.qa.json",
+      "qa_sha256": "d23ddfaf663e782abaf7066712d05406cba09082863e08ac39a78ca416b4ec3e",
+      "qa_ok": true,
+      "qa_errors": 0,
+      "qa_warnings": 0,
+      "rendered_files": [
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+          "sha256": "57f5dc44a3b841d5e86453840d7284a41ecad35b2f2e9497ece9472bd8355c62",
+          "size_bytes": 737935
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-01.png",
+          "sha256": "110210b42ed74b509e7b33cd37c77f8009932229db452f2faa02383bdeaeda31",
+          "size_bytes": 122805
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-02.png",
+          "sha256": "a968d7659a9e549baf29fcda22c40f7ccbc80238f8a9c9ea5b21cd3367968d58",
+          "size_bytes": 166273
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-03.png",
+          "sha256": "99ac67ffc1d24d0d6e2764c7e904267ca83502c61d4f84289f7a602bb1c31f7c",
+          "size_bytes": 221110
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-04.png",
+          "sha256": "4e81ce117139b335e800ad9d74c3f276e7d60af127161ea2107847920a09a02c",
+          "size_bytes": 203335
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-05.png",
+          "sha256": "f56311cb2ba20651859b5ef9904e52f158f8075ced29fc78747b871c5582ddd0",
+          "size_bytes": 135283
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-06.png",
+          "sha256": "772b74f531dfef748a417e287c76b01043acc9bee9865ed2b0ac78c589bff86a",
+          "size_bytes": 220154
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-07.png",
+          "sha256": "fcbd14712909d8b6bc00a77e405660953b63b4f83c0789122ea083f326f1b763",
+          "size_bytes": 176229
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-08.png",
+          "sha256": "b6b26487967fe5790d1531c30778f800c4496e11775567938947720e8c646cb2",
+          "size_bytes": 197207
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-09.png",
+          "sha256": "8312ea07d7ea30da78afe0693d32dc538ce0d6638fe9d76fa862f320bce1936c",
+          "size_bytes": 205566
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-10.png",
+          "sha256": "f25b39846dee19af4f557e00dfc7266166c6db06ed67df4e2bf6731cb632f2c8",
+          "size_bytes": 228483
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-11.png",
+          "sha256": "c99fda443df372b43d87234730ee275e7c5b2abc17246af7eeccd8ae31eb83cd",
+          "size_bytes": 170477
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-12.png",
+          "sha256": "b374ce94fc339d9d8db94b252601fa952a0a24f03dd39d4f52e5a392d3bef5c4",
+          "size_bytes": 125107
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-13.png",
+          "sha256": "0c5d42f6d0d552df88db05cefdc9cad45178a710f4ad4e9d6fcf40baf1ba2771",
+          "size_bytes": 199970
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-14.png",
+          "sha256": "6c8ff6e34749e0fd66348447af6b5545959c6099f882662a826c478528a04143",
+          "size_bytes": 219843
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-15.png",
+          "sha256": "1f83f32af43a6b7d2c0e2b748fffca501467102ced8dd1e56566bfe41c939af9",
+          "size_bytes": 180438
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-16.png",
+          "sha256": "09a94fe071b16b58fb1b2b94f82394e440d8b45c373b9c13df0e062cb17ca1df",
+          "size_bytes": 247972
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-17.png",
+          "sha256": "547f97387f8514938a9cf9ed7980fc70702d82f39a6b07e2ce1274be4d157948",
+          "size_bytes": 190611
+        },
+        {
+          "path": "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-pptx/quiet-by-design-standards-for-mwaa-terminals-2-18.png",
+          "sha256": "78c73cd405ac3cd585a06a7a2482e39b4ebebbd64372c18389b499680eb7b84e",
+          "size_bytes": 182126
+        }
+      ],
+      "visual_inspection": {
+        "type": "presentation_slides",
+        "path": "quiet-by-design-standards-for-mwaa-terminals-2-visual-inspection.json",
+        "sha256": "476a58d91878d3c5aebe191acb6d56f7770169ed8540ad5b861ed238a37524b5",
+        "visual_brief_path": "visual-brief.json",
+        "visual_brief_sha256": "c15955d0dddf9d3e700d43af777962769fd1c2704c9a10a411899fe5a4970515",
+        "files": [
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/designer-qa.json",
+            "sha256": "a3382e33f16c26e2a43675d2721638749e3296f21f106f07ad0126b16401ed18",
+            "size_bytes": 4132
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/montage.png",
+            "sha256": "865705311b8d8fcea9825520a54f2b1e5df7ea7e2ff7897cf07ed324d18ea676",
+            "size_bytes": 876008
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-01.png",
+            "sha256": "110210b42ed74b509e7b33cd37c77f8009932229db452f2faa02383bdeaeda31",
+            "size_bytes": 122805
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-02.png",
+            "sha256": "a968d7659a9e549baf29fcda22c40f7ccbc80238f8a9c9ea5b21cd3367968d58",
+            "size_bytes": 166273
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-03.png",
+            "sha256": "99ac67ffc1d24d0d6e2764c7e904267ca83502c61d4f84289f7a602bb1c31f7c",
+            "size_bytes": 221110
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-04.png",
+            "sha256": "4e81ce117139b335e800ad9d74c3f276e7d60af127161ea2107847920a09a02c",
+            "size_bytes": 203335
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-05.png",
+            "sha256": "f56311cb2ba20651859b5ef9904e52f158f8075ced29fc78747b871c5582ddd0",
+            "size_bytes": 135283
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-06.png",
+            "sha256": "772b74f531dfef748a417e287c76b01043acc9bee9865ed2b0ac78c589bff86a",
+            "size_bytes": 220154
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-07.png",
+            "sha256": "fcbd14712909d8b6bc00a77e405660953b63b4f83c0789122ea083f326f1b763",
+            "size_bytes": 176229
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-08.png",
+            "sha256": "b6b26487967fe5790d1531c30778f800c4496e11775567938947720e8c646cb2",
+            "size_bytes": 197207
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-09.png",
+            "sha256": "8312ea07d7ea30da78afe0693d32dc538ce0d6638fe9d76fa862f320bce1936c",
+            "size_bytes": 205566
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-10.png",
+            "sha256": "f25b39846dee19af4f557e00dfc7266166c6db06ed67df4e2bf6731cb632f2c8",
+            "size_bytes": 228483
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-11.png",
+            "sha256": "c99fda443df372b43d87234730ee275e7c5b2abc17246af7eeccd8ae31eb83cd",
+            "size_bytes": 170477
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-12.png",
+            "sha256": "b374ce94fc339d9d8db94b252601fa952a0a24f03dd39d4f52e5a392d3bef5c4",
+            "size_bytes": 125107
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-13.png",
+            "sha256": "0c5d42f6d0d552df88db05cefdc9cad45178a710f4ad4e9d6fcf40baf1ba2771",
+            "size_bytes": 199970
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-14.png",
+            "sha256": "6c8ff6e34749e0fd66348447af6b5545959c6099f882662a826c478528a04143",
+            "size_bytes": 219843
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-15.png",
+            "sha256": "1f83f32af43a6b7d2c0e2b748fffca501467102ced8dd1e56566bfe41c939af9",
+            "size_bytes": 180438
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-16.png",
+            "sha256": "09a94fe071b16b58fb1b2b94f82394e440d8b45c373b9c13df0e062cb17ca1df",
+            "size_bytes": 247972
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-17.png",
+            "sha256": "547f97387f8514938a9cf9ed7980fc70702d82f39a6b07e2ce1274be4d157948",
+            "size_bytes": 190611
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-18.png",
+            "sha256": "78c73cd405ac3cd585a06a7a2482e39b4ebebbd64372c18389b499680eb7b84e",
+            "size_bytes": 182126
+          },
+          {
+            "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+            "sha256": "2f11d7e798eab1c0e25d53342e77f41510d8e338d11fd34865b3aeb6daed79d9",
+            "size_bytes": 737935
+          }
+        ]
+      }
+    }
+  ],
+  "status": "ready"
+}

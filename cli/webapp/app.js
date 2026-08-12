@@ -21,9 +21,17 @@ function tabClientId() {
 const state = {
   meta: {}, groups: [], formats: [], selectedFormat: "report",
   seated: new Set(), ws: null, reviseSlug: null, resultSlug: null,
-  argumentSeated: new Set(), argumentUploads: [], argumentUploading: 0,
+  argumentSeated: new Set(),
+  sourceUploads: { report: [], scope: [], argument: [] },
+  sourceUploading: { report: 0, scope: 0, argument: 0 },
   resultReviseSlug: null, resultMode: "report", step: 1, home: null,
   sessionToken: null, clientId: tabClientId(),
+};
+
+const SOURCE_UI = {
+  report: { dropzone: "#report-dropzone", input: "#f-files", list: "#report-files" },
+  scope: { dropzone: "#scope-dropzone", input: "#s-files", list: "#scope-files" },
+  argument: { dropzone: "#argument-dropzone", input: "#a-files", list: "#argument-files" },
 };
 
 const CX = 400, CY = 252, OUTER_RX = 312, OUTER_RY = 188, INNER_RX = 210, INNER_RY = 124;
@@ -35,6 +43,9 @@ const PROCESS_SLOTS = {
   "art-director": 125, "presentation-designer": 155, "red-team": 180,
 };
 const STAGE_FILL = { 1: 15, 2: 45, 3: 75, 4: 92 };
+const ARGUMENT_FAST_PRESET = [
+  "contrarian", "quantitative-analyst", "airport-ceo", "airport-coo",
+];
 const constellation = { nodes: {}, svg: null };
 
 // ─────────── init ───────────
@@ -48,13 +59,13 @@ async function init() {
   agentsRes.process.forEach((p) => (state.meta[p.name] = { ...p, process: true }));
   state.formats = metaRes.formats;
   state.authOk = metaRes.auth_ok; state.authMsg = metaRes.auth_message;
-  state.sources = metaRes.sources || []; state.defaultBudget = metaRes.default_budget ?? 80;
+  state.defaultBudget = metaRes.default_budget ?? 80;
   state.modelsCfg = metaRes.models || {};
   state.activeRun = Boolean(metaRes.active_run);
   state.sessionToken = metaRes.session_token || null;
 
   buildFormats(); buildAgentGroups(); buildArgumentAgentGroups();
-  applyPreset("default"); applyArgumentPreset("default");
+  applyPreset("default"); applyArgumentPreset("fast");
   wireUI(); buildHeroDots(); setHeroStats(agentsRes);
   await loadHome();
   if (state.activeRun) startRun({ type: "attach" });
@@ -62,7 +73,8 @@ async function init() {
 }
 
 function modelShort(id) {
-  return String(id || "").replace("claude-", "").replace("opus-4-8", "Opus 4.8")
+  if (String(id || "") === "opus") return "Opus (latest)";
+  return String(id || "").replace("claude-", "").replace("opus-5-0", "Opus (latest)")
     .replace("fable-5", "Fable 5").replace("sonnet-4-6", "Sonnet 4.6")
     .replace("o3-deep-research", "o3 DR").replace("o4-mini-deep-research", "o4-mini DR");
 }
@@ -109,26 +121,18 @@ function nav(view) {
   if (view === "audit") loadAudit();
 }
 
-async function prepScopeView() {
-  // Re-fetch meta so files dropped into sources/ after page load are seen.
-  try {
-    const meta = await fetch("/api/meta").then((r) => r.json());
-    state.sources = meta.sources || [];
-    state.sessionToken = meta.session_token || state.sessionToken;
-  } catch (_) {}
-  const has = state.sources.length > 0;
-  const note = $("#scope-sources"), warn = $("#scope-nosources");
-  note.classList.toggle("hidden", !has);
-  warn.classList.toggle("hidden", has);
-  if (has) note.textContent = `📎 Scope material staged: ` + state.sources.map((s) => `${s.name} (${s.size})`).join(", ");
-  $("#scope-launch").disabled = !has || !state.authOk;
+function prepScopeView() {
+  const auth = $("#scope-auth");
+  auth.classList.toggle("hidden", Boolean(state.authOk));
+  if (!state.authOk) auth.textContent = "⚠ " + state.authMsg + " — run `claude login` in your terminal, then reload.";
+  updateSourceControls();
 }
 
 function prepArgumentView() {
-  $("#argument-launch").disabled = !state.authOk || state.argumentUploading > 0;
   const auth = $("#argument-auth");
   auth.classList.toggle("hidden", Boolean(state.authOk));
   if (!state.authOk) auth.textContent = "⚠ " + state.authMsg + " — run `claude login` in your terminal, then reload.";
+  updateSourceControls();
 }
 
 function wireUI() {
@@ -152,25 +156,15 @@ function wireUI() {
   $("#scope-launch").onclick = () => {
     const title = $("#s-title").value.trim();
     if (!title) { $("#s-title").focus(); $("#s-title").style.borderColor = "var(--red)"; return; }
+    if (!state.sourceUploads.scope.length) { flash($(".scope-required-note"), "Add at least one scope document."); return; }
     startRun({
       type: "start", mode: "scope", title, notes: $("#s-notes").value.trim(),
+      source_tokens: state.sourceUploads.scope.map((file) => file.token),
       auto_approve: !$("#s-review").checked,
       budget: readBudget("#s-budget"),
     });
   };
-  const dropzone = $("#argument-dropzone"), fileInput = $("#a-files");
-  dropzone.onclick = () => fileInput.click();
-  dropzone.onkeydown = (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
-  };
-  fileInput.onchange = () => { uploadArgumentFiles(fileInput.files); fileInput.value = ""; };
-  ["dragenter", "dragover"].forEach((name) => dropzone.addEventListener(name, (e) => {
-    e.preventDefault(); dropzone.classList.add("dragging");
-  }));
-  ["dragleave", "drop"].forEach((name) => dropzone.addEventListener(name, (e) => {
-    e.preventDefault(); dropzone.classList.remove("dragging");
-  }));
-  dropzone.addEventListener("drop", (e) => uploadArgumentFiles(e.dataTransfer.files));
+  Object.keys(SOURCE_UI).forEach(setupSourceUploader);
   $("#a-pptx").onchange = () => {
     $("#argument-slide-field").classList.toggle("hidden", !$("#a-pptx").checked);
     $("#a-pptx").closest(".argument-output-card").classList.toggle("selected", $("#a-pptx").checked);
@@ -184,9 +178,9 @@ function wireUI() {
   $("#log-toggle").onclick = () => { const l = $("#activity-log"); const h = l.classList.toggle("hidden"); $("#log-toggle").textContent = h ? "Show" : "Hide"; };
 
   if (!state.authOk) { const b = $("#auth-banner"); b.textContent = "⚠ " + state.authMsg + "  —  run `claude login` in your terminal, then reload."; b.classList.remove("hidden"); }
-  if (state.sources.length) { const n = $("#sources-note"); n.textContent = `📎 ${state.sources.length} source file(s) staged — they'll be attached: ` + state.sources.map((s) => s.name).join(", "); n.classList.remove("hidden"); }
   $("#f-budget").value = state.defaultBudget;
   $("#a-budget").value = Math.min(state.defaultBudget, 60);
+  updateSourceControls();
 }
 
 // ─────────── wizard ───────────
@@ -200,7 +194,7 @@ function goStep(n) {
   $$(".wiz-dots i").forEach((d) => d.classList.toggle("on", +d.dataset.dot === n));
   $("#wiz-back").style.visibility = n === 1 ? "hidden" : "visible";
   $("#wiz-next").textContent = n === 3 ? "🚀  Convene the Council" : "Next →";
-  $("#wiz-next").disabled = n === 3 && !state.authOk;
+  $("#wiz-next").disabled = n === 3 && (!state.authOk || state.sourceUploading.report > 0);
   if (n === 3) buildReview();
 }
 function flash(el, msg) {
@@ -237,7 +231,7 @@ function buildReview() {
   if ($("#f-pptx").checked) {
     rows.push(["Deck", escapeHtml($("#f-deck-mode").selectedOptions[0]?.textContent || "Board decision")]);
   }
-  if (state.sources.length) rows.push(["Sources", state.sources.map((s) => escapeHtml(s.name)).join(", ")]);
+  if (state.sourceUploads.report.length) rows.push(["Sources", state.sourceUploads.report.map((s) => escapeHtml(s.name)).join(", ")]);
   const e = estimateCost($("#f-pptx").checked);
   rows.push(["Est. cost", `<span class="est">$${e.low}–$${e.high}</span>` +
     (e.deep ? ` <span class="est-note">+ OpenAI deep research, billed separately</span>` : "") +
@@ -366,6 +360,7 @@ function setArgumentSeated(names) {
 function applyArgumentPreset(which) {
   const all = Object.values(state.meta).filter((m) => !m.process);
   if (which === "none") return setArgumentSeated([]);
+  if (which === "fast") return setArgumentSeated(ARGUMENT_FAST_PRESET.filter((name) => state.meta[name]));
   if (which === "default") return setArgumentSeated(all.filter((m) => m.default).map((m) => m.name));
   if (which === "all") return setArgumentSeated(all.filter((m) => !m.gated && !m.supplemental).map((m) => m.name));
 }
@@ -400,65 +395,99 @@ function updateArgumentCount() {
   $("#argument-seated-count").innerHTML = html;
 }
 
-function argumentHeaders(extra = {}) {
+function sourceHeaders(extra = {}) {
   return {
     "x-council-session": state.sessionToken,
     "x-council-client": state.clientId,
     ...extra,
   };
 }
-function renderArgumentFiles() {
-  const root = $("#argument-files"); root.innerHTML = "";
-  state.argumentUploads.forEach((file) => {
-    const row = document.createElement("div"); row.className = "argument-file";
+function setupSourceUploader(purpose) {
+  const ui = SOURCE_UI[purpose], dropzone = $(ui.dropzone), fileInput = $(ui.input);
+  dropzone.onclick = () => fileInput.click();
+  dropzone.onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+  };
+  fileInput.onchange = () => { uploadSourceFiles(purpose, fileInput.files); fileInput.value = ""; };
+  ["dragenter", "dragover"].forEach((name) => dropzone.addEventListener(name, (e) => {
+    e.preventDefault(); dropzone.classList.add("dragging");
+  }));
+  ["dragleave", "drop"].forEach((name) => dropzone.addEventListener(name, (e) => {
+    e.preventDefault(); dropzone.classList.remove("dragging");
+  }));
+  dropzone.addEventListener("drop", (e) => uploadSourceFiles(purpose, e.dataTransfer.files));
+}
+function updateSourceControls() {
+  if ($("#scope-launch")) {
+    $("#scope-launch").disabled = !state.authOk || state.sourceUploading.scope > 0 || !state.sourceUploads.scope.length;
+  }
+  if ($("#argument-launch")) {
+    $("#argument-launch").disabled = !state.authOk || state.sourceUploading.argument > 0;
+  }
+  if ($("#wiz-next") && state.step === 3) {
+    $("#wiz-next").disabled = !state.authOk || state.sourceUploading.report > 0;
+  }
+}
+function renderSourceFiles(purpose) {
+  const root = $(SOURCE_UI[purpose].list); root.innerHTML = "";
+  state.sourceUploads[purpose].forEach((file) => {
+    const row = document.createElement("div"); row.className = "source-file";
     row.innerHTML = `<div><b>${escapeHtml(file.name)}</b><span>${escapeHtml(file.size || file.status || "")}</span></div>`;
-    const remove = document.createElement("button"); remove.type = "button"; remove.className = "argument-file-remove"; remove.textContent = "Remove";
-    remove.onclick = () => removeArgumentFile(file.token);
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "source-file-remove"; remove.textContent = "Remove";
+    remove.onclick = () => removeSourceFile(purpose, file.token);
     row.appendChild(remove); root.appendChild(row);
   });
-  if (state.argumentUploading) {
-    const pending = document.createElement("div"); pending.className = "argument-file pending";
-    pending.textContent = `Uploading ${state.argumentUploading} file${state.argumentUploading === 1 ? "" : "s"}…`;
+  if (state.sourceUploading[purpose]) {
+    const pending = document.createElement("div"); pending.className = "source-file pending";
+    pending.textContent = `Uploading ${state.sourceUploading[purpose]} file${state.sourceUploading[purpose] === 1 ? "" : "s"}…`;
     root.appendChild(pending);
   }
-  prepArgumentView();
+  updateSourceControls();
+  if (purpose === "report" && state.step === 3) buildReview();
 }
-async function uploadArgumentFiles(fileList) {
+async function uploadSourceFiles(purpose, fileList) {
   const files = Array.from(fileList || []);
   if (!files.length) return;
-  state.argumentUploading += files.length; renderArgumentFiles();
+  state.sourceUploading[purpose] += files.length; renderSourceFiles(purpose);
   for (const file of files) {
     try {
       if (file.size > 40 * 1024 * 1024) throw new Error(`${file.name} exceeds the 40 MB file limit.`);
-      const res = await fetch(`/api/argument-source?name=${encodeURIComponent(file.name)}`, {
-        method: "POST", headers: argumentHeaders({ "content-type": "application/octet-stream" }), body: file,
+      const query = new URLSearchParams({ purpose, name: file.name });
+      const res = await fetch(`/api/source?${query}`, {
+        method: "POST", headers: sourceHeaders({ "content-type": "application/octet-stream" }), body: file,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Could not upload ${file.name}.`);
-      state.argumentUploads.push(data);
+      state.sourceUploads[purpose].push(data);
     } catch (error) {
       alert(error.message || String(error));
     } finally {
-      state.argumentUploading -= 1; renderArgumentFiles();
+      state.sourceUploading[purpose] -= 1; renderSourceFiles(purpose);
     }
   }
 }
-async function removeArgumentFile(token) {
+async function removeSourceFile(purpose, token) {
   try {
-    const res = await fetch(`/api/argument-source?token=${encodeURIComponent(token)}`, {
-      method: "DELETE", headers: argumentHeaders(),
+    const query = new URLSearchParams({ purpose, token });
+    const res = await fetch(`/api/source?${query}`, {
+      method: "DELETE", headers: sourceHeaders(),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Could not remove the file.");
-    state.argumentUploads = state.argumentUploads.filter((file) => file.token !== token);
-    renderArgumentFiles();
+    state.sourceUploads[purpose] = state.sourceUploads[purpose].filter((file) => file.token !== token);
+    renderSourceFiles(purpose);
   } catch (error) { alert(error.message || String(error)); }
+}
+function clearSourceFiles(purpose) {
+  state.sourceUploads[purpose] = [];
+  state.sourceUploading[purpose] = 0;
+  renderSourceFiles(purpose);
 }
 function launchArgument() {
   const title = $("#a-title").value.trim();
   const argumentText = $("#a-text").value.trim();
   if (!title) { $("#a-title").focus(); $("#a-title").style.borderColor = "var(--red)"; return; }
-  if (!argumentText && !state.argumentUploads.length) {
+  if (!argumentText && !state.sourceUploads.argument.length) {
     $("#a-text").focus(); flash($(".argument-required-note"), "Paste text or attach a document."); return;
   }
   if (!state.argumentSeated.size) { flash($("#argument-seated-count"), "Seat at least one agent."); return; }
@@ -471,7 +500,7 @@ function launchArgument() {
     type: "start", mode: "strengthen", title,
     argument_text: argumentText, research_goal: $("#a-goal").value.trim(),
     audience: $("#a-audience").value.trim(), agents: Array.from(state.argumentSeated),
-    source_tokens: state.argumentUploads.map((file) => file.token),
+    source_tokens: state.sourceUploads.argument.map((file) => file.token),
     want_pptx: wantPptx, slide_count: wantPptx ? slideCount : null,
     budget: readBudget("#a-budget"),
   });
@@ -488,7 +517,8 @@ function launchNew() {
       time_horizon: $("#f-horizon").value.trim(), approval_path: $("#f-approval").value.trim(),
       success_measure: $("#f-success-measure").value.trim(),
       agents: Array.from(state.seated), want_pptx: $("#f-pptx").checked,
-      deck_mode: $("#f-deck-mode").value, use_sources: true },
+      deck_mode: $("#f-deck-mode").value,
+      source_tokens: state.sourceUploads.report.map((file) => file.token) },
     auto_approve: !$("#f-review").checked, budget: readBudget("#f-budget"),
   });
 }
@@ -527,15 +557,97 @@ function startRun(payload) {
   state.lastEventSeq = 0;
   $("#run-title").textContent = payload.spec?.title || payload.title || payload.slug || "Council run";
   buildStageRail(); resetConstellation(payload.spec?.title || payload.title || payload.slug || "");
+  state.runFinished = false;
+  state.reconnectAttempt = 0;
+  openSocket(payload);
+}
+
+// Connect, and keep connecting. A long run outlives browser crashes, sleeping
+// laptops, and network blips; the server keeps a sequenced event log, so
+// rejoining costs only the events this tab actually missed.
+function openSocket(payload) {
   const proto = location.protocol === "https:" ? "wss" : "ws";
   const query = new URLSearchParams({
     token: state.sessionToken,
     client_id: state.clientId,
   });
-  const ws = new WebSocket(`${proto}://${location.host}/ws?${query}`); state.ws = ws;
-  ws.onopen = () => ws.send(JSON.stringify(authenticatedControl(payload)));
+  const ws = new WebSocket(`${proto}://${location.host}/ws?${query}`);
+  state.ws = ws;
+  state.lastPayload = payload;
+  ws.onopen = () => {
+    state.reconnectAttempt = 0;
+    ws.send(JSON.stringify(authenticatedControl(payload)));
+  };
   ws.onmessage = (ev) => handleEvent(JSON.parse(ev.data));
-  ws.onclose = () => log("Connection closed.", "warn");
+  ws.onclose = () => {
+    if (state.runFinished) return;
+    scheduleReconnect();
+  };
+}
+
+function scheduleReconnect() {
+  const attempt = (state.reconnectAttempt || 0) + 1;
+  state.reconnectAttempt = attempt;
+  if (attempt > 60) {
+    log("Lost contact with the Council server. Reload once it is running again.", "err");
+    setConnectionBanner("Disconnected — reload when the server is back.", "err");
+    return;
+  }
+  const delay = Math.min(1000 * attempt, 5000);
+  setConnectionBanner(`Reconnecting to the run… (attempt ${attempt})`, "warn");
+  log(`Connection lost — reconnecting in ${Math.round(delay / 1000)}s…`, "warn");
+  setTimeout(async () => {
+    // Rejoin the live run from the last event this tab rendered. If the run
+    // ended while we were away, fall back to the finished report.
+    try {
+      const meta = await fetch("/api/meta").then((r) => r.json());
+      if (!meta.active_run) { await recoverFinishedRun(); return; }
+    } catch (_) { /* server still down — the socket attempt will retry */ }
+    openSocket({ type: "attach", after: state.lastEventSeq || 0 });
+  }, delay);
+}
+
+async function recoverFinishedRun() {
+  state.runFinished = true;
+  setConnectionBanner("", "");
+  log("The run finished while this tab was disconnected.", "ok");
+  await loadHome();
+  nav("home");
+}
+
+// A run has exactly one controlling tab. Extra tabs watch. If the controlling
+// tab dies, the server hands control to the next tab that attaches, so a
+// crashed browser can never strand a run at an unapprovable checkpoint.
+function applyControlStatus(e) {
+  const observing = !e.controls && e.run_active;
+  document.body.dataset.observing = observing ? "1" : "";
+  const cancel = $("#cancel-btn");
+  if (cancel) cancel.disabled = observing;
+  let note = $("#cp-observing");
+  if (observing) {
+    if (!note) {
+      note = document.createElement("div");
+      note.id = "cp-observing";
+      note.className = "cp-observing";
+      $("#cp-actions")?.parentElement?.insertBefore(note, $("#cp-actions"));
+    }
+    note.textContent = e.message || "Another tab is controlling this run.";
+  } else if (note) {
+    note.remove();
+  }
+}
+
+function setConnectionBanner(text, kind) {
+  let el = $("#conn-banner");
+  if (!text) { if (el) el.remove(); return; }
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "conn-banner";
+    el.className = "conn-banner";
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.dataset.kind = kind || "warn";
 }
 
 // ─────────── stage rail ───────────
@@ -611,7 +723,13 @@ function hideTip() { $("#node-tooltip").classList.add("hidden"); }
 function handleEvent(e) {
   if (e.seq && e.seq <= (state.lastEventSeq || 0)) return;
   if (e.seq) state.lastEventSeq = e.seq;
+  // Any delivered event proves the connection is healthy again.
+  if (state.reconnectAttempt) { state.reconnectAttempt = 0; setConnectionBanner("", ""); }
   switch (e.type) {
+    case "control_status":
+      state.hasControl = Boolean(e.controls);
+      applyControlStatus(e);
+      return;
     case "run_start":
       if (e.stages) buildStageRail(e.stages);
       buildConstellation(e.agents || []);
@@ -673,12 +791,14 @@ function handleEvent(e) {
       nodeState(e.agent, "error");
       log(`✕ ${state.meta[e.agent]?.display || e.agent} — ${e.message || e.error_type || "agent failed"}`, "err"); break;
     case "checkpoint": showCheckpoint(e); break;
-    case "run_complete": showResult(e); break;
+    case "run_complete": state.runFinished = true; setConnectionBanner("", ""); showResult(e); break;
     case "control_error":
       log("Control denied: " + e.message, "err"); break;
     case "run_error": log("Error: " + e.message, "err"); alert("The run hit an error:\n\n" + e.message + "\n\nCompleted work is saved — resume from Home."); loadHome(); break;
-    case "run_stopped": log("Run stopped.", "warn"); $("#side-run").classList.add("hidden"); break;
-    case "stream_end": state.ws?.close(); break;
+    case "run_stopped":
+      state.runFinished = true; setConnectionBanner("", "");
+      log("Run stopped.", "warn"); $("#side-run").classList.add("hidden"); break;
+    case "stream_end": state.runFinished = true; setConnectionBanner("", ""); state.ws?.close(); break;
   }
 }
 function log(text, cls = "") {
@@ -753,6 +873,7 @@ async function showResult(e) {
     $("#result-toc").innerHTML = "";
     const dl = $("#result-downloads"); dl.innerHTML = "";
     if (e.zip) { const a = document.createElement("a"); a.className = "dl-btn"; a.href = e.zip; a.textContent = "⤓ All deliverables (.zip)"; dl.appendChild(a); }
+    clearSourceFiles("scope");
     await loadHome(); nav("result"); return;
   }
   if (e.mode === "strengthen") {
@@ -764,8 +885,8 @@ async function showResult(e) {
       const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json());
       $("#result-body").innerHTML = renderMarkdown(data.markdown || "");
       buildTOC(); renderDownloads(data.downloads);
-    } catch (_) { $("#result-body").textContent = "Strengthened argument saved to the library."; }
-    state.argumentUploads = []; renderArgumentFiles();
+    } catch (_) { $("#result-body").textContent = "One-page memo saved to the library."; }
+    clearSourceFiles("argument");
     await loadHome(); nav("result"); return;
   }
   $("#result-new").textContent = "New report";
@@ -774,6 +895,7 @@ async function showResult(e) {
   $("#result-quality").classList.remove("hidden");
   try { const data = await fetch(`/api/report/${e.slug}`).then((r) => r.json()); state.resultReviseSlug = data.revise_slug || state.resultReviseSlug; $("#result-body").innerHTML = renderMarkdown(data.markdown || ""); buildTOC(); renderDownloads(data.downloads); }
   catch (_) { $("#result-body").textContent = "Report saved to runs/."; }
+  clearSourceFiles("report");
   await loadHome(); nav("result");
 }
 async function saveFinalQuality() {
@@ -863,4 +985,11 @@ function renderMarkdown(md) {
   }
   return html;
 }
-init();
+init().then(() => {
+  $("#app-loading").classList.add("hidden");
+}).catch((error) => {
+  console.error(error);
+  $("#app-loading").classList.add("failed");
+  $("#app-loading-title").textContent = "The Council could not load";
+  $("#app-loading-detail").textContent = "Refresh the page. If the problem continues, check the Council terminal.";
+});

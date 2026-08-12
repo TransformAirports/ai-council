@@ -1,0 +1,90 @@
+# Quantitative Analyst — Reproduction Package
+
+Run: `quiet-by-design-standards-for-mwaa-terminals-2`
+Producer: `quantitative-analyst`
+Generated: 2026-08-06
+
+This folder contains every calculation cited in
+`outputs/stage1/quantitative-analyst-brief.md`. The brief is the readable
+analysis; this folder is the audit trail.
+
+## Files
+
+- `calculations.json` — the authoritative record. Inputs (with sources),
+  analyst-labeled assumptions (with bases), formulas, and every scenario
+  result reported in the brief. Read this file first.
+- `concourse-e-cost-sensitivity.csv` — capital, annualized debt-service,
+  and cost-per-enplanement for the Concourse E acoustic/PA/EVACS/AV/FIDS
+  package under low, mid, high, and historic-envelope scenarios.
+- `cpe-sensitivity.csv` — cost-per-enplanement impact scaling from the
+  Concourse E cases to program-wide (5M sqft new/renovated per the July
+  2026 IAD expansion announcement).
+- `macleamy-change-cost.csv` — cost of correcting the same $9.57M mid-
+  rigor acoustic decision at each project stage per the MacLeamy /
+  AIA IPD curve, expressed as a low–high range.
+- `announcement-load.csv` — daily broadcast event count for the Concourse E
+  layout at three announcement rates, with 75-minute listener-weighted
+  exposure in the unzoned vs. gate-zoned cases.
+- `accessibility-coverage.csv` — combined-channel coverage math for
+  visual + audible + mobile (+ staffed) channels under five parameter
+  combinations, tested against a 99.9% coverage target.
+- `compliance-thresholds.csv` — numeric thresholds and governing authority
+  for every metric a defensible MWAA quiet-by-design standard must
+  specify. Threshold labeled "(analyst)" is not code-imposed and must be
+  adopted by MWAA to become binding.
+
+## How to reproduce
+
+Every result in `calculations.json` is derived by direct arithmetic from
+`source_inputs` and `assumptions_analyst_labeled`. To rebuild:
+
+1. Copy `source_inputs.*.value` into a spreadsheet cell for each variable.
+2. Copy the corresponding `assumptions_analyst_labeled.*` scenarios.
+3. Evaluate each formula in `calculations.calculations.*.formula` against
+   the labeled scenario. A pocket calculator is sufficient — no numerical
+   solvers are used.
+
+Example — Concourse E mid-rigor capital:
+
+    capital = GSF * cost_per_gsf * acoustic_share
+            = 435,000 * 1,100 * 0.020
+            = $9,570,000
+
+Example — Concourse E mid-rigor annual debt service:
+
+    r = 0.0437; n = 30
+    factor = (r * (1+r)^n) / ((1+r)^n - 1) = 0.06085
+    annual = 9,570,000 * 0.06085 = $582,335
+
+Example — cost per enplanement (IAD CY2025):
+
+    cpe = 582,335 / 13,859,735 = $0.0420 per enplanement
+
+## What is NOT in this package
+
+- No MWAA-verified Concourse E line-item cost. `cost_per_gsf` is an
+  analyst assumption band drawn from public U.S. terminal construction
+  benchmarks and is labeled as such throughout.
+- No observed MWAA holdroom announcement cadence. The 10 / 15 / 30
+  announcements-per-gate-per-hour band is analyst-set.
+- No FIDS uptime, STI commissioning, or passenger survey data from MWAA.
+  The accessibility-coverage math uses illustrative channel probabilities.
+- No modeling of the airline majority-in-interest (MII) approval path.
+  Whether the standard requires MII consultation under the 2025 U&L is
+  an open governance question flagged in the airport context packet §3
+  and in the brief §7.
+
+## Notes on precision
+
+Currency figures are rounded to the nearest dollar in the JSON and to the
+nearest hundred-thousand or ten-thousand dollars in the brief prose. Cost
+per enplanement is reported to three or four decimal places to make small
+differences legible, not to imply that precision exists in the underlying
+inputs. Treat all reported figures as one significant figure until MWAA
+operator data replaces the analyst assumptions.
+
+## Citations
+
+Source references for every input are inside `calculations.json` under
+`source_inputs.*.source` and inside the sibling evidence file
+`outputs/stage1/quantitative-analyst-evidence.jsonl`.

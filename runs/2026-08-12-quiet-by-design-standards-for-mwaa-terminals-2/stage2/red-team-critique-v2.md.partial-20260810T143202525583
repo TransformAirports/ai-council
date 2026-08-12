@@ -1,0 +1,249 @@
+# Airport Executive Review v2 — Board-Readiness Prosecution
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Reviewer:** airport-executive-reviewer
+**Target:** `outputs/stage2/strategist-draft-v2.md`
+**Inputs:** `outputs/stage2/red-team-critique-v1.md` (evidence-prosecutor); `outputs/run-manifest.json` (14 selected briefs; strategist → executive-reviewer → strategist-v3 pipeline); `outputs/stage1/evidence-map.md`; `outputs/context/airport-context.md`; run prompt `prompts/runs/quiet-by-design-standards-for-mwaa-terminals-2.md`.
+**Jurisdiction:** governance, finance, airline, procurement, operations, delivery. Evidence integrity was prosecuted in v1; I do not re-litigate it except where it changes what the Board can actually approve.
+
+---
+
+## Bottom line
+
+The v2 draft reads well from a chair that already believes the thesis. From the chair of an operating airport executive who must sign a Board memo, it is not yet assignable. The recommendation names an executive owner, a first-90-day action, and a stop condition, but it does not name the approval route, does not name the funding source, does not identify the authority having jurisdiction that enforces the intelligibility floor, does not identify the vehicle through which the amendment reaches the tenant-lease surface it says is the whole point, and does not test United's or American's response to the two clauses (§9.05.8 exposure at DCA; gate-PA discipline for slot-constrained departures) that carry the argument. The draft's own "MII carve-out is a diligence item" concession is another way of saying the approval route is unknown. A board memo that concedes the approval route is unknown is not a board memo.
+
+**Verdict up front:** READY WITH NAMED CONDITIONS. Not fatal, but eight conditions must close before Stage 3 or the Strategist has written a well-argued essay rather than a decision package.
+
+---
+
+## Numbered findings
+
+Each finding carries a location, a charge, a severity tag, and a required remedy. Severity legend: **FATAL** — the recommendation cannot be board-ready until this is answered; **CONDITION** — must be a named board-memo condition or a Stage-3 addition, not left as running-text hedges; **FIT** — clean-up.
+
+### G1 — The approval route is undeclared, and the draft admits it
+
+- **Location:** "Where it gets written" ¶2: *"General counsel should confirm before the Board memo is drafted whether the amendment triggers majority-in-interest thresholds in the 2025 Use and Lease and whether the safety/accessibility carve-out applies. If the answer is board resolution, the executive owner is the President and CEO…"*
+- **Charge:** The recommendation is written as if GC has already opined. The draft names the owner *conditional on the answer*. An executive cannot present that conditional to the Board — either it is a Design Manual amendment inside existing delegated authority (VP D&C or P&CEO order), or it is a Board resolution, or it is a U&L side letter subject to airline concurrence. Those are three different memos, three different timelines, and three different vote counts.
+- **Severity:** **FATAL** until closed.
+- **Remedy:** Before Stage 3, GC must return one of three positions: (a) Design Manual amendment inside existing consultant fees, VP D&C-signed, no Board action; (b) Board resolution required because the amendment sets owner performance requirements that flow into airline rates and charges; (c) U&L amendment subject to MII because it directly binds tenant/airline behavior. Strategist v3 must state which route applies and rewrite the decision card accordingly. The current text presents (a) and (b) as equivalent; they are not.
+
+### G2 — The authority having jurisdiction for the intelligibility floor is still unnamed
+
+- **Location:** "The floors the standard inherits" ¶1: *"The authority having jurisdiction — MWAA's own code function under its federal lease, or a county fire marshal; the specific AHJ at each airport is itself a diligence item — enforces the code floor at certificate of occupancy."*
+- **Charge:** F2 in the evidence prosecution flagged the invented-fire-marshal claim; the v2 fix acknowledges the gap but leaves it open. The whole enforcement story in ¶1 rests on someone enforcing NFPA 72 STI at CO. If the answer is "MWAA fire-and-rescue under §5.1-158 and 49 U.S.C. §49104 federal-lease authority," the amendment sits inside the Authority's own compliance envelope and executes fastest. If the answer is a county fire marshal (Loudoun for IAD; Arlington for DCA T1/T2), the Authority controls only the specification and depends on an outside official to enforce, which changes the delivery model.
+- **Severity:** **FATAL.** The COO cannot commission Concourse C or D against a standard whose enforcer is unknown.
+- **Remedy:** Airports Authority Fire Marshal's office and MWAA General Counsel to confirm, in writing, the AHJ for building/fire-code plan review and CO at IAD and DCA. Strategist v3 names it in the same sentence as NFPA 72.
+
+### G3 — The Design Manual amendment vehicle is asserted; existence not verified
+
+- **Location:** Executive summary ¶8: *"Adopt the standard as an amendment to the Airports Authority Design Manual"*; body: *"Adopt the standard as an amendment to the Airports Authority Design Manual, scoped inside the FY26 revision cycle."*
+- **Charge:** The airport-context packet §8.1 explicitly named as a gap whether the current seven-volume Design Manual contains acoustic performance criteria at all. If Volumes 1/2/3 have no acoustic section, "amend" is the wrong verb — the correct verb is "insert a new performance section," which is a heavier procedural lift and probably requires the FY26 revision cycle rather than a mid-cycle addendum. The draft assumes the vehicle exists.
+- **Severity:** **CONDITION.**
+- **Remedy:** VP Design and Construction to confirm whether an acoustic/information performance section currently exists in Volumes 1/2/3 (IAD and DCA parallel volumes). If it does, the amendment is a redline. If it does not, Strategist v3 must add the FY26-cycle procedural steps (working-group convening, cross-airport review, ADA/504 compliance concurrence, publication as revision 20xx-x) into the 90-day plan.
+
+### G4 — Funding source is missing entirely
+
+- **Location:** "Where it gets written" ¶2: *"Route it as a Design Manual amendment inside existing consultant fees."*
+- **Charge:** The draft names $12M–$40M as the MWAA-wide capital stack (Exec ¶7; footnote 16). It then says the amendment itself sits inside existing consultant fees. Those are two different questions. The consultant fees are inside program budgets. The $12M–$40M is not. Where does it come from — AIP? PFC (subject to FAA approval and the PFC application timeline)? GARB proceeds (subject to bond covenants and the $5.5B forward issuance signal)? Airline-approved capital under U&L Article on capital projects? Operating capital? Grant funds under BIL/IIJA terminal-modernization set-asides? Each has a different approval clock and a different airline-consent posture.
+- **Severity:** **FATAL.** No airport executive presents a capital recommendation without a funding source.
+- **Remedy:** CFO to identify the funding source(s) for (i) the incremental design/specification fees, (ii) the incremental construction premium at Concourses C and D (and any DCA program work), (iii) the mobile-notification platform lifecycle, and (iv) the STIPA commissioning campaign and its 60-day re-measurement. Strategist v3 states the funding source explicitly in the decision card.
+
+### G5 — Lifecycle, not one-time, is the cost story that matters
+
+- **Location:** Exec ¶7 and footnote 16.
+- **Charge:** The $12M–$40M is a one-time capital order-of-magnitude for ceiling treatment plus FIDS redundancy plus mobile-notification platform. The lifecycle cost is not scoped: STIPA re-measurement at defined intervals; loudspeaker replacement on a 10–15-year cycle; the FIDS SLA infrastructure whose degradation is the day-two failure mode; the mobile-notification platform which is a software-and-hosting O&M line item, not a capital purchase; annual acoustic tile replacement in high-wear zones; and the additional inspection and commissioning staff time the standard implies. The draft's $0.03–$0.11 per enplanement is capital-only.
+- **Severity:** **CONDITION.**
+- **Remedy:** Strategist v3 adds a lifecycle cost line, even at order-of-magnitude ($X per year O&M), and states whether it flows through the airline rates and charges recovery, sits inside operating budget, or sits inside grant-funded periodic renewal. This matters because the 140% coverage target lives on the O&M line, not the capital line.
+
+### G6 — MII carve-out is treated as a background hope, not a decision-gate test
+
+- **Location:** "The counter-case, honestly" ¶3: *"majority-in-interest carve-outs in U.S. use-and-lease agreements commonly exempt safety- and security-mandated capital, which suggests the amendment may sit outside airline veto if it is written as a safety/accessibility performance standard rather than a discretionary premium. Whether the executed MWAA 2025 U&L follows that pattern is a diligence question."*
+- **Charge:** This is not a diligence question that can wait. It is *the* determining question for the delivery model. If the executed 2025 U&L follows the industry-typical pattern, the amendment goes through as a safety/accessibility performance standard and airlines have no veto. If it does not, or the carve-out is narrower than in peer agreements, United and American get an MII vote on the incremental capital at C/D and DCA and the standard has to be renegotiated as a side letter before the 2039 U&L review. The draft cannot recommend "amendment" without knowing which of those two worlds it is in.
+- **Severity:** **FATAL.**
+- **Remedy:** GC to disclose to the executive team (not the public draft) whether the executed 2025 U&L §Article on capital projects contains an MII carve-out for safety/security/accessibility-mandated capital, what the categorical language is, and what threshold triggers airline concurrence. Strategist v3 either states that MII is not triggered (and cites the section) or states that airline concurrence is required and adds a paragraph on how it will be obtained.
+
+### G7 — The airline lease exhibit clause quietly reopens the fight the draft says it won't open
+
+- **Location:** "The counter-case, honestly" ¶3: *"it should say nothing about airline announcement scripting inside the leased envelope — a fight MWAA does not need to open before the next U&L review."* Then "Where it gets written" ¶1: the mandatory floor includes *"what the airline lease exhibits require by way of gate-PA discipline for slot-constrained departures."*
+- **Charge:** The draft says two contradictory things in adjacent sections. Either the standard specifies what airline lease exhibits require (in which case the standard is amending the U&L and airline concurrence is on) or it says nothing about airline behavior (in which case the DCA higher-floor argument has nowhere to land, because the microphone at DCA gate 35 is American's). The v2 draft cannot ride both horses.
+- **Severity:** **FATAL** — internal contradiction on a load-bearing clause.
+- **Remedy:** Pick a lane. The intellectually honest lane, given the "MWAA doesn't own the microphone" title, is: the airport-controlled base-building specification is the mandatory floor; airline lease-exhibit language is a *goal for the 2039 U&L review*, not a Day-1 requirement; the interim mechanism is a memorandum of understanding or side letter with each signatory carrier at each airport, negotiated bilaterally against the airport's operational data. Strategist v3 states this and drops the "airline lease exhibits require" clause from the Day-1 tier.
+
+### G8 — The Concourse E "commissioning-data baseline" has no owner, no contractor, and no Cx budget
+
+- **Location:** Exec ¶6 and "Where it gets written" ¶2: *"Concourse E, opening in September 2026, becomes the commissioning-data baseline against which C and D will be judged."*
+- **Charge:** Concourse E opens next month. To use it as a STIPA-in-occupied-conditions baseline, MWAA needs today: a signed commissioning-authority contract with an acoustics consultant, an approved test protocol (occupied conditions means passengers in the space), United's operational concurrence to hold a section of the concourse during test windows, and an approved measurement uncertainty and pass/fail spec. None of that appears in the draft, and none of it is trivial to procure inside 30 days. If MWAA misses the E baseline, the "commissioning-data" argument collapses and the case for C/D commissioning discipline weakens materially.
+- **Severity:** **CONDITION** if MWAA can execute a Cx-plus-acoustics scope inside the CO window; **FATAL** if it cannot.
+- **Remedy:** VP Design and Construction, Vice President Airports Management (IAD), and the acoustics Cx agent to confirm within 14 days whether a Concourse E occupied-conditions STIPA baseline is achievable at or within 60 days of opening. If yes, the draft's timing argument holds. If no, Strategist v3 recasts the baseline as "first C/D pier substantial completion" and the urgency argument is C/D-only.
+
+### G9 — DCA-side execution is not sized
+
+- **Location:** Throughout. The "two calibrations" section describes what DCA needs; the "where it gets written" section says Concourse C/D at IAD is the timing driver. The DCA program is $2.4B under the current CCP focused on gate area capacity, curb/roadway, and terminal repairs — nothing in the draft says which DCA project inherits the standard first.
+- **Charge:** If the answer is Terminal 2 gate area renovations, that is a live procurement now and the standard has to be inserted mid-flight, which is expensive. If the answer is the Terminal 1 (1941 art deco) preservation carve-out, the DCA higher-floor argument has no near-term project to land on. The draft's DCA advocacy has no DCA delivery vehicle.
+- **Severity:** **CONDITION.**
+- **Remedy:** Strategist v3 identifies the first DCA project that inherits the standard, states whether the amendment reaches it via the design brief (early enough) or via a change order (late), and prices the DCA-side delivery separately from IAD C/D.
+
+### G10 — Tenant handbook amendment mechanics are asserted, not designed
+
+- **Location:** Exec ¶2 and last-image ¶: *"per the amended tenant handbook."*
+- **Charge:** MWAA's concession leases are staggered contracts with individual concessionaires, negotiated at different times, with different renewal clocks. A "tenant handbook amendment" changes the standards *going forward*; it does not automatically apply to existing leases until renewal or a mutually agreed lease amendment. Time-to-full-coverage depends on the concession lease portfolio's weighted-average remaining term, which is not in the record. If that number is seven years, the "captioned and muted" outcome the last-image paragraph describes is a 2033 outcome, not a Day-1 outcome, and the standard is not doing the work the vignette assumes.
+- **Severity:** **CONDITION.**
+- **Remedy:** VP Commercial to disclose the concession lease renewal schedule and the weighted-average remaining term. Strategist v3 states the time horizon over which the tenant-handbook amendment reaches steady-state coverage, and identifies which existing leases MWAA will offer voluntary amendments to (with what consideration).
+
+### G11 — Leading indicators are entirely lagging
+
+- **Location:** "Where it gets written" ¶2: *"The leading indicator is that STIPA data at commissioning and again 60 days after opening."*
+- **Charge:** Both measurements are on assets that have already been built. That is not a leading indicator; it is a Day-1 and Day-60 acceptance test. A leading indicator points to something that has not yet been baked in and gives the executive time to intervene. Candidates the draft does not use: percent of C/D design deliverables containing acoustic performance sections against the drawing checklist; percent of tenant lease renewals in the current fiscal year that incorporated the amended handbook language; number of signatory-carrier bilateral meetings held on gate-PA discipline; percent of consultant scopes for FY27 program work that name the standard; number of Volume 1/2/3 sections redlined by the working group by month.
+- **Severity:** **CONDITION.**
+- **Remedy:** Strategist v3 provides a proper leading-indicator dashboard: 2–3 process-input metrics that would give the executive team a signal 6–12 months before the STIPA number lands.
+
+### G12 — The stop condition is written narrowly
+
+- **Location:** "Where it gets written" ¶2: *"Stop if the MII review indicates the standard becomes an incremental capital line item outside the safety carve-out; in that case renegotiate as a side-letter to the next U&L review, not adopted as an aspirational document."*
+- **Charge:** The MII stop condition is present. Other stop conditions the executive would want and the draft omits: stop if a signatory carrier formally objects to the DCA gate-PA discipline clause; stop if GC advises the DOT ACAA/PRM rulemaking direction (footnote 8) contradicts a specific standard clause; stop if the Concourse E baseline shows the current MWAA acoustic environment is already inside the ACRP 175 band (in which case the amendment is unnecessary at IAD's newest space); stop if the funding source identified under G4 is unavailable in the FY27 budget; stop if the AHJ (G2) declines to enforce STIPA in occupied conditions.
+- **Severity:** **CONDITION.**
+- **Remedy:** Expand the stop conditions to a numbered list, each with an owner and a decision date.
+
+### G13 — Board vote map is missing
+
+- **Location:** "Where it gets written" ¶2 names P&CEO with COO and VP D&C as co-sponsors but never touches the Board.
+- **Charge:** MWAA has 17 seats: 7 VA gubernatorial, 4 D.C. mayoral, 3 MD gubernatorial, 3 Presidential. A resolution needs a simple majority; a controversial resolution needs enough of the appointing authorities aligned that the memo is a formality, not a fight. The July 2026 White House / USDOT / United announcement puts the federal appointees under different pressure than the VA and DC appointees. The disability-community counter-argument runs directly to the D.C. and MD appointees. The draft is silent on all of this. The 2026 officers (Chair Uncapher, Vice Chair Vogel, Secretary Smith) are not named and their prior public positions are not tested.
+- **Severity:** **CONDITION.**
+- **Remedy:** Before the memo drafts, the P&CEO's office runs an informal read on the Board. Strategist v3 acknowledges the political geometry in one paragraph — VA-appointed majority, disability-community equities that the D.C. and MD appointees will hear from, federal-appointed pressure on the Dulles rollout — and states the Chair's role in whether this is a consent-agenda item or a discussion item.
+
+### G14 — Airline reaction is asserted, not tested
+
+- **Location:** Throughout. Draft assumes United will not object to Concourse C/D acoustic requirements and that American will accept the DCA higher-floor implication.
+- **Charge:** United is the paying customer at C/D through CPE; incremental capital that CPE-recovers hits United's cost line and the airline has an interest and (depending on MII) a vote. United's response to a standard that adds intelligibility performance to their own concourses may be neutral or supportive — but nobody has asked. American at DCA sees a standard that argues its gates need a *higher* announcement floor than it currently maintains. The airline-strategist brief anticipates the U&L MII fight; the draft does not stage the pre-diligence conversation.
+- **Severity:** **CONDITION** (may be **FATAL** if United objects to the C/D program-brief redline before it issues).
+- **Remedy:** VP Airline Affairs to hold pre-briefing conversations with United (IAD) and American (DCA) inside the next 30 days, offering the safety/accessibility framing and gathering their position. Strategist v3 references those conversations and, if they have not occurred by Stage 3, makes them the first item in the 90-day action.
+
+### G15 — The FIDS SLA is asserted with no engineering source
+
+- **Location:** Last-image ¶: *"The FIDS updates within an SLA that survives a gate change inside T-25 minutes."*
+- **Charge:** This is a new operational requirement that appears in the vignette without appearing in the mandatory-floor tier. What is the current SLA? What is the required SLA? What does it cost to move from A to B? Who owns FIDS at MWAA — is it an in-house system, a Damarel/SITA/RESA contract, an airline-controlled feed at some gates? If a FIDS-SLA requirement is genuinely in the standard, it belongs in the mandatory floor with a target and an owner, not smuggled into the closing image.
+- **Severity:** **CONDITION.**
+- **Remedy:** Either (a) elevate the FIDS SLA to the mandatory-floor list with a specific requirement (e.g., "gate change propagates to FIDS within 60 seconds of AODB update") and identify the owner and the vendor implication, or (b) drop it from the vignette. Do not have it appear only in the last paragraph.
+
+### G16 — Employee sound exposure is footnoted but not owned
+
+- **Location:** Exec ¶6 and "Where it gets written" ¶1: OSHA 29 CFR 1910.95 named under recommended practice; footnote 30 cites the 85 dBA / 90 dBA thresholds.
+- **Charge:** MWAA has a workers' compensation ledger; gate agents in slot-constrained hold rooms and tenants on the concourse are the exposed population. If the standard names OSHA exposure monitoring only in the "recommended" tier, the executive who owns Environmental Health & Safety will read that as an unfunded suggestion. The context packet §8.5 identified this as a gap. Draft did not close it.
+- **Severity:** **CONDITION.**
+- **Remedy:** Coordinate with the EHS Director; either commit to a specific monitoring cadence (annual dosimetry sweep of the top ten noisiest hold-room and concourse locations at each airport) with a budget line, or explicitly state that OSHA compliance rides on airline and tenant obligations for their own employees and MWAA's obligation is limited to airport staff in airport-controlled space.
+
+### G17 — Procurement path for the mobile-notification platform is undefined
+
+- **Location:** "Where it gets written" ¶1: *"an emergency-notification stack specified on generator plus UPS plus local battery, with a duty-officer analog fallback."*
+- **Charge:** The stack the standard requires includes a mobile-notification platform (per footnote 16, part of the $12M–$40M). Does MWAA already own one? If not, the procurement is a competitive IT services acquisition subject to airport procurement rules, DBE participation, and — if federally funded — grant-procurement standards (2 CFR Part 200). Timeline for that class of acquisition is 9–18 months from RFP release. The 90-day plan does not include the acquisition-planning phase.
+- **Severity:** **CONDITION.**
+- **Remedy:** Chief Information Officer or equivalent to confirm whether the mobile-notification platform exists in the current MWAA stack, whether it can be extended, or whether new procurement is required. If new, add the acquisition-planning steps to the 90-day plan.
+
+### G18 — Labor and workforce implications are absent
+
+- **Location:** Not addressed.
+- **Charge:** A standard that changes what a gate agent, dispatcher, or airport-operations coordinator does at the microphone is a labor and training matter. Airline gate agents are covered by CBAs. MWAA airport-operations staff are represented. The draft assumes labor-neutral implementation. It is not: at minimum the standard implies training (new SOPs on PA push authority, new escalation for IROPS), and at DCA the higher-floor argument means MORE gate-agent voice work per boarding, not less.
+- **Severity:** **CONDITION.**
+- **Remedy:** Strategist v3 adds one paragraph on training obligation, workload implication for gate agents (airline concurrence per airline), and the airport-operations training plan the Airports (IAD) and Airports (DCA) VPs will build inside the first 180 days.
+
+### G19 — IROPS behavior at peak hour is described in the vignette, not tested
+
+- **Location:** Opening frame and closing frame.
+- **Charge:** The vignette imagines a peak-hour DCA morning when the standard is working. The IROPS test is the day of a ground stop, a runway closure, or a security event. In IROPS the volume of PA traffic goes up, gate changes cascade, and adjacent-zone spillover becomes the operational goal, not the failure mode. The mandatory floor as drafted implies a redundant-channel obligation but does not test whether the mandatory floor collapses safely under load.
+- **Severity:** **CONDITION.**
+- **Remedy:** Add an IROPS-mode clause to the mandatory tier: pre-authorized override authorities, temporary intelligibility-target relaxation with duty-officer sign-off, and the analog-fallback playbook that trained through the 19 July 2024 CrowdStrike outage. State it in the standard, not only in the counter-case section.
+
+### G20 — Preservation carve-outs are named but not scoped
+
+- **Location:** "Where it gets written" ¶1: *"preservation carve-outs for the Saarinen Main Terminal at IAD and the 1941 Terminal 1 at DCA."*
+- **Charge:** These are two architecturally protected buildings. A preservation carve-out that reads as "the standard does not apply here" is different from one that reads as "the standard applies except where SHPO consultation identifies a specific character-defining feature that cannot be modified." The draft does not distinguish. Either interpretation is defensible; picking one changes what an architect and a preservation consultant do next week.
+- **Severity:** **FIT.**
+- **Remedy:** Strategist v3 states the carve-out mechanism (SHPO consultation with defined character-defining features rather than blanket exemption) and identifies the historic-preservation contact at each airport.
+
+### G21 — Bond-covenant test is not run
+
+- **Location:** Absent.
+- **Charge:** A capital addition of $12M–$40M sized against the $9.0B CCP is trivial to the coverage ratio, and the draft says so. The bond-covenant question that matters is different: does the standard, as an owner-required design specification, alter the risk profile the rating agencies read? Moody's Aa3 / S&P AA– / Fitch AA– affirmations reference airline-cost trajectory and CCP execution risk; the addition of an operationally novel performance standard on a passenger-facing surface is a minor rating-narrative touch, but it is a touch. Not tested.
+- **Severity:** **FIT.**
+- **Remedy:** Confirm with Treasury that no covenant is engaged. Note in Stage 3 that rating agencies were notified as part of the routine annual dialogue.
+
+### G22 — Grant-assurance implications are not tested
+
+- **Location:** Absent.
+- **Charge:** MWAA receives FAA AIP and BIL/IIJA grants. A performance standard that governs accessible communication in airport-controlled space intersects the accessibility grant-assurance regime under 49 U.S.C. §47107. If any portion of the $12M–$40M is grant-funded, procurement is 2 CFR Part 200 and DBE, and any incremental spec that reduces accessible information flow is at risk of a grant-assurance finding under DOT 49 CFR Parts 27 and 28. The draft's redundant-channel obligation *helps* here; the draft has not said so.
+- **Severity:** **FIT** if operating capital funded; **CONDITION** if grant-funded.
+- **Remedy:** Depends on G4 answer. If any grant funds are in scope, add one sentence stating that the redundant-channel obligation satisfies the accessibility grant-assurance regime and does not create a new one.
+
+### G23 — What the evidence pass did not test, in one place
+
+The evidence prosecutor caught what was written poorly. The following operating-executive concerns were not in-scope for that pass and remain untested:
+
+- **AHJ enforcement mechanism** (G2)
+- **Design Manual amendment vehicle existence** (G3)
+- **Funding source and lifecycle O&M** (G4, G5)
+- **MII carve-out language in the executed 2025 U&L** (G6)
+- **Airline pre-briefing status and airline concurrence pathway** (G14)
+- **Concourse E occupied-conditions STIPA feasibility inside 60 days** (G8)
+- **DCA delivery vehicle** (G9)
+- **Tenant lease staggered-renewal reach** (G10)
+- **Leading indicators tied to inputs, not to acceptance tests** (G11)
+- **Mobile-notification platform ownership and acquisition timeline** (G17)
+- **Labor implications and training obligation** (G18)
+- **IROPS-mode behavior of the mandatory floor** (G19)
+- **Bond-covenant and grant-assurance implications** (G21, G22)
+- **Board vote arithmetic given 17-seat composition and the July 2026 political context** (G13)
+
+Any one of these left open in Stage 3 gets asked at the Board table and answered by a staff member who wishes it had been answered on paper.
+
+---
+
+## Airport decision card — the version the draft owes the Board
+
+This is the card Strategist v3 must produce, populated with the answers to G1–G22. As currently drafted, the fields marked **[UNANSWERED]** cannot be filled.
+
+| Field | Draft's implied answer | Executive-review verdict |
+|---|---|---|
+| **Executive owner** | President & CEO, with COO and VP Design and Construction as co-sponsors | Acceptable if the amendment vehicle is (a) or (b); needs VP Airline Affairs as co-sponsor if (c) per G1/G6. |
+| **Decision and approval route** | "Design Manual amendment inside existing consultant fees, or Board resolution" | **[UNANSWERED]** — pick one per G1. |
+| **First 90-day action** | Instruct Design Manual working group to insert acoustic/information performance criteria into Volumes 1 and IAD/DCA tenant volumes before the C/D program brief issues | Acceptable in outline; incomplete without (i) GC clearance date, (ii) AHJ confirmation, (iii) United and American pre-briefing, (iv) Concourse E Cx contract execution or explicit deferral, (v) working-group membership named. |
+| **Cost order of magnitude** | $12M–$40M one-time capital; $0.03–$0.11 per enplanement | Capital-only. Add lifecycle O&M per G5. |
+| **Plausible funding source** | Not stated | **[UNANSWERED]** — G4 must close before the memo. |
+| **Airline dependency** | §9.05.8 monitoring constraint at DCA; MII posture uncertain | **[UNANSWERED]** — G6 (MII carve-out) and G7 (airline lease exhibits vs. base building) must close. |
+| **Board dependency** | Not mapped | **[UNANSWERED]** — G13. |
+| **Federal dependency** | NFPA 72, 14 CFR Part 382, ADA Title II, 49 CFR Part 27 named; DOT ACAA/PRM rulemaking direction flagged | Acceptable; add grant-assurance test per G22. |
+| **Procurement dependency** | Not scoped for the mobile-notification platform, FIDS upgrades, or acoustic Cx contract | **[UNANSWERED]** — G17 and G8. |
+| **Labor dependency** | Not addressed | **[UNANSWERED]** — G18. |
+| **Operational dependency** | Concourse E baseline, C/D program brief | Concourse E owner and Cx feasibility unresolved per G8; DCA delivery vehicle unresolved per G9. |
+| **Leading indicator** | STIPA at commissioning; STIPA at 60 days | Both lagging. Replace per G11. |
+| **Failure mode and stop condition** | Scope migration to announcement policy; MII outside safety carve-out → side letter | Acceptable but narrow. Expand per G12. |
+| **What evidence would change the recommendation** | Not stated | Add: MII language reads without carve-out; AHJ declines occupied-conditions STIPA; Concourse E baseline shows current MWAA environment already inside ACRP 175; funding source unavailable in FY27; United or American formally objects at pre-briefing. |
+
+---
+
+## Fatal flaws vs. implementation conditions
+
+**Fatal flaws** — the recommendation cannot be board-ready until these close:
+
+- **G1** — Approval route undeclared.
+- **G2** — AHJ for the intelligibility floor unnamed.
+- **G4** — Funding source undeclared.
+- **G6** — MII carve-out for safety/security/accessibility capital in the executed 2025 U&L is unverified.
+- **G7** — Internal contradiction on airline lease-exhibit scope.
+
+**Implementation conditions** — must appear in Stage 3 as named conditions, decisions, or scoped follow-ups:
+
+- **G3, G5, G8, G9, G10, G11, G12, G13, G14, G15, G16, G17, G18, G19, G22.**
+
+**Fit-and-finish** — clean up in Stage 3 without dependency:
+
+- **G20, G21.**
+
+---
+
+## Verdict
+
+**READY WITH NAMED CONDITIONS.**
+
+The v2 argument is intellectually correct, honestly hedged where the evidence prosecutor pressed, and correctly identifies the design-manual seam as the leverage point. It is not a board-ready decision package until the five fatal flaws close and the fifteen implementation conditions are named on paper rather than assumed.
+
+The one-sentence brief to the Strategist for v3: keep the argument, add the decision card, close the five fatal flaws before you print, and stop writing sentences that say two contradictory things about the airline surface.

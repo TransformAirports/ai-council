@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "inspection_type": "word_pages",
+  "artifact": {
+    "path": "quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx",
+    "sha256": "054b546184476f3d75fbac57b688a173f5709d1eeeddfa226a204c4161fd7216",
+    "size_bytes": 199495
+  },
+  "pdf": {
+    "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.pdf",
+    "sha256": "c88ebd1c6a79e66abe045f2d3f5d289b92ca14102e02845117af627ec059de5d",
+    "size_bytes": 170796
+  },
+  "page_count": 3,
+  "rendered_pages": [
+    {
+      "page_number": 1,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-1.png",
+      "sha256": "9135ba74e17350171d83c5126a3c616c3119f5f008295ec1be4404068d0376fd",
+      "size_bytes": 291169
+    },
+    {
+      "page_number": 2,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-2.png",
+      "sha256": "ef9cfd4b017d8667e928ddb60200d09b68adaefd6d822c8eea98872332784051",
+      "size_bytes": 315406
+    },
+    {
+      "page_number": 3,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-3.png",
+      "sha256": "c5574f58f508aa92cf2c054b854f3c42e7142bd5351f997ce081bfe2242baec1",
+      "size_bytes": 226645
+    }
+  ],
+  "montage": {
+    "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/montage.png",
+    "sha256": "3fe0ddbe319120ac550e1aceaf43dcca63eea4a00e34c1e6878059b23df1b4c8",
+    "size_bytes": 269911
+  },
+  "inspection": {
+    "inspector": "art-director",
+    "full_size_each_page_inspected": true,
+    "montage_inspected": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Verified all 3 rendered page hashes and the montage hash against the receipt before inspection; inspected the exact hash-bound bytes.",
+      "Page 1: logo lockup sharp, title and 'Executive decision brief' hierarchy clean, bottom-line callout box intact, decision-ownership table starts with 'Decision owner' and 'Approval route' rows fully contained; no mid-row clipping at the page break.",
+      "Page 2: decision table continues at a clean row boundary ('First 90-day action', 'Success measures'); the long success-measures bullet list is fully contained within its cell with no overflow or clipped text; 'Why this matters now' and 'Evidence that should drive the decision' sections legible.",
+      "Page 3: 'Recommended action' priority table (3 rows) intact with no split rows; two-column decision-brief notes legible with clean citation wraps; page ends about two-thirds down — normal final-page whitespace, footer present.",
+      "Headers ('TRANSFORM AIRPORTS / AI RESEARCH COUNCIL') and footers ('CONFIDENTIAL WORKING PAPER • n') consistent across all 3 pages.",
+      "Montage: 3-page sequence paced correctly, no blank or stranded pages, table-heavy layout reads as a finished board-ready brief."
+    ],
+    "unresolved_findings": []
+  }
+}

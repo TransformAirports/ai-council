@@ -256,9 +256,16 @@ def main(argv: list[str] | None = None) -> int:
                         f"`{args.resume}`. Existing artifacts were left untouched."
                     )
                     return 2
-                menu.resume_flow(info)
+                menu.resume_flow(
+                    info,
+                    auto_approve=args.no_review,
+                    budget_usd=args.budget,
+                )
             else:
-                menu.resume_flow()
+                menu.resume_flow(
+                    auto_approve=args.no_review,
+                    budget_usd=args.budget,
+                )
             return 0
 
         if args.scope:

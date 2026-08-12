@@ -1,0 +1,224 @@
+# Airport Context Packet — MWAA (IAD + DCA)
+
+Run: `quiet-by-design-standards-for-mwaa-terminals-2`
+Assembled: 2026-08-07
+Purpose: shared factual baseline for the research swarm on a quiet-by-design
+terminal standard for MWAA. Restricted to publicly verifiable facts. Where the
+public record is silent, that gap is named rather than filled.
+
+## 1. Decision framing (from the run prompt and manifest)
+
+- **Operator named:** Metropolitan Washington Airports Authority (MWAA),
+  operating Washington Dulles International (IAD) and Ronald Reagan Washington
+  National (DCA) as a two-airport system.
+- **Thesis:** MWAA should adopt a common quiet-by-design standard for new and
+  substantially renovated terminal space at IAD and DCA, defined not as "fewer
+  announcements" but as an integrated specification for acoustics, PA zoning,
+  FIDS/digital information, and operational controls, with redundant channels
+  to protect safety, accessibility, and irregular-operations resilience. The
+  central question is what is mandatory system-wide, what varies by
+  terminal/context, and how compliance is measured.
+- **Decision owner:** not specified in the manifest. Reasonable inference from
+  MWAA governance: the Board of Directors on any change to design manuals or
+  major program requirements; the President & CEO on internal policy; Design
+  and Construction and Airports (IAD, DCA) on execution. Do not attribute a
+  named owner in the report.
+- **Decision required:** not specified. The prompt asks for a tiered
+  standard (mandatory / recommended / context-dependent) plus a governance
+  path into design manuals, program briefs, consultant scopes, airline and
+  tenant agreements, technology standards, procurement, commissioning, and
+  operations.
+- **Time horizon:** not specified. The prompt anchors on "future terminal
+  planning" rather than short-term retrofits, which places the relevant window
+  on the current 15-year Use & Lease term (2025–2039) and the announced
+  multi-decade Dulles transformation.
+- **Approval path:** not specified. The likely institutional route is
+  internal design-manual revision plus board resolution when the change alters
+  program scope or capital cost carried under airline rates and charges.
+- **Success measure:** not specified. The prompt lists candidate metrics —
+  ambient level, reverberation, signal-to-noise, Speech Transmission Index
+  (STI), zone spillover, announcement frequency/duration, intelligibility,
+  accessibility outcomes, and employee exposure — but does not commit to any.
+- **Operator-supplied sources:** none. `source_paths`, `source_material`, and
+  `source_library` in the manifest are all empty arrays. No confidential or
+  private documents are in scope for this run.
+
+## 2. Authority and governance
+
+- MWAA is an independent public body created in 1987 under the Metropolitan
+  Washington Airports Act; it operates IAD and DCA under a long-term lease
+  from the U.S. Department of Transportation. Federal ownership, local
+  operation.
+- Board of Directors: 17 seats. Virginia's governor appoints seven (confirmed
+  by the Virginia General Assembly); D.C.'s mayor appoints four (confirmed by
+  D.C. Council); Maryland's governor appoints three; the President appoints
+  three with U.S. Senate advice and consent. Members serve six-year terms and
+  may be reappointed once. Officers are elected annually.
+- 2026 officers: Mark Uncapher, chair; Alex Vogel, vice chair; Felice C. Smith,
+  secretary (re-elected).
+- Rulemaking and policy for the two airports flow through board resolutions
+  and MWAA's published Orders and Instructions for IAD and DCA respectively.
+  The Airports Authority Design Manual (seven volumes; IAD Vol. 1 covers
+  airport design and signing, Vol. 2 the Main Terminal / Concourse Z tenant
+  standards, Vol. 3 Concourse B tenant standards, and DCA has parallel
+  volumes) is the natural home for a quiet-by-design standard, but the public
+  record does not currently disclose explicit acoustic performance
+  requirements (NC, RT60, STI, adjacent-zone spillover) inside those volumes.
+
+## 3. Finance and credit
+
+- New 15-year Airport Use Agreement and Premises Lease with the signatory
+  airlines effective January 1, 2025, replacing the prior agreement that
+  expired December 31, 2024. Structured as a two-airport residual system
+  designed to address the historical Reagan/Dulles cost imbalance.
+- Attached to the new agreement: a $9.0 billion Capital Construction Program
+  (CCP), split roughly $6.99 billion at IAD and $2.39 billion at DCA. The
+  agreement includes a 140% airline-funded debt-service coverage target.
+- 2025 debt issuance: $714.4 million Airport System Revenue and Refunding
+  Bonds, Series 2025A. MWAA has publicly signalled roughly $5.5 billion of
+  new debt across 2025–2028, with adjusted debt per O&D enplanement forecast
+  to peak near $400 in 2028.
+- Credit ratings (as of May 2025 affirmations): Moody's Aa3, S&P AA-, Fitch
+  AA-; all three outlooks stable.
+- Airline cost per enplanement: reported at $12.77 currently, with the 2025A
+  official statement forecast rising to $20.71 by 2030 under the CCP.
+- In late July 2026, MWAA, United Airlines, and USDOT jointly announced a
+  larger vision: a $20 billion–$22.5 billion multi-decade Dulles
+  transformation that would replace Concourses C and D, extend the AeroTrain,
+  retire the mobile lounges, and touch more than 5 million square feet.
+  Financing structure for the incremental scope beyond the existing $7 billion
+  IAD CCP has not been publicly detailed and is being actively questioned in
+  the trade press.
+
+## 4. Airline framework
+
+- Signatory-airline agreement is the 15-year Use & Lease effective 2025.
+  Publicly available terms include the residual two-airport model, the $9 B
+  CCP, and the 140% coverage target. Majority-in-interest (MII) thresholds
+  governing airline concurrence on capital projects are conventional in
+  residual agreements of this type, but the specific MII language, project
+  categories, and any carve-outs for design manual changes or
+  passenger-experience investments have not been disclosed publicly for this
+  agreement and should not be assumed from industry convention.
+- Anchor tenants and gate share:
+  - **IAD:** United Airlines is the dominant carrier and signed a long-term
+    lease at Dulles alongside the 2025 Use & Lease. Concourse E, opening
+    later in 2026 (435,000 sq ft, 14 United gates, ~46,000 sq ft of
+    concessions, a 40,000-sq-ft United club, direct AeroTrain access), is
+    delivered under this partnership.
+  - **DCA:** American Airlines is the dominant carrier; Delta, United,
+    Southwest, Alaska, JetBlue, and Air Canada Express also operate.
+- Slot and perimeter rules at DCA remain governed by the FAA's High Density
+  Rule and the statutory perimeter, most recently modified by Section 502 of
+  the 2024 FAA Reauthorization, which authorized 10 additional daily beyond-
+  perimeter slot exemptions. In December 2024 DOT awarded two exemptions each
+  to Alaska (SAN), American (SAT), Delta (SEA), Southwest (LAS), and United
+  (SFO); service was required to begin by March 17, 2025. Slot economics
+  amplify the operational cost of a missed boarding at DCA more than at a
+  typical hub, which is directly relevant to any quiet-terminal standard
+  that reshapes how boarding is called.
+
+## 5. Terminals, capital program, and physical context
+
+- **IAD (Dulles):**
+  - Landmark Eero Saarinen Main Terminal (1962), a designated architectural
+    icon whose formal preservation is stated policy under the modernization
+    program. Midfield concourses A/B (regional and international) and C/D
+    (older United piers) currently connected by AeroTrain and the residual
+    mobile lounges.
+  - Concourse E (14 United gates) is the first delivered piece of the
+    modernization and is scheduled to open later in 2026.
+  - The July 2026 announcement calls for replacing Concourses C and D,
+    extending AeroTrain, adding a new central walking tunnel and moving
+    walkways, retiring the mobile lounges, and creating or renovating more
+    than 5 million square feet over the coming decade. The scope will
+    generate a long pipeline of new terminal space where a quiet-by-design
+    standard could be applied before design and procurement harden.
+- **DCA (Reagan National):**
+  - Terminal 1 (gates A1–A9): the original 1941 art deco terminal;
+    Southwest-dominant with Frontier and Air Canada Express.
+  - Terminal 2 (concourses B, C, D, E; gates B10–E59): the 1997 Cesar Pelli
+    National Hall with attached concourses; serves American, Delta, United,
+    Alaska, and JetBlue.
+  - The two terminals are not connected post-security. DCA recently
+    standardized gate/terminal signage terminology to match industry norms.
+  - Under the current CCP, DCA receives roughly $2.4 billion of investment,
+    focused on gate area capacity, curb/roadway, and terminal repairs rather
+    than a wholesale rebuild.
+
+## 6. Traffic and operating conditions (calendar year 2025)
+
+- Combined system: just under 54 million passengers — a system record for
+  the two-airport authority.
+- IAD: approximately 29 million total passengers and 10.5 million
+  international passengers, both all-time highs.
+- DCA: approximately 24.9 million passengers, down 5.3% from 26.3 million in
+  2024 and the lowest annual total since 2022. Three drivers cited publicly:
+  (a) the January 2025 midair collision between an Army helicopter and a
+  regional jet on approach to DCA and the flight restrictions that followed;
+  (b) a seven-week federal government shutdown in fall 2025; (c) softer
+  federal-government-related travel demand tied to workforce reductions.
+- These traffic conditions matter for the quiet-terminal argument in two
+  ways: DCA's short average curb-to-gate journey and heavy business/federal
+  mix drive different PA and information-density needs than IAD's much longer
+  international transfer journeys, and DCA's operational fragility to
+  irregular ops (single main runway, slot constraints, incident-driven
+  restrictions) sets the floor on how minimal announcement policy can go.
+
+## 7. Regulatory, safety, and accessibility constraints
+
+- FAA design and operational standards (Part 139, NFPA 415, TSA screening
+  layouts, and CBP FIS requirements at IAD) constrain terminal layout, egress,
+  and public-information design. Any quiet standard must be compatible with
+  emergency notification, TSA queue communication, and CBP arrival messaging.
+- Emergency notification requirements: NFPA 72 governs voice evacuation
+  systems and intelligibility; ADA and Section 504 govern accessible
+  information; ACAA (Air Carrier Access Act) governs airline-provided
+  communication in the terminal. A quiet-by-design standard has to specify
+  compliance envelopes for each, not silence them.
+- MWAA operates under a federal lease from USDOT and receives FAA AIP and
+  BIL/IIJA grant funds; grant assurances constrain procurement and asset
+  disposition. Board resolutions and federal grant assurances therefore
+  govern how a new design standard can be embedded in consultant scopes and
+  contractor specifications.
+- The current federal administration is a visible political stakeholder in
+  the Dulles program; the July 2026 announcement was made jointly with the
+  White House and the Secretary of Transportation. Any high-visibility change
+  to passenger-facing standards at IAD will be interpreted in that political
+  context.
+
+## 8. Named gaps in the public record
+
+The following facts would meaningfully sharpen the analysis but are not in
+the public record reviewed for this packet. The research swarm should not
+guess at them; if they turn out to matter, they should be surfaced as open
+questions in the final deliverable.
+
+1. Whether the current MWAA Airports Authority Design Manual contains
+   explicit acoustic performance criteria (target NC/RC levels, T60/RT30
+   ranges by space type, adjacent-zone STI or Speech Transmission Index
+   thresholds, PA loudspeaker density and coverage overlap requirements).
+2. Whether either airport currently has a written PA governance policy
+   (announcement categories permitted, scripting, frequency caps, zoning
+   rules, quiet-hours, tenant broadcast rights).
+3. The specific MII thresholds, categories, and airline-review triggers in
+   the 2025 Use & Lease as they apply to design standards, PA/FIDS systems,
+   and passenger-experience capital.
+4. Whether MWAA has piloted quiet-terminal, silent-boarding, or reduced-
+   announcement practices at any concourse or hold-room in the last decade,
+   and any measured results.
+5. Current employee sound-exposure monitoring practice for gate agents,
+   concessions staff, and airport operations personnel in the noisiest
+   hold-room and concourse zones at both airports.
+6. Financing structure for the incremental Dulles scope announced in July
+   2026 beyond the $7 B IAD CCP already inside the 2025 Use & Lease, and
+   whether airline concurrence for that incremental scope is complete.
+
+## 9. Source note
+
+All facts in this packet come from public MWAA publications, federal
+regulatory documents, credit-rating agency and Bond Buyer reporting, USDOT
+and congressional research materials, and mainstream trade press dated 2024
+through August 2026. Every source used is enumerated with URL, type,
+locator, date, and the specific claims it supports in
+`outputs/context/context-sources.jsonl`.

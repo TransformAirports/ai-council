@@ -1,0 +1,4 @@
+practice,announcements_per_boarding,seconds_per_announcement,pa_seconds_per_gate_hour,pa_duty_cycle_pct_of_hour,notes
+current_us_hub_baseline,6,20,120,3.3,ASSUMPTION - pre-boarding + priority + 4 zones
+reduced_helsinki_lcy_model,2,20,40,1.1,ASSUMPTION - final call + all zones open only
+reduction_delta,-4,0,-80,-2.2,COMPUTED (66.7% reduction in PA time)

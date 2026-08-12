@@ -1,0 +1,11 @@
+{
+  "format": "one-page argument memo",
+  "mode": "strengthen",
+  "pipeline_version": "strengthen-v10",
+  "request": "context/argument-request.json",
+  "slide_count": 5,
+  "slug": "data-center-concerns-on-aircraft-approach",
+  "started": "2026-07-29T15:23:12+00:00",
+  "title": "Data Center Concerns on Aircraft Approach",
+  "want_pptx": true
+}

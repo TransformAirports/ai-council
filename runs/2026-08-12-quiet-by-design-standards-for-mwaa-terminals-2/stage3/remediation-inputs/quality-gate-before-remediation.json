@@ -1,0 +1,413 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-08-11T18:30:54+00:00",
+  "final_draft": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+  "passed": false,
+  "error_count": 64,
+  "warning_count": 0,
+  "artifact_validation": {
+    "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+    "valid": true,
+    "kind": "markdown",
+    "errors": [],
+    "warnings": [],
+    "size_bytes": 36700,
+    "word_count": 5162,
+    "record_count": 0,
+    "sha256": "c4ab81f76bd6426446da0cac8b44f00e50cf1ac30f47bf08366ec0976998be73"
+  },
+  "reader_word_count": 3482,
+  "word_count_bounds": {
+    "minimum": 1500,
+    "maximum": 2000
+  },
+  "readability_profile": null,
+  "evidence_records": 256,
+  "claim_lineage_records": 33,
+  "issues": [
+    {
+      "severity": "error",
+      "code": "footnote_sequence",
+      "message": "numeric footnotes are not sequential in order of first use",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "numeric_claims_without_footnotes",
+      "message": "numerical claims lack a footnote in the same sentence or table row",
+      "count": 17
+    },
+    {
+      "severity": "error",
+      "code": "attributed_claims_without_footnotes",
+      "message": "attributed claims lack a footnote in the same sentence",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "word_count_out_of_range",
+      "message": "the final article has 3,482 reader-facing words; the run contract requires 1,500\u20132,000",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-001 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_evidence_citation_mismatch",
+      "message": "FC-002 has no evidence ID that identifies its reader-facing source: quantitative-analyst::ev-6d299a264850, airport-coo::ev-c0536e07fced, airport-ceo::ev-2d60eddcc4ee",
+      "count": 3
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-003's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-003 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-004 does not appear in the sentence or table row cited by [^5]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-004's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-004 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-005's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-005 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-006's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-006 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-007 does not appear in the sentence or table row cited by [^9]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-007's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-007 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-008 does not appear in the sentence or table row cited by [^10]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-008's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-008 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-009's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_evidence_citation_mismatch",
+      "message": "FC-010 has no evidence ID that identifies its reader-facing source: infrastructure-economist::ev-c7de83fd1cff, quantitative-analyst::ev-63ae2b6f3b6a, airline-commercial-strategist::ev-f9a970d8ef43, airport-emergency-management-director::ev-ee7f0e4f7e81",
+      "count": 4
+    },
+    {
+      "severity": "error",
+      "code": "claim_evidence_citation_mismatch",
+      "message": "FC-011 has no evidence ID that identifies its reader-facing source: quantitative-analyst::ev-016771294110, contrarian::ev-05651008aaea, virtual-chris::ev-28fef46dd915",
+      "count": 3
+    },
+    {
+      "severity": "error",
+      "code": "claim_evidence_citation_mismatch",
+      "message": "FC-012 has no evidence ID that identifies its reader-facing source: quantitative-analyst::ev-6d299a264850, airport-coo::ev-c0536e07fced, airport-ceo::ev-2d60eddcc4ee, virtual-chris::ev-dfc04bba7cbd",
+      "count": 4
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-013's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-014's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-015's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-016 does not appear in the sentence or table row cited by [^18]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-016's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-017's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_references_missing_evidence",
+      "message": "FC-018 references unknown evidence IDs: contrarian::ev-84f94950e08d",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-018's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_evidence_citation_mismatch",
+      "message": "FC-019 has no evidence ID that identifies its reader-facing source: director-of-public-safety::ev-038498d557ce",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-020's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_without_evidence",
+      "message": "FC-021 is retained but has no evidence IDs",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-022 does not appear in the sentence or table row cited by [^25]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-022's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-023's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-023 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-024's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-025's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-025 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_lineage_schema",
+      "message": "FC-026 is missing: draft_sha256",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "stale_claim_lineage",
+      "message": "FC-026 is not bound to the current final-draft bytes",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-026 does not appear in the sentence or table row cited by [^30]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-026's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-027 does not appear in the sentence or table row cited by [^31]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-027's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-027 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_lineage_schema",
+      "message": "FC-028 is missing: draft_sha256",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "stale_claim_lineage",
+      "message": "FC-028 is not bound to the current final-draft bytes",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-028 does not appear in the sentence or table row cited by [^32]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-028's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-028 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-030's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-030 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-031's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "FC-032 does not appear in the sentence or table row cited by [^7]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-032's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-032 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "FC-033's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "primary_source_not_checked",
+      "message": "FC-033 is retained but its primary source was not checked",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "incomplete_claim_lineage",
+      "message": "reader-facing footnotes lack retained claim lineage: [^24], [^8]",
+      "count": 2
+    }
+  ]
+}

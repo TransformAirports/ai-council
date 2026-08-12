@@ -1,0 +1,700 @@
+{
+  "schema_version": "2.0",
+  "communication_job": "Equip MWAA executives, capital planners, and policy readers to evaluate — before designs and procurements harden — a tiered communications-integrity standard entering the MWAA Design Manual, framed as safety engineering (intelligibility floors, channel redundancy, announcement governance) rather than announcement reduction, with the technical evidence base laid out for pre-meeting reading.",
+  "audience": "Airport executives, capital planners, and policy readers at MWAA and peer authorities. Sophisticated, skeptical, tired of consultant decks; expect regulation numbers, measured thresholds, and honest caveats.",
+  "decision": "Decision-critical unknown: the run prompt specifies no requested decision. The verified draft frames the choice as whether MWAA adds a tiered communications-integrity standard to the Design Manual this capital cycle — mandatory intelligibility, accessibility, and governance floors at both airports, context-dependent tiers by terminal — before the committed ~$9B AUL capital program and the provisional $20B+ Dulles transformation pass through design.",
+  "decision_owner": "Decision-critical unknown: the run prompt names no accountable executive. The verified draft identifies the MWAA Office of Engineering as the issuing authority under its delegated Design Manual standards-setting role, with Board visibility; the delegation's exact scope was not verified from primary MWAA governance documents in this research pass.",
+  "approval_path": "Decision-critical unknown: the run prompt specifies no approval path. The verified draft proposes: Office of Engineering issues the Design Manual amendment under delegated standards-setting authority; taken to the MWAA Board as an information item; escalated to a Board resolution only if airline consultation surfaces material objection. Tenant-audio reach is contingent on verification of the 2025 Airline Use and Lease Agreement's majority-in-interest provisions, which no agent read in primary text.",
+  "first_90_day_action": "Direct the Office of Engineering to (1) verify the current Design Manual's acoustic, PA-zoning, and STI content and the 2025 AUL's majority-in-interest and cost-recovery provisions from primary text, and (2) commission the IAD Concourse E intelligibility and ambient baseline — STI measured per IEC 60268-16:2020 under representative traffic, not empty-building conditions — at the fall 2026 opening, establishing the reference number every future MWAA facility is measured against.",
+  "success_measures": [
+    "Acceptance: Concourse E commissioning baseline achieves STI >= 0.45 (CIS >= 0.65) at >= 90% of measurement locations within each acoustically distinguishable space, average STI >= 0.50 (CIS >= 0.70), measured per IEC 60268-16:2020 under representative traffic — the NFPA 72 emergency-voice floor applied as the facility acceptance test.",
+    "Within 90 days, primary-text verification of the Design Manual's current acoustic/PA content and the 2025 AUL majority-in-interest provisions is complete and documented; stop condition: if the Manual already contains equivalent tiers, re-scope the amendment to gap-fill only; if MII review shows tenant-audio reach requires airline consent, escalate to Board resolution rather than issue as an information item.",
+    "Every new or substantially renovated terminal design package after amendment issuance includes an acoustically-distinguishable-space map as a milestone design deliverable, with commissioning verification under representative traffic treated as verification-with-cure-period, not an occupancy condition.",
+    "Announcement governance operational within the first amended project: audit-logged broadcasts, templated multi-language delivery, and a named Airport Duty Manager IROPS override with post-event reconciliation of every deviation."
+  ],
+  "deck_mode": "technical_read_ahead",
+  "visual_thesis": "One ruler runs the whole deck: the Speech Transmission Index scale. Every exhibit either places a requirement on that ruler (NFPA 72, ACRP 175, IEC 60268-16) or shows why an unspecified, reverberant, cross-broadcast terminal falls off it. Quiet is rendered as engineering — floors, maps, commissioning gates, audit logs — never as subtraction. Peer airports appear as policy analogues in tables, never as design precedents; every SFO number is visibly labeled self-reported.",
+  "signature_visual": {
+    "slide_number": 4,
+    "concept": "The Intelligibility Ruler: a single horizontal STI scale (0 to 1.0) banded with the IEC 60268-16:2020 qualitative categories (Bad <0.30, Poor 0.30-0.45, Fair 0.45-0.60, Good 0.60-0.75, Excellent >0.75), with callout markers pinning NFPA 72's emergency-voice floor (STI >= 0.45 at >= 90% of locations per acoustically distinguishable space; average >= 0.50) and ACRP 175's pier-style departure-lounge recommendation (minimum STI 0.45 with 10 dB(A) signal-to-noise). A shaded annotation at the low end labels where the loud, reverberant, cross-broadcast terminal lands — making the draft's central inversion ('the loud terminal is the unintelligible one') legible in seconds.",
+    "visual_type": "annotated_threshold_scale",
+    "visual_spec": "Horizontal band chart, full slide width. X-axis: STI 0.0-1.0 with the five IEC qualitative bands as labeled background zones in stepped tints of one hue. Two marker groups above the scale: (1) NFPA 72 pair — per-location floor 0.45 and ADS average 0.50, bracketed and labeled 'emergency voice floor (code)'; (2) ACRP 175 marker at 0.45 labeled 'pier-style PA recommendation (guidance), +10 dB(A) SNR'. Below the scale, one shaded arrow zone spanning the Bad/Poor bands labeled 'unspecified reverberant, cross-broadcast terminal defaults here'. No decorative iconography. All threshold numbers printed at the marker. Footnote line distinguishes code (NFPA 72) from guidance (ACRP 175) from measurement method (IEC 60268-16:2020).",
+    "evidence_ids": [
+      "director-of-public-safety::ev-9ef92c27e224",
+      "contrarian::ev-58a4b35511d3",
+      "quantitative-analyst::ev-d1b6bd6f446b",
+      "operations-analyst::ev-4cea7e413a8a",
+      "operations-analyst::ev-ee92641d9233",
+      "airport-coo::ev-036e168941ec"
+    ],
+    "source_note": "NFPA 72, National Fire Alarm and Signaling Code (emergency communications intelligibility; code paywalled, thresholds corroborated across 10+ ledger records); ACRP Research Report 175 (TRB, 2017); IEC 60268-16:2020 qualitative STI bands (standard paywalled; bands corroborated in secondary records).",
+    "asset_source": "Built natively by the designer from the cited thresholds; no external image or vendor graphic."
+  },
+  "brand_profile": {
+    "identity": "Transform Airports AI Council — evidence-first executive advisory",
+    "palette": "Deep navy primary, slate gray secondary, one warm amber accent reserved for thresholds and decision callouts; light warm-white backgrounds. No gradients, no drop shadows.",
+    "typography": "Single sans-serif family (e.g., Source Sans or equivalent licensed face). Headlines 28-32pt sentence case; body 16-18pt; source notes 10-11pt, never below 9pt.",
+    "chart_style": "Flat, gridline-light, data labels printed at the mark rather than in legends where possible. Caveats ('SFO-reported', 'provisional', 'not verified from primary text') appear on the exhibit face, not only in notes.",
+    "photography_policy": "Real MWAA-owned facility photography only, and only where it adds place or operational meaning (Concourse E interior, IAD holdroom). No stock photography, no clip art, no icon grids.",
+    "read_ahead_treatment": "Slides 1-10 are speaker-led board slides (low density, one claim each). Slides 11-18 are read-ahead/appendix pages (denser analytical exhibits, labeled 'Read-ahead' in the header band)."
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "narrative_job": "Speaker-led. Set the frame: this is a safety-engineering standard, not an announcement-reduction program.",
+      "headline": "The loud terminal is the unintelligible one",
+      "evidence_ids": [],
+      "visual_type": "title_typographic",
+      "visual_spec": "Typographic title slide. Title plus subtitle: 'A communications-integrity standard for MWAA terminals — argued as safety engineering, delivered through the Design Manual.' Run identifier and date in footer. No imagery.",
+      "source_note": "Transform Airports AI Council, technical read-ahead, August 2026.",
+      "density_budget": "Title + 1 subtitle line; no body text.",
+      "speaker_note": "Name the discipline up front: externally this is a communications-integrity standard, never a 'quiet airport' brand. The argument is that intelligibility, not silence, is the design objective."
+    },
+    {
+      "slide_number": 2,
+      "narrative_job": "Speaker-led. Establish why now: the capital passing through the Design Manual this cycle.",
+      "headline": "Roughly $9B committed, $20B+ provisional — all of it passes through the Design Manual",
+      "evidence_ids": [
+        "infrastructure-economist::ev-525ee186f14c",
+        "airline-commercial-strategist::ev-e40c8b59ee9e",
+        "quantitative-analyst::ev-6d299a264850",
+        "airport-coo::ev-c0536e07fced",
+        "virtual-chris::ev-d6d475e3fe78"
+      ],
+      "visual_type": "horizontal_bar_chart",
+      "visual_spec": "Two-group horizontal bars in USD billions: committed AUL capital construction program (IAD 6.99, DCA 2.39; labeled 'committed, 15-year AUL effective Jan 1, 2025') and announced Dulles transformation (>20, hatched fill, labeled 'provisional pending Board action, announced July 29, 2026'). Side caption quotes the Design Manual as 'a mandatory guide with the force of law on the airport property' as the enforcement vehicle. Provisional bar visually distinguished by hatching, not color alone.",
+      "source_note": "MWAA use-and-lease press release (2024); July 29, 2026 joint announcement as reported by Travel Agent Central and Simple Flying ($20B+ provisional); MWAA Design Manual description, mwaa.com.",
+      "density_budget": "<= 35 words on slide; 1 chart; 1 caption.",
+      "speaker_note": "The Board question is not whether to fund a program — the capital is already committed or announced. It is whether to write the paragraph that governs how those square feet sound. The $20B+ figure stays hatched: provisional, not committed."
+    },
+    {
+      "slide_number": 3,
+      "narrative_job": "Speaker-led. State the political constraint that dictates the framing.",
+      "headline": "After January 29, 2025, no board signs a policy paraphrasable as 'fewer safety broadcasts'",
+      "evidence_ids": [
+        "airport-emergency-management-director::ev-f77647c9aa61",
+        "virtual-christian::ev-3faefcb5157a"
+      ],
+      "visual_type": "framing_callout",
+      "visual_spec": "Text-led slide, two columns. Left: the constraint — NTSB AIR-26/02 final report on the January 29, 2025 midair collision (67 fatalities) resets tolerance for any 'reduce announcements' framing. Right: the inversion in one sentence — the standard is defensible only as a floor that raises the probability the announcement that matters reaches the passenger who needs it. Amber accent rule between columns. No photography of the accident; no imagery.",
+      "source_note": "NTSB Aircraft Accident Report AIR-26/02 (final, 2026, ntsb.gov); contemporaneous coverage (CNN).",
+      "density_budget": "<= 60 words; no chart.",
+      "speaker_note": "This slide is why the word 'quiet' stays internal. The recommendation survives politically only as the opposite of subtraction: engineered intelligibility with redundant channels."
+    },
+    {
+      "slide_number": 4,
+      "narrative_job": "Speaker-led. SIGNATURE VISUAL. Make the central mechanism — loudness destroys intelligibility, and the floors are numeric — understandable in seconds.",
+      "headline": "One ruler decides the argument: the Speech Transmission Index",
+      "evidence_ids": [
+        "director-of-public-safety::ev-9ef92c27e224",
+        "contrarian::ev-58a4b35511d3",
+        "quantitative-analyst::ev-d1b6bd6f446b",
+        "operations-analyst::ev-4cea7e413a8a",
+        "operations-analyst::ev-ee92641d9233",
+        "airport-coo::ev-036e168941ec"
+      ],
+      "visual_type": "annotated_threshold_scale",
+      "visual_spec": "The Intelligibility Ruler (signature visual, per signature_visual spec): horizontal STI scale 0.0-1.0 banded with IEC 60268-16:2020 qualitative categories (Bad <0.30, Poor 0.30-0.45, Fair 0.45-0.60, Good 0.60-0.75, Excellent >0.75); NFPA 72 markers at 0.45 (per-location, >= 90% of locations per acoustically distinguishable space; CIS >= 0.65) and 0.50 average (CIS >= 0.70); ACRP 175 marker at 0.45 minimum with 10 dB(A) SNR for pier-style departure lounges; shaded low-end zone labeled 'unspecified reverberant, cross-broadcast terminal defaults here'. Footnote line separates code vs guidance vs measurement method.",
+      "source_note": "NFPA 72 (code paywalled; thresholds corroborated across 10+ ledger records reproducing code language); ACRP Research Report 175 (TRB, 2017); IEC 60268-16:2020 (standard paywalled; bands corroborated in secondary records).",
+      "density_budget": "1 exhibit; <= 25 words outside the exhibit.",
+      "speaker_note": "You fail these floors by being loud, reverberant, and cross-broadcast — precisely the condition an unspecified terminal defaults to. Every acoustic and PA-zoning requirement in the standard flows from this inversion."
+    },
+    {
+      "slide_number": 5,
+      "narrative_job": "Speaker-led. Give the governance precedent: rank-and-consolidate discipline forced on legacy safety messaging.",
+      "headline": "The Joint Commission did not silence ICU alarms — it made hospitals govern them",
+      "evidence_ids": [
+        "virtual-christian::ev-780eab34e4f2",
+        "virtual-chris::ev-c85dbffbc62f",
+        "virtual-christian::ev-4ded8693a914"
+      ],
+      "visual_type": "precedent_timeline",
+      "visual_spec": "Simple three-node horizontal timeline: (1) alarm-fatigue problem documented — the cited review reports one academic medical center logging 74,535 alarms across eight units in one week (labeled 'illustrative magnitude'); (2) NPSG.06.01.01 phase one effective January 1, 2014 — inventory and prioritize; (3) phase two effective January 1, 2016 — governance policies and accountability. Caption maps the pattern to airports: inventory, rank, govern, log.",
+      "source_note": "The Joint Commission, National Patient Safety Goal NPSG.06.01.01 (phased 2014/2016); Respiratory Therapy Magazine alarm-fatigue review (per-bed figures vary by study; magnitude illustrative).",
+      "density_budget": "<= 40 words; 1 timeline.",
+      "speaker_note": "The lateral move, used once: indiscriminate broadcast was itself the safety failure, and the fix was governance with proof, not silence. That is what audit-logged announcement governance imports."
+    },
+    {
+      "slide_number": 6,
+      "narrative_job": "Speaker-led. Neutralize the peer set: policy analogues, not design precedents.",
+      "headline": "The 'silent airport' peer set is a category error — none published measurement",
+      "evidence_ids": [
+        "infrastructure-economist::ev-3bf14ae0605d",
+        "technology-scout::ev-49076621090e",
+        "technology-scout::ev-436a5e8bb2a2",
+        "technology-scout::ev-9c7e329a7616",
+        "operations-analyst::ev-d05117e47cf7"
+      ],
+      "visual_type": "comparison_table",
+      "visual_spec": "Four-row comparison table (London City, Helsinki-Vantaa, Copenhagen, Schiphol) with columns: announcement policy (LCY silent since 2008, no flight/gate announcements since Aug 18, 2016 except essential/emergency; HEL silent since 2015 with gate-area override; CPH gate/boarding moved to screens and app; AMS operator-described Silent Airport, screens and app), structural profile (small point-to-point vs. large transfer hub), and published intelligibility or missed-boarding data (a single 'None identified in this research pass' merged cell across all rows, amber accent). Renders report_visuals exhibit 2.",
+      "source_note": "Operator self-descriptions: londoncityairport.com; Finavia (Helsinki-Vantaa); Copenhagen Airport passenger-communication policy; Amsterdam Schiphol Silent Airport pages. No published intelligibility or missed-boarding measurement identified for any of the four.",
+      "density_budget": "1 table (4 rows x 3 columns); <= 20 words outside table.",
+      "speaker_note": "MWAA does not need to import their brand; it needs to out-engineer them. The merged 'none identified' cell is the honest core of this slide."
+    },
+    {
+      "slide_number": 7,
+      "narrative_job": "Speaker-led. Present SFO as both the model and the failure mode, with self-reported figures visibly flagged.",
+      "headline": "SFO shows the operating model — and what subtraction without engineering costs",
+      "evidence_ids": [
+        "infrastructure-economist::ev-941fb7139ec7",
+        "airport-emergency-management-director::ev-c8908972475c",
+        "operations-analyst::ev-ccf2fd3ef094",
+        "contrarian::ev-3840eded78c8"
+      ],
+      "visual_type": "before_after_bar_pair",
+      "visual_spec": "Two paired before/after bar charts, both stamped 'SFO-reported; methodology not published' on the exhibit face: (1) individual paging occurrences per day, 492 to 261; (2) cumulative announcement time, 145 to 58 minutes per day. Right-hand counterweight panel: documented passenger complaints and missed-flight accounts from contemporaneous reporting, presented as text callout, equal visual weight. Renders report_visuals exhibit 3.",
+      "source_note": "SFO Quiet Airport outcomes as reported by International Airport Review (2023) and View from the Wing, citing SFO; all figures SFO-reported, methodology not published. Counterweight: Simple Flying, documented missed-flight and confusion accounts.",
+      "density_budget": "2 small charts + 1 counterweight callout; <= 40 words.",
+      "speaker_note": "Borrow the operating model — zoned delivery, no cross-terminal final calls, gate-area retention. Treat the outcome numbers as SFO's own accounting. Announcement reduction without intelligibility engineering and channel redundancy is subtraction, not design."
+    },
+    {
+      "slide_number": 8,
+      "narrative_job": "Speaker-led. Establish that the standard binds MWAA harder on accessibility, not softer.",
+      "headline": "The people who most need to hear are the legal floor, not an edge case",
+      "evidence_ids": [
+        "director-of-public-safety::ev-038498d557ce",
+        "contrarian::ev-aa028959594f",
+        "airport-coo::ev-f1624cbe51e1",
+        "contrarian::ev-7fb259c1c5c5"
+      ],
+      "visual_type": "regulatory_stack_diagram",
+      "visual_spec": "Vertical stack of four labeled regulation bands, each with a one-line obligation: 28 CFR 35.160 (ADA Title II effective communication); 2010 ADA Standards §219/§706 (assistive-listening systems in each assembly area where audible communication is integral); 14 CFR Part 382 (prompt access to the same gate information for passengers needing visual or hearing assistance); ACRP Research Report 239 (digital-first substitution is partial, not sufficient, for travelers with disabilities and older adults — labeled 'guidance'). Side annotation: a standard mandating redundant visual, digital, staffed, and hearing-loop channels binds harder than current practice.",
+      "source_note": "28 C.F.R. § 35.160 (ada.gov); DOJ 2010 ADA Standards §§219, 706; 14 C.F.R. Part 382 (ecfr.gov); ACRP Research Report 239 (TRB, 2023).",
+      "density_budget": "1 stack diagram (4 bands); <= 45 words.",
+      "speaker_note": "Reducing broadcast without specifying redundant channels compounds exclusion — non-English speakers, travelers without smartphones, older adults, people with hearing, vision, cognitive, or sensory-processing differences. The floors are regulation numbers, not aspirations."
+    },
+    {
+      "slide_number": 9,
+      "narrative_job": "Speaker-led. Show the standard's structure: two tiers plus the IROPS override.",
+      "headline": "A two-tier standard — and the paragraph the silent-airport literature omits",
+      "evidence_ids": [
+        "virtual-chris::ev-d6d475e3fe78",
+        "operations-analyst::ev-4cea7e413a8a",
+        "quantitative-analyst::ev-8cb15085981e",
+        "operations-analyst::ev-2c4b423a196e",
+        "operations-analyst::ev-08af28494c7c"
+      ],
+      "visual_type": "framework_diagram",
+      "visual_spec": "Two-column framework panel. Column A, 'Mandatory at both airports': ADS map as design deliverable; intelligibility floors per NFPA 72 and ACRP 175; measurement per IEC 60268-16:2020 commissioned under representative traffic with cure period; accessibility floors (28 CFR 35.160, ADA Standards, Part 382); hearing conservation per 29 CFR 1910.95; audit-logged announcement governance; tenant TV and gate-lounge audio kept in scope. Column B, 'Context-dependent by terminal': tier levels for PA zoning and announcement density; quiet/low-stimulation space scope; enforcement mechanics by lease type. Bottom band, amber: IROPS override — Airport Duty Manager holds named authority to exceed announcement-density templates during declared irregular operations; every deviation logged and reconciled.",
+      "source_note": "Framework from the verified final draft; floors per NFPA 72, ACRP 175, IEC 60268-16:2020, 28 CFR 35.160, 2010 ADA Standards, 14 CFR Part 382, 29 CFR 1910.95; governance capabilities per ACI-NA (Feb 27, 2026).",
+      "density_budget": "1 two-column framework + 1 bottom band; <= 90 words total in cells.",
+      "speaker_note": "A standard that does not survive the first Wednesday afternoon of gate holds will not be believed for the Wednesday it was written for. The override with audit trail is what makes operations sign it."
+    },
+    {
+      "slide_number": 10,
+      "narrative_job": "Speaker-led. Close with the ask: path to force, first application, 90-day action, success measures.",
+      "headline": "The ask: write the paragraph this capital cycle",
+      "evidence_ids": [
+        "virtual-chris::ev-d6d475e3fe78",
+        "airport-coo::ev-cb0ee1ba21bd",
+        "quantitative-analyst::ev-4105534f02b4",
+        "infrastructure-economist::ev-525ee186f14c"
+      ],
+      "visual_type": "process_flow",
+      "visual_spec": "Left-to-right six-step flow (renders report_visuals exhibit 4): Office of Engineering drafts amendment -> primary-text verification (Design Manual acoustic content; AUL majority-in-interest provisions) -> airline and tenant consultation with formal comment window -> Board information item (escalate to resolution only on material objection) -> Design Manual publication binds consultants and contractors -> commissioning verification under representative traffic with cure period. Sidebar callout: first 90-day action — commission the Concourse E intelligibility and ambient baseline at fall 2026 opening; acceptance floor STI >= 0.45 at >= 90% of locations per ADS, average >= 0.50, per IEC 60268-16:2020 under representative traffic.",
+      "source_note": "Path per the verified final draft; Design Manual authority per MWAA description (mwaa.com); Concourse E facts per MWAA project disclosures (flydulles.com), verified Aug 11, 2026. AUL MII provisions not verified from primary text — flagged as the path's contingency.",
+      "density_budget": "1 flow (6 steps) + 1 sidebar; <= 60 words outside exhibit.",
+      "speaker_note": "The decision owner and approval path are stated as the draft's proposal, not verified authority — say so aloud. The verification steps are inside the ask, not after it."
+    },
+    {
+      "slide_number": 11,
+      "narrative_job": "Read-ahead. Detail the financial window that scopes the amendment to work still in programming.",
+      "headline": "Read-ahead: the coverage window is why the amendment targets work still in programming",
+      "evidence_ids": [
+        "infrastructure-economist::ev-dc8d320b20fa",
+        "infrastructure-economist::ev-ed2a314947b9",
+        "contrarian::ev-a6417525686b"
+      ],
+      "visual_type": "line_chart_annotated",
+      "visual_spec": "Single line: net-revenue debt-service coverage from 1.63x (2024) declining to approximately 1.3x over five years, drawn as a two-point trajectory with the intermediate path shaded as 'projected range' (no invented intermediate values — only the two reported points are marked). Annotation: approximately $5.5B of new debt phases in 2025-2028. Caption: added specification cost inside programs already in design cuts against coverage; specification at programming stage does not.",
+      "source_note": "Moody's projection as reported by The Bond Buyer, 'MWAA goes to market' (2025; subscription-gated). Underlying rating-agency reports are the primary citation-grade source — confirm before board-facing publication.",
+      "density_budget": "1 chart; <= 50 words.",
+      "speaker_note": "Read-ahead page. The two data points are the only reported values; the designer must not interpolate a smooth annual series."
+    },
+    {
+      "slide_number": 12,
+      "narrative_job": "Read-ahead. Show the rework-avoidance cost logic with its confidence level on the face.",
+      "headline": "Read-ahead: specify at design time — the retrofit premium at commercial benchmarks",
+      "evidence_ids": [
+        "quantitative-analyst::ev-ff8f080c67c3",
+        "quantitative-analyst::ev-aeed0d967d98"
+      ],
+      "visual_type": "range_bar_chart",
+      "visual_spec": "Two horizontal range bars in USD per square foot: new-construction acoustic ceiling treatment $5-$15; retrofit acoustic panel treatment $18-$45. Exhibit face carries the label 'non-airport commercial benchmarks, medium confidence; airside premiums would raise both ranges'. No computed multiple or savings figure is printed — the ranges speak directionally.",
+      "source_note": "Commercial pricing guides: designtransitionstudio.com (new-construction acoustic ceiling, 2026 guide) and acousticmod.com (retrofit vs. new construction; page since relocated). Non-airport, directional benchmarks.",
+      "density_budget": "1 chart; <= 35 words.",
+      "speaker_note": "Read-ahead page. Do not print a ratio ('3x cheaper') — the draft deliberately says 'a fraction' because the benchmarks are non-airport and directional."
+    },
+    {
+      "slide_number": 13,
+      "narrative_job": "Read-ahead. Lay out the airline asymmetry that shapes tenant-audio enforcement at each airport.",
+      "headline": "Read-ahead: one standard, two very different anchor-tenant problems",
+      "evidence_ids": [
+        "airline-commercial-strategist::ev-df19b606cf60",
+        "airline-commercial-strategist::ev-934794d4c8c3",
+        "airline-commercial-strategist::ev-f9a970d8ef43",
+        "infrastructure-economist::ev-c7de83fd1cff",
+        "quantitative-analyst::ev-63ae2b6f3b6a",
+        "airline-commercial-strategist::ev-ae855a6678ab"
+      ],
+      "visual_type": "side_by_side_profile",
+      "visual_spec": "Two-panel IAD vs. DCA profile. IAD panel: 29.01M passengers 2025, 10.53M international, fastest 2025 growth among the 50 largest US airports; United approximately 67% of passenger traffic, 50 jetbridge-equipped gates in Concourses C/D; international-connection hub. DCA panel: slot-controlled domestic O&D airport; American approximately 53% market share (end-2024); 2025 traffic declined (no number printed — the verified draft states the decline without figures). Footer strip: airline briefing reported by Cranky Flier pegs fully loaded IAD transformation cost per enplanement at $90.64 vs. $12.88 today — labeled 'analyst-reported airline positioning, not an MWAA figure'.",
+      "source_note": "Simple Flying (United IAD share and gates, verified Aug 11, 2026; American DCA share, March 2025) — directional trade-press figures; IAD traffic per MWAA reporting via Simple Flying and FFXnow; CPE figures per Cranky Flier (Aug 4, 2026), attributed as analyst commentary.",
+      "density_budget": "2 panels + 1 footer strip; <= 90 words total.",
+      "speaker_note": "Read-ahead page. Do not print a DCA 2025 passenger total — the reader-citable draft states the decline without numbers, and the deck must match the draft."
+    },
+    {
+      "slide_number": 14,
+      "narrative_job": "Read-ahead. Define the tenant-audio boundary problem and the governance technology that makes enforcement auditable.",
+      "headline": "Read-ahead: half the soundscape is tenant-owned — governance is the technology",
+      "evidence_ids": [
+        "airline-commercial-strategist::ev-df19b606cf60",
+        "infrastructure-economist::ev-525ee186f14c",
+        "operations-analyst::ev-08af28494c7c",
+        "technology-scout::ev-98a81e3fc5da"
+      ],
+      "visual_type": "boundary_diagram",
+      "visual_spec": "Schematic holdroom boundary diagram (conceptual, not a real floorplan): MWAA-controlled audio zones vs. airline podium PA at preferential-use gates vs. concessionaire TVs/audio, each labeled with its current governance instrument and the proposed reach of the amendment (contingent on AUL majority-in-interest verification — printed on the face). Companion panel lists the auditable governance capabilities the amendment can specify: centralized management, replay and audit logs of every broadcast, elimination of manual-initiation errors, templated multi-language delivery. Enforcement mechanics strip: annual acoustic inspections keyed to lease renewal, cure notices, lease-management escalation for pattern noncompliance.",
+      "source_note": "Airline gate control per trade-press reporting (Simple Flying); AUL structure per MWAA press release, MII provisions not verified from primary text; governance platform capabilities per ACI-NA, 'The Data-Driven Future of Automated Airport Announcements' (Feb 27, 2026) — industry advocacy, directional.",
+      "density_budget": "1 diagram + 1 list panel + 1 strip; <= 90 words.",
+      "speaker_note": "Read-ahead page. Nobody claims today's Design Manual reaches the podium microphone; the argument is that the amendment, once verified against the AUL, should be written to reach it, with carriers briefed early and cost-recovery position in writing first."
+    },
+    {
+      "slide_number": 15,
+      "narrative_job": "Read-ahead. Anchor the implementation sequence: Concourse E baseline, verification gates, reference application.",
+      "headline": "Read-ahead: Concourse E carries the first commissioned baseline this fall",
+      "evidence_ids": [
+        "quantitative-analyst::ev-4105534f02b4",
+        "virtual-chris::ev-d4385d53696a",
+        "airline-commercial-strategist::ev-6ee2cd9496e1",
+        "technology-scout::ev-98a81e3fc5da",
+        "infrastructure-economist::ev-525ee186f14c"
+      ],
+      "visual_type": "implementation_timeline",
+      "visual_spec": "Horizontal timeline (renders report_visuals exhibit 5): Days 1-30 — primary-text verification of Design Manual acoustic/PA content and AUL MII provisions (Office of Engineering); Fall 2026 — Concourse E (approximately 435,000 sq ft, 14 gates) opens; commission intelligibility and ambient baseline under representative traffic; This capital cycle — amendment issued and taken to Board as information item; Reference application — DCA Terminal 1 concourse replacement, marked 'subject to phase verification — not verified in this research pass', with fallback to the earliest IAD C/D element still in programming. Contingency markers rendered in amber with dashed borders.",
+      "source_note": "Concourse E per MWAA project disclosures (flydulles.com, verified Aug 11, 2026); reference-application phasing per the verified final draft, flagged unverified; verification gaps per the fact-check report.",
+      "density_budget": "1 timeline (4 milestones); <= 40 words outside exhibit.",
+      "speaker_note": "Read-ahead page. The Terminal 1 choice is conditional and the deck must show the condition, not resolve it."
+    },
+    {
+      "slide_number": 16,
+      "narrative_job": "Read-ahead. Specify the measurement protocol and the standard's known limitation.",
+      "headline": "Read-ahead: an empty-building reading is not a commissioning result",
+      "evidence_ids": [
+        "contrarian::ev-851bd0537852",
+        "operations-analyst::ev-ee92641d9233",
+        "operations-analyst::ev-2c4b423a196e",
+        "quantitative-analyst::ev-9b2f7d231121"
+      ],
+      "visual_type": "protocol_flow",
+      "visual_spec": "Three-step commissioning protocol flow: (1) empty-building STI baseline per IEC 60268-16:2020; (2) representative-traffic verification — required because the standard's own scope (general comments in §7.13 and §8.9.3) does not cover fluctuating background noise, and terminals are the paradigm fluctuating-noise environment; (3) cure period and re-measurement, treated as verification-with-cure-period rather than an occupancy condition. Side reference strip of related floors: 29 CFR 1910.95 hearing-conservation trigger at 85 dB(A) 8-hour TWA; ANSI/ASA S12.60 35 dB(A) core-learning-space background as the reference benchmark for MWAA-defined low-stimulation zones only (labeled 'reference, not terminal ambient').",
+      "source_note": "IEC 60268-16:2020 scope limitation (standard paywalled; scope confirmed in ledger record citing §7.13, §8.9.3); 29 C.F.R. § 1910.95 (OSHA); ANSI/ASA S12.60 (paywalled; 35 dB(A) figure corroborated in ledger).",
+      "density_budget": "1 flow (3 steps) + 1 reference strip; <= 70 words.",
+      "speaker_note": "Read-ahead page. This is the technical detail that separates the standard from paper: acceptance under representative traffic, with the cure period keeping it off the occupancy critical path."
+    },
+    {
+      "slide_number": 17,
+      "narrative_job": "Read-ahead. Present the strongest counter-case honestly and show the amendment's marginal content.",
+      "headline": "Read-ahead: 'the floors already exist' is half-right — here is the marginal content",
+      "evidence_ids": [
+        "quantitative-analyst::ev-8cb15085981e",
+        "operations-analyst::ev-4cea7e413a8a",
+        "contrarian::ev-aa028959594f",
+        "contrarian::ev-7fb259c1c5c5"
+      ],
+      "visual_type": "gap_table",
+      "visual_spec": "Two-column table: 'What existing floors require' (NFPA 72 — emergency voice intelligibility only; 2010 ADA Standards — receiver counts, not daily-announcement intelligibility; ACRP 175 — guidance, not code) vs. 'What only the amendment adds' (ADS map at each design milestone; representative-traffic commissioning; audit-logged governance of routine PA; channel-redundancy floors; IROPS override; tenant-audio boundaries). Bottom caveat band: the serious objection — premature specification before program-brief maturity drives change orders, and hard commissioning gates on the critical path in this coverage window would be a bond-rating conversation — answered by cure-period commissioning and milestone (not occupancy) deliverables.",
+      "source_note": "Counter-case and rebuttal per the verified final draft; regulatory scope per NFPA 72, 2010 ADA Standards, ACRP Research Report 175 as corroborated in the evidence ledger.",
+      "density_budget": "1 table (2 columns x 6 rows) + 1 caveat band; <= 100 words total.",
+      "speaker_note": "Read-ahead page. Intellectual honesty is the tone contract: the objection gets stated at full strength before the rebuttal."
+    },
+    {
+      "slide_number": 18,
+      "narrative_job": "Read-ahead. Close the appendix with open verification items and the source appendix pointer, so the reader knows exactly what is not yet proven.",
+      "headline": "Read-ahead: what this research pass did not verify",
+      "evidence_ids": [
+        "technology-scout::ev-98a81e3fc5da",
+        "infrastructure-economist::ev-525ee186f14c"
+      ],
+      "visual_type": "verification_checklist",
+      "visual_spec": "Checklist table of open items, each with owner and closure route: (1) current Design Manual acoustic/PA/STI content — read Volume 2 and applicable specification sections (public on mwaa.com); (2) 2025 AUL majority-in-interest thresholds and cost-recovery categorization — primary agreement text; (3) DCA Terminal 1 concourse replacement phase — capital program status; (4) SFO measurement methodology — Airport Commission minutes or program report; (5) rating-agency primary reports behind the Bond Buyer DSCR figures. Footer: full source appendix follows in the Word report; all deck figures carry ledger lineage.",
+      "source_note": "Open gaps per the evidence map (§5) and fact-check report (source-integrity problems 1-4). No figure on this page is asserted as verified.",
+      "density_budget": "1 checklist (5 rows); <= 60 words outside checklist.",
+      "speaker_note": "Read-ahead page. Ending the packet on the unverified list is deliberate — it converts the gaps into the first 90 days of assigned work."
+    }
+  ],
+  "report_visuals": [
+    {
+      "title": "Exhibit 1 — Intelligibility floors and targets on one STI scale",
+      "exhibit_type": "table",
+      "takeaway": "The numeric floors already exist in code and guidance; a loud, reverberant, cross-broadcast terminal is the condition that fails them.",
+      "evidence_ids": [
+        "director-of-public-safety::ev-9ef92c27e224",
+        "contrarian::ev-58a4b35511d3",
+        "quantitative-analyst::ev-d1b6bd6f446b",
+        "operations-analyst::ev-4cea7e413a8a",
+        "operations-analyst::ev-ee92641d9233",
+        "airport-coo::ev-036e168941ec"
+      ],
+      "source_note": "NFPA 72, National Fire Alarm and Signaling Code (code paywalled; thresholds corroborated across 10+ evidence records reproducing code language); ACRP Research Report 175 (Transportation Research Board, 2017); IEC 60268-16:2020 (standard paywalled; qualitative bands corroborated in secondary records).",
+      "row_header": "Requirement",
+      "columns": [
+        {
+          "label": "Value",
+          "unit": "STI (index, 0-1)"
+        },
+        {
+          "label": "Applies to"
+        },
+        {
+          "label": "Authority status"
+        }
+      ],
+      "rows": [
+        {
+          "label": "NFPA 72 per-location floor",
+          "values": [
+            ">= 0.45 (CIS >= 0.65)",
+            "At >= 90% of measurement locations within each acoustically distinguishable space, emergency voice systems",
+            "Code (adopted edition governs)"
+          ]
+        },
+        {
+          "label": "NFPA 72 average floor",
+          "values": [
+            ">= 0.50 (CIS >= 0.70)",
+            "Average across each acoustically distinguishable space, emergency voice systems",
+            "Code (adopted edition governs)"
+          ]
+        },
+        {
+          "label": "ACRP 175 minimum",
+          "values": [
+            ">= 0.45, with 10 dB(A) signal-to-noise",
+            "Public-address broadcasts in pier-style departure lounges",
+            "Guidance (TRB/FAA-sponsored, 2017)"
+          ]
+        },
+        {
+          "label": "IEC 60268-16:2020 qualitative bands",
+          "values": [
+            "Bad <0.30; Poor 0.30-0.45; Fair 0.45-0.60; Good 0.60-0.75; Excellent >0.75",
+            "Objective rating of speech intelligibility; measurement method required by reference",
+            "Measurement standard (paywalled; cite by reference)"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Exhibit 2 — Peer 'silent airport' programs: policy analogues, not design precedents",
+      "exhibit_type": "comparison",
+      "takeaway": "Every frequently cited peer is structurally unlike IAD or DCA, and none has published intelligibility or missed-boarding measurement.",
+      "evidence_ids": [
+        "infrastructure-economist::ev-3bf14ae0605d",
+        "technology-scout::ev-49076621090e",
+        "technology-scout::ev-436a5e8bb2a2",
+        "technology-scout::ev-9c7e329a7616",
+        "operations-analyst::ev-d05117e47cf7"
+      ],
+      "source_note": "Operator self-descriptions: London City Airport (londoncityairport.com); Finavia (Helsinki-Vantaa); Copenhagen Airport passenger-communication policy; Amsterdam Schiphol Silent Airport pages. No published intelligibility or missed-boarding measurement identified for any of the four in this research pass.",
+      "row_header": "Airport",
+      "columns": [
+        {
+          "label": "Announcement policy"
+        },
+        {
+          "label": "Structural profile vs. IAD/DCA"
+        },
+        {
+          "label": "Published outcome measurement"
+        }
+      ],
+      "rows": [
+        {
+          "label": "London City (LCY)",
+          "values": [
+            "Silent policy since 2008; no flight or gate announcements since August 18, 2016, except essential and emergency",
+            "Small, point-to-point, business-traveler-dominant",
+            "None identified in this research pass"
+          ]
+        },
+        {
+          "label": "Helsinki-Vantaa (HEL)",
+          "values": [
+            "Silent regime since 2015; gate-area and emergency overrides retained",
+            "Small transfer airport, high English proficiency",
+            "None identified in this research pass"
+          ]
+        },
+        {
+          "label": "Copenhagen (CPH)",
+          "values": [
+            "Gate and boarding information moved to screens and app; operator-published policy",
+            "Point-to-point-weighted Northern European hub",
+            "None identified in this research pass"
+          ]
+        },
+        {
+          "label": "Amsterdam Schiphol (AMS)",
+          "values": [
+            "Operator-described Silent Airport model; information on screens and airport app",
+            "Large transfer hub — the closest structural analogue; regime rests on screen density and app-carrying passengers",
+            "None identified in this research pass"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Exhibit 3 — SFO Quiet Airport reported outcomes (SFO-reported; methodology not published)",
+      "exhibit_type": "table",
+      "takeaway": "SFO's own accounting shows large reductions in paging volume, but no published measurement methodology exists and passenger complaints and missed-flight accounts sit in the same record.",
+      "evidence_ids": [
+        "infrastructure-economist::ev-941fb7139ec7",
+        "airport-emergency-management-director::ev-c8908972475c",
+        "operations-analyst::ev-ccf2fd3ef094",
+        "contrarian::ev-3840eded78c8"
+      ],
+      "source_note": "SFO Quiet Airport outcomes as reported by International Airport Review (2023) and View from the Wing, citing SFO; all figures SFO-reported, measurement methodology not published. Counter-evidence: Simple Flying, documented missed-flight and confusion accounts attributed to the reduced-announcement practice.",
+      "row_header": "Reported measure",
+      "columns": [
+        {
+          "label": "Before program"
+        },
+        {
+          "label": "After program"
+        }
+      ],
+      "rows": [
+        {
+          "label": "Individual paging occurrences",
+          "unit": "occurrences per day (SFO-reported)",
+          "values": [
+            492,
+            261
+          ]
+        },
+        {
+          "label": "Cumulative announcement time",
+          "unit": "minutes per day (SFO-reported)",
+          "values": [
+            145,
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Exhibit 4 — How the standard enters force",
+      "exhibit_type": "flow",
+      "takeaway": "The enforcement vehicle already exists: the Design Manual binds consultants and contractors today, and the amendment path runs through the Office of Engineering with Board escalation only on material airline objection.",
+      "evidence_ids": [
+        "virtual-chris::ev-d6d475e3fe78",
+        "airport-coo::ev-cb0ee1ba21bd",
+        "infrastructure-economist::ev-525ee186f14c",
+        "contrarian::ev-851bd0537852"
+      ],
+      "source_note": "Path per the verified final draft. Design Manual described by MWAA as 'a mandatory guide with the force of law on the airport property' (mwaa.com); 2025 AUL majority-in-interest provisions not verified from primary agreement text — consultation step carries that contingency.",
+      "steps": [
+        {
+          "label": "Draft the amendment",
+          "detail": "Office of Engineering drafts the tiered communications-integrity standard as a Design Manual amendment under its delegated standards-setting authority.",
+          "owner": "MWAA Office of Engineering"
+        },
+        {
+          "label": "Verify primary texts",
+          "detail": "Read the current Design Manual acoustic/PA content and the 2025 AUL majority-in-interest and cost-recovery provisions before amendment language enters any scope document.",
+          "owner": "MWAA Office of Engineering",
+          "trigger": "Days 1-30 of the effort"
+        },
+        {
+          "label": "Consult airlines and tenants",
+          "detail": "Brief carriers early, open a formal comment window, and put MWAA's cost-recovery position in writing; tenant-audio reach is contingent on the AUL verification.",
+          "owner": "MWAA (airline relations)",
+          "trigger": "After primary-text verification"
+        },
+        {
+          "label": "Board information item",
+          "detail": "Take the amendment to the MWAA Board as an information item; escalate to a resolution only if airline consultation surfaces material objection.",
+          "owner": "MWAA Board",
+          "trigger": "Material objection escalates to resolution"
+        },
+        {
+          "label": "Publish and bind",
+          "detail": "Amendment publishes into the Design Manual, which binds consultants and contractors on airport property.",
+          "owner": "MWAA Office of Engineering"
+        },
+        {
+          "label": "Commission and verify",
+          "detail": "Each covered project verifies intelligibility under representative operating traffic with a cure period — verification-with-cure-period, not an occupancy condition.",
+          "owner": "Project commissioning teams",
+          "trigger": "Facility opening under representative traffic"
+        }
+      ]
+    },
+    {
+      "title": "Exhibit 5 — First-cycle implementation timeline",
+      "exhibit_type": "timeline",
+      "takeaway": "Concourse E's fall 2026 opening carries the first commissioned baseline; the amendment targets work still in programming inside the debt-service coverage compression window.",
+      "evidence_ids": [
+        "quantitative-analyst::ev-4105534f02b4",
+        "virtual-chris::ev-d4385d53696a",
+        "airline-commercial-strategist::ev-6ee2cd9496e1",
+        "technology-scout::ev-98a81e3fc5da",
+        "infrastructure-economist::ev-dc8d320b20fa"
+      ],
+      "source_note": "Concourse E facts per MWAA project disclosures (flydulles.com), verified August 11, 2026; DCA Terminal 1 phase not verified in this research pass; coverage window per Bond Buyer summarizing Moody's May 2025 report (subscription-gated; rating-agency reports are primary citation-grade sources).",
+      "milestones": [
+        {
+          "period": "Days 1-30",
+          "action": "Primary-text verification",
+          "detail": "Read the current Design Manual acoustic, PA-zoning, and STI content and the 2025 AUL majority-in-interest and cost-recovery provisions.",
+          "owner": "MWAA Office of Engineering",
+          "success_measure": "Both verifications documented; amendment scope set to gap-fill if equivalent Manual content exists"
+        },
+        {
+          "period": "Fall 2026",
+          "action": "Concourse E baseline commissioning",
+          "detail": "Approximately 435,000 sq ft, 14 gates. Measure STI and ambient baseline per IEC 60268-16:2020 under representative traffic at opening.",
+          "owner": "MWAA with project commissioning team",
+          "success_measure": "STI >= 0.45 at >= 90% of locations per acoustically distinguishable space; average >= 0.50, under representative traffic"
+        },
+        {
+          "period": "This capital cycle",
+          "action": "Design Manual amendment issued",
+          "detail": "Tiered communications-integrity standard issued by the Office of Engineering; Board information item; escalation to resolution only on material airline objection.",
+          "owner": "MWAA Office of Engineering / MWAA Board",
+          "success_measure": "Every subsequent design package includes an acoustically-distinguishable-space map as a milestone deliverable"
+        },
+        {
+          "period": "Reference application (phase-dependent)",
+          "action": "Apply standard to first covered project",
+          "detail": "DCA Terminal 1 concourse replacement if still in programming (phase not verified in this research pass); otherwise the earliest IAD Concourse C/D element still in programming.",
+          "owner": "MWAA capital program",
+          "success_measure": "First project commissioned against the Concourse E baseline with cure-period verification"
+        }
+      ]
+    },
+    {
+      "title": "Exhibit 6 — The capital and coverage window",
+      "exhibit_type": "table",
+      "takeaway": "The amendment must land while roughly $9 billion of committed work is still specifiable and before debt-service coverage compresses to its projected floor.",
+      "evidence_ids": [
+        "infrastructure-economist::ev-525ee186f14c",
+        "airline-commercial-strategist::ev-e40c8b59ee9e",
+        "quantitative-analyst::ev-6d299a264850",
+        "airport-coo::ev-c0536e07fced",
+        "infrastructure-economist::ev-dc8d320b20fa",
+        "infrastructure-economist::ev-ed2a314947b9"
+      ],
+      "source_note": "MWAA use-and-lease press release (2024): $6.99B IAD, $2.39B DCA, 15-year AUL effective January 1, 2025. July 29, 2026 joint announcement (as reported by Travel Agent Central and Simple Flying): $20B+ provisional pending Board action. Coverage trajectory per Bond Buyer summarizing Moody's May 2025 report (subscription-gated; rating-agency reports are the primary citation-grade sources).",
+      "row_header": "Measure",
+      "columns": [
+        {
+          "label": "Value"
+        },
+        {
+          "label": "Status"
+        }
+      ],
+      "rows": [
+        {
+          "label": "IAD committed capital construction program",
+          "unit": "USD billions",
+          "values": [
+            6.99,
+            "Committed under 15-year AUL effective January 1, 2025"
+          ]
+        },
+        {
+          "label": "DCA committed capital construction program",
+          "unit": "USD billions",
+          "values": [
+            2.39,
+            "Committed under 15-year AUL effective January 1, 2025"
+          ]
+        },
+        {
+          "label": "Announced Dulles transformation",
+          "unit": "USD billions",
+          "values": [
+            "More than 20",
+            "Provisional pending Board action (announced July 29, 2026)"
+          ]
+        },
+        {
+          "label": "Planned new debt, 2025-2028",
+          "unit": "USD billions",
+          "values": [
+            "Approximately 5.5",
+            "Projection reported by Bond Buyer summarizing Moody's"
+          ]
+        },
+        {
+          "label": "Net-revenue debt-service coverage, 2024",
+          "unit": "coverage ratio (x)",
+          "values": [
+            1.63,
+            "Reported (Bond Buyer summarizing Moody's)"
+          ]
+        },
+        {
+          "label": "Projected coverage over five years",
+          "unit": "coverage ratio (x)",
+          "values": [
+            "Approximately 1.3",
+            "Projection reported by Bond Buyer summarizing Moody's"
+          ]
+        }
+      ]
+    }
+  ],
+  "source_appendix": [
+    "NFPA 72, National Fire Alarm and Signaling Code — emergency communications intelligibility criteria (STI >= 0.45 / CIS >= 0.65 at >= 90% of locations per acoustically distinguishable space; average STI >= 0.50 / CIS >= 0.70). Code paywalled; thresholds corroborated across 10+ ledger records reproducing code language. Cite the edition adopted by the authority having jurisdiction.",
+    "ACRP Research Report 175: Improving Intelligibility of Airport Terminal Public Address Systems (Transportation Research Board, 2017) — minimum STI 0.45, 10 dB(A) signal-to-noise for pier-style departure lounges. Guidance, not code; 2017 survey base.",
+    "IEC 60268-16:2020, Sound system equipment — Part 16 — STI model, test signals, measurement methods, qualitative bands; scope does not cover fluctuating background noise (general comments in §7.13, §8.9.3). Paywalled; require compliance by reference.",
+    "MWAA, use-and-lease agreement press release (2024) — 15-year AUL effective January 1, 2025; $6.99B IAD / $2.39B DCA capital construction program; 140% airline-funded coverage target. Majority-in-interest provisions not verified from primary agreement text.",
+    "July 29, 2026 joint Dulles transformation announcement — as reported by Travel Agent Central and Simple Flying; $20B+ figure provisional pending Board action.",
+    "MWAA Office of Engineering, Design Manual (seven volumes, annually updated), mwaa.com — 'a mandatory guide with the force of law on the airport property.' Current acoustic/PA content not verified from primary Manual text in this research pass.",
+    "MWAA Concourse E project disclosures, flydulles.com — approximately 435,000 sq ft, 14 gates, initial phase opening fall 2026; verified August 11, 2026.",
+    "NTSB Aircraft Accident Report AIR-26/02 (final, 2026, ntsb.gov) — January 29, 2025 midair collision; contemporaneous coverage per CNN.",
+    "The Bond Buyer, 'MWAA goes to market' (2025, subscription-gated) — DSCR 1.63x (2024) to approximately 1.3x over five years; approximately $5.5B new debt 2025-2028. Rating-agency reports are the primary citation-grade sources.",
+    "Commercial acoustic pricing guides — designtransitionstudio.com (new-construction ceiling $5-$15/sq ft) and acousticmod.com (retrofit panels $18-$45/sq ft). Non-airport, medium-confidence directional benchmarks.",
+    "SFO Quiet Airport outcomes — International Airport Review (2023) and View from the Wing, citing SFO (paging 492 to 261/day; 145 to 58 min/day). All figures SFO-reported; methodology not published. Counter-evidence: Simple Flying missed-flight and confusion accounts.",
+    "Peer operator self-descriptions — London City Airport (silent since 2008; extended August 18, 2016), Finavia/Helsinki-Vantaa (since 2015), Copenhagen Airport, Amsterdam Schiphol. No published intelligibility or missed-boarding measurement identified.",
+    "Regulatory floors — 28 C.F.R. § 35.160 (ada.gov); DOJ 2010 ADA Standards §§219, 706; 14 C.F.R. Part 382 (ecfr.gov); 29 C.F.R. § 1910.95 (OSHA); ANSI/ASA S12.60 (paywalled; 35 dB(A) corroborated in ledger).",
+    "ACRP Research Report 239: Assessing Airport Programs for Travelers with Disabilities and Older Adults (TRB, 2023) — digital channels are complements, not substitutes.",
+    "The Joint Commission, National Patient Safety Goal NPSG.06.01.01, Clinical Alarm Management (phased January 1, 2014 and January 1, 2016); Respiratory Therapy Magazine alarm-fatigue review (74,535 alarms across eight units in one week; illustrative magnitude).",
+    "Trade-press airline figures — Simple Flying (United approximately 67% of IAD traffic, 50 jetbridge gates, verified August 11, 2026; American approximately 53% DCA share, March 2025); Cranky Flier (August 4, 2026; $90.64 vs. $12.88 CPE, analyst-reported airline positioning). Directional, not primary MWAA disclosure.",
+    "ACI-NA, 'The Data-Driven Future of Automated Airport Announcements' (February 27, 2026, airportscouncil.org) — automated PA governance capabilities; industry advocacy, directional."
+  ],
+  "accessibility_checks": [
+    "Contrast: all text and data marks meet WCAG 2.1 AA contrast (4.5:1 body, 3:1 large text and chart elements) against the warm-white background.",
+    "No color-only encoding: provisional vs. committed values distinguished by hatching and labels; the IEC STI bands carry printed labels, not tint alone; contingent timeline milestones use dashed borders plus text flags.",
+    "Minimum sizes: body text >= 16pt on speaker-led slides, >= 12pt on read-ahead pages; source notes >= 10pt and never below 9pt; chart data labels >= 12pt.",
+    "Alt text: every exhibit ships with a one-sentence alt description stating the takeaway and the key values (required for the Word report exhibits and the PPTX).",
+    "Reading order: slide object order set so screen readers encounter headline, exhibit, caveat, source note in that sequence.",
+    "Caveats on the face: 'SFO-reported', 'provisional', 'not verified from primary text', and 'non-airport benchmark' labels are printed inside the exhibit area at legible size, not buried in footnotes.",
+    "No flashing, animation, or decorative motion in either deliverable.",
+    "The deck itself models the report's accessibility argument: every quantitative exhibit has a redundant text statement of its primary claim."
+  ],
+  "asset_requests": [
+    {
+      "id": "AR-1",
+      "description": "MWAA-owned interior photograph of IAD Concourse E holdroom or concourse spine, used only on read-ahead slide 15 background band if available; adds place and scale for the baseline-commissioning milestone.",
+      "rights": "MWAA media library or MWAA communications office; publication rights confirmed in writing before use. No stock substitute permitted — omit the photo rather than substitute.",
+      "fallback": "Render slide 15 with the timeline exhibit alone; no imagery."
+    },
+    {
+      "id": "AR-2",
+      "description": "Native vector build of the Intelligibility Ruler (signature visual, slide 4) from the cited thresholds; also rendered at print resolution for the Word report alongside Exhibit 1.",
+      "rights": "Original work; no third-party assets.",
+      "fallback": "Not applicable — designer-built from cited values only."
+    },
+    {
+      "id": "AR-3",
+      "description": "Conceptual holdroom boundary schematic for slide 14 (MWAA zone / airline podium / concessionaire audio). Must be visibly schematic — labeled 'conceptual, not a floorplan' — because no verified IAD/DCA gate-arrangement document exists in this run.",
+      "rights": "Original work; no vendor diagrams or airline-branded assets.",
+      "fallback": "Replace with a three-column text panel carrying the same governance-boundary content."
+    }
+  ]
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 from cli.evidence import bind_claim_lineage_to_draft
 from cli.quality_gate import (
     PublicationQualityError,
+    inspect_executive_memo_markdown,
     inspect_publication_markdown,
     publication_word_count,
     resolve_word_count_bounds,
@@ -15,6 +16,31 @@ from cli.quality_gate import (
 
 
 class QualityGateTests(unittest.TestCase):
+    def test_executive_memo_profile_accepts_direct_short_structure(self) -> None:
+        text = (
+            "# Gate plan\n\n"
+            "## Bottom line\n\nAuthorize the trial and cap the exposure.\n\n"
+            "## Why it holds\n\nThe operating record supports a bounded test. "
+            "The team can measure the result before expanding.\n\n"
+            "## Strongest objection\n\nA small trial may not predict full-scale demand. "
+            "That limit argues for a test, not a permanent commitment.\n\n"
+            "## What to do now\n\nName the owner and set the stop condition.\n"
+        )
+        self.assertEqual(inspect_executive_memo_markdown(text), [])
+
+    def test_executive_memo_profile_blocks_academic_and_dense_copy(self) -> None:
+        text = (
+            "# Gate plan\n\n## Bottom line\n\nThis paper presents a review of the issue. "
+            + " ".join(["Dense prose keeps accumulating without helping the reader."] * 20)
+            + "\n"
+        )
+        codes = {
+            issue.code for issue in inspect_executive_memo_markdown(text)
+        }
+        self.assertIn("memo_structure_missing", codes)
+        self.assertIn("memo_paragraph_too_long", codes)
+        self.assertIn("memo_academic_register", codes)
+
     @staticmethod
     def _write_ledger(root: Path) -> Path:
         ledger = root / "evidence-ledger.jsonl"

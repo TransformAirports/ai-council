@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0",
+  "artifact": {
+    "path": "quiet-by-design-standards-for-mwaa-terminals-2.pptx",
+    "sha256": "ddb16fb33e8e1b0276607445075253956707412beefff77a610d7f36faf400f8",
+    "size_bytes": 93802
+  },
+  "visual_brief": {
+    "path": "visual-brief.json",
+    "sha256": "c15955d0dddf9d3e700d43af777962769fd1c2704c9a10a411899fe5a4970515"
+  },
+  "deck_mode": "technical_read_ahead",
+  "slide_count": 18,
+  "rendered_slides": [
+    {
+      "slide_number": 1,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-01.png",
+      "sha256": "110210b42ed74b509e7b33cd37c77f8009932229db452f2faa02383bdeaeda31",
+      "size_bytes": 122805
+    },
+    {
+      "slide_number": 2,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-02.png",
+      "sha256": "a968d7659a9e549baf29fcda22c40f7ccbc80238f8a9c9ea5b21cd3367968d58",
+      "size_bytes": 166273
+    },
+    {
+      "slide_number": 3,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-03.png",
+      "sha256": "99ac67ffc1d24d0d6e2764c7e904267ca83502c61d4f84289f7a602bb1c31f7c",
+      "size_bytes": 221110
+    },
+    {
+      "slide_number": 4,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-04.png",
+      "sha256": "4e81ce117139b335e800ad9d74c3f276e7d60af127161ea2107847920a09a02c",
+      "size_bytes": 203335
+    },
+    {
+      "slide_number": 5,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-05.png",
+      "sha256": "f56311cb2ba20651859b5ef9904e52f158f8075ced29fc78747b871c5582ddd0",
+      "size_bytes": 135283
+    },
+    {
+      "slide_number": 6,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-06.png",
+      "sha256": "772b74f531dfef748a417e287c76b01043acc9bee9865ed2b0ac78c589bff86a",
+      "size_bytes": 220154
+    },
+    {
+      "slide_number": 7,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-07.png",
+      "sha256": "fcbd14712909d8b6bc00a77e405660953b63b4f83c0789122ea083f326f1b763",
+      "size_bytes": 176229
+    },
+    {
+      "slide_number": 8,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-08.png",
+      "sha256": "b6b26487967fe5790d1531c30778f800c4496e11775567938947720e8c646cb2",
+      "size_bytes": 197207
+    },
+    {
+      "slide_number": 9,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-09.png",
+      "sha256": "8312ea07d7ea30da78afe0693d32dc538ce0d6638fe9d76fa862f320bce1936c",
+      "size_bytes": 205566
+    },
+    {
+      "slide_number": 10,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-10.png",
+      "sha256": "f25b39846dee19af4f557e00dfc7266166c6db06ed67df4e2bf6731cb632f2c8",
+      "size_bytes": 228483
+    },
+    {
+      "slide_number": 11,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-11.png",
+      "sha256": "c99fda443df372b43d87234730ee275e7c5b2abc17246af7eeccd8ae31eb83cd",
+      "size_bytes": 170477
+    },
+    {
+      "slide_number": 12,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-12.png",
+      "sha256": "b374ce94fc339d9d8db94b252601fa952a0a24f03dd39d4f52e5a392d3bef5c4",
+      "size_bytes": 125107
+    },
+    {
+      "slide_number": 13,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-13.png",
+      "sha256": "0c5d42f6d0d552df88db05cefdc9cad45178a710f4ad4e9d6fcf40baf1ba2771",
+      "size_bytes": 199970
+    },
+    {
+      "slide_number": 14,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-14.png",
+      "sha256": "6c8ff6e34749e0fd66348447af6b5545959c6099f882662a826c478528a04143",
+      "size_bytes": 219843
+    },
+    {
+      "slide_number": 15,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-15.png",
+      "sha256": "1f83f32af43a6b7d2c0e2b748fffca501467102ced8dd1e56566bfe41c939af9",
+      "size_bytes": 180438
+    },
+    {
+      "slide_number": 16,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-16.png",
+      "sha256": "09a94fe071b16b58fb1b2b94f82394e440d8b45c373b9c13df0e062cb17ca1df",
+      "size_bytes": 247972
+    },
+    {
+      "slide_number": 17,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-17.png",
+      "sha256": "547f97387f8514938a9cf9ed7980fc70702d82f39a6b07e2ce1274be4d157948",
+      "size_bytes": 190611
+    },
+    {
+      "slide_number": 18,
+      "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-18.png",
+      "sha256": "78c73cd405ac3cd585a06a7a2482e39b4ebebbd64372c18389b499680eb7b84e",
+      "size_bytes": 182126
+    }
+  ],
+  "montage": {
+    "path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/montage.png",
+    "sha256": "865705311b8d8fcea9825520a54f2b1e5df7ea7e2ff7897cf07ed324d18ea676",
+    "size_bytes": 876008
+  },
+  "signature_visual": {
+    "slide_number": 4,
+    "concept": "The Intelligibility Ruler: a single horizontal STI scale (0 to 1.0) banded with the IEC 60268-16:2020 qualitative categories (Bad <0.30, Poor 0.30-0.45, Fair 0.45-0.60, Good 0.60-0.75, Excellent >0.75), with callout markers pinning NFPA 72's emergency-voice floor (STI >= 0.45 at >= 90% of locations per acoustically distinguishable space; average >= 0.50) and ACRP 175's pier-style departure-lounge recommendation (minimum STI 0.45 with 10 dB(A) signal-to-noise). A shaded annotation at the low end labels where the loud, reverberant, cross-broadcast terminal lands — making the draft's central inversion ('the loud terminal is the unintelligible one') legible in seconds.",
+    "visual_type": "annotated_threshold_scale",
+    "rendered_path": "inspection/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-04.png",
+    "rendered_sha256": "4e81ce117139b335e800ad9d74c3f276e7d60af127161ea2107847920a09a02c"
+  },
+  "inspection": {
+    "inspector": "presentation-designer",
+    "full_size_each_slide_inspected": true,
+    "montage_inspected": true,
+    "signature_exhibit_present": true,
+    "signature_exhibit_matches_brief": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Slide 4: the ACRP 175 leader line struck through the second line of its own annotation and did not reach the 0.45 marker; replaced with a legend-keyed note (blue dot matching the on-ruler marker) placed in the clear field right of the default-zone callout, and the subtitle text frame was deepened to remove a text-overflow warning.",
+      "Slide 11: the dashed projection connector was mis-rotated — it struck the '1.63x (2024, reported)' label and the 'Projected range' note and ended short of the projected point; recomputed as a true dot-to-dot chord between the 1.63x and ~1.3x markers. The '~$5.5B of new debt phases in, 2025-2028' callout covered the '~1.3x (projected over five years)' label; callout relocated to the empty lower-left field and the note moved above the connector.",
+      "Slide 1: cover subtitle began flush against the gold accent bar, clipping the first characters; subtitle text block indented clear of the bar."
+    ],
+    "unresolved_findings": []
+  }
+}

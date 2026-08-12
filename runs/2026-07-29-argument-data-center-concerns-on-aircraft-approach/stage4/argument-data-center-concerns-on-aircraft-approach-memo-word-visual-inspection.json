@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "inspection_type": "word_pages",
+  "artifact": {
+    "path": "argument-data-center-concerns-on-aircraft-approach-memo.docx",
+    "sha256": "afc08b2c76dd729aaefb415bbc099b4829cd4ba54737923312ff8b2ab638444e",
+    "size_bytes": 41238
+  },
+  "pdf": {
+    "path": "qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo.pdf",
+    "sha256": "cc436f39240b36454719658fd0228fa35748c98c4e281d773d671c68bfc6c592",
+    "size_bytes": 130151
+  },
+  "page_count": 1,
+  "rendered_pages": [
+    {
+      "page_number": 1,
+      "path": "qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo-1.png",
+      "sha256": "412c6d4715c0623104fd5e5c2ca42cfa21bec9ef25ea577112a8bf2910cb32dd",
+      "size_bytes": 526982
+    }
+  ],
+  "montage": {
+    "path": "qa/argument-data-center-concerns-on-aircraft-approach-memo/montage.png",
+    "sha256": "bd13d754f930cecd5cb2b3690b5bf3bd2b5b566b4418aa257c15ef767adf8e90",
+    "size_bytes": 156037
+  },
+  "inspection": {
+    "inspector": "art-director",
+    "full_size_each_page_inspected": true,
+    "montage_inspected": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Page 1 (sha256 412c6d47...) inspected at full size: no clipped text, no split or overflowing tables or figures; single-column memo layout renders intact.",
+      "Header 'TRANSFORM AIRPORTS // AI RESEARCH COUNCIL' and footer 'HUMAN REVIEW REQUIRED / page 1' present and consistent; classification band 'EXECUTIVE MEMO // FOR DECISION' renders correctly above the title.",
+      "Section hierarchy (Bottom line / Why it holds / Strongest objection / What to do now) is clear; bold lead-ins and the numbered four-item action list render without stranded or orphaned lines.",
+      "Sources block is set in footnote-size type but remains legible at full resolution; superscript citation markers in body text render correctly.",
+      "Montage inspected: exactly one page, matching page_count 1; no blank, duplicate, or stranded pages. Page is text-dense but appropriate for a one-page decision memo; whitespace and margins are balanced."
+    ],
+    "unresolved_findings": []
+  }
+}

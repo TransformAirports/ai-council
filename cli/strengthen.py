@@ -1,10 +1,10 @@
 """Focused Council workflow for strengthening an existing argument.
 
-Unlike a normal Council run, this mode does not produce a Word report. It takes
-an existing argument (pasted text, uploaded source material, or both), runs a
-selected research swarm, reconciles the evidence, and releases a concise,
-fact-checked Markdown argument. An optional presentation is built to an exact
-operator-supplied slide count.
+Unlike a normal Council run, this mode is deliberately short. It takes an
+existing argument (pasted text, uploaded source material, or both), runs one
+focused research wave, sharpens and verifies the case, and releases an exact
+one-page Word memo. The verified Markdown remains available in the reader, and
+an optional presentation is built to an exact operator-supplied slide count.
 """
 from __future__ import annotations
 
@@ -52,8 +52,16 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 ARGUMENT_SLIDE_MIN = 3
 ARGUMENT_SLIDE_MAX = 30
 ARGUMENT_TEXT_MAX_CHARS = 200_000
-ARGUMENT_RELEASE_SCHEMA_VERSION = "1.0"
-ARGUMENT_PIPELINE_SCHEMA_VERSION = "strengthen-v5"
+ARGUMENT_RELEASE_SCHEMA_VERSION = "2.0"
+ARGUMENT_PIPELINE_SCHEMA_VERSION = "strengthen-v10"
+ARGUMENT_MEMO_LENGTH = "350–550 words"
+ARGUMENT_RESEARCH_MAX_TURNS = 24
+ARGUMENT_SYNTHESIS_MAX_TURNS = 18
+ARGUMENT_FACTCHECK_MAX_TURNS = 28
+ARGUMENT_REMEDIATION_MAX_TURNS = 20
+ARGUMENT_ART_DIRECTION_MAX_TURNS = 18
+ARGUMENT_PRESENTATION_MAX_TURNS = 36
+ARGUMENT_WORD_INSPECTION_MAX_TURNS = 10
 SAFE_SLUG = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 
 
@@ -190,6 +198,7 @@ class StrengthenResult:
     public_slug: str = ""
     archive_path: Path | None = None
     argument_path: Path | None = None
+    memo_path: Path | None = None
     deck_path: Path | None = None
     completed: bool = False
 
@@ -249,9 +258,12 @@ def _request_markdown(request: StrengthenRequest, source_paths: list[str]) -> st
         f"## Current argument\n\n{material}\n\n"
         f"## Supplemental material\n\n{sources}\n\n"
         "## Output contract\n\n"
-        "Return one concise, standalone argument—not a report, methodology, research "
-        "summary, or memo. Preserve the author's point of view while improving the "
-        "logic, evidence, specificity, and treatment of the strongest counter-case.\n"
+        "Return one exact one-page executive memo, not a report, academic article, "
+        "methodology, or research summary. Preserve the author's point of view while "
+        "improving the logic, evidence, specificity, and treatment of the strongest "
+        f"counter-case. Keep the reader-facing body to {ARGUMENT_MEMO_LENGTH}. Use "
+        "short paragraphs, concrete subjects and verbs, and the exact sections "
+        "`Bottom line`, `Why it holds`, `Strongest objection`, and `What to do now`.\n"
     )
 
 
@@ -279,12 +291,12 @@ def _write_active_marker(
             "slug": request.slug,
             "title": request.title,
             "started": started,
-            "format": "strengthened argument",
+            "format": "one-page argument memo",
             "mode": "strengthen",
             "want_pptx": request.want_pptx,
             "slide_count": request.slide_count,
             "request": "context/argument-request.json",
-            "pipeline_version": "strengthen-v1",
+            "pipeline_version": ARGUMENT_PIPELINE_SCHEMA_VERSION,
         },
     )
 
@@ -551,17 +563,17 @@ def _prepare_argument_manifest(
 
     role_models = {
         **{
-            name: agents[name].model_override or _model("research")
+            name: agents[name].model_override or _model("argument_research")
             for name in request.selected_agents
         },
         "evidence-curator": _model("curation"),
-        "strategist": _model("synthesis"),
+        "strategist": _model("argument_synthesis"),
         "fact-checker": _model("factcheck"),
+        "art-director": _model("art_direction"),
     }
     if request.want_pptx:
         role_models.update(
             {
-                "art-director": _model("art_direction"),
                 "presentation-designer": _model("presentation"),
             }
         )
@@ -709,18 +721,78 @@ def _prepare_argument_manifest(
                     and changed_execution
                     and changed_execution <= {"cli/strengthen.py"}
                 )
-                migration_allowed = bool(
-                    prior_semantic == current_semantic
+                is_turn_limit_recovery_migration = bool(
+                    prior_schema == "strengthen-v6"
                     and changed_execution
+                    and changed_execution
+                    <= {
+                        "cli/__main__.py",
+                        "cli/menu.py",
+                        "cli/orchestrator.py",
+                        "cli/strengthen.py",
+                    }
+                )
+                # `claude-opus-5-0` was accepted as a configuration value but
+                # the live Claude API rejects it. Anthropic's `opus` alias is
+                # the supported, forward-compatible identifier. Permit only
+                # that exact model substitution, and only alongside the three
+                # files that implement/document it.
+                prior_with_opus_alias = json.loads(json.dumps(prior_semantic))
+                for agent_contract in prior_with_opus_alias.get("agents", []):
+                    if (
+                        isinstance(agent_contract, dict)
+                        and agent_contract.get("model") == "claude-opus-5-0"
+                    ):
+                        agent_contract["model"] = "opus"
+                is_opus_alias_migration = bool(
+                    prior_schema == "strengthen-v7"
+                    and changed_execution
+                    and changed_execution
+                    <= {
+                        "council.toml",
+                        "cli/config.py",
+                        "cli/strengthen.py",
+                    }
+                    and prior_with_opus_alias == current_semantic
+                )
+                is_turn_limit_cleanup_migration = bool(
+                    prior_schema == "strengthen-v8"
+                    and changed_execution
+                    and changed_execution
+                    <= {
+                        "cli/orchestrator.py",
+                        "cli/strengthen.py",
+                    }
+                )
+                is_one_page_memo_layout_migration = bool(
+                    prior_schema == "strengthen-v9"
+                    and changed_execution
+                    and changed_execution
+                    <= {
+                        "cli/docx_builder.py",
+                        "cli/strengthen.py",
+                    }
+                )
+                migration_allowed = bool(
+                    changed_execution
                     and (
-                        (
-                            prior_schema == "strengthen-v1"
-                            and changed_execution <= {"cli/strengthen.py"}
+                        is_opus_alias_migration
+                        or (
+                            prior_semantic == current_semantic
+                            and (
+                                (
+                                    prior_schema == "strengthen-v1"
+                                    and changed_execution <= {"cli/strengthen.py"}
+                                )
+                                or is_lineage_migration_followup
+                                or is_verifier_v4_migration
+                                or is_curator_v4_migration
+                                or is_downstream_v5_migration
+                                or is_turn_limit_recovery_migration
+                                or is_turn_limit_cleanup_migration
+                                or is_one_page_memo_layout_migration
+                            )
                         )
-                        or is_lineage_migration_followup
-                        or is_verifier_v4_migration
-                        or is_curator_v4_migration
-                        or is_downstream_v5_migration
                     )
                 )
             if not migration_allowed:
@@ -743,6 +815,14 @@ def _prepare_argument_manifest(
                         if prior_schema == "strengthen-v2"
                         else "curator receipt migration"
                         if prior_schema in {"strengthen-v3", "strengthen-v4"}
+                        else "turn-limit and authentication recovery"
+                        if prior_schema == "strengthen-v6"
+                        else "unsupported Opus identifier replaced by rolling alias"
+                        if prior_schema == "strengthen-v7"
+                        else "turn-limit stream cleanup recovery"
+                        if prior_schema == "strengthen-v8"
+                        else "one-page memo source-layout recovery"
+                        if prior_schema == "strengthen-v9"
                         else "lineage-remediation receipt migration"
                     ),
                     "changed_execution_files": sorted(changed_execution),
@@ -810,7 +890,7 @@ def _archive_strengthen_run(
                     f"Archived: {date.today().isoformat()}",
                     f"Claude API total: **${tally.total:.2f}**",
                     "",
-                    "The focused workflow produced a concise verified argument"
+                    "The focused workflow produced an exact one-page verified Word memo"
                     + (" and an exact-length presentation." if request.want_pptx else "."),
                     "Review the fact-check report and evidence map before external use.",
                     "",
@@ -843,19 +923,23 @@ def _publish_strengthen_release(
     repo_root: Path,
     request: StrengthenRequest,
     final_argument: Path,
+    memo: Path,
     deck: Path | None,
     archive_dir: Path,
-) -> tuple[Path, Path | None]:
+) -> tuple[Path, Path, Path | None]:
     reports_dir = repo_root / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
     public_slug = f"argument-{request.slug}"
     argument_target = reports_dir / f"{public_slug}.md"
+    memo_target = reports_dir / f"{public_slug}-memo.docx"
     deck_target = reports_dir / f"{public_slug}.pptx" if deck is not None else None
     pointer_target = reports_dir / f"{public_slug}-release.json"
     staging_root = Path(tempfile.mkdtemp(prefix=".argument-release-", dir=reports_dir))
     try:
         staged_argument = staging_root / argument_target.name
         shutil.copy2(final_argument, staged_argument)
+        staged_memo = staging_root / memo_target.name
+        shutil.copy2(memo, staged_memo)
         staged_deck: Path | None = None
         if deck is not None and deck_target is not None:
             staged_deck = staging_root / deck_target.name
@@ -866,7 +950,14 @@ def _publish_strengthen_release(
                 "path": argument_target.name,
                 "sha256": _sha256(staged_argument),
                 "size_bytes": staged_argument.stat().st_size,
-            }
+            },
+            {
+                "role": "word_memo",
+                "path": memo_target.name,
+                "sha256": _sha256(staged_memo),
+                "size_bytes": staged_memo.stat().st_size,
+                "page_count": 1,
+            },
         ]
         if staged_deck is not None and deck_target is not None:
             artifacts.append(
@@ -894,16 +985,17 @@ def _publish_strengthen_release(
             },
         )
         os.replace(staged_argument, argument_target)
+        os.replace(staged_memo, memo_target)
         if staged_deck is not None and deck_target is not None:
             os.replace(staged_deck, deck_target)
         # The pointer is the commit record and is always promoted last.
         os.replace(staged_pointer, pointer_target)
     finally:
         shutil.rmtree(staging_root, ignore_errors=True)
-    return argument_target, deck_target
+    return argument_target, memo_target, deck_target
 
 
-async def _build_argument_deck(
+async def _build_argument_visual_brief(
     *,
     request: StrengthenRequest,
     repo_root: Path,
@@ -914,7 +1006,6 @@ async def _build_argument_deck(
 ) -> Path:
     assert request.slide_count is not None
     art_director = agents["art-director"]
-    designer = agents["presentation-designer"]
     visual_path = outputs_dir / "stage4" / "visual-brief.json"
     visual_path.parent.mkdir(parents=True, exist_ok=True)
     schema_path = repo_root / "assets" / "brand" / "visual-brief.schema.json"
@@ -925,9 +1016,13 @@ async def _build_argument_deck(
         "`outputs/stage3/fact-check-report.md`.\n\n"
         f"Create the canonical visual brief for an `argument_brief` presentation "
         f"of exactly {request.slide_count} slides. This deck strengthens and presents "
-        "the argument; it is not a report placed on slides. Use one claim per slide, "
-        "a genuine counter-case, an evidence-bearing signature visual, and a final "
-        "implication or ask. The `slides` array must contain exactly "
+        "the argument; it is not a report placed on slides. Build a single clean line "
+        "of reasoning: claim, stakes, mechanism, proof, strongest objection, and ask, "
+        "adapting that sequence when the requested count differs from six. Use one "
+        "claim per slide, a genuine counter-case, an evidence-bearing signature visual, "
+        "and a final implication or ask. Headlines must be short argumentative "
+        "sentences, not topic labels. Default to no more than 45 visible words on a "
+        "slide. The `slides` array must contain exactly "
         f"{request.slide_count} entries numbered 1 through {request.slide_count}.\n\n"
         "Write valid JSON to `outputs/stage4/visual-brief.json` and validate it "
         "against `assets/brand/visual-brief.schema.json`. Use `argument_brief` as "
@@ -941,6 +1036,7 @@ async def _build_argument_deck(
         step_label="argument/art-direction",
         tally=tally,
         output_path=visual_path,
+        max_turns=ARGUMENT_ART_DIRECTION_MAX_TURNS,
         artifact_contract=_visual_brief_contract(),
         manifest_path=manifest_path,
         artifact_id="argument/visual-brief",
@@ -980,6 +1076,21 @@ async def _build_argument_deck(
             "Argument visual brief failed validation: "
             + "; ".join(visual_validation.errors[:8])
         )
+    return visual_path
+
+
+async def _build_argument_deck(
+    *,
+    request: StrengthenRequest,
+    repo_root: Path,
+    outputs_dir: Path,
+    agents: dict[str, Any],
+    tally: CostTally,
+    manifest_path: Path,
+    visual_path: Path,
+) -> Path:
+    assert request.slide_count is not None
+    designer = agents["presentation-designer"]
 
     out_path = outputs_dir / "stage4" / f"argument-{request.slug}.pptx"
     inspection_dir = outputs_dir / "stage4" / "inspection" / request.slug
@@ -994,7 +1105,10 @@ async def _build_argument_deck(
         "brand system in `assets/brand/`.\n\n"
         f"Save the finished deck to `{out_path.relative_to(repo_root).as_posix()}`. "
         f"It must contain exactly {request.slide_count} slides—no title-slide or "
-        "appendix additions beyond the canonical slide contract.\n\n"
+        "appendix additions beyond the canonical slide contract. Keep the English "
+        "plain and spare. Use assertion headlines, one visual idea per slide, generous "
+        "type, and no dashboard-card wall or decorative filler. A reader should grasp "
+        "each slide in five seconds and the entire argument from the headline sequence.\n\n"
         "After building, run this exact QA and inspection command:\n\n"
         f"`.venv/bin/python -m cli.presentation_qa \"{out_path}\" "
         f"--mode argument_brief --slide-count {request.slide_count} "
@@ -1012,6 +1126,7 @@ async def _build_argument_deck(
         step_label="argument/presentation",
         tally=tally,
         output_path=out_path,
+        max_turns=ARGUMENT_PRESENTATION_MAX_TURNS,
         required_outputs=((receipt_path, _visual_inspection_contract()),),
         manifest_path=manifest_path,
         artifact_id="argument/presentation",
@@ -1127,9 +1242,14 @@ async def run_strengthen_pipeline(
     request_md = outputs_dir / "context" / "argument-request.md"
     request_md.write_text(_request_markdown(request, source_paths), encoding="utf-8")
 
-    process_names = ["evidence-curator", "strategist", "fact-checker"]
+    needs_evidence_fallback = all(
+        by_name[name].provider == "openai" for name in request.selected_agents
+    )
+    process_names = ["strategist", "fact-checker", "art-director"]
+    if needs_evidence_fallback:
+        process_names.insert(0, "evidence-curator")
     if request.want_pptx:
-        process_names.extend(["art-director", "presentation-designer"])
+        process_names.append("presentation-designer")
     manifest_path = _prepare_argument_manifest(
         request=request,
         repo_root=repo_root,
@@ -1149,9 +1269,9 @@ async def run_strengthen_pipeline(
         agents=[*request.selected_agents, *process_names],
         stages=[
             "Research",
-            "Strengthen",
+            "Sharpen",
             "Verify",
-            "Build deck" if request.want_pptx else "Release",
+            "Memo & deck" if request.want_pptx else "One-page memo",
         ],
     )
 
@@ -1184,7 +1304,7 @@ async def run_strengthen_pipeline(
             prompt += (
                 f"\n\nAlso write claim-level evidence to "
                 f"`{evidence.relative_to(repo_root).as_posix()}` as JSONL. Each record "
-                "must contain `claim`, `source_title`, `source_url` or `source_path`, "
+                "must contain `claim`, `source_title`, one of `source_url`, `source_path`, or `source_citation` (use `source_citation` plus `page_or_section` for paywalled or print-only standards such as NFPA, IEC, or ANSI, and never invent a URL to satisfy the schema), "
                 "`source_type`, `is_primary`, `page_or_section`, "
                 "`supporting_excerpt`, `source_date`, `data_vintage`, "
                 "`airport_or_entity`, `units`, `denominator`, `caveat`, and "
@@ -1208,11 +1328,12 @@ async def run_strengthen_pipeline(
             await _run_agent(
                 agent=agent,
                 user_prompt=prompt,
-                model=agent.model_override or _model("research"),
+                model=agent.model_override or _model("argument_research"),
                 cwd=repo_root,
                 step_label=f"argument/research/{name}",
                 tally=tally,
                 output_path=brief,
+                max_turns=ARGUMENT_RESEARCH_MAX_TURNS,
                 required_outputs=required,
                 manifest_path=manifest_path,
                 artifact_id=f"argument/research/{name}",
@@ -1231,131 +1352,134 @@ async def run_strengthen_pipeline(
 
     ledger_path = outputs_dir / "evidence-ledger.jsonl"
     evidence_map = outputs_dir / "stage1" / "evidence-map.md"
-    curator_dependencies = (
+    research_dependencies = (
         "run-manifest.json",
         "context/argument-request.md",
         "stage1/*-brief.md",
         "stage1/*-evidence.jsonl",
     )
-    curator_outputs = (
-        (evidence_map, contract_for_path(evidence_map)),
-        (ledger_path, ArtifactContract("jsonl", min_records=0)),
-    )
-    curator_can_resume = bool(
-        resume
-        and _required_outputs_complete(curator_outputs)
-        and _required_outputs_match_manifest(
-            curator_outputs,
-            manifest_path,
-            curator_dependencies,
-        )
-    )
-    if not curator_can_resume:
-        ledger = build_evidence_ledger(
-            selected_agents=request.selected_agents,
-            stage1_dir=outputs_dir / "stage1",
-            output_path=ledger_path,
-        )
-        update_artifact(
-            manifest_path,
-            ledger_path,
-            validate_artifact(ledger_path, ArtifactContract("jsonl", min_records=0)),
-            artifact_id="argument/evidence-ledger",
-            producer="orchestrator",
-        )
-        await emit(
-            "evidence_update",
-            ledger_path=str(ledger_path),
-            record_count=ledger.record_count,
-            agents_without_evidence=ledger.agents_without_evidence,
-            invalid_record_count=len(ledger.invalid_records),
-        )
-    curator_prompt = (
-        "Read the argument request, all selected research briefs in "
-        "`outputs/stage1/`, and `outputs/evidence-ledger.jsonl`. Reconcile duplicate "
-        "findings, disagreements, primary-source quality, and the strongest "
-        "counter-case. Use targeted web research only for a small number of "
-        "load-bearing gaps. Update the canonical evidence ledger in place with any "
-        "new verified evidence.\n\nWrite a compact argument kit—not a report—to "
-        "`outputs/stage1/evidence-map.md`. Rank the evidence the strategist should "
-        "use, state what not to claim, and identify any unresolved limits."
-    )
-    await _run_agent(
-        agent=by_name["evidence-curator"],
-        user_prompt=curator_prompt,
-        model=_model("curation"),
-        cwd=repo_root,
-        step_label="argument/evidence-curation",
-        tally=tally,
-        output_path=evidence_map,
-        required_outputs=((ledger_path, ArtifactContract("jsonl", min_records=0)),),
-        manifest_path=manifest_path,
-        artifact_id="argument/evidence-map",
-        dependency_inputs=curator_dependencies,
+    ledger = build_evidence_ledger(
+        selected_agents=request.selected_agents,
+        stage1_dir=outputs_dir / "stage1",
+        output_path=ledger_path,
     )
     ledger = normalise_evidence_ledger(ledger_path)
-    curator_fingerprint = build_dependency_fingerprint(
-        manifest_path, curator_dependencies
-    )
-    update_artifact(
-        manifest_path,
-        evidence_map,
-        validate_artifact(evidence_map, contract_for_path(evidence_map)),
-        artifact_id="argument/evidence-map",
-        producer="evidence-curator",
-        dependencies=curator_fingerprint,
-    )
     update_artifact(
         manifest_path,
         ledger_path,
         validate_artifact(ledger_path, ArtifactContract("jsonl", min_records=0)),
         artifact_id="argument/evidence-ledger",
-        producer="evidence-curator",
-        dependencies=curator_fingerprint,
+        producer="orchestrator",
+        dependencies=build_dependency_fingerprint(
+            manifest_path, research_dependencies
+        ),
     )
     await emit(
         "evidence_update",
         ledger_path=str(ledger_path),
         record_count=ledger.record_count,
-        agents_without_evidence=[],
+        agents_without_evidence=ledger.agents_without_evidence,
         invalid_record_count=len(ledger.invalid_records),
     )
 
-    # Stage 2 — write only the strengthened argument.
-    await emit("stage_start", stage=2, label="Rebuilding the argument around the evidence")
+    # OpenAI Deep Research returns a brief but not claim-level JSONL. Only the
+    # all-OpenAI edge case needs the legacy curation call; the normal focused
+    # path folds evidence ranking into the Strategist call below.
+    evidence_map_ready = False
+    if ledger.record_count == 0:
+        curator_prompt = (
+            "Read the argument request and all selected research briefs in "
+            "`outputs/stage1/`. Recover only claim-level, primary-source evidence "
+            "needed for the one-page memo. Write a compact argument kit to "
+            "`outputs/stage1/evidence-map.md` and canonical evidence records to "
+            "`outputs/evidence-ledger.jsonl`. Do not broaden the research."
+        )
+        await _run_agent(
+            agent=by_name["evidence-curator"],
+            user_prompt=curator_prompt,
+            model=_model("curation"),
+            cwd=repo_root,
+            step_label="argument/evidence-fallback",
+            tally=tally,
+            output_path=evidence_map,
+            max_turns=ARGUMENT_SYNTHESIS_MAX_TURNS,
+            required_outputs=((ledger_path, ArtifactContract("jsonl", min_records=1)),),
+            manifest_path=manifest_path,
+            artifact_id="argument/evidence-map",
+            dependency_inputs=research_dependencies,
+        )
+        ledger = normalise_evidence_ledger(ledger_path)
+        evidence_map_ready = True
+
+    # Stage 2 — rank the evidence and write the strengthened memo in one pass.
+    await emit("stage_start", stage=2, label="Sharpening the argument into a one-page memo")
     strategist_draft = outputs_dir / "stage2" / "strategist-draft.md"
+    evidence_map_instruction = (
+        "Use the existing `outputs/stage1/evidence-map.md` as the ranked argument "
+        "kit; do not rewrite it."
+        if evidence_map_ready
+        else (
+            "First rank the few facts that actually carry the case, reconcile "
+            "duplication and disagreement, and state what the memo must not claim. "
+            "Write that compact argument kit to `outputs/stage1/evidence-map.md`."
+        )
+    )
     strategist_prompt = (
         "Read `outputs/context/argument-request.md`, every selected research brief, "
-        "`outputs/stage1/evidence-map.md`, and `outputs/evidence-ledger.jsonl`.\n\n"
-        "Rewrite the supplied argument into one concise, standalone, evidence-driven "
-        "argument for the named audience. Preserve the author's intended position, "
-        "but sharpen the thesis, causal mechanism, quantitative anchors, named cases, "
-        "and strongest counter-case. Change or narrow the claim when the evidence "
-        "requires it. Do not describe the research process, agents, briefs, or Council. "
-        "Do not write an executive summary, table of contents, methodology, appendix, "
-        "or report sections. Aim for 600–1,200 words and never exceed 1,500 words. "
-        "Use reader-facing numeric Markdown footnotes for every material factual claim.\n\n"
-        "Write the complete argument to `outputs/stage2/strategist-draft.md`."
+        "and `outputs/evidence-ledger.jsonl`. "
+        + evidence_map_instruction
+        + "\n\n"
+        "Then rewrite the supplied argument as an exact one-page executive memo for "
+        "the named audience. Preserve the author's intended position, but make the "
+        "thesis unmistakable, explain the causal mechanism in plain English, use only "
+        "the strongest quantitative anchors or named cases, and answer the strongest "
+        "reasonable objection. Narrow the claim when the evidence requires it. Lead "
+        "with the conclusion. Use short paragraphs, concrete nouns, active verbs, and "
+        "ordinary English. No scene-setting, literature review, throat-clearing, process "
+        "language, executive summary, methodology, table of contents, or appendix. "
+        f"The reader-facing body must be {ARGUMENT_MEMO_LENGTH}. Use exactly these H2 "
+        "sections: `Bottom line`, `Why it holds`, `Strongest objection`, and `What to "
+        "do now`. Use reader-facing numeric Markdown footnotes for every material "
+        "factual claim.\n\nWrite the memo to "
+        "`outputs/stage2/strategist-draft.md`."
+    )
+    strategist_dependencies = (
+        "run-manifest.json",
+        "context/argument-request.md",
+        "stage1/*-brief.md",
+        "evidence-ledger.jsonl",
+        *(("stage1/evidence-map.md",) if evidence_map_ready else ()),
     )
     await _run_agent(
         agent=by_name["strategist"],
         user_prompt=strategist_prompt,
-        model=_model("synthesis"),
+        model=_model("argument_synthesis"),
         cwd=repo_root,
         step_label="argument/strategist",
         tally=tally,
         output_path=strategist_draft,
+        max_turns=ARGUMENT_SYNTHESIS_MAX_TURNS,
         artifact_contract=ArtifactContract("markdown", min_words=250),
+        required_outputs=(
+            ()
+            if evidence_map_ready
+            else ((evidence_map, contract_for_path(evidence_map)),)
+        ),
         manifest_path=manifest_path,
         artifact_id="argument/strategist-draft",
-        dependency_inputs=(
-            "run-manifest.json",
-            "context/argument-request.md",
-            "stage1/*-brief.md",
-            "stage1/evidence-map.md",
-            "evidence-ledger.jsonl",
-        ),
+        dependency_inputs=strategist_dependencies,
     )
+    if not evidence_map_ready:
+        update_artifact(
+            manifest_path,
+            evidence_map,
+            validate_artifact(evidence_map, contract_for_path(evidence_map)),
+            artifact_id="argument/evidence-map",
+            producer="strategist",
+            dependencies=build_dependency_fingerprint(
+                manifest_path, strategist_dependencies
+            ),
+        )
 
     # Stage 3 — independent source verification and publication text gate.
     await emit("stage_start", stage=3, label="Verifying every load-bearing claim")
@@ -1368,8 +1492,11 @@ async def run_strengthen_pipeline(
         "the research briefs, and the supplied argument material. Check every number, "
         "named example, attribution, causal claim, date, denominator, and footnote. "
         "Remove or narrow anything you cannot verify. Preserve a concise argument; do "
-        "not expand it into a report. The released text may contain no internal Council "
-        "language or unverified tags.\n\n"
+        "not expand it into a report or academic article. Preserve the exact memo "
+        "sections, keep the reader-facing body between 350 and 550 words, lead with the "
+        "conclusion, and replace abstract or scholarly phrasing with short, direct "
+        "English. The released text may contain no internal Council language or "
+        "unverified tags.\n\n"
         "Write the verified argument to `outputs/stage3/final-draft.md`, the verification "
         "log to `outputs/stage3/fact-check-report.md`, and claim lineage to "
         "`outputs/claim-lineage.jsonl` using your charter's JSONL schema. For each "
@@ -1399,6 +1526,7 @@ async def run_strengthen_pipeline(
         step_label="argument/fact-check",
         tally=tally,
         output_path=final_draft,
+        max_turns=ARGUMENT_FACTCHECK_MAX_TURNS,
         artifact_contract=ArtifactContract("markdown", min_words=250),
         required_outputs=(
             (fact_report, contract_for_path(fact_report)),
@@ -1430,7 +1558,8 @@ async def run_strengthen_pipeline(
             agent_names=[*request.selected_agents, *process_names],
             claim_lineage_path=lineage_path,
             output_format="argument",
-            length_instruction="250–1,500 words",
+            length_instruction=ARGUMENT_MEMO_LENGTH,
+            readability_profile="executive_memo",
             raise_on_failure=False,
         )
         return current_lineage, current_validation, current_quality
@@ -1488,7 +1617,9 @@ async def run_strengthen_pipeline(
             "under `outputs/stage3/lineage-remediation-input/`, together with "
             "`outputs/evidence-ledger.jsonl` and the underlying primary sources. "
             "Perform one bounded release remediation. Preserve the concise argument "
-            "unless a factual claim must be removed or narrowed.\n\n"
+            "unless a factual claim must be removed or narrowed. Preserve the four "
+            "required memo headings and repair any word-count, paragraph-density, "
+            "sentence-density, or academic-register blocker in plain English.\n\n"
             "Rebuild claim lineage around the reader-facing draft, not around source "
             "metadata: create exactly one retained record per footnote marker; copy "
             "the complete sentence or table row immediately cited by that marker "
@@ -1516,6 +1647,7 @@ async def run_strengthen_pipeline(
             step_label="argument/fact-check-remediation",
             tally=tally,
             output_path=final_draft,
+            max_turns=ARGUMENT_REMEDIATION_MAX_TURNS,
             artifact_contract=ArtifactContract("markdown", min_words=250),
             required_outputs=(
                 (fact_report, contract_for_path(fact_report)),
@@ -1539,7 +1671,8 @@ async def run_strengthen_pipeline(
             agent_names=[*request.selected_agents, *process_names],
             claim_lineage_path=lineage_path,
             output_format="argument",
-            length_instruction="250–1,500 words",
+            length_instruction=ARGUMENT_MEMO_LENGTH,
+            readability_profile="executive_memo",
             raise_on_failure=True,
         )
     update_artifact(
@@ -1582,18 +1715,67 @@ async def run_strengthen_pipeline(
         warning_count=int(quality["warning_count"]),
     )
 
-    # Stage 4 — optional exact-length deck, then immutable archive and release.
+    # Stage 4 — exact one-page memo, optional deck, then archive and release.
     await emit(
         "stage_start",
         stage=4,
         label=(
-            f"Building an exact {request.slide_count}-slide deck"
+            f"Building a one-page memo and exact {request.slide_count}-slide deck"
             if request.want_pptx
-            else "Archiving and releasing the strengthened argument"
+            else "Building and inspecting the one-page memo"
         ),
     )
+    from cli.docx_builder import build_one_page_argument_memo
+    from cli.orchestrator import run_word_visual_inspection
+
+    memo_path, _memo_receipt = build_one_page_argument_memo(
+        slug=request.slug,
+        title=request.title,
+        final_draft=final_draft,
+        out_dir=outputs_dir / "stage4",
+    )
+    memo_dependencies = (
+        "run-manifest.json",
+        "stage3/final-draft.md",
+        "quality-gate.json",
+        "claim-lineage.jsonl",
+    )
+    update_artifact(
+        manifest_path,
+        memo_path,
+        validate_artifact(memo_path),
+        artifact_id="argument/word-memo",
+        producer="orchestrator",
+        role="word_memo",
+        dependencies=build_dependency_fingerprint(
+            manifest_path, memo_dependencies
+        ),
+    )
+
+    async def inspect_memo() -> None:
+        await run_word_visual_inspection(
+            artifacts=[memo_path],
+            outputs_dir=outputs_dir,
+            all_agents=all_agents,
+            tally=tally,
+            manifest_path=manifest_path,
+            step_label="argument/word-visual-inspection",
+            max_turns=ARGUMENT_WORD_INSPECTION_MAX_TURNS,
+        )
+
     deck_path: Path | None = None
     if request.want_pptx:
+        visual_path, _ = await asyncio.gather(
+            _build_argument_visual_brief(
+                request=request,
+                repo_root=repo_root,
+                outputs_dir=outputs_dir,
+                agents=by_name,
+                tally=tally,
+                manifest_path=manifest_path,
+            ),
+            inspect_memo(),
+        )
         deck_path = await _build_argument_deck(
             request=request,
             repo_root=repo_root,
@@ -1601,14 +1783,33 @@ async def run_strengthen_pipeline(
             agents=by_name,
             tally=tally,
             manifest_path=manifest_path,
+            visual_path=visual_path,
         )
+    else:
+        await inspect_memo()
+
+    publishing_quality_path = outputs_dir / "publishing-quality.json"
+    update_artifact(
+        manifest_path,
+        publishing_quality_path,
+        validate_artifact(
+            publishing_quality_path,
+            ArtifactContract(
+                "json",
+                required_keys=("artifact", "kind", "ok", "issues"),
+            ),
+        ),
+        artifact_id="argument/word-publishing-quality",
+        producer="orchestrator",
+    )
     archive_dir = _archive_strengthen_run(
         repo_root=repo_root, request=request, tally=tally
     )
-    argument_release, deck_release = _publish_strengthen_release(
+    argument_release, memo_release, deck_release = _publish_strengthen_release(
         repo_root=repo_root,
         request=request,
         final_argument=final_draft,
+        memo=memo_path,
         deck=deck_path,
         archive_dir=archive_dir,
     )
@@ -1617,6 +1818,7 @@ async def run_strengthen_pipeline(
     _clear_outputs(outputs_dir)
     result.archive_path = archive_dir
     result.argument_path = argument_release
+    result.memo_path = memo_release
     result.deck_path = deck_release
     result.completed = True
     await emit(
@@ -1626,6 +1828,7 @@ async def run_strengthen_pipeline(
         mode="strengthen",
         total=tally.total,
         archive=archive_dir.relative_to(repo_root).as_posix(),
+        memo=str(memo_release.relative_to(repo_root)),
         slide_count=request.slide_count,
     )
     _notify_done(

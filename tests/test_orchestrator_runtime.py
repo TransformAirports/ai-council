@@ -550,6 +550,65 @@ class AgentRuntimeTests(unittest.TestCase):
             self.assertAlmostEqual(tally.total, 0.25)
             self.assertEqual(journaled, [0.25])
 
+    def test_max_turn_result_and_cleanup_error_accept_complete_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.md"
+            evidence = root / "evidence.jsonl"
+
+            async def fake_query(*, prompt, options):
+                del prompt, options
+                output.write_text(
+                    " ".join(["complete"] * 120), encoding="utf-8"
+                )
+                evidence.write_text(
+                    json.dumps({"claim": "A supported claim."}) + "\n",
+                    encoding="utf-8",
+                )
+                yield ResultMessage(
+                    subtype="error_max_turns",
+                    duration_ms=1,
+                    duration_api_ms=1,
+                    is_error=True,
+                    num_turns=24,
+                    session_id="test-session",
+                    stop_reason="tool_use",
+                    total_cost_usd=0.75,
+                )
+                raise Exception(
+                    "Claude Code returned an error result: "
+                    "Reached maximum number of turns (24)"
+                )
+
+            tally = CostTally()
+            with patch("claude_agent_sdk.query", fake_query):
+                result = asyncio.run(
+                    _run_agent(
+                        agent=_agent(root),
+                        user_prompt="Research and write the required files.",
+                        model="test-model",
+                        cwd=root,
+                        step_label="test/max-turn-recovery",
+                        tally=tally,
+                        output_path=output,
+                        artifact_contract=ArtifactContract(
+                            "markdown", min_words=100
+                        ),
+                        required_outputs=((
+                            evidence,
+                            ArtifactContract("jsonl", min_records=1),
+                        ),),
+                    )
+                )
+
+            self.assertFalse(result["skipped"])
+            self.assertEqual(result["turns"], 24)
+            self.assertEqual(result["cost"], 0.75)
+            self.assertTrue(output.is_file())
+            self.assertTrue(evidence.is_file())
+            self.assertEqual(list(root.glob("*.partial-*")), [])
+            self.assertAlmostEqual(tally.total, 0.75)
+
     def test_resume_requires_the_complete_atomic_artifact_set(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

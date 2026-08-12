@@ -1,0 +1,104 @@
+# Director of Public Safety — Independent Research Brief
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Chair:** Director of Public Safety, top-tier US hub airport (sworn police, ARFF/structural fire, and airport PSAP under a single command)
+**Author lens:** 25 years sworn, command-level activation experience, Part 139 ARFF Index E operating environment, FAA AC 150/5200-31C compliant Airport Emergency Plan, TSA 1542 Airport Security Coordinator
+**Date:** 2026-08-06
+
+---
+
+## 1. Position in one paragraph
+
+I support a MWAA quiet-by-design standard, on one condition: MWAA must define "quiet" as *intelligible and controllable*, not as *silent*. Every North American mass-casualty and mass-evacuation event at an airport in the last decade — Fort Lauderdale-Hollywood on January 6, 2017, Los Angeles on November 1, 2013, the JFK Terminal 8 self-evacuation of August 14, 2016, and roughly a dozen unattended-bag closures at large hubs since — turned on the same failure mode: the terminal's audio, visual, and mobile communication stack could not dominate a crowd once panic set in. A quiet-by-design standard is the correct moment to fix that stack, because acoustics, PA zoning, emergency voice/alarm systems (EVACS), digital signage, and staffed communication either work together or fail together, and the cost of reordering that stack after commissioning is roughly three times the cost of ordering it before commissioning. If MWAA writes the standard well, it is a safety upgrade wearing a passenger-experience jacket. If MWAA writes it badly, the next FLL after-action report cites the standard by name.
+
+## 2. Key findings
+
+1. **"Quiet" and "unintelligible" are not synonyms — and today they get conflated.** NFPA 72 requires an average Speech Transmission Index (STI) of ≥ 0.50 across the acoustically distinguishable space (ADS) and ≥ 0.45 at 90 percent of measurement points for emergency voice/alarm systems [Source: https://sdifire.com/ensuring-clear-communication/]. Reducing ambient noise (chimes, non-safety paging, muted TVs, HVAC treatment) *raises* the signal-to-noise ratio and generally *improves* STI. The public safety case for the standard is that a properly executed quiet baseline makes emergency voice communication more effective, not less.
+
+2. **Federal law requires redundant channels regardless of the branding.** IBC 907.5.2.2 requires an emergency voice/alarm communication system in Group A occupancies over 300 occupants; airport terminals are Group A-3. Voice evacuation is mandatory for assembly loads above 1,000 [Source: https://engineersuniverse.com/studios/fire-alarm/fire-alarm-codes-by-building-type]. 14 CFR § 139.325 requires each certificated airport's Airport Emergency Plan to include "a communications network." 49 CFR Part 27 and 14 CFR Part 382 Subpart D require effective communication with passengers with disabilities, including visual counterparts to audible information. A quiet standard cannot legally strip any of these; it must specify how they interlock.
+
+3. **The FLL 2017 incident is the single most important case study, and it is not primarily a police story — it is a communications story.** The active shooting itself lasted under 80 seconds. The self-evacuation of roughly 12,000 people onto the tarmac 90 minutes later, triggered by unfounded reports of a second shooter, injured more than 50 and closed the airport for the day. The Broward County after-action review found that "the public address system was only broadcasting messages inside the terminal" while passengers were on the ramp; a surge of roughly 2,600 responding officers overwhelmed the interoperable radio system for approximately four minutes; and passengers who fled had abandoned phones and radios [Source: https://airportimprovement.com/article/fort-lauderdale-int-l-shares-lessons-learned-2017-active-shooter-tragedy/][Source: https://www.policinginstitute.org/uncategorized/fort-lauderdale-hollywood-international-airport-active-shooter-incident-and-post-event-response/]. FLL's remediation was not to add PA — it was to add *channels*: 50 bullhorns with 1,200-foot outdoor range, IPAWS geofenced cellphone alerts, and terminal-wide employee communications training.
+
+4. **LAX 2013 is the peer case.** The independent 100-page after-action review of the November 1, 2013 Terminal 3 shooting identified the absence of an interoperable radio backbone across LAX police, LAPD, LAFD, and 20+ responding agencies as the primary failure; the airport's mass-notification path to passengers was also inadequate. LAWA subsequently invested over $2 million in centralized PA, digital messaging, and mobile push [Source: https://www.cbsnews.com/losangeles/news/report-serious-communication-flaws-hampered-lax-shooting-response/][Source: https://www.lawa.org/news-releases/2014/news-release25]. The pattern across FLL and LAX is identical: the terminal's routine acoustic environment was never designed to carry a crisis message to every occupant in every space.
+
+5. **The "silent airport" peers are quieter, not silent — and their emergency stack is untouched.** Copenhagen (CPH) and Helsinki (HEL, silent since 2015) eliminated routine flight and passenger paging, retaining announcements at the departure gate, during irregular operations, and in emergencies [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. Amsterdam Schiphol's fully silent period is a two-minute annual commemoration on May 4, not an operating policy [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]. Any MWAA reader who transfers the branding without the operating model is buying the wrong thing.
+
+6. **MWAA's architecture makes intelligibility harder, not easier.** Saarinen's IAD main terminal (1962) is a National Historic Landmark; DCA Terminal 1 (1941, Charles M. Goodman) is on the National Register; DCA Terminal 2 (National Hall, Pelli, 1997) is a vaulted high-volume space [context: airport-context.md §9]. High reverberation times in these envelopes drive STI down before a system engineer ever specifies a loudspeaker. Retrofitting acoustics or PA inside these envelopes triggers Section 106 historic-preservation review when federal action is present. The greenfield Concourse E (opening autumn 2026, ~435,000 sq ft, first substantial new IAD terminal space in decades [context §4]) is the only near-term opportunity to build to a new standard clean.
+
+7. **MWAA operates its own police and fire under one command — that is a structural advantage the standard should exploit.** MWAA Police Department is a sworn, accredited agency with Commonwealth of Virginia certification, jurisdiction across three counties (Fairfax, Loudoun, Arlington) and the Dulles Toll Road [Source: https://www.mwaa.com/police]. MWAA Fire & Rescue was carved out of FAA ARFF at the 1987 transfer and operates ARFF, structural, EMS (BLS/ALS), river rescue at DCA, technical rescue, and hazmat for both airports [Source: https://en.wikipedia.org/wiki/Metropolitan_Washington_Airports_Authority_Fire_and_Rescue_Department]. Unlike hubs that rely on a host municipal police or fire department, MWAA controls its own radio infrastructure, dispatch, and Airport Emergency Plan communications architecture end-to-end. That means the quiet-by-design standard can be enforced *inside* the same command that owns emergency response — a rare governance alignment other airports would envy.
+
+8. **DCA sits inside a heightened-safety political environment after January 29, 2025.** The midair collision between PSA 5342 and a U.S. Army UH-60 killed 67 and triggered helicopter-route reviews and temporary flight restrictions [context §6]. Every DCA public-safety recommendation, including any change to the audible information environment, will be read by the DCA congressional delegation, DOT, and NTSB through a heightened-scrutiny lens. This is not a reason to avoid the standard. It is a reason to over-document the emergency-communications preservation inside it.
+
+## 3. Evidence
+
+### 3.1 Intelligibility floors and code requirements
+
+NFPA 72 (2025 edition, Annex D) treats an emergency voice/alarm system as compliant when 90 percent of measurement points within an acoustically distinguishable space measure STI ≥ 0.45 and average STI ≥ 0.50 (equivalent to 0.70 CIS) [Source: https://sdifire.com/ensuring-clear-communication/]. Values above 0.50 are treated as suitable for life-safety voice communication in the professional practice literature; below 0.45 the message is not defensibly comprehensible for evacuation instructions [Source: https://en.wikipedia.org/wiki/Speech_transmission_index].
+
+IBC 907.5.2.2 requires EVACS in Group A occupancies with more than 300 occupants and mandatory voice-evacuation systems in assembly occupancies above 1,000, designed and installed to NFPA 72 [Source: https://engineersuniverse.com/studios/fire-alarm/fire-alarm-codes-by-building-type]. Airport terminals fall inside Group A-3, and a MWAA departures hall regularly runs at loads well above these thresholds.
+
+FAA AC 150/5200-31C is the governing Airport Emergency Plan advisory circular under 14 CFR § 139.325; the plan must include a communications network capable of prompt notification [context §8].
+
+### 3.2 Fort Lauderdale-Hollywood, January 6, 2017
+
+The shooting lasted under 80 seconds. Five dead, six wounded. Approximately 90 minutes later, unfounded reports of a second shooter triggered self-evacuation of roughly 12,000 people, more than 50 hospitalizations from panic-related injuries, and closure of the airport [Source: https://www.policinginstitute.org/uncategorized/fort-lauderdale-hollywood-international-airport-active-shooter-incident-and-post-event-response/].
+
+Key AAR findings, per the Broward County Aviation Department and the airport's public briefings: (a) the PA system reached only interior terminal spaces, not the ramp where thousands of passengers had fled; (b) an approximate 2,600-officer surge overwhelmed the interoperable radio system for about four minutes; (c) passengers who ran had abandoned personal devices and airport radios; (d) remediation included IPAWS geofenced cellphone alerting, 50 bullhorns with 1,200-foot radius for outdoor coverage, and terminal-wide communications training [Source: https://airportimprovement.com/article/fort-lauderdale-int-l-shares-lessons-learned-2017-active-shooter-tragedy/]. Airport Director Mark Gale quoted: "I don't think that we could have envisioned a secondary incident with the magnitude of what we experienced" — a direct admission that the pre-2017 communications architecture assumed the crisis stayed inside the building.
+
+### 3.3 Los Angeles International, November 1, 2013
+
+One TSA officer killed, three others injured. Independent AAR: absence of interoperable radio across 20+ agencies, inadequate emergency alert and warning system, incident-command shortfalls, and inadequate passenger-facing communication [Source: https://www.cbsnews.com/losangeles/news/report-serious-communication-flaws-hampered-lax-shooting-response/]. LAWA subsequently built a centralized PA, added 11 roadway message signs, cell-push messaging, visual messaging inside terminals, and spent more than $2 million on the notification stack [Source: https://www.lawa.org/news-releases/2014/news-release25].
+
+### 3.4 The false-alarm baseline
+
+JFK Terminal 8 (August 14, 2016) was self-evacuated by passengers acting on unfounded shots-fired 911 calls. JFK Terminal 1 (June 2016) was evacuated for a bag that turned out to be a false hit. LaGuardia Terminal B (September 2016) was evacuated for a suspicious vehicle later cleared [Source: https://www.nbcnews.com/news/us-news/airport-false-alarms-expose-danger-panicked-evacuations-experts-say-n639456]. These are not exotic events. They are the modal public-safety event at a large hub, occurring several times a year across the top 20 US airports. Any quiet-by-design standard must be tested against this event class, not against a hypothetical calm evacuation.
+
+### 3.5 Peer "silent airport" reality
+
+Copenhagen: no routine "go to gate" or "boarding" announcements; information on screens; announcements retained at gate, during irregular operations, and for emergencies [Source: https://www.cph.dk/en/practical/gate-information-and-boarding]. Helsinki: silent since 2015 on routine flight and passenger paging; announcements retained at the gate and for emergencies [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. Amsterdam Schiphol: annual two-minute silence for war remembrance, not a routine policy [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]. None of these operators has publicly documented a reduction in emergency voice/alarm capacity.
+
+### 3.6 Federal accessibility overlay
+
+Under the DOT ADA rule (49 CFR Part 27) and 14 CFR Part 382 Subpart D, airports must provide accessible facilities and effective communication for passengers with disabilities [Source: https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382/subpart-D]. DOJ's 2010 ADA Standards require title II entities (which MWAA functionally serves as, given its public-body status) to communicate as effectively with people with communication disabilities as with the general public [Source: https://www.ada.gov/effective-comm.htm]. Removing audible information without a mandatory visual counterpart — of documented equivalency — is not defensible under this stack.
+
+### 3.7 Wireless/IPAWS as a channel MWAA does not fully own
+
+IPAWS geo-targeted Wireless Emergency Alerts are the standard post-FLL remediation for reaching passengers who have physically left the building [Source: https://www.fema.gov/emergency-managers/practitioners/integrated-public-alert-warning-system]. Two known constraints: only about 34 percent of active US smartphones supported enhanced geo-targeting as of the July 2021 CTIA study, meaning a WEA sent for "IAD Concourse C" will spill to nearby cell sectors [Source: https://www.fema.gov/sites/default/files/documents/fema_ipaws-tip-41-wea-geo-targeting-360.pdf]; and only credentialed local, state, tribal, or federal alerting authorities can push through the IPAWS gateway. MWAA would need its own IPAWS credential and internal governance to actuate this at 3 AM. Reliance on Arlington County, Fairfax County, or Loudoun County to push a WEA for a MWAA incident inserts a jurisdictional handoff at the moment where seconds count.
+
+### 3.8 Evidence gap named honestly
+
+I could not retrieve the current MWAA Design Manual sections on acoustics, PA zoning, EVACS, or FIDS in the time budget of this pass, and the context packet explicitly warns those sections are not verified [context §12]. Any specific claim about *what MWAA already requires* is a matter of primary-document retrieval before the standard is drafted, not a matter I infer here.
+
+## 4. The public safety case for the thesis
+
+The strongest argument for a quiet-by-design standard is that it forces a conversation the airport does not otherwise have. Today, acoustic performance, PA design, EVACS commissioning, FIDS refresh, mobile notification, and staffed communication live in six different chapters of six different documents owned by four different departments (Engineering, IT, Airline Services, and Public Safety), and they get integrated for the first time during commissioning — which is exactly when integration is most expensive and most likely to be deferred. A unified standard, owned by a named executive with change-control authority, is how you fix that pattern before the ribbon-cutting.
+
+The second argument is that reduced non-safety paging *helps* emergency voice communication. Ambient chimes, redundant boarding calls, muted-TV audio bleed, and non-critical concessionaire PA all raise the noise floor in the exact acoustic environment where the EVACS has to deliver an STI ≥ 0.50 message. Removing that noise floor is a life-safety upgrade, not a comfort upgrade. Public safety benefits when the emergency channel has less competition.
+
+The third argument is that Concourse E is opening in autumn 2026 and the expanded Dulles program is contemplating $20–22.5B over roughly a decade [context §4]. If MWAA does not set the standard before those procurements harden, the operator will inherit a heterogeneous mix of vendor solutions with no coherent commissioning specification — and inherit the audio failure modes that come with them.
+
+## 5. The public safety case against the thesis
+
+The most dangerous version of this standard is one written by an aesthetics committee and enforced by procurement. Three specific failure modes I would flag to the Strategist:
+
+1. **"Fewer announcements" being interpreted by tenants and airlines as "fewer emergency messages."** In a signatory-carrier environment (MWAA runs a U&L, not an airport-of-use model), airlines and concessions push back on operator rules that constrain their commercial paging. If the standard is not explicit about which announcement categories are non-negotiable — security directives, evacuation, shelter-in-place, IROPS mass-communications during a real event — the airlines will interpret ambiguity in their favor and the operator will find out during an incident.
+
+2. **Removing PA coverage from spaces the standard treats as non-critical.** The FLL AAR is unambiguous: the crisis moves to the ramp, the roadway, the garage, the AeroTrain platform, the CBP FIS queue, the curb. A quiet-by-design standard that reduces coverage in those "back-of-house" or "transitional" spaces to save capital cost is the standard that produces the next AAR. Non-terminal spaces must be inside the standard, not exceptions to it.
+
+3. **Historic-preservation constraints forcing under-performance inside the Saarinen and Goodman envelopes.** MWAA cannot install every acoustic treatment or loudspeaker geometry it wants inside a National Historic Landmark. A standard that specifies performance metrics (STI, sound-pressure level, coverage) without also specifying variance procedures for landmark spaces will either be violated on day one or force a slower, more expensive Section 106 process no one budgeted.
+
+## 6. Five operational realities a strategist can use
+
+1. **NFPA 72 STI 0.50 average / 0.45 at 90 percent of points is the compliance floor for every terminal MWAA operates today.** Not aspirational, not "considered." A failure to meet it is a citation-eligible finding under the adopted local building code and a plaintiff's exhibit after a mass-notification failure [Source: https://sdifire.com/ensuring-clear-communication/].
+
+2. **The FLL post-2017 remediation cost pattern is the benchmark, not an outlier.** Bullhorns for outdoor coverage, IPAWS credentialing and integration, geofenced WEA capability, and terminal-wide employee communications training — that stack, at a hub scale, runs seven figures capital and mid-six figures annual O&M. If the standard omits it, MWAA is voluntarily buying the FLL 2017 posture [Source: https://airportimprovement.com/article/fort-lauderdale-int-l-shares-lessons-learned-2017-active-shooter-tragedy/].
+
+3. **MWAA holds its own police, fire, and dispatch under one command — a governance advantage most hubs lack.** MWAA Police Department is a sworn accredited Virginia agency with jurisdiction across three counties and the Dulles Toll Road. MWAA Fire & Rescue owns ARFF, structural, EMS, technical rescue, hazmat, and river rescue at DCA [Source: https://www.mwaa.com/police][Source: https://en.wikipedia.org/wiki/Metropolitan_Washington_Airports_Authority_Fire_and_Rescue_Department]. The standard can be enforced inside the same command that owns Airport Emergency Plan execution. Airports without integrated public safety cannot say this.
+
+4. **DCA sits inside a post-January 29, 2025 political environment.** Any recommendation touching DCA emergency communications will be read by NTSB, DOT, and Congress through a heightened-scrutiny lens because of the PSA 5342 / UH-60 collision [context §6]. Over-document the emergency-communications preservation inside any DCA-facing element.
+
+5. **Concourse E is the pilot the standard needs.** Opening autumn 2026, ~435,000 sq ft, 14 United gates, direct AeroTrain access [context §4] — the first substantial new IAD terminal space in decades and the only near-term opportunity to build clean to a new standard. If MWAA locks the standard before Concourse E opens, that concourse becomes the reference installation and internal STI/coverage baseline. If not, MWAA will retrofit later at multiples of the price.
+
+---
+
+*Independent brief. No other Stage 1 outputs consulted. Evidence trail in `director-of-public-safety-evidence.jsonl`.*

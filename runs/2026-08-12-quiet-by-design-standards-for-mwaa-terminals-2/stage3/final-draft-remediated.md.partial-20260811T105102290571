@@ -1,0 +1,130 @@
+# The Loud Terminal Is the Unintelligible One
+
+**A communications-integrity standard for MWAA terminals — argued as safety engineering, delivered through the Design Manual.**
+
+*Run: quiet-by-design-standards-for-mwaa-terminals-2 · Remediated final draft (Stage 3, post-gate) · 2026-08-11*
+
+---
+
+## Executive Summary
+
+MWAA holds approximately $6.99 billion of committed capital at IAD and $2.39 billion at DCA under the fifteen-year Airline Use and Lease Agreement effective January 1, 2025.[^1] On July 29, 2026, the President, the U.S. Transportation Secretary, United's CEO, and MWAA jointly announced a Dulles transformation described at more than $20 billion, provisional pending Board action.[^2] Every square foot of that work passes through the seven-volume MWAA Design Manual.[^3]
+
+The recommendation is narrow: add a tiered communications-integrity standard to the Design Manual this capital cycle, issued by the Office of Engineering under delegated standards-setting authority, taken to the Board as an information item at the next Business Administration Committee, and escalated to a resolution only if AAAC consultation surfaces material airline objection or an AUL cost-center reclassification. After the January 29, 2025 midair collision and the February 2026 NTSB final report, the standard is defensible only as a floor that raises the probability the announcement that matters — the gate change, the shelter-in-place, the IROPS diversion — reaches the passenger who needs it.[^4] NFPA 72 Chapter 24 requires a Speech Transmission Index of at least 0.45 at 90% of measurement locations in each Acoustically Distinguishable Space, average 0.50.[^5] ACRP Research Report 175 targets STI 0.50 with 10–15 dB(A) signal-to-noise;[^6] IEC 60268-16:2020 supplies the measurement method.[^7]
+
+Design-time acoustic treatment runs roughly two to four times below retrofit at commercial-benchmark midpoints, based on non-airport indicative pricing.[^8] The Design Manual binds consultants and contractors today; its reach into tenant audio is the subject of the amendment, contingent on verification of the 2025 AUL's majority-in-interest provisions.[^9] Debt-service coverage compresses from 1.63× in 2024 to roughly 1.3× through 2029 as approximately $5.5 billion of new debt phases in,[^10] which is why the amendment must be scoped to work still in programming, not programs already in design. The Board question is not whether to fund a program. It is whether to write the paragraph.
+
+---
+
+## The Loud Terminal Is the Unintelligible One
+
+Trade-press summaries of a Johns Hopkins ICU observation put alarm rates at 771 per bed per day.[^11] The Joint Commission's response was National Patient Safety Goal NPSG.06.01.01, phased in 2014 and 2016: every accredited hospital had to inventory its alarms, rank them, govern them, and prove it.[^12] Indiscriminate broadcast was itself the safety failure.
+
+The analogous condition in an airport holdroom is well documented. IAD moved 29.01 million passengers in 2025, 10.53 million of them international — the fastest 2025 growth among the fifty largest U.S. airports.[^13] DCA saw a year-over-year decline in 2025 following the January 29 collision[^4] and the 43-day federal shutdown. Every one of those passengers expected the announcement that mattered to reach them.
+
+MWAA is about to specify, from the studs up, an enormous run of new terminal space. The July 29 announcement covers more than 5 million square feet: Concourses C and D replaced, AeroTrain extended, mobile lounges retired, the Saarinen Main Terminal preserved.[^2] The committed AUL figures are firm — roughly $6.99 billion at IAD and $2.39 billion at DCA, the latter including the eventual replacement of the Terminal 1 main concourse.[^1] The anchor tenant has noticed the price. Cranky Flier described United CEO Scott Kirby as visibly uncomfortable and cited an airline briefing pegging fully loaded IAD transformation cost per enplanement at $90.64, against $12.88 today.[^14] A standard that lives in the Design Manual survives program shrinkage, re-scoping, or a change of administration. A case built on program durability does not.
+
+After NTSB AIR-26/02, no board member wants a policy paraphrased as "airport cuts safety announcements."[^4] That instinct is correct — and it is the argument. NFPA 72 Chapter 24 sets an intelligibility floor because a terminal is not one acoustic environment.[^5] You fail that floor by being loud, reverberant, and cross-broadcast: precisely the condition an unspecified terminal defaults to. High ambient noise pushes STI down the qualitative bands of IEC 60268-16 — toward "Poor" and "Bad" at the frequencies that matter most for emergency announcements.[^7] The louder the terminal, the less intelligible the announcement that counts.
+
+Other airports' reduced-announcement models are policy analogues, not design precedents. San Francisco International reports its Quiet Airport program removed roughly 90 minutes of daily announcement time in its International Terminal and reduced paging by roughly 40% — SFO's own figures, without published measurement methodology.[^15] The same record holds documented passenger complaints and missed-flight anecdotes.[^16] Announcement reduction without intelligibility engineering is subtraction, not design.
+
+The accessibility floor is non-negotiable. 28 CFR 35.160 obligates MWAA to ensure effective communication with people with disabilities.[^17] The 2010 ADA Standards §219 and §706 require assistive-listening systems in each assembly area where audible communication is integral to use.[^18] ACRP Report 239 treats digital-first substitution as partial, not sufficient, for travelers with disabilities and older adults.[^19] A regime that reduces broadcast without mandating redundant visual, digital, staffed, and hearing-loop channels compounds exclusion. One planning note: the Saarinen Main Terminal was determined National Register-eligible in 1978, and Section 106 consultation with the Virginia SHPO and ACHP runs six to eighteen months, longer with a Memorandum of Agreement[^20] — reason to keep the amendment's first applications outside the eligible-district envelope.
+
+Governance is the technology. Automated announcement platforms can be specified in Design Manual terms: centralized management, replay and audit logs of every broadcast, elimination of manual-initiation errors, templated multi-language delivery.[^21] Enforcement matters as much as the platform: annual acoustic inspections keyed to lease renewal, 30/60/90-day cure notices, lease-management escalation only for pattern noncompliance.
+
+The financial case rests on rework avoidance, not new capital. Commercial industry pricing provides two directional benchmarks: new-construction acoustic ceiling treatment at approximately $5–$15 per square foot and retrofit acoustic panel treatment at approximately $18–$45 — non-airport, medium-confidence indicative figures. Design-time treatment runs roughly two to four times below retrofit at the midpoints.[^8] An order-of-magnitude range for the full stack of $12–$40 million — ceiling premium, FIDS redundancy, mobile notification platform — sits between 0.17% and 0.57% of the committed IAD program.[^8] The window is narrow: debt-service coverage compresses from 1.63× in 2024 to roughly 1.3× through 2029 as some $5.5 billion of new debt phases in.[^10]
+
+The strongest counter-case is redundancy: NFPA 72, ADA, and ACRP 175 already set the floors that matter. Half-right. NFPA 72 Chapter 24 binds emergency voice; it does not require ADS mapping as a general design deliverable, govern routine PA, or compel governance of manual-initiation error. ACRP 175 is guidance, not code. The amendment's marginal content — the ADS map at each design milestone, representative-traffic commissioning, audit-logged governance, channel-redundancy floors, an IROPS override, and a tenant-audio boundary tied to the AUL — is exactly what the existing floors do not require.
+
+United operates about 50 jetbridge gates and moves about 67% of IAD traffic; American holds roughly 53% of DCA market share — both directional trade-press figures, not primary MWAA rate-setting disclosures.[^22] A standard that cannot reach tenant audio governs half the soundscape. The amendment, once the 2025 AUL's majority-in-interest provisions are confirmed, should be written to reach it.[^9] Exercise it first where friction is lowest: the DCA Terminal 1 concourse replacement or, if that project has passed scope-definition, the earliest IAD C/D element still in programming. Either way, Concourse E — opening this fall with fourteen new United gates[^23] — carries the first commissioned STI and ambient baseline under representative traffic. That baseline becomes the number every future MWAA facility is measured against.
+
+Return to the ICU. The Joint Commission did not tell hospitals to reduce alarms. It told them to prove which ones mattered, that those would be heard, and that the machinery for governing the rest was on the record. A decade later the ICUs are audible in the right places, at the right times, to the right people. That is what a communications-integrity standard buys an airport. The Board question is not whether to fund a program. It is whether to write the paragraph.
+
+---
+
+## Airport Decision Card
+
+**Owner and instrument.** MWAA President and CEO sponsors. Vice President for Engineering drafts and issues the amendment under the delegated standards-setting authority exercised for annual Design Manual revisions. Board receives it as an information item at the next Business Administration Committee (target: November 2026 cycle). A formal resolution is initiated only if AAAC consultation surfaces material airline objection or the 2025 AUL cost-center analysis requires MII treatment.
+
+**External framing convention.** Internal engineering name: "quiet-by-design." External policy name in all Board papers, press releases, DOT correspondence, and airline briefings: "MWAA Communications-Integrity Standard." MWAA Communications drafts and enforces the convention.
+
+**Airline-consultation lane (parallel to drafting, on the critical path).**
+- Weeks 1–3: confidential briefings to United and American executive station managers and capital counsels.
+- Week 4: formal AAAC briefing; thirty-day comment window opens.
+- Week 12: written MWAA position on cost-recovery categorization keyed to specific 2025 AUL cost centers. No amendment language enters any scope document until the Week 12 position letter is on the record.
+
+**First 180 days.**
+- **Days 1–30 — verification.** Current acoustic, PA-zoning, and STI content of the Design Manual; DCA Terminal 1 project phase; 2025 AUL MII and consultation text; NFPA 72 edition in force at each AHJ; Section 106 posture with Virginia SHPO and ACHP for any Saarinen-adjacent scope.[^20]
+- **Days 30–90 — drafting and stakeholder.** Mandatory-tier language keyed to NFPA 72 Ch. 24,[^5] ACRP 175,[^6] IEC 60268-16:2020,[^7] 28 CFR 35.160,[^17] and 29 CFR 1910.95.[^24] Airline-consultation lane; Fire Marshal briefings at each AHJ.
+- **Days 90–180 — application and adoption.** Pilot to DCA Terminal 1 or earliest eligible IAD C/D element in programming. Board information item; publish the amendment in the annual Design Manual revision. Commission the first ADS map and baseline STI/ambient reading at Concourse E within 90 days of opening.[^23]
+
+**Cost and funding.** Capital stack $12M–$40M one-time (analyst construction from non-airport commercial pricing benchmarks; see footnote 8), allocated roughly 60/40 IAD/DCA. Funding candidates: program contingency inside the committed AUL work; PFC amendment for the mobile notification platform; General Airport Revenue Bonds only if a stand-alone capital element requires it. Operating tail approximately $0.8M–$2.5M/year across both airports.
+
+**Dependencies.** 2025 AUL MII and cost-recovery text; Section 106 consultation on Saarinen-adjacent application, 6–18 months;[^20] FAA Part 139 emergency-communications compliance baseline;[^25] Fire Marshal AHJ concurrence at each airport; represented-workforce bargaining posture on any new duties.
+
+**Leading indicators.**
+1. Amendment language published in the next Design Manual annual revision and cited by section in the first eligible major terminal-package scope documents.
+2. Commissioned STI and ambient readings at Concourse E under representative traffic within 90 days of opening, benchmarked against ACRP 175 and NFPA 72.
+3. Missed-boarding, service-recovery, and ADA-effective-communication complaint rates at amendment-governed facilities, benchmarked against non-amendment facilities.
+
+**Failure modes / stop conditions.**
+- If the current Design Manual already contains equivalent or stronger acoustic and PA-zoning content, the recommendation contracts to a governance-and-verification amendment.
+- If the 2025 AUL MII text materially constrains tenant-audio enforcement, the tenant tier drops from mandatory to recommended pending renegotiation.
+- If the Concourse E baseline shows existing MWAA design already meets ACRP 175 and NFPA 72 targets under representative traffic, mandatory application contracts to governance and IROPS behavior.
+
+**What would change this recommendation.**
+- A measured MWAA STI/ambient baseline showing existing spaces already meet targets under representative traffic.
+- Publication of peer-airport primary measurement methodology permitting direct-copy operating patterns.
+- FAA publication of Part 139 amendments touching PA and communications, moving requirements outside MWAA's discretion.
+
+---
+
+[^1]: MWAA, "Metropolitan Washington Airports Authority Completes Negotiations for New Use and Lease Agreement with Airlines" (2024), mwaa.com; MWAA, "Airports Authority Board Approves Use and Lease Agreement for Airlines; Addresses Reagan/Dulles Imbalance" (2024), mwaa.com. Committed capital construction program approximately $9.4B at execution (~$6.99B at IAD, ~$2.39B at DCA, the latter including eventual Terminal 1 main concourse replacement). Majority-in-interest thresholds and cost-recovery categorization not verified from primary AUL text in this research pass.
+
+[^2]: Secondary coverage of the July 29, 2026 Dulles transformation announcement: Simple Flying, "Goodbye Mobile Lounges: Here Comes Washington Dulles' $20+ Billion Revival," simpleflying.com; Cranky Flier (Brett Snyder), "The Plan for Dulles is Ambitious and Ridiculous… and It Won't Happen," crankyflier.com. White House and DOT primary press releases could not be accessed in verification (HTTP 403). Program elements — Concourse C/D replacement, AeroTrain extension, mobile-lounge retirement, Saarinen Main Terminal preserved, more than 5 million square feet — confirmed through secondary coverage. Total program figure of $20B-plus is described as provisional in all sources, pending Board action, program-budget amendment, and airline-consent documents.
+
+[^3]: MWAA Office of Engineering, *Design Manual* (2020 base edition, seven volumes, updated annually), mwaa.com/business/airports-authority-design-manual; MWAA Design Manual August 2020 PDF, mwaa.com/sites/mwaa.com/files/2021-09/01_DM_2020.pdf.
+
+[^4]: National Transportation Safety Board, *Aircraft Accident Report NTSB/AIR-26/02, Midair Collision Between PSA Airlines Flight 5342 and U.S. Army UH-60L, Ronald Reagan Washington National Airport, January 29, 2025* (final report released February 17, 2026); ntsb.gov. Attributed causes — FAA helicopter route placement, ATC staffing configuration, visual-separation reliance — documented in NPR, "NTSB blames 'deep' systemic failures for DCA midair collision," npr.org; CNN, "DCA midair collision first responders, others remembered by victims' families as heroes," cnn.com. Primary NTSB report PDF too large to fetch directly; report existence and findings confirmed through multiple press accounts.
+
+[^5]: NFPA 72, *National Fire Alarm and Signaling Code* (2022 edition), Chapter 24 (Emergency Communications Systems); intelligibility criteria for Acoustically Distinguishable Spaces: STI ≥ 0.45 (or CIS ≥ 0.65) at ≥ 90% of measurement locations; average STI ≥ 0.50 (or CIS ≥ 0.70). Standard is paywalled; values corroborated by Honeywell/Notifier, "Mass Notification: Intelligibility is NOT Optional," and suppressionsystems.com, "Voice Intelligibility in Mass Notification Systems" (source citation: NFPA 72 Annex D and Chapter 18). Cite edition in force at the applicable AHJ (Loudoun/Fairfax Fire Marshals for IAD; DC Fire Marshal for DCA).
+
+[^6]: Airport Cooperative Research Program, *ACRP Research Report 175: Improving Intelligibility of Airport Terminal Public Address Systems*, Transportation Research Board / FAA (2017); target STI 0.50, acceptable band 0.46–0.53, minimum 0.45; SNR 10–15 dB(A) in pier-style departure lounges. Available open access at crp.trb.org and nap.nationalacademies.org.
+
+[^7]: International Electrotechnical Commission, IEC 60268-16:2020, *Sound System Equipment — Part 16: Objective rating of speech intelligibility by speech transmission index*; webstore.iec.ch/en/publication/26771. Paywalled. STI qualitative bands (Bad <0.30, Poor 0.30–0.45, Fair 0.45–0.60, Good 0.60–0.75, Excellent >0.75) confirmed across multiple industry technical guides citing IEC 60268-16.
+
+[^8]: Analyst construction from commercial industry indicative pricing. For new-construction acoustic ceiling treatment: designtransitionstudio.com, "Acoustical Ceiling Cost Per Square Foot: Price Guide 2026" (approximately $5–$15/ft² installed). Retrofit acoustic panel treatment (approximately $18–$45/ft²) is a non-airport commercial indicative figure; specific source not confirmed in this verification pass. Both ranges are medium-confidence directional benchmarks; airside badging, escort, and night-work premiums would raise both ranges. Full stack range $12M–$40M is an analyst construction applied to the IAD program scale; it is not a bid estimate.
+
+[^9]: MWAA Office of Engineering, *Design Manual*, mwaa.com/business/airports-authority-design-manual; MWAA Design Manual PDF (2020), mwaa.com. The extent of current acoustic and PA content in the Design Manual, and the reach of the tenant-technology-standards apparatus into airline holdroom audio, not verified in this research pass. Majority-in-interest thresholds under the 2025 AUL not verified from primary text; amendment scope into tenant audio is contingent on that verification.
+
+[^10]: MWAA Credit Ratings, mwaa.com/financial-statistics/investor-relations/credit-ratings (Fitch AA−, Moody's Aa3, S&P AA−, all stable, 2025–2026). Net revenue DSCR compression from 1.63× (2024 projection) to approximately 1.3× over the five-year window, and approximately $5.5B of new debt across 2025–2028, are from Moody's forward analysis per rating-agency reporting. Note: MWAA's consolidated system DSCR under the Master Indenture rate covenant (FY2024 approximately 3.16×) uses a different metric than the net revenue projection figure cited here.
+
+[^11]: The Joint Commission, *National Patient Safety Goal NPSG.06.01.01, Clinical Alarm Management* — announcement via Essential Hospitals, essentialhospitals.org. The 771 alarms per bed per day figure is cited in medical trade literature as a Johns Hopkins ICU research finding; primary study citation not resolved in this research pass. Used as illustrative magnitude.
+
+[^12]: The Joint Commission, National Patient Safety Goal NPSG.06.01.01, *Clinical Alarm Management*, effective January 1, 2014 (phase one; leadership priority established by July 1, 2014), January 1, 2016 (phase two); essentialhospitals.org.
+
+[^13]: Simple Flying, "How United Is Quietly Rebuilding Washington Dulles Into Its Ultimate Hub," simpleflying.com (noting "Dulles' 29 million passengers in 2025" and United carrying "two-thirds" of those passengers); consistent with MWAA, IAD Calendar Year 2025 Air Traffic Statistics (29,008,839 total passengers, +6.4% year-over-year; 10.53 million international; highest 2025 growth rate among the fifty largest U.S. airports).
+
+[^14]: Cranky Flier (Brett Snyder), "The Plan for Dulles is Ambitious and Ridiculous… and It Won't Happen" (August 4, 2026), crankyflier.com. Article cites an airline briefing from May 2026 pegging fully loaded IAD transformation cost per enplanement at approximately $90.64 versus approximately $12.88 today. Scott Kirby described as trying "not to look too disturbed." Underlying airline-briefing methodology not independently verified.
+
+[^15]: San Francisco International Airport, Quiet Airport program; summarized by viewfromthewing.com, "San Francisco Airport Removed 90 Minutes of Daily Noise — Travelers Say It Changed Everything" (90-minute figure specifically for the International Terminal; 40% paging reduction reported by SFO); International Airport Review, "San Francisco Airport continues work on Quiet Airport programme." All figures attributed to SFO's own reporting; measurement methodology not published in accessible sources.
+
+[^16]: Simple Flying, "Why This Airport's 'Quiet Policy' Is Frustrating Some Passengers," simpleflying.com. Documents passenger complaints and missed-flight anecdotes attributed to SFO's reduced-announcement practice.
+
+[^17]: 28 C.F.R. § 35.160 (Title II of the Americans with Disabilities Act, effective communication; auxiliary aids and services); ecfr.gov.
+
+[^18]: U.S. Department of Justice, *2010 ADA Standards for Accessible Design*, §§ 219 and 706 (assistive-listening systems in assembly areas where audible communication is integral to use); centerforhearingaccess.org, "ADA Standards for Assistive Listening Systems."
+
+[^19]: Airport Cooperative Research Program, *ACRP Research Report 239: Assessing Airport Programs for Travelers with Disabilities and Older Adults* (Transportation Research Board, 2023); treatment of digital-first substitution as a partial rather than sufficient channel.
+
+[^20]: Federal Aviation Administration Section 3 Progress Report (Advisory Council on Historic Preservation, 2023/2024), achp.gov: Dulles Main Terminal, ATCT, mobile lounges, runways, terminal-area landscaping, and Dulles Airport Access Highway determined eligible for the National Register of Historic Places in March 1978 as a Historic District under Criteria A and C. Property is Register-eligible; Section 106 consultation obligations attach to eligible properties. Consultation with the Virginia SHPO and ACHP runs six to eighteen months, longer with a Memorandum of Agreement.
+
+[^21]: ACI-NA (Airports Council International — North America), "The Data-Driven Future of Automated Airport Announcements: Smarter Communication for Smarter Terminals," Centerlines® NOW (February 27, 2026), airportscouncil.org. Describes centralized management, audit-logged broadcast, elimination of manual-initiation error, and AI-generated multi-language templating. Industry advocacy publication; directional rather than measurement-grade.
+
+[^22]: Simple Flying, "How United Is Quietly Rebuilding Washington Dulles Into Its Ultimate Hub," simpleflying.com (United operating "the 50 gates in Concourses C and D" and carrying approximately 67% of IAD traffic in 2025). American Airlines' approximately 53% DCA market share is a directional trade-press figure not confirmed from a primary MWAA rate-setting disclosure in this research pass.
+
+[^23]: MWAA / Dulles Next project disclosures: flydulles.com/Next ("a modern 14-gate facility," 435,000 ft², AeroTrain-connected); International Airport Review, "United and MWAA celebrate $500 million Concourse E expansion to enhance passenger experience at Dulles," internationalairportreview.com. Opening date not confirmed from a primary MWAA announcement accessible in this research pass; opening described as fall 2026 in project materials.
+
+[^24]: 29 C.F.R. § 1910.95 (Occupational Safety and Health Administration, Occupational Noise Exposure); osha.gov/laws-regs/regulations/standardnumber/1910/1910.95. Hearing-conservation program required at 85 dB(A) 8-hour TWA; permissible exposure limit 90 dB(A).
+
+[^25]: 14 C.F.R. Part 139 (Certification of Airports), emergency-communications requirements; ecfr.gov/current/title-14/chapter-I/subchapter-G/part-139. Annual inspection cycle by FAA Airports District Office; deviation from as-designed emergency PA performance is a finding.

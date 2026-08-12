@@ -1,0 +1,11 @@
+metric,governing_authority,threshold_value,units,applicability,notes
+Speech Transmission Index (EVACS-required areas),NFPA 72 (2022) §18.4.11,>= 0.50,STI (0-1),Every acoustically distinguishable EVACS zone,Measured per IEC 60268-16
+Design target STI (analyst),MWAA design manual (analyst recommendation),>= 0.55,STI (0-1),Same as above,Provides margin above code minimum
+Ambient LAeq (occupied concourse) (analyst),Analyst benchmark ex ASHRAE / ISO 9921,<= 55–60,dB(A),Airside holdrooms and connectors during peak,No U.S. code sets this; MWAA must specify
+Reverberation time T60 large volumes (analyst),Analyst benchmark ex ANSI/ASA S12.60,1.2–1.6,seconds,Large-volume concourse areas,Design target
+Reverberation time T60 gate hold pockets (analyst),Analyst benchmark ex ANSI/ASA S12.60,<= 0.8,seconds,Localized holdroom volumes,Design target
+Signal-to-noise ratio during PA,IEC 60268-16 intelligibility guidance,>= +15,dB above ambient,All PA broadcast zones,Ensures intelligibility
+Adjacent-zone PA spillover (analyst),Analyst target; no fixed standard,<= -10,dB relative to paged zone,Zoned PA implementations,Enforces meaningful zoning
+Assistive listening receivers,ADA §219 §706,by capacity table,receivers per capacity,Assembly areas >= 50 occupants,Loop or FM/IR
+Visual counterpart to audible messages,49 CFR Part 27; ADA effective communication,100%,coverage of safety-critical messages,All public areas,No exceptions permitted
+Emergency plan communications network,14 CFR §139.325,required,capability,Part 139 airports,No PA-specific threshold set by regulator

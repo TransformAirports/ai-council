@@ -1,0 +1,234 @@
+# Evidence Map — Quiet-by-Design Standards for MWAA Terminals
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Curator:** evidence-curator
+**Date:** 2026-08-07
+**Ledger under review:** `outputs/evidence-ledger.jsonl` (260 records after dedupe, from 262 raw across 14 research agents)
+
+This is a handoff to the Strategist. It says which evidence to build the article on, which evidence to touch with tongs, where the swarm agrees, where it quietly disagrees, and where the argument would collapse if a fact-checker went looking.
+
+---
+
+## 1. The ten most load-bearing evidence records
+
+Ranked by argumentative weight — the records whose removal would either force the Strategist to rewrite a section or would concede the counter-case.
+
+| Rank | Evidence ID(s) | Claim (compressed) | Why it is load-bearing | Source posture |
+|---|---|---|---|---|
+| 1 | E-0019, E-0041, E-0051, E-0075, E-0076, E-0101, E-0122, E-0123, E-0187, E-0221 | ACRP Research Report 175 recommends STI ≥ 0.45 (target 0.50) and SNR ≥ 10 dB(A) for terminal PA in pier-style departure lounges; reverberation over 2.0 s rarely achieves STI 0.50. | The single domestic, peer-reviewed reference every agent (infrastructure-economist, technology-scout, quantitative-analyst, ops-analyst, airline-strategist, regulatory-political, airport-CEO, airport-COO, public-safety, EM-director, contrarian) converges on. Anchors the article's engineering claim without touching a peer press release. | Authoritative research (TRB / FAA-sponsored, 2017). Multiple independent citations to nap.nationalacademies.org and the Wilson Ihrig upload. High confidence. |
+| 2 | E-0073, E-0130, E-0185, E-0197 | NFPA 72 Chapter 24 emergency-communications acceptance: average STI ≥ 0.50 per ADS, ≥ 0.45 at 90% of measurement locations. | The code floor Virginia and DC adopt by reference; MWAA cannot design below it. Turns "quiet" into a number a fire marshal will accept. | Primary regulation (NFPA 72 2022 edition; cited via multiple secondary references — paywalled). High confidence on the number; low direct-primary confirmation of the exact language. |
+| 3 | E-0132 | 49 CFR 27.71 requires airport operators receiving federal financial assistance to display PA messages on video monitors. | Makes visual paging a grant-eligibility condition, not a design preference. Removes any "audio-only" fallback from the debate. Only one agent surfaced this — Strategist must not lose it. | Primary regulation (eCFR direct-source). High confidence. |
+| 4 | E-0133 | 14 CFR 382.53 obliges air carriers to give passengers with vision or hearing impairment the same trip information available to others. | Pulls airline gate-podium PA and airline-club audio into the standard's scope. Any tenant carve-out is legally dubious. Directly refutes an airline-side argument that "we own the podium, our rules." | Primary regulation (eCFR). High confidence. |
+| 5 | E-0189, E-0199 | 14 CFR Part 139.319/.325 requires an Airport Emergency Plan and a documented communications network; ARFF response within 3 minutes of alarm. | Post-1/29/2025, DCA's Part 139 posture is under a hotter regulatory watch; the standard has to be defensible as an *upgrade* to emergency communications, not a reduction. | Primary regulation. High confidence. |
+| 6 | E-0026, E-0086, E-0105, E-0142, E-0148, E-0149, E-0150, E-0232 | MWAA plans ~$5.5B new debt 2025–2028; net revenue debt service coverage compresses from 1.63× (2024) toward ~1.3×; adjusted debt/O&D enplanement projected to rise from $223 (2024) toward ~$400 in 2028 (Moody's flags $400 as a pressure threshold). | The financial altitude the standard has to survive. Also frames the timing argument (specify now, or pay 2×–4× later — Exhibit E1 in quant brief). | Bond Buyer trade press citing Fitch/Moody's/S&P May 2025 affirmations. Multiple corroborating citations. Medium-to-high confidence on the numbers; **the ratings and $5.5B originate in the Bond Buyer report, not from a direct read of the 2025A Official Statement in this ledger**. |
+| 7 | E-0109, E-0111, E-0141, E-0151, E-0213, E-0231 | MWAA 15-year Airline Use and Lease Agreement took effect January 1, 2025 with an approximately $9B baseline capital construction program (~$6.99B IAD, ~$2.39B DCA); runs through December 31, 2039. | The consent envelope for anything that raises airline cost. The standard is defensible only if adopted upstream of consultant scope; adopted late, it becomes a change-order fight. | Primary operator press release (MWAA news release) + trade press. High confidence on term and headline scope; **MII thresholds and cost-recovery mechanics not verified from primary agreement text — do not cite specific MII percentages.** |
+| 8 | E-0084, E-0112, E-0145, E-0152, E-0212 | On July 29, 2026, MWAA/USDOT/United announced a $20B+ (widely reported as more than $22B) multi-decade Dulles transformation: replaces Concourses C and D, extends the AeroTrain, retires the mobile lounges, preserves the Saarinen Main Terminal. | Establishes both the scope inside which any standard will be applied and the political altitude ("presentable to a stage with the President") at which the standard is now judged. | Trade press + federal press release. Medium confidence on program scope details; **the announcement did not include a project-by-project budget, final gate count, or detailed construction sequence — trade-press analysis has flagged this explicitly.** |
+| 9 | E-0154, E-0177 | NTSB Final Report AIR-26-02 (February 2026) on the January 29, 2025 DCA midair collision found probable cause: FAA placement of a helicopter route in close proximity to a runway approach; identified degraded radio, blocked transmissions, and ambiguous nighttime visual cues. 67 fatalities. | Sets the political floor at DCA. Any standard that reads as reducing safety-communications capacity fails politically before it fails technically. | Primary federal investigation report (NTSB). High confidence. |
+| 10 | E-0027, E-0028, E-0106, E-0107, E-0146, E-0210, E-0227, E-0228, E-0243 | IAD served 29.01M passengers in 2025 (up 6.4% YoY), of which 10.53M international (~36% international share). DCA served 24.89M in 2025 (down 5.4% YoY). | The physical fact that makes "one standard, two airports" a live question: IAD's international-connector traffic mix invalidates any visual-first/app-first assumption that a DCA-only frame would allow. | Airport context packet (assembled from MWAA reporting). High confidence for headline totals; **cite the underlying MWAA release, not the context packet, in the final article.** |
+
+Honorable mentions (evidence that carries a specific argument but not the spine):
+
+- **E-0029, E-0108, E-0143, E-0211, E-0225, E-0230** — MWAA's seven-volume 2020 Design Manual is described by the Authority as "a mandatory guide with the force of law on the airport property" (six-agent corroboration). This is the *vehicle* claim — the reason the recommendation is a Design Manual amendment, not a policy memo.
+- **E-0118, E-0139** — Section 502 of the FAA Reauthorization Act of 2024 (Pub. L. 118-63) added 10 daily beyond-perimeter DCA slot exemptions, awarded December 2024. The reason DCA's operational tempo is not going down.
+- **E-0033, E-0120, E-0174** — SFO physically removed boarding-area-wide paging capability from airline gate podiums and centralized non-routine announcements at SFO's own communications desk (ops-analyst, airline-strategist, airport-COO). This is the *mechanism* under the SFO precedent — more useful than the disputed 40% headline.
+- **E-0121** — Denver's quiet-zone initiative was reportedly blocked by Southwest; a carrier-veto precedent that predicts United's and American's leverage at IAD and DCA.
+- **E-0100, E-0186, E-0249** — NFPA 72 requires visible notification in parallel with audible for hearing-impaired occupants (multiple corroborations). Kills any "reduce PA, add screens" framing that treats audible and visual as swappable.
+- **E-0192, E-0201** — FLL 2017 stampede: five killed initially, then ~90 minutes later false-gunfire rumors triggered self-evacuation across four terminals with 50+ additional hospitalizations. The single strongest example of communications-integrity failure at a US hub.
+
+---
+
+## 2. What is genuinely non-obvious
+
+Not the "airports should be quieter" observation. These are the reads a McKinsey deck would miss:
+
+1. **The Design Manual is already the vehicle. There is no "standards apparatus" gap to close.** MWAA's own framing — "mandatory guide with the force of law on airport property" (E-0029/E-0108/E-0143/E-0211/E-0225/E-0230, corroborated across six agents) — means the correct recommendation is not a new instrument but an amendment path with an accompanying Specification and Estimating & Scheduling section. Every agent independently converges here. Any recommendation for a standalone "quiet airport policy" is duplicative and creates two enforcement regimes.
+
+2. **The measurable prize is intelligibility, not silence — and the numbers are already public.** ACRP 175 + NFPA 72 + IEC 60268-16 together define a defensible target in one paragraph (Exhibit E3 in quantitative-analyst brief). The regulatory-political-analyst independently arrives at the same conclusion. What MWAA is being asked to invent is largely already codified; what is missing is the discipline of *binding* it through commissioning acceptance and re-verification (COO brief §7, Public Safety brief).
+
+3. **Tenant audio is where the standard fails silently.** The COO brief (E-0181 cluster) estimates the MWAA head-end covers roughly 30–40% of the audible surface on a peak day. Airline gate podiums, airline clubs, TSA queue callouts, CBP FIS, concessions televisions, and retail music are outside the head-end. Any standard that regulates only MWAA-owned zones moves the dB meter 3–4 dB, not 30. The technology-scout, airline-strategist, and public-safety chairs all reach the same conclusion via different routes.
+
+4. **The SFO precedent's *mechanism* is more transferable than its *number*.** SFO's headline (40% noise, 90 minutes) is a self-report with no published methodology — nine of the ten SFO-headline records in this ledger flag the caveat; only one cites it without qualification (see §4). The *mechanism* — SFO physically disabled airline access to airport-wide paging and absorbed non-routine announcements into the airport's own communications desk — is where MWAA can either copy or fail to copy. That requires audio-matrix and Use-and-Lease work MWAA has not scoped.
+
+5. **The airline-consent battlefield is not "will they accept a standard" but "when."** The airline-commercial-strategist reframes the question as a MII/rate-hearing veto question. The airport-CEO and regulatory-political agents converge on the same answer: adopt inside the Design Manual *before* consultant scopes for Concourse C/D and DCA Terminal 1 harden, and airline consent is not required because it is not a rate change; adopt after, and it is a change-order fight with United and American as anchor carriers. The window is the current officer term of the Board.
+
+6. **The DCA political overlay from January 29, 2025 makes "quiet" a bad flag to plant.** Not because the technical content is wrong — because the frame lands sideways. Every executive-facing agent (CEO, COO, Public Safety, EM Director, Contrarian, Regulatory-Political) reaches this conclusion independently: the standard has to be branded and defended as *intelligibility-by-design*, not as *quiet-by-design*, and its most publishable outcome must be safer emergency communications, not fewer routine announcements.
+
+7. **The IAD/DCA split is not a "customization" problem — it is an accessibility problem.** IAD's 36%+ international share (~10.5M passengers) and connection-dominant traffic mix breaks any visual-first/app-first assumption that would satisfy DCA's business O&D profile. Applied uniformly, the standard either over-serves DCA or excludes IAD's non-English-first-language connectors — a Title VI/LEP risk the regulatory-political analyst flags explicitly (E-0135, DOT 2001/2005 LEP guidance).
+
+8. **The peer "silent airport" set is policy, not technology.** Every European precedent MWAA is being asked to emulate — LCY, Helsinki, Copenhagen, Barcelona, Schiphol — cites a governance rule, not a numeric target (technology-scout §2.4). None publishes STI, LEQ, or measured intelligibility numbers. Schiphol's 48-hour pre-notification for deaf and blind passengers (E-0098) is not lawful under the ADA. Peer models tell MWAA what to write down; they do not tell MWAA what to measure.
+
+---
+
+## 3. Agreements across the swarm
+
+Where 5+ agents converge independently (each without reading the others' briefs). The Strategist can treat these as the article's factual spine.
+
+- **ACRP Research Report 175 is the domestic reference document.** (10 agents: infrastructure-economist, operations-analyst, technology-scout, quantitative-analyst, contrarian, airline-strategist, regulatory-political, airport-CEO, airport-COO, public-safety, EM-director, virtual-christian, virtual-chris, virtual-pat.)
+- **STI ≥ 0.50 (emergency) / STI ≥ 0.45 (baseline) is the code floor.** (8 agents converge on this exact number.)
+- **The MWAA Design Manual is the correct instrument.** (7 agents.)
+- **SFO's 40%/90-minute figure needs a caveat.** (9 of 10 agents that cited it added a caveat or explicitly attributed it to the operator; only virtual-christian's E-0219 restated it without qualification.)
+- **Post-1/29/2025 DCA politics constrain the framing.** (6 agents.)
+- **Tenant audio is the coverage gap.** (COO, technology-scout, airline-strategist, public-safety, EM-director.)
+- **IAD's international-connector mix breaks a uniform prescription.** (Airline-strategist, COO, regulatory-political, EM-director, quantitative-analyst.)
+- **The current standards window closes with Concourse C/D scoping — 2026 to 2028.** (CEO, COO, regulatory-political, airline-strategist, quantitative-analyst, EM-director.)
+
+---
+
+## 4. Contradictions and disagreements the Strategist must preserve
+
+The ledger writes only two of these as explicit `contradicted_by` links (the SFO-headline pair). The rest are argumentative disagreements the swarm did not encode as data conflicts. All are load-bearing for the article — hiding any of them produces a weaker piece.
+
+### 4.1 Explicit contradiction — SFO's 40%/90-minute headline
+
+- **Cited with methodology caveat / operator-attribution flag:** E-0034 (ops-analyst), E-0056 (technology-scout), E-0093 (contrarian), E-0119 (airline-strategist), E-0159 (airport-CEO), E-0173 (COO), E-0214 (EM-director), E-0219 (virtual-christian), E-0237 (virtual-chris), E-0244 (virtual-pat).
+- **Ledger status:** all 10 marked `disputed`, cross-linked via `contradicted_by`. The dedupe found E-0034 as the anchor record whose caveat is embedded in its own claim text; the other nine records cite the same headline with varying degrees of caveat elsewhere.
+- **Instruction to Strategist:** cite the *mechanism* (E-0033 / E-0120 / E-0174 — SFO physically removed airline-facing terminal-wide paging and centralized non-routine announcements at SFO's own communications desk) rather than the *number*. If the 40% or 90-minute figure must appear, it appears with the words "SFO reports" and "measurement methodology not verified in primary sources." The single independently reported before/after count that survives audit is the paging-occurrence delta (492 → 261 daily; 145 → 58 minutes) in E-0032 / E-0054 — cite that instead of the 40% figure.
+
+### 4.2 Cost sizing — rounding error or real premium?
+
+- **Quantitative-analyst:** MWAA-wide incremental capital $12M–$40M, 0.06%–0.20% of the announced IAD program, $0.03–$0.11 per enplanement (0.16%–0.54% of projected 2030 CPE). Frames the decision as "discipline, not affordability." (Quant brief Exhibit E6, corroborated by ledger records E-0075/E-0076 on the intelligibility baseline and E-0079/E-0080 on retrofit-vs-new-build cost premium.)
+- **Director of Public Safety:** "High-STI zoned MNS with integrated visual notification, tenant override, and public-safety mic priority at IAD and DCA scale is not free… low single-digit percent premium on affected capital, not a rounding error."
+- **Airport-CEO:** "Every recoverable dollar the standard adds — commissioning scope, POE verification, tenant enforcement — flows into rates and charges and shows up in the airlines' CPE. In a 1.3× coverage environment, 'optional' is a fighting word."
+- **Instruction to Strategist:** both are right at different scopes. Quant's number is base-building acoustic package inside a new-build program. Public-safety's number is program-wide MNS + tenant + POE + re-verification. Do not collapse them; the article should present the low number as a lower bound and the CEO's coverage concern as the real constraint on ambition.
+
+### 4.3 Whether to write the standard at all — Contrarian vs. everyone
+
+- **Contrarian:** replace "a common quiet-by-design standard binding on both airports, adopted now" with (a) reference-adoption of ACRP 175, IEC 60268-16, and NFPA 72 in the Design Manual, plus (b) an operational-governance policy — announcement scripts, PA suppression zones, tenant TV mute defaults, gate podium volume caps — implementable under current tenant agreements and reversible at COO level. Escalate to binding design requirements only where operational discipline demonstrably fails.
+- **Every other agent:** write it, but write it right (Design Manual amendment; ECS-first framing; performance spec, not frequency cap; tenant clauses reached explicitly).
+- **Instruction to Strategist:** the Contrarian's fallback is close to a subset of the majority position. The genuine disagreement is over whether to sequence the operational governance moves *before* or *bundled with* the binding standard. That sequencing question is a real recommendation the article can make — not a side note.
+
+### 4.4 Whether tenant audio should be in scope
+
+- **Regulatory-political-analyst:** a tenant carve-out is "legally dubious" under 14 CFR 382.53; the tenant audio is already in scope by federal statute, so the standard should say so.
+- **Airline-commercial-strategist:** binding tenant audio "reopens cost-recovery categorization, invites MII interventions, and forces United and American to give up an operational tool." Recommends reserving announcement-volume policy for a separate negotiation track.
+- **Instruction to Strategist:** both are right. The reconciliation is a performance-specification approach for gate podium equipment (STI floor, spillover cap, no announcement-frequency cap) inside the Design Manual, coupled with a separate governance instrument that negotiates announcement policy with United and American as a partnership item, not a tenant obligation.
+
+### 4.5 What "quiet" means
+
+- **Contrarian, virtual-pat, virtual-christian:** the passenger-experience frame carries real weight; peer airports have proven the frame is memorable and salable.
+- **Director of Public Safety, EM Director, Airport CEO, COO, Regulatory-political:** the passenger-experience frame is the *reason the standard will lose value engineering*. Frame as ECS-first / intelligibility-by-design or the STI and ADS discipline gets traded off after 60% design.
+- **Instruction to Strategist:** the article should adopt the ECS-first frame in its recommendation and its title; if the "quiet" word appears, it appears as an outcome, not as a design objective.
+
+### 4.6 Whether the peer "silent airport" set transfers
+
+- **Cited approvingly as precedent:** infrastructure-economist, operations-analyst, technology-scout, virtual-pat, virtual-chris.
+- **Cited with strong non-transfer caveats:** contrarian, airline-strategist, COO, regulatory-political, EM-director.
+- **Instruction to Strategist:** cite these as *policy* precedents for what to write down (announcement governance, PA suppression zones), not as *measured* precedents for what to expect at IAD or DCA. The article's default posture on any European figure is Schiphol's 48-hour pre-notification example: culturally acceptable there, unlawful here.
+
+---
+
+## 5. Strongest evidence against the thesis
+
+The Contrarian brief is the load-bearing counter-case (E-0093 through E-0110, plus §3 scenarios in the contrarian-brief.md). The five specific counter-arguments the Strategist must address or concede:
+
+1. **SFO's "40% and 90 minutes" is program-owner self-reporting with no published methodology (E-0034, E-0056, E-0093, E-0119, E-0159, E-0173, E-0214, E-0219, E-0237, E-0244).** The most-cited US precedent for quiet-airport outcomes cannot survive an evidence audit. The article cannot lean on the number. It can lean on the *mechanism* — SFO physically disabled airline-side terminal-wide paging (E-0033, E-0120, E-0174).
+2. **Denver's quiet-zone was reportedly blocked by Southwest (E-0121).** A dominant carrier at a US hub can and did veto a comparable initiative. United (anchor at IAD, co-author of the $20B+ program) and American (53% share at DCA — E-0117, three concourses) are structurally at least as capable of the same veto.
+3. **The coverage window is exactly the wrong window for optional cost (airport-CEO §5).** MWAA is heading into its tightest coverage compression in a decade (1.63× → ~1.3×) as $5.5B of new debt phases in. Standards that raise recoverable capex or commissioning cost without an explicit CFO defense arrive at the wrong meeting.
+4. **Schiphol's 48-hour pre-notification for deaf and blind travelers is not lawful under the ADA (E-0098, contrarian brief).** The peer model whose text most closely matches "silent airport" would fail a Part 27 or DOJ challenge if imported directly. The article must not use Schiphol as a model without this caveat.
+5. **Standards written into a Design Manual bind for decades; personal-audio, spatial-audio wearables, biometric notification, and AI concierge apps will materially change what "redundant channel" means inside the standard's first ten years.** A performance-spec framing (STI, RT60, LEQ, coverage) survives that drift; a technology-prescriptive framing does not.
+
+Additional counter-evidence the Strategist should not ignore:
+
+- **Clinical-alarm literature on alarm fatigue (virtual-christian brief).** Between 86% and 99.5% of physiologic monitor alarms in hospital settings are false. This is the strongest data-based analogy the article can invoke *against* over-announcement — but it also warns against under-specifying what triggers must fire the ECS.
+- **CNN Airport Network shut down after 30 years on March 31, 2021 (virtual-christian brief).** Points to a broader industry inflection away from broadcast media in airport public spaces — supports the direction of travel — but is not evidence of measured passenger outcomes.
+
+---
+
+## 6. Evidence gaps that could change the conclusion
+
+These are the specific questions whose answers would move the recommendation, not marginal footnote items.
+
+| # | Gap | Why it matters | Load-bearing? |
+|---|---|---|---|
+| G-1 | **What does the 2020 MWAA Design Manual (seven volumes) already contain on acoustics, PA zoning, STI, ambient LEQ, and FIDS?** | If it already contains binding STI or acoustic requirements, the recommendation is a *strengthening* amendment (small lift, high defensibility). If it does not, the recommendation is a *new* Volume (larger lift, more board attention). Every agent flagged this as unknown. | Yes — changes both scope and sequencing. |
+| G-2 | **Majority-in-interest thresholds and cost-recovery categorization under the January 1, 2025 Use and Lease Agreement.** | Determines whether the standard rides inside base-building recovery (airline consent presumed) or triggers an MII process (airline consent required). The airline-strategist and airport-CEO both flagged this as unknown and unsourced. | Yes — determines the delivery path. |
+| G-3 | **Airline gate-podium PA ownership at IAD and DCA (base-building vs. tenant-installed by carrier).** | Determines whether the standard can bind gate podium performance through the Design Manual or must be negotiated through Use and Lease amendments. | Yes — determines enforceability. |
+| G-4 | **SFO's audio-matrix modifications that enabled gate-limited paging.** | The *mechanism* under the SFO precedent. If MWAA cannot replicate the audio-matrix architecture, the SFO comparison collapses. | Medium — affects one section, not the thesis. |
+| G-5 | **Primary methodology behind SFO's 40% noise-reduction claim.** | The Strategist has already been warned not to cite it as fact. Would only be needed if the article decided to lean on the number. | Low — already routed around. |
+| G-6 | **Primary policy documents for Copenhagen, Helsinki, Amsterdam Schiphol, Barcelona El Prat, Dubai, and London City quiet-airport programs.** | Would let the article quote peer policy text directly rather than through secondary reporting. | Medium — improves credibility of the peer section. |
+| G-7 | **MWAA-specific PA telemetry — announcements per hour per gate by category.** | Would collapse Exhibit E4 in the quant brief from assumption to fact and would let the article report actual current-state announcement density at IAD and DCA. | Yes if the article makes a quantitative "reduction" claim; low if it stays qualitative. |
+| G-8 | **Whether the NTSB February 2026 final report addressed terminal-side communications performance (as distinct from ATC/military failures).** | If yes, the article should quote the terminal-side finding directly. If no, the article should say so and stop implying an NTSB terminal-communications finding that does not exist. | Yes — misuse risks a fact-check veto. |
+| G-9 | **DCA Terminal 1 replacement project status (programming / design / procurement).** | Determines whether the standard can bind T1 replacement design or arrives too late. | Yes — affects the timing argument. |
+| G-10 | **MWAA-specific missed-boarding data at existing gate populations.** | The single most-abused number in the "silent airport" literature. Without MWAA data, the article cannot commit to a missed-boarding claim in either direction. | Medium — the quant brief already flagged this and routed around it. |
+
+**Gap-fill in this pass:** none. Given budget constraints, no targeted WebFetch or WebSearch was executed. Every gap above remains open; the Strategist should either commission a targeted primary-source retrieval before publication or scope the article's claims to what the ledger supports.
+
+---
+
+## 7. Source-quality warnings and stale data
+
+- **Bond Buyer trade press is the primary conduit for MWAA financial figures in this ledger.** The $5.5B new-debt figure, the 1.63× → 1.3× coverage compression, the $400 debt-per-enplanement ceiling, and the May 2025 rating affirmations all trace to Bond Buyer reporting. The 2025A Official Statement itself is not directly quoted. For a bond-facing paragraph in the final article, MWAA's own OS should be the citation, not Bond Buyer.
+- **Wikipedia is used for MWAA police (233 sworn) and MWAA Fire & Rescue (163 personnel across four stations).** The public-safety-director brief cites Wikipedia. These are tertiary sources; MWAA's own department pages or annual reports should be the primary citation.
+- **`https://dwuconsulting.com/airports/iad`** and the equivalent DCA page are the sourcing for IAD's $12.77 (2026 first-half) CPE and DCA's $8.41 (2025) CPE (E-0127). DWU Consulting is a third-party dataset. The MWAA rate books themselves (referenced in E-0128) are the primary citation.
+- **SFO's 40%/90-minute figures appear across nine trade-press outlets, all deriving from SFO Customer Care staff estimates.** Treat as one source, not nine.
+- **All 51 records in the raw ledger citing `outputs/context/airport-context.md`** have been re-tagged `contextual` (48 kept after dedupe, 3 collapsed to canonical). These are Stage-0 packet references, not primary evidence. Every load-bearing use of one should be replaced with a primary citation before publication.
+- **Context packet §10 explicitly lists what it does not establish** — including MII thresholds, current airline gate leaseholds, and whether the 2020 Design Manual already contains binding acoustic requirements. Every use of the packet should be scoped to what §10 says the packet supports.
+- **The July 29, 2026 IAD announcement had no project-by-project budget, no final gate count, and no construction sequence** (E-0007, cited by the infrastructure-economist and airline-strategist). Any article language that treats the $20B+/$22B figure as a hardened program is over-committed.
+- **The FLL 2017 AAR figure of "50+ additional hospitalized during the stampede"** is drawn from the Police Executive Research Forum / National Policing Institute report; two agents cited it slightly differently (Public Safety says "more than 50 additional people were hospitalized"; EM Director says the AAR "documented communication and command-post lockdown challenges"). Cite the AAR PDF, not a secondary summary.
+- **AviaVox, Renkus-Heinz, Holosonics, and SITA vendor pages are cited for capability and reference deployments** (technology-scout §3). Do not cite them for outcome data. SITA's "99.9 percent availability across 100+ deployments" is a vendor marketing claim, not an audited number.
+- **Data vintage:** MWAA passenger traffic (2025 calendar year, cited multiple times) is current. Rating affirmations are May 2025. The Use and Lease effective date is January 1, 2025. The IAD transformation announcement is July 29, 2026. Nothing in the ledger is more than 20 months old for the MWAA-specific facts.
+
+---
+
+## 8. Do-not-claim list
+
+The article, the deck, the executive summary, and the board packet must not assert any of the following without a primary source that supersedes the current ledger:
+
+1. **"SFO reduced onsite noise by 40%" or "SFO removed 90 minutes of daily announcements"** as an independently verified outcome. Both are program-owner self-reports without a published measurement methodology. Attribute to SFO Customer Care staff, or cite the *mechanism* (removed airline-facing terminal-wide paging) instead of the *number*.
+2. **Any specific MWAA MII percentage threshold** — the number is not in this ledger. Industry convention is not evidence.
+3. **That reduced announcements will improve safety.** No agent produced evidence for this claim. Public Safety and EM Director make the opposite case: alarm-fatigue reduction may be an outcome, but reduced announcements degrade the fallback channel during IROPS and post-outage FIDS/mobile latency.
+4. **That the 2020 MWAA Design Manual does not already contain STI, LEQ, or acoustic requirements.** This is a gap, not a fact. Framing the recommendation as filling a void will read as an insult to the Office of Engineering if the void does not exist.
+5. **That Schiphol's silent-airport model transfers to a US airport under the ADA.** Schiphol requires 48-hour pre-notification for deaf and blind passengers (E-0106). That obligation is not lawful under 14 CFR 382 or 49 CFR 27.
+6. **That "silent airport" is a legal or engineering-defined term.** It is a marketing phrase. Every peer airport labeled "silent" has emergency, security, and gate-area exceptions.
+7. **Any specific airline app adoption rate at IAD or DCA.** Not in the ledger. Assuming push-notification coverage is a design bet, not a measured input.
+8. **Any specific missed-boarding rate change attributable to a quiet-airport policy.** The industry 5%–18% no-show range (E-0090) conflates true no-shows with missed-at-gate; neither is a control for this question. The quant brief already flagged this as the number most likely to embarrass MWAA if wrong.
+9. **That IAD and DCA can use identical prescriptions.** Every strategic agent in the swarm converges on airport-specific implementation of common performance targets. Identical prescriptions would fail either the Saarinen ceiling or the DCA T1 historic envelope.
+10. **That the NTSB February 2026 final report addressed MWAA terminal-side communications performance.** The report addressed FAA/ATC/military failures. Terminal-side communications performance during response is a separate open question (G-8). Any implication otherwise is a fact-check veto risk.
+11. **That the $20B+/$22B IAD figure is a hardened program budget.** It is not; E-0007 flags the absence of a project-by-project budget, gate count, or construction sequence in the July 2026 announcement.
+12. **That a peer-airport "silent" policy has produced measured missed-boarding or intelligibility outcomes.** No agent surfaced peer-airport primary measurement.
+
+---
+
+## 9. Candidate airport cases and quantitative exhibits
+
+### 9.1 Airport cases the article can build on
+
+- **San Francisco (SFO), 2018–2020 — the mechanism case.** SFO physically disabled airline-facing terminal-wide paging capability and centralized non-routine announcements. Individual paging fell from 492 to 261 daily; cumulative announcement duration from 145 to 58 minutes (E-0032, E-0054). Cite the counts (attributed to SFO reporting via Airport Technology feature), not the 40% figure. Mechanism records: E-0033 (ops-analyst), E-0120 (airline-strategist), E-0174 (COO).
+- **London City Airport, 2008–present — the policy case.** Silent-terminal policy documented on LCY's own operations pages; PA reserved for bad weather delays or genuine emergencies (E-0058 technology-scout, E-0036 ops-analyst, E-0245 virtual-pat). Behavioral premise (frequent flyers wear headphones on entry) is documented in Smithsonian coverage cited in the contrarian brief.
+- **Amsterdam Schiphol — the boundary case.** Silent-airport claim; 48-hour pre-notification for deaf and blind passengers (E-0098); illustrates what quiet-airport policy looks like in a jurisdiction with a different accessibility regime, and why direct transfer to the US fails.
+- **Helsinki Vantaa (Finavia) — the operator-negotiation case.** Silent since 2015 (E-0037 ops-analyst, E-0016 infrastructure-economist); Finavia-referenced 2016 study found passengers judged the policy "more positive than neutral" (E-0038). Suppressed routine flight announcements from a 2019 rollout per subsequent reporting.
+- **Dubai International — the volume-cap case.** Announcements from more than 2,000 daily to fewer than 700; two-per-flight cap; ten-month negotiation with customer airlines (E-0030, E-0031, E-0057). Airport operator claim, not independent measurement.
+- **Denver International — the carrier-veto case.** Southwest reportedly blocked a proposed quiet-zone initiative (E-0121). The single strongest carrier-response data point in the ledger for MWAA's context.
+- **Fort Lauderdale-Hollywood (FLL), January 6, 2017 — the stampede/communications-integrity case.** Five killed initially; ~90 minutes later, false-gunfire rumor triggered self-evacuation across four terminals with 50+ additional hospitalizations (E-0192, E-0201). PERF/National Policing Institute AAR is the primary reference.
+- **Los Angeles (LAX), November 1, 2013 — the speed-of-response case.** TSO Gerardo Hernandez killed at checkpoint; TSA mandated annual active-shooter training in response (E-0193). LAX Airport Police Chief Gannon testimony: response speed is the operative variable (E-0194).
+- **Atlanta (ATL), December 17, 2017 — the backup-power case.** 11-hour power outage; ~1,500 flights grounded; tower kept power, terminal did not (E-0204, E-0205). Argues for ECS head-end UPS runtime, not just terminal generator runtime.
+- **MSP International — the accessibility precedent.** Hearing loops through Terminal 1 departures, arrivals, baggage claim, international arrivals, common-use gates E1–E4, Concourse G; T2 gates H11–H14 complete and H1–H10 in construction (E-0069 technology-scout). Real-time captioning of PA to gate-area screens (E-0247 virtual-pat).
+- **Port Authority of NY & NJ — the mandate precedent.** Port Authority moved from encouragement to mandate for hearing loops at gates and information counters in new or significantly improved terminals (E-0070). The nearest US precedent for the kind of Design Manual amendment MWAA is being asked to write.
+- **Pittsburgh International (PIT) — the sensory-space precedent.** 1,500 sq ft sensory space with decommissioned American Airlines cabin, mock jetway (E-0067).
+
+### 9.2 Quantitative exhibits the article should carry forward from the quant brief
+
+The Strategist should treat these as chart-ready:
+
+- **Exhibit E1 — Design-time vs. retrofit cost delta:** basic acoustic ceiling $5–$15/sf new construction vs. $18–$45/sf retrofit; applied to Concourse E's 435,000 sf envelope, avoided rework range $1.3M–$17.4M (midpoint ~$6.8M). *Directly refutes the "affordability" objection.*
+- **Exhibit E3 — Intelligibility criteria:** STI ≥ 0.50 average per ADS, ≥ 0.45 at 90% of measurement locations, SNR ≥ 10 dB(A), commissioned at opening and re-verified every 5 years or after material acoustic change. *One-paragraph adoptable design-manual language.*
+- **Exhibit E4 — Announcement-density arithmetic:** typical US-hub boarding call sequence 6 announcements/gate/hour × 20 sec = 3.3% duty cycle; Helsinki/LCY-style final-call + all-zones-open ≈ 1.1% duty cycle; ~67% PA-time reduction. *Marked ASSUMPTION-driven pending MWAA telemetry.*
+- **Exhibit E5 — Cost of redundant channels:** MWAA-wide gate-area FIDS redundancy ~198 gates at $1.6M–$3.6M capex; mobile notification platform ~$500K/year opex ($2.5M five-year TCO); combined five-year range $4.1M–$6.1M. *0.02%–0.03% of the announced IAD program.*
+- **Exhibit E6 — CPE sensitivity:** incremental capital $12M–$40M → $0.9M–$3.0M annual debt service → $0.03–$0.11 per enplanement (0.16%–0.54% of the projected 2030 CPE of $20.71). *Article's headline "affordability is not the debate" number.*
+- **Exhibit E7 — Common target, divergent toolkit:** at IAD, designers pick ceiling systems ex ante; at DCA, retrofit means absorptive-object placement, PA re-aiming, and directional loudspeakers because ceiling replacement often isn't available. *The reason the standard is common but the prescriptions diverge.*
+
+### 9.3 Peer-airport comparison table the article could use (not yet built)
+
+Suggested columns: Airport | Traffic mix | Policy year | Announcement rule | Published intelligibility target | Accessibility mechanism | Verification of outcome | Primary source. Filling this table honestly would show that only ACRP 175 and NFPA 72 supply the "published intelligibility target" column, and that no peer airport supplies a "verification of outcome" column — a picture the article would be honest to publish.
+
+---
+
+## 10. Curator's summary
+
+The swarm produced a factually strong, thematically consistent body of evidence with two structural weaknesses. First, half the "silent airport" precedent stack cannot support the weight the article's title implies — SFO's numbers are self-reported, the European peers do not publish measurements, and Denver's veto is a warning MWAA cannot dismiss. Second, the ledger contains zero explicit contradictions before this pass, which understates the real disagreements between the operator-executive chairs (CEO, COO, Public Safety, EM Director) and the passenger-experience advocates. This map surfaces both.
+
+The article that survives is one that (a) reframes the standard as intelligibility-by-design anchored to ACRP 175, NFPA 72, and IEC 60268-16; (b) treats the Design Manual as the correct vehicle; (c) writes the recommendation in performance-spec terms that airlines can neither argue about nor circumvent; (d) sequences operational-governance moves against tenant audio explicitly, rather than promising them as byproducts; and (e) presents the SFO precedent as a mechanism, not a number.
+
+The article that will not survive fact-check is one that leans on the 40% figure, treats "silent airport" as a legal category, promises safety improvements through fewer announcements, or implies the NTSB report addressed MWAA terminal-side communications.
+
+The window to act runs until Concourse C/D scoping hardens. That is inside the current Board officer term. The Strategist should treat that window as the real deadline, not the article's own publication date.

@@ -105,12 +105,17 @@ def _normalise_record(
     ).strip()
     source_url = str(raw.get("source_url") or raw.get("url") or "").strip()
     source_path = str(raw.get("source_path") or "").strip()
+    # Paywalled standards (NFPA, IEC, ANSI) and print-only works carry a full
+    # written citation instead of a link. It must survive into the ledger or the
+    # ledger contract rejects a record stage 1 legitimately accepted.
+    source_citation = str(raw.get("source_citation") or "").strip()
     source = str(
         raw.get("source")
         or raw.get("source_title")
         or raw.get("citation")
         or source_url
         or source_path
+        or source_citation
         or ""
     ).strip()
     if not claim:
@@ -167,6 +172,7 @@ def _normalise_record(
             "source_title": str(raw.get("source_title") or source).strip(),
             "source_url": source_url or None,
             "source_path": source_path or None,
+            "source_citation": source_citation or None,
             "source_type": source_type,
             "is_primary": is_primary,
             "locator": str(
@@ -520,13 +526,23 @@ def bind_claim_lineage_to_draft(
                 record.get("footnote_id") or record.get("footnote") or ""
             ).strip()
             citation = definitions.get(footnote_id)
+            # The marker must annotate this claim. Containment holds either
+            # way round: a claim narrower than the marked sentence sits inside
+            # it, and a claim spanning several sentences contains the one the
+            # marker is attached to. Requiring only the first direction made
+            # every multi-sentence claim impossible to bind, which stalled the
+            # publication gate on claims that were correctly cited.
+            # `claim not in body_identity` still holds the line: the claim text
+            # must appear contiguously in the draft, so a record stitching
+            # together non-adjacent sentences is still refused.
+            contexts = marker_contexts.get(footnote_id, [])
+            annotated = any(
+                claim in context or context in claim for context in contexts
+            )
             if (
                 not claim
                 or claim not in body_identity
-                or not any(
-                    claim in context
-                    for context in marker_contexts.get(footnote_id, [])
-                )
+                or not annotated
                 or citation is None
                 or normalise(record.get("citation")) != normalise(citation)
             ):

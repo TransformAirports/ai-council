@@ -1,0 +1,121 @@
+# Technology Scout Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Author:** technology-scout
+**Stage:** 1 (independent research)
+**Run:** quiet-by-design-standards-for-mwaa-terminals-2
+**Date:** 2026-08-07
+
+---
+
+## 1. Scope framing
+
+The run thesis asks MWAA to fix acoustics, public-address (PA) zoning, information systems, and operational controls *before* designs harden — while preserving safety and accessibility. This brief maps the technology stack that determines whether a quiet-by-design standard is a measurable specification or a marketing slogan. It is deliberately narrow: I am not evaluating operational-intelligence platforms in the general sense (A-CDM, digital twins, biometrics). Those are the wrong lens for this run. The question here is what an airport operator can specify, measure, procure, and commission to hit an acoustic and communication target.
+
+## 2. A working taxonomy of the "quiet-by-design" stack
+
+I split the technology surface into five layers. Every layer has a measurable specification, a commodity procurement path, and an accessibility failure mode.
+
+**Layer A — Room acoustics.** Ceiling and wall absorption, floor treatment, reverberation time (RT60), background noise criteria (NC/RC). This is the layer that either enables everything above it or defeats it. Perforated metal ceilings, mineral fiber, micro-perforated aluminum, and porous absorbers behind acoustic louvers are the standard palette for terminal work. Incheon Terminal 1 was designed to RT60 < 3.5 s, NC-55, STI > 0.45; the extended Terminal 2 tightened to RT60 < 2.5 s and STI > 0.50 [Source: https://www.ingentaconnect.com/content/ince/incecp/2020/00000261/00000005/art00081].
+
+**Layer B — Distributed voice systems (PA/VA).** Loudspeaker density, zoning, delay compensation, and amplifier redundancy. NFPA 72 Chapter 24 governs emergency communications. Two commercial architectures dominate: (i) high-density ceiling-array PAVA (JBL, Bosch, TOA) tuned per zone; (ii) directional / parametric loudspeakers (Holosonics Audio Spotlight, Focusonics, Genasys) that beam intelligible speech into a defined footprint rather than a room. Ultrasonic parametric arrays exploit the nonlinearity of air to reproduce audible sound in a tight column [Source: https://www.holosonics.com/].
+
+**Layer C — Announcement generation and governance.** This is the "who talks and when" layer. Automated engines such as AviaVox produce multilingual phoneme-based speech tied to the AODB, so an announcement fires only when the flight state warrants it [Source: https://aviavox.com/for-airports/]. Bosch and TOA both distribute the AviaVox engine with their PAVA stacks [Source: https://www.toa.eu/toa-1/partnerships/aviavox]. The point of the engine is not that computers talk instead of humans; it is that the ruleset is auditable and the frequency of announcements becomes a KPI rather than a habit.
+
+**Layer D — Visual and digital redundancy.** FIDS density, gate-side dynamic displays, sub-FIDS "banners" under primary boards, mobile notifications, and personalized boarding-pass push. London City Airport paired its 2008 silent-terminal policy with real-time flight updates over Facebook Messenger and Twitter [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]. Helsinki added banners directly below FIDS boards and a WeChat channel for Chinese travelers [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. SITA's 2024 Passenger IT Insights reports 60% mobile-boarding-pass usage and 85% user satisfaction — a working denominator for how much communicative burden mobile can absorb before it excludes the other 40% [Source: https://www.sita.aero/resources/surveys-reports/2024-sita-passenger-it-insights/].
+
+**Layer E — Accessibility and low-stimulation refuge.** Hearing-loop induction systems (T-coil), captioned FIDS, tactile wayfinding, and sensory rooms. This layer is not an add-on to a quiet standard — it is the reason a quiet standard is legally defensible under ADA and the Air Carrier Access Act. Winnipeg Richardson (YWG) completed terminal-wide induction-loop coverage in December 2024, transmitting PA content directly to telecoil-enabled hearing aids [Source: https://www.inlandav.ca/post/case-study-championing-accessibility-at-the-winnipeg-richardson-international-airport-with-hearing]. Pittsburgh's "Presley's Place" is 1,500 sq ft and includes a jet-cabin replica for sensory desensitization; Atlanta opened the first US airport sensory room in 2016 [Source: https://blueskypit.com/sensory-rooms-aviations-latest-trend/].
+
+Things I intentionally exclude from the taxonomy: aircraft noise management (airside), employee hearing-protection programs (OSHA — different regulatory stack), retail background music (leased premises, tenant-controlled). MWAA can specify all three, but they are not the load-bearing decisions in a "quiet-by-design" standard.
+
+## 3. Standards a specification can cite
+
+- **Speech Transmission Index (STI) — IEC 60268-16 Ed. 5.** The single-number score (0 to 1) that quantifies how much speech information survives the room-plus-system chain [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. STIPA is the field-measurement variant; a modulated test signal is played through the installed system and read by a Class 1 sound-level meter in each occupied zone. Commercial meters (NTi Audio, Bedrock, Bruel & Kjaer) commission a terminal in a day.
+- **STI thresholds.** Below 0.36 unacceptable; 0.36–0.44 poor; 0.44–0.60 fair; 0.60–0.76 good; above 0.76 excellent. Public spaces including airports typically require ≥ 0.50 [Source: https://svantek.com/applications/speech-transmission-index-for-public-address-systems/].
+- **NFPA 72 Section 18.4.10 and Annex D.** Emergency voice-notification systems must deliver STI ≥ 0.45 or CIS ≥ 0.70 across the covered area [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/]. This is the floor MWAA cannot design under, regardless of quiet-airport ambition.
+- **Common Intelligibility Scale (CIS).** Alternative to STI, expressed 0 to 1; NFPA 72 accepts either.
+- **ACRP Research Report 175 (2017).** The only US-airport-specific design guideline for terminal PA intelligibility. Measured 46 spaces across participating airports; mean STI 0.51, at the edge of the IEC 60268 VA target of 0.50 [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf]. In plain language: the US industry, on average, is designing to a passing grade with no margin.
+- **Room-acoustic criteria.** RT60 (mid-frequency reverberation time), NC/RC (background noise criteria). Common terminal targets: NC 45–55, RT60 1.5–2.5 s depending on volume geometry. Incheon's tightening from Terminal 1 to Terminal 2 (3.5 s → 2.5 s RT60, 0.45 → 0.50 STI) is a useful trajectory to cite.
+- **ISO 9921** for verbal communication legibility in noise — safety-critical speech.
+
+## 4. Documented deployments — measured versus branded
+
+**London City (LCY), 2008.** The oldest continuously operating silent-terminal policy. Only essential announcements (emergencies, disruptions, display failures) are broadcast; flight information is pushed to screens, social channels, and airline apps [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]. LCY reports customer-satisfaction favorability for "terminal environment and noise"; the airport is small (~5M pax) and single-terminal, so the transfer risk to a hub is real. Independent operational-outcome data is thin.
+
+**Helsinki (HEL), 2015.** Removed non-essential PA in June 2015 [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. A 2016 passenger study — commissioned by the operator, not independent — reported respondents viewed the change as "more positive than neutral," lowering stress; wayfinding impact was "neutral." Mitigations: banners under FIDS, mobile app, WeChat for Chinese passengers, walk-time estimators. Terminal 2 was designed with perforated ceiling panels to enhance room acoustics for the same policy [Source: https://www.helsinki-airport.com/terminal-2.php].
+
+**Copenhagen (CPH).** Longstanding minimized-announcement policy. Independent Skytrax and Trustpilot reviews surface a specific operational complaint: gate announcements only within roughly 60 minutes of departure, producing dense queuing and passenger anxiety at gate opening [Source: https://www.airlinequality.com/airport-reviews/copenhagen-airport/]. This is the standard failure mode of a silent policy that under-invests in visual and mobile redundancy.
+
+**Dubai International (DXB), 2018.** The most quantitatively documented silent-airport transition on record. Dubai Airports coordinated with airlines to cap flight announcements at a maximum of two, cut total daily announcements from more than 2,000 to fewer than 700 (emergencies plus missing-child/passenger only), removed pre-boarding/boarding/final-boarding/gate-change calls, and simultaneously upgraded FIDS data quality [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/]. Cited rationale: mandatory security plus ad hoc broadcasts caused information overload and "switch off." This is the case with a real baseline and a real delta.
+
+**Chennai (MAA), 2017.** SMS-based airline notifications replaced gate announcements; gate changes still permitted verbally [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. Small hub, low complexity, useful as a shape-of-the-model reference.
+
+**Changi (SIN), December 2017.** Adopted the silent-airport policy with mixed social-media reception and specific concerns raised about vulnerable passengers [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]. Changi separately operates a Calm Room in Terminal 2 for neurodivergent travelers [Source: https://www.accessible-singapore.com/blogs/calm-room].
+
+**Incheon (ICN).** Not a silent-policy airport, but the best-documented case of designing a terminal *to a measured acoustic target*. Terminal 1: RT60 < 3.5 s, STI > 0.45, NC-55. Terminal 2 extension: RT60 < 2.5 s, STI > 0.50, D50 > 0.40. Ceiling perforated aluminum with porous absorbers and acoustic louvers were the primary treatments [Source: https://www.ingentaconnect.com/content/ince/incecp/2020/00000261/00000005/art00081]. Incheon is the useful "what to specify" reference; the silent-airport marquee airports are the "what to demand of operations" references.
+
+**Schiphol.** Schiphol's operational silent-airport claims are older and less documented in English-language primary sources than Dubai's. The verified Schiphol-specific narrative is the annual 2-minute national commemoration silence [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]. Treat "Schiphol silent since 2011" claims skeptically until an underlying operator policy document is located.
+
+## 5. What is off-the-shelf in 2026 and what is not
+
+Off-the-shelf, mature, procurable through a normal Div 27 spec:
+
+- STIPA commissioning as an acceptance test. Vendor-neutral, day-of-commissioning field measurement.
+- Zoned PAVA with directional loudspeakers for hold-room-limited audio (Holosonics, Focusonics, JBL zoned arrays).
+- AviaVox / AODB-linked automated announcement engines in 40+ languages [Source: https://aviavox.com/for-airports/].
+- Hearing-loop induction systems certified to IEC 60118-4 (Winnipeg 2024 as reference deployment).
+- Sensory rooms as a well-established program (ATL 2016, PIT 2019, Delta expansions).
+- FIDS with real-time push to airline apps; mobile boarding pass at 60% adoption / 85% satisfaction [Source: https://www.sita.aero/resources/surveys-reports/2024-sita-passenger-it-insights/].
+
+Still custom work:
+
+- **Announcement-governance policy tied to airline use agreements.** Dubai's "max two announcements per flight" required contractual language with signatory carriers. That is a bilateral policy artifact, not a product.
+- **Coordinated multi-channel redundancy — the "if PA goes off, what turns on"** matrix. There is no off-the-shelf orchestration layer that pushes an announcement out of PA, into hearing loops, onto FIDS banners, into airline apps, and to gate agents simultaneously with logging.
+- **Empirical passenger-experience measurement.** Ambient sound level, STIPA, missed-boarding rate, and passenger anxiety are not measured as a package by any commercial airport-experience platform in 2026.
+- **Historic-terminal integration.** DCA Terminal 1 (Historic District) and the Pelli Terminal 2 constrain loudspeaker mounting, ceiling penetration, and cable routing enough that the acoustic solution will be bespoke [Source: https://www.mwaa.com/reagan-national-airport-history — MWAA published Historic District status; verify in MWAA design manual].
+
+## 6. Failure modes documented in peer deployments
+
+1. **Silence without redundancy produces queue anxiety.** Copenhagen's persistent complaint pattern — gate opens, no announcement, passengers pile up 60 minutes early — is a design failure of the visual/mobile layer, not the PA layer [Source: https://www.airlinequality.com/airport-reviews/copenhagen-airport/].
+2. **Silence excludes the digitally disconnected.** Changi's social-media reception surfaced concerns about vulnerable passengers; the failure mode is real if the visual, hearing-loop, and staffed redundancies are not funded to the same standard as the mobile push [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over].
+3. **Designing to NFPA 72 minimum leaves no headroom.** ACRP 175's measured mean STI of 0.51 across 46 airport spaces is a warning: the industry designs to pass, not to be good. A quiet-by-design standard that specifies only NFPA's 0.45 minimum in occupied zones will produce the same result [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+4. **PA-engine automation without airline coordination fails.** AviaVox and equivalent systems trigger from the AODB; if the airline's boarding sequence is not integrated, the announcement is either wrong or missing. Dubai's coordination with airlines was the enabling step, not the technology purchase [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/].
+
+## 7. Honest assessment — real vs. hype
+
+**Real in 2026.** Room acoustics, PAVA, STI/STIPA commissioning, directional loudspeakers, automated announcement engines, hearing loops, and sensory rooms are mature, procurable technologies with published standards behind them. An operator willing to write numbers into the design manual can measure compliance on day one of occupancy. Incheon has done this; the specification path is proven.
+
+**Real, but scarce data.** "Silent airport" outcomes are almost entirely operator-reported and vendor-friendly. LCY, HEL, and DXB report favorable satisfaction; none of that data has been independently audited in a way MWAA's board should treat as decision-grade. The strongest single data point is Dubai's announcement-count delta (~2,000 → <700 per day) because it is a *before-and-after operational metric*, not a satisfaction survey.
+
+**Hype.** "Zen terminal," "calming environment," "wellness-driven passenger experience," and vendor case studies that measure success by lighting temperature and background music are marketing. MWAA should not accept any of these as design criteria; they lack thresholds and are unenforceable at commissioning.
+
+## 8. Verbatim data points a strategist can lift
+
+- Dubai International reduced daily terminal announcements from **over 2,000 to fewer than 700**, capping announcements at **two per flight**, negotiated bilaterally with airlines [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/].
+- **NFPA 72 Section 18.4.10 and Annex D** require emergency voice communication to deliver **STI ≥ 0.45 or CIS ≥ 0.70** across the covered area [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/].
+- ACRP Report 175 measured **mean STI 0.51 across 46 US airport spaces** — designing to pass, not to be good [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+- Incheon Terminal 2 was designed to **RT60 < 2.5 s, STI > 0.50, NC criteria applied per zone** — an example of a numeric specification MWAA could adopt [Source: https://www.ingentaconnect.com/content/ince/incecp/2020/00000261/00000005/art00081].
+- SITA 2024 reports **60% of passengers used mobile boarding passes, 85% satisfied** — meaning ~40% still need non-mobile channels [Source: https://www.sita.aero/resources/surveys-reports/2024-sita-passenger-it-insights/].
+- London City has run a silent terminal since **2008**, pushing information to screens, Messenger, and Twitter; gate-change exceptions remain [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy].
+- Winnipeg Richardson completed terminal-wide **hearing-loop induction coverage in December 2024** — the reference deployment for T-coil accessibility at a mid-size hub [Source: https://www.inlandav.ca/post/case-study-championing-accessibility-at-the-winnipeg-richardson-international-airport-with-hearing].
+- Pittsburgh's Presley's Place sensory room is **1,500 sq ft and includes a jet-cabin replica** for sensory desensitization; ATL opened the first US airport sensory room in 2016 [Source: https://blueskypit.com/sensory-rooms-aviations-latest-trend/].
+
+## 9. Evidence gaps
+
+- No independent (non-operator, non-vendor) measurement of passenger stress, missed-boarding rates, or wayfinding accuracy under a silent policy at any hub airport.
+- MWAA Design Manual and Tenant Design Handbook not publicly retrievable in this pass — cannot confirm whether current MWAA specification cites STI, RT60, or NC/RC. The airport-context packet named this gap; I did not close it.
+- No public evidence on how airline majority-in-interest provisions in the 2025–2039 MWAA use agreement would treat a change to hold-room audio governance or PA zoning.
+- No verified primary source for a Schiphol operational "silent since 2011" policy — treat trade-press claims with skepticism until sourced.
+- Cost data for the technology layers (PAVA per zone, directional loudspeaker per gate, hearing loop per hold room, sensory-room construction) not compiled here; procurement pricing depends on Div 27 specification detail beyond this brief's scope.
+
+## 10. Recommendation to the synthesis stage
+
+Treat "quiet-by-design" as a **specification problem**, not a **program name**. The Council brief should recommend that MWAA:
+
+- Adopt STI and RT60 numeric targets into the design manual, exceeding NFPA 72's 0.45 minimum (Incheon T2's 0.50 is a defensible floor; 0.55 in hold rooms is achievable).
+- Require zoned PAVA with directional or beam-steered loudspeakers at all new gates.
+- Require an AODB-integrated automated announcement engine and a *published, board-adopted announcement-frequency KPI* (Dubai's two-per-flight is the workable model).
+- Require hearing loops in every hold room and every checkpoint queue.
+- Require sensory / low-stimulation rooms at IAD (per concourse) and DCA (one per terminal minimum).
+- Reject any "quiet" specification that does not define measured compliance and post-occupancy verification.
+
+The rest of the Stage-1 swarm should test this specification frame against operational risk, regulatory friction, and airline economics.

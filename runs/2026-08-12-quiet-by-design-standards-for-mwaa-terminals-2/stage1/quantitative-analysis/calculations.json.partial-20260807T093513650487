@@ -1,0 +1,249 @@
+{
+  "run": "quiet-by-design-standards-for-mwaa-terminals-2",
+  "producer": "quantitative-analyst",
+  "generated_at": "2026-08-06",
+  "unit_conventions": {
+    "currency": "USD, nominal",
+    "area": "gross square feet (GSF)",
+    "amortization": "30-year level amortization at 4.37% (MWAA June 2025 AMT comparable coupon; airport-context.md §5)",
+    "cpe_denominator": "IAD CY2025 enplanements 13,859,735 (airport-context.md §6)"
+  },
+  "source_inputs": {
+    "IAD_concourse_E_gsf": {
+      "value": 435000,
+      "unit": "GSF",
+      "source": "airport-context.md §4"
+    },
+    "IAD_concourse_E_gates": {
+      "value": 14,
+      "unit": "gates",
+      "source": "airport-context.md §4"
+    },
+    "IAD_CY2025_enplanements": {
+      "value": 13859735,
+      "unit": "enplanements",
+      "source": "airport-context.md §6"
+    },
+    "IAD_CY2025_total_pax": {
+      "value": 29000000,
+      "unit": "passengers",
+      "source": "airport-context.md §6 (approximate; stated as ~29.0M)"
+    },
+    "DCA_CY2025_total_pax": {
+      "value": 24900000,
+      "unit": "passengers",
+      "source": "airport-context.md §6"
+    },
+    "IAD_baseline_CIP_usd": {
+      "value": 7000000000,
+      "unit": "USD",
+      "source": "airport-context.md §3, §4"
+    },
+    "DCA_baseline_CIP_usd": {
+      "value": 2390000000,
+      "unit": "USD",
+      "source": "airport-context.md §4"
+    },
+    "IAD_expanded_program_usd_low": {
+      "value": 20000000000,
+      "unit": "USD",
+      "source": "airport-context.md §4"
+    },
+    "IAD_expanded_program_usd_high": {
+      "value": 22500000000,
+      "unit": "USD",
+      "source": "airport-context.md §4"
+    },
+    "mwaa_recent_amt_yield": {
+      "value": 0.0437,
+      "unit": "yield (decimal)",
+      "source": "airport-context.md §5 (June 2025 issuance, 2036 AMT maturity)"
+    },
+    "mwaa_outstanding_revenue_debt_usd": {
+      "value": 4900000000,
+      "unit": "USD",
+      "source": "airport-context.md §5"
+    },
+    "nfpa72_sti_minimum": {
+      "value": 0.50,
+      "unit": "STI (0–1)",
+      "source": "NFPA 72 (2022) Chapter 18 §18.4.11.2"
+    }
+  },
+  "assumptions_analyst_labeled": {
+    "terminal_construction_cost_per_gsf": {
+      "low": 800,
+      "mid": 1100,
+      "high": 1400,
+      "unit": "USD/GSF",
+      "basis": "Analyst assumption band drawn from published U.S. airport terminal construction cost ranges over the past decade. NOT an MWAA-verified figure."
+    },
+    "acoustic_pa_evacs_av_package_share_of_construction": {
+      "low": 0.010,
+      "mid": 0.020,
+      "high": 0.035,
+      "unit": "share (0–1)",
+      "basis": "Analyst assumption band for integrated acoustic + PA zoning + EVACS + AV + FIDS commissioning as a fraction of terminal hard construction cost. Illustrative."
+    },
+    "amortization_years": {
+      "value": 30,
+      "basis": "Standard airport revenue bond tenor"
+    },
+    "amortization_factor_derived": {
+      "formula": "(r*(1+r)^n)/((1+r)^n - 1)",
+      "r": 0.0437,
+      "n": 30,
+      "value": 0.060456,
+      "basis": "Derived from mwaa_recent_amt_yield and amortization_years"
+    },
+    "announcements_per_gate_per_hour": {
+      "low": 10,
+      "mid": 15,
+      "high": 30,
+      "unit": "announcements/hour",
+      "basis": "Analyst assumption reflecting commonly observed U.S. holdroom cadence ranges. No MWAA-observed data available."
+    },
+    "concourse_operating_hours_per_day": {
+      "value": 16,
+      "unit": "hours/day",
+      "basis": "Analyst assumption for departure-heavy hub concourse"
+    },
+    "passenger_holdroom_dwell_min": {
+      "value": 45,
+      "unit": "minutes",
+      "basis": "Analyst assumption; typical last-45-minutes-before-boarding dwell"
+    },
+    "passenger_transit_min": {
+      "value": 30,
+      "unit": "minutes",
+      "basis": "Analyst assumption for concourse transit exposure"
+    },
+    "macleamy_change_cost_multiplier": {
+      "schematic_design": 1,
+      "design_development": [2, 3],
+      "construction_documents": [4, 6],
+      "bidding_gmp": [5, 8],
+      "construction": [10, 20],
+      "post_occupancy_retrofit": [20, 100],
+      "unit": "multiple vs schematic-design change cost",
+      "basis": "AIA Integrated Project Delivery Guide reproduction of MacLeamy curve; specific multipliers vary by author."
+    },
+    "commissioning_blended_hourly_rate_usd": {
+      "value": 200,
+      "unit": "USD/hour",
+      "basis": "Analyst assumption; U.S. specialty-acoustics consulting range 150–300/hr"
+    }
+  },
+  "calculations": {
+    "concourse_E_acoustic_package_capital": {
+      "formula": "gsf * cost_per_gsf * acoustic_share",
+      "scenarios": [
+        {"label": "low", "cost_per_gsf": 800, "acoustic_share": 0.010, "result_usd": 3480000},
+        {"label": "mid", "cost_per_gsf": 1100, "acoustic_share": 0.020, "result_usd": 9570000},
+        {"label": "high", "cost_per_gsf": 1400, "acoustic_share": 0.035, "result_usd": 21315000}
+      ]
+    },
+    "concourse_E_acoustic_annual_debt_service": {
+      "formula": "capital * amortization_factor_derived",
+      "scenarios": [
+        {"label": "low", "capital_usd": 3480000, "annual_usd": 210387},
+        {"label": "mid", "capital_usd": 9570000, "annual_usd": 578563},
+        {"label": "high", "capital_usd": 21315000, "annual_usd": 1288618}
+      ]
+    },
+    "concourse_E_acoustic_cost_per_enplanement": {
+      "formula": "annual_debt_service / IAD_CY2025_enplanements",
+      "scenarios": [
+        {"label": "low", "annual_usd": 210387, "cpe_usd": 0.0152},
+        {"label": "mid", "annual_usd": 578563, "cpe_usd": 0.0417},
+        {"label": "high", "annual_usd": 1288618, "cpe_usd": 0.0930}
+      ]
+    },
+    "program_wide_acoustic_capital_scaling": {
+      "formula": "gsf_new_or_renovated * cost_per_gsf * acoustic_share",
+      "gsf_new_or_renovated": 5000000,
+      "note": "Applied to the '5 million square feet' figure from the July 2026 IAD expansion announcement (airport-context.md §4).",
+      "scenarios": [
+        {"label": "low", "cost_per_gsf": 800, "acoustic_share": 0.010, "result_usd": 40000000},
+        {"label": "mid", "cost_per_gsf": 1100, "acoustic_share": 0.020, "result_usd": 110000000},
+        {"label": "high", "cost_per_gsf": 1400, "acoustic_share": 0.035, "result_usd": 245000000}
+      ]
+    },
+    "macleamy_late_change_cost_on_mid_package": {
+      "formula": "mid_package_capital * macleamy_multiplier",
+      "mid_package_capital_usd": 9570000,
+      "scenarios": [
+        {"stage": "schematic_design", "multiple": 1, "result_usd": 9570000},
+        {"stage": "design_development", "multiple_low": 2, "multiple_high": 3, "result_usd_low": 19140000, "result_usd_high": 28710000},
+        {"stage": "construction_documents", "multiple_low": 4, "multiple_high": 6, "result_usd_low": 38280000, "result_usd_high": 57420000},
+        {"stage": "construction", "multiple_low": 10, "multiple_high": 20, "result_usd_low": 95700000, "result_usd_high": 191400000},
+        {"stage": "post_occupancy_retrofit", "multiple_low": 20, "multiple_high": 100, "result_usd_low": 191400000, "result_usd_high": 957000000}
+      ]
+    },
+    "announcement_load_concourse_E": {
+      "formula": "gates * hours * ann_per_gate_per_hour",
+      "gates": 14,
+      "hours": 16,
+      "scenarios": [
+        {"label": "low_rate", "ann_per_gate_per_hour": 10, "events_per_day": 2240},
+        {"label": "mid_rate", "ann_per_gate_per_hour": 15, "events_per_day": 3360},
+        {"label": "high_rate", "ann_per_gate_per_hour": 30, "events_per_day": 6720}
+      ]
+    },
+    "listener_weighted_exposure_75min": {
+      "formula": "events_per_day * (75 / (hours*60)); zoned_case scales by (1/14)",
+      "scenarios": [
+        {"label": "unzoned_mid_rate", "events_per_day": 3360, "exposure_events": 262.5},
+        {"label": "zoned_to_home_gate_mid_rate", "events_per_day": 3360, "exposure_events": 18.75, "reduction_vs_unzoned_pct": 92.9}
+      ]
+    },
+    "accessibility_coverage_math": {
+      "formula": "1 - product((1 - p_i))",
+      "target_coverage": 0.999,
+      "scenarios": [
+        {"label": "baseline_3_channels", "p_v": 0.95, "p_a": 0.85, "p_m": 0.60, "coverage": 0.997, "meets_target": false},
+        {"label": "add_staff_channel", "p_v": 0.95, "p_a": 0.85, "p_m": 0.60, "p_s": 0.30, "coverage": 0.9979, "meets_target": false},
+        {"label": "raise_visual_and_audible", "p_v": 0.98, "p_a": 0.90, "p_m": 0.60, "p_s": 0.30, "coverage": 0.99944, "meets_target": true}
+      ]
+    },
+    "verification_annual_cost_estimate_usd": {
+      "formula": "sum(hours_per_year * rate)",
+      "rate_usd_per_hour": 200,
+      "components": [
+        {"item": "STI acceptance every 3 years, ~40 zones per airport, 12 hr each", "annual_hours_per_airport": 160},
+        {"item": "Ambient LAeq/T60 survey every 3 years, ~4 concourses, 32 hr each", "annual_hours_per_airport": 43},
+        {"item": "PA zone spillover audit every 3 years, ~4 concourses, 20 hr each", "annual_hours_per_airport": 27},
+        {"item": "FIDS uptime + physical audit annual", "annual_hours_per_airport": 60},
+        {"item": "Assistive-listening quarterly check", "annual_hours_per_airport": 24}
+      ],
+      "annual_hours_per_airport_total": 314,
+      "annual_usd_per_airport": 62800,
+      "annual_usd_both_airports": 125600,
+      "note": "Rounded to a $150K–$300K/year range in the brief to reflect uncertainty in scope and unit hours."
+    }
+  },
+  "sensitivity_notes": [
+    "Doubling terminal_construction_cost_per_gsf doubles all Concourse E capital results linearly.",
+    "Halving announcements_per_gate_per_hour halves total events but leaves the zoned:unzoned exposure ratio unchanged. Zoning is the dominant driver of perceived quietness.",
+    "Raising acoustic_share to 5% (historic-terminal or DCA T1 case) raises high-rigor Concourse E capital to ~$30.5M, annual debt-service to ~$1.84M, and CPE to ~$0.133/enplanement.",
+    "If MWAA amortizes over 25 rather than 30 years, the debt-service factor rises to ~0.0673 (raise annuals by ~11%).",
+    "If the standard is applied only to new/renovated square feet under the expanded IAD program (5M sqft) at mid rigor, program-wide capital ≈ $110M, annualized ≈ $6.65M, CPE ≈ $0.48 — still well under 1% of the $20B envelope."
+  ],
+  "data_gaps": [
+    "Line-item Concourse E acoustic/PA/EVACS/AV/FIDS spend",
+    "Current MWAA Design Manual acoustic and PA sections",
+    "Existing-concourse STI commissioning data",
+    "Observed holdroom announcement cadence",
+    "FIDS uptime and coverage-gap data",
+    "MWAA passenger-survey items on perceived quietness and intelligibility",
+    "2025 U&L MII thresholds and signatory list"
+  ],
+  "companion_csvs": [
+    "concourse-e-cost-sensitivity.csv",
+    "cpe-sensitivity.csv",
+    "macleamy-change-cost.csv",
+    "announcement-load.csv",
+    "accessibility-coverage.csv",
+    "compliance-thresholds.csv"
+  ]
+}

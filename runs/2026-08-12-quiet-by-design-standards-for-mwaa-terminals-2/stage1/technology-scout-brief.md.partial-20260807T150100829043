@@ -1,0 +1,360 @@
+# Technology Scout Brief — Quiet-by-Design Terminal Technology for MWAA
+
+Run: `quiet-by-design-standards-for-mwaa-terminals-2`
+Prepared: 2026-08-07
+Lens: what is on the market, what is proven in airport deployment, what still needs
+custom engineering, and what a MWAA design standard actually has to specify to be
+buildable, testable, and enforceable.
+
+The run brief warns against "recommending technologies or acoustic products before
+defining the required performance and operating model." I take that seriously: this
+brief is a scan of the technology stack organized around the performance targets a
+MWAA standard would set, not a product catalog. Every category below is described
+in terms of what it does to the measurable acoustic and information environment,
+what standard governs it, and what is genuinely off-the-shelf in 2026 versus what
+still requires bespoke integration.
+
+---
+
+## 1. Taxonomy: what "quiet-by-design technology" actually is
+
+A useful taxonomy separates the stack into four layers. The failure mode of most
+"quiet airport" projects is buying products from one layer without specifying the
+others.
+
+**Layer 1 — Room acoustics and finishes.** Absorption (NRC/SAA-rated ceilings,
+wall panels, carpet), diffusion, HVAC and baggage-system source control, and
+partition design. These set the ambient sound level (measured as NC or RC) and the
+mid-frequency reverberation time (T30/RT60) that every downstream system inherits.
+ACRP Research Report 175 documents that background noise in the surveyed terminals
+ranged from roughly NC 45 to NC 60 and RT from about 1.2 to 3.5 seconds — a range
+across which the same loudspeaker will produce Speech Transmission Index (STI)
+readings that differ by 0.2 or more, i.e., the difference between "intelligible"
+and "code-failing." [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/201/original/acrp_r175.pdf]
+
+**Layer 2 — Voice notification and PA.** Amplifiers, DSP, zone control,
+loudspeaker density and directivity, plus the emergency voice-alarm layer required
+by NFPA 72 and (where relevant) EN 54-16 certified equipment. In 2026 this layer
+is dominated by IP-audio platforms (Q-SYS, Biamp Tesira, Bosch Praesensa, Bose
+ControlSpace) that make fine-grained zoning trivial in software once loudspeaker
+coverage is right in hardware. What is still hard is the loudspeaker layout: an
+open-plan concourse under a 30-foot ceiling with 2.5-second RT will not become
+intelligible by adding zones, only by adding sources with tighter directivity.
+
+**Layer 3 — Visual and digital information.** Flight information display systems
+(FIDS), dynamic wayfinding, gate-side monitors, "silent TV" strategies, and
+digital signage feeds. Quiet-airport implementations from Helsinki, Schiphol, and
+London City all rest on the same operating premise: passengers get flight status
+from screens and the app, not from ceiling speakers. [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]
+[Source: https://www.londoncityairport.com/silent-airport-policy]
+
+**Layer 4 — Personal and assistive channels.** Airline and airport mobile apps
+with push notifications, Bluetooth beacons for gate proximity, hearing loops
+(induction) for hearing-aid users, and — the emerging one — Bluetooth LE Audio
+Auracast broadcasts. Auracast lets a gate PA broadcast directly to any compatible
+hearing aid, earbud, or phone inside the coverage bubble, replacing the induction
+loop's copper wire with a software-defined coverage zone. [Source: https://www.bluetooth.com/auracast/assistive-listening/]
+
+The taxonomy matters because MWAA's design manual can only enforce what it can
+measure. Layer 1 and Layer 2 have mature ISO/IEC/NFPA metrics. Layer 3 has
+industry-standard uptime SLAs. Layer 4 accessibility is largely governed by ADA
+Section 706 for assistive listening plus airline ACAA obligations. The standard
+should be written against those metrics, not against product names.
+
+---
+
+## 2. Key findings
+
+- **The reference document already exists.** ACRP Research Report 175, *Improving
+  Intelligibility of Airport Terminal Public Address Systems* (TRB / Wilson Ihrig,
+  2017), is the closest thing the industry has to a written quiet-airport
+  engineering baseline for U.S. airports. It surveys real terminal acoustics,
+  documents the STI/RT/NC relationships, and prescribes design and commissioning
+  procedures. MWAA does not need to invent a physics chapter for its manual; it
+  needs to adopt ACRP 175 by reference and set airport-specific numeric targets
+  above the ACRP floor. [Source: https://nap.nationalacademies.org/catalog/24839/improving-intelligibility-of-airport-terminal-public-address-systems]
+
+- **NFPA 72 is the mandatory floor, and it is a low floor.** NFPA 72 (2022) Annex
+  D states that intelligibility is acceptable if at least 90% of measurement
+  locations in an "acoustically distinguishable space" (ADS) achieve STI ≥ 0.45,
+  with an average ≥ 0.50 (equivalent to CIS 0.65 / 0.70). Crucially, NFPA 72
+  treats quantitative measurement as *permitted, not required* — a listening test
+  can satisfy the code. A MWAA standard that stops at NFPA compliance will get
+  concourses that pass a listening test and still sound like every other American
+  airport. [Source: https://sdifire.com/ensuring-clear-communication/]
+
+- **Silent-airport policy is nine to twenty-five years old, not new.** Schiphol
+  branded itself a silent airport in the 2000s; Helsinki-Vantaa turned off
+  concourse-wide flight and passenger announcements on 1 June 2015; London City
+  operates a silent departure lounge with tannoy use restricted to emergencies
+  and bad weather; SFO's Quiet Airport program (from 2018) reports a ~40%
+  reduction in announcements and roughly 90 minutes of announcements per day
+  eliminated in the International Terminal. [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]
+  [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]
+  This is not experimental. It is a well-worn operating model.
+
+- **Directional loudspeaker arrays are moving from novelty to mainline transport
+  infrastructure.** Deutsche Bahn's Frankfurt Central Station trialed Holoplot's
+  beamforming arrays to deliver platform-specific announcements without bleed
+  into adjacent areas. In airport terms this is the technology that finally
+  breaks the "one PA, one concourse" architecture and lets a single hold room be
+  addressed without spilling into the gate next door. [Source: https://audioxpress.com/news/holoplot-showcases-broader-possibilities-for-3d-audio-beamforming-and-wavefield-synthesis-at-ise-2024]
+  The technology is real; the cost is not "just another PA system."
+
+- **Bluetooth LE Audio / Auracast is the accessibility inflection point.** In 2026
+  Auracast is a shipping Bluetooth SIG standard, supported in shipping hearing
+  aids from GN/ReSound, Starkey, and others. It replaces induction loops with
+  software-defined broadcast zones and can deliver the *same* audio to a
+  hearing-aid user, a passenger with earbuds, and an ADA assistive-listening
+  receiver. This is the first credible way for a quiet terminal to reduce ambient
+  announcements without cutting the deaf and hard-of-hearing population out of
+  the information stream. [Source: https://www.bluetooth.com/auracast/assistive-listening/]
+
+- **Sensory-inclusion "certification" is a training and signage program, not a
+  technology stack.** KultureCity's Sensory Inclusive certification — deployed at
+  LaGuardia Terminal B, Pittsburgh, Minneapolis-St Paul, and dozens of other
+  airports — is primarily staff training plus sensory bags and a room. Airports
+  buy it because it is credible and cheap, not because it changes the acoustic
+  environment. Any MWAA quiet standard should treat it as a Layer 4
+  complement, not a substitute for Layer 1 acoustic performance. [Source: https://www.aviationpros.com/airport-business/news/55337463/laguardia-terminal-b-introduces-new-sensory-accessibility-program-through-partnership-with-kulturecity]
+
+- **The failure mode is announcement-count metrics.** SFO's own program measures
+  itself in announcements-removed-per-day, which is a policy metric, not an
+  acoustic one. Passenger complaints in the trade press about the SFO policy
+  cluster around missed information, not decibels. [Source: https://simpleflying.com/airport-quiet-policy-frustrating-passengers-sfo/]
+  A MWAA standard measured in "announcements eliminated" will regress the same
+  way. The right metrics are Layer 1 and Layer 2 (NC, RT, STI in each ADS) plus
+  Layer 3/4 information-delivery SLAs (screen coverage per seat, app push latency,
+  Auracast coverage of every gate), with announcement policy as an operational
+  procedure downstream of those.
+
+---
+
+## 3. Evidence — technology categories, standards, deployments
+
+### 3.1 Standards catalog for a MWAA design manual
+
+The following standards are what an actual quiet-by-design specification would
+reference. All are real, current, and available to a MWAA design consultant.
+
+- **NFPA 72 (2022), National Fire Alarm and Signaling Code**, Chapter 24 and
+  Annex D — voice intelligibility, ADS definition, STI/CIS thresholds. Governs
+  the *emergency* voice layer. [Source: https://sdifire.com/ensuring-clear-communication/]
+- **IEC 60268-16**, Sound system equipment — Objective rating of speech
+  intelligibility by speech transmission index. The measurement method (STIPA)
+  referenced by NFPA 72 and by ACRP 175. [Source: https://www.iso.org/standard/74237.html for related family; primary IEC document is print/paid]
+- **EN 54-16**, Voice alarm control and indicating equipment. European
+  equivalent; relevant if MWAA specifies EN-certified DSP for
+  interoperability. [Source: https://sdifire.com/ensuring-clear-communication/]
+- **ISO 3382-3:2012**, Measurement of room acoustic parameters — Open plan
+  offices. Directly applicable to airside concourses and check-in halls; defines
+  distraction distance and spatial decay of speech, both of which map cleanly to
+  terminal layout decisions. [Source: https://www.iso.org/standard/74237.html adjacent standard family]
+- **ISO 22955:2021**, Acoustic quality of open office spaces. Not written for
+  airports, but the only published standard that treats large open volumes as
+  activity-typed zones with numeric acoustic targets; a useful template for the
+  "acoustically distinguishable space" categories a MWAA standard would need.
+  [Source: https://www.iso.org/standard/74237.html]
+- **ANSI/ASA S12.2**, Criteria for evaluating room noise (NC / RC / NCB). The
+  ambient sound criteria a MWAA standard would set per space type.
+- **ADA 2010 Standards, §706** and **§219** — assistive listening: number of
+  receivers required, hearing-aid compatibility. Sets the accessibility floor
+  Auracast rollouts must meet or exceed.
+- **ACRP Research Report 175 (2017)** — the airport-specific document; contains
+  survey data, design guidelines, and a commissioning chapter that could be
+  lifted almost verbatim into a MWAA design-manual appendix. [Source: https://nap.nationalacademies.org/read/24839/chapter/11]
+
+### 3.2 Airports with documented deployments
+
+- **Helsinki (HEL / Finavia)** — Silent airport since 1 June 2015. No terminal-
+  wide flight or passenger announcements; passengers directed to FIDS, website,
+  and app. Gate-side and emergency announcements retained. Quiet pods, quiet
+  rooms, and a published sensory offer. [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]
+  [Source: https://customerservice.finavia.fi/en/support/solutions/articles/79000120316-is-there-a-quiet-room-at-the-airport-]
+- **Amsterdam Schiphol (AMS)** — "Virtually no announcements"; information is
+  pushed to FIDS, website, and Schiphol app. Also runs a formal accessibility
+  program for deaf and blind passengers alongside the silent policy. [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]
+  [Source: https://www.schiphol.nl/en/assistance/flying-for-the-deaf-and-blind/]
+- **London City (LCY)** — Silent departure lounge; tannoy only during emergency
+  or weather disruption; passengers rely on FIDS. [Source: https://www.londoncityairport.com/silent-airport-policy]
+- **San Francisco (SFO)** — Quiet Airport since 2018. Music restrictions on
+  retail tenants, boarding announcements confined to the immediate boarding
+  area, no terminal-wide "final call." Reported ~40% announcement reduction and
+  ~90 minutes/day removed in the International Terminal. Public reaction has
+  been polarized; missed-information complaints are the dominant negative. [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]
+  [Source: https://simpleflying.com/airport-quiet-policy-frustrating-passengers-sfo/]
+- **LaGuardia Terminal B (LGA)** — KultureCity Sensory Inclusive certification;
+  sensory bags, sensory room, staff training. Represents the training-and-
+  facilities model rather than the acoustic model. [Source: https://www.aviationpros.com/airport-business/news/55337463/laguardia-terminal-b-introduces-new-sensory-accessibility-program-through-partnership-with-kulturecity]
+
+### 3.3 Vendor landscape (2026, off-the-shelf)
+
+- **IP-audio DSP / zone control platforms:** QSC Q-SYS, Biamp Tesira, Bosch
+  Praesensa (EN 54-16), Bose ControlSpace, Ateis, TOA. Any of these can deliver
+  Layer 2 zoning against an ACRP-175-quality design; the differentiator is EN 54
+  certification (Praesensa) if MWAA wants a single certified emergency + PA
+  platform.
+- **Directional / beamformed arrays:** Holoplot X1/X2 (beamforming and wavefield
+  synthesis; Frankfurt Central Station reference), Meyer Sound Panaray,
+  Renkus-Heinz IC / Iconyx (steerable columns). Renkus-Heinz Iconyx is the
+  price-per-coverage sweet spot for hold rooms with hard finishes. Holoplot is
+  the ceiling of what is possible and prices accordingly. [Source: https://audioxpress.com/news/holoplot-showcases-broader-possibilities-for-3d-audio-beamforming-and-wavefield-synthesis-at-ise-2024]
+- **STI/STIPA measurement:** NTi Audio XL2 with STIPA option, Bedrock Audio
+  SM90, Bruel & Kjaer 2270. Any of these is capable of documenting NFPA 72
+  Annex D compliance and ACRP 175 design values. MWAA should require quarterly
+  measurement, not one-time commissioning.
+- **Ambient sound monitoring dashboards:** Softdb, RION, and DIY LoRa/IP sensor
+  meshes are all viable. This is now off-the-shelf; the question is who owns
+  the alerts.
+- **Auracast broadcasters:** Ampetronic (already the market leader in induction
+  loops), Contacta, and a widening list of standard AV-over-IP vendors are
+  shipping Auracast-capable transmitters in 2026. Hearing-aid support is
+  shipping from GN/ReSound and others. [Source: https://www.bluetooth.com/auracast/assistive-listening/]
+- **FIDS and digital wayfinding:** SITA, Amadeus, INFAX, Ultramain are the
+  incumbent airport-specific vendors; digital signage is commoditized. Screen
+  density per seat is the real MWAA design decision, not vendor selection.
+- **Sensory certification:** KultureCity is the only widely recognized U.S.
+  airport certification. Missoula, LGA Terminal B, and MSP are documented
+  reference sites. [Source: https://opendoorsnfp.org/wp-content/uploads/2023/05/US-Airports-with-Sensory-Rooms.pdf]
+
+### 3.4 Off-the-shelf vs custom in 2026
+
+**Off-the-shelf in 2026:** EN 54-16 certified voice-alarm DSP; zone-per-gate
+software control; STIPA measurement; commodity FIDS; KultureCity certification;
+Auracast broadcasters at gate scale; steerable-column loudspeakers.
+
+**Still custom / integration work:** whole-terminal acoustic modeling tied to the
+architectural model (BIM-integrated ODEON or CATT-Acoustic runs); MWAA-specific
+announcement scripting and category taxonomy; airline-app deep links for
+individual boarding pushes at DCA/IAD; Auracast integration with airline
+gate-hosting; PA/FIDS/app/Auracast governance policy (who can trigger what, on
+which zones, under which operating scenarios); commissioning acceptance criteria
+that survive a substantial-completion punch list.
+
+### 3.5 Cost and ROI — what is known, what is claimed, what is not
+
+Public airport disclosures rarely separate PA/FIDS/acoustic cost from the shell
+they sit in, and vendor case studies almost never publish audited ROI. What is
+defensible to say:
+
+- ACRP 175 explicitly frames intelligibility as a design-and-commissioning
+  problem, not a procurement one, and notes that "the technology to achieve
+  appropriate acoustics is readily available" — i.e., the marginal capex is
+  small when specified early and large when retrofitted. [Source: https://nap.nationalacademies.org/read/24839/chapter/11]
+- SFO reports announcement-count reductions but does not publish independently
+  audited passenger-experience or missed-boarding data tied to the Quiet Airport
+  program. Read the 40% and 90-minute figures as self-reported policy metrics,
+  not as measured outcomes. [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]
+- Vendor ROI claims for directional loudspeaker arrays (Holoplot and peers) are
+  almost entirely drawn from live-events and rail deployments. There is no
+  peer-reviewed airport ROI study in the public record.
+
+Any cost range in a MWAA standard should therefore be built bottom-up from
+per-square-foot loudspeaker density and finish upgrade allowances, not from
+vendor case studies.
+
+### 3.6 Failures and stalled deployments
+
+The public record on failed quiet-airport deployments is thin because failures
+are unbranded — an airport that quietly turned announcements back on rarely
+publishes a case study. What is visible:
+
+- **SFO policy backlash.** Passenger and aviation-press complaints about missed
+  boardings and confusion at SFO are documented. The failure mode is treating
+  announcement removal as the goal rather than as a downstream consequence of
+  better information architecture. [Source: https://simpleflying.com/airport-quiet-policy-frustrating-passengers-sfo/]
+- **Silent-airport branding as a marketing exercise.** Multiple "silent airport"
+  lists in the trade press include airports whose only implementation is a
+  press release. A MWAA standard should refuse to accept "silent" as a claim
+  without STI, RT, NC, and per-ADS measurement.
+- **Induction-loop obsolescence risk.** Airports installing new copper induction
+  loops in 2026, with Auracast shipping in mainstream hearing aids, face a
+  written-down asset within a design life.
+
+---
+
+## 4. Honest assessment of maturity
+
+**Real, mature, buy-it now:** IP-audio DSP with fine-grained zoning (Q-SYS,
+Biamp, Praesensa); STIPA measurement; Layer-1 acoustic materials with published
+NRC/SAA data; sensory certification programs; commodity FIDS. A MWAA design
+standard could specify all of these against numeric targets today without waiting
+for any product roadmap.
+
+**Real but early:** Beamformed loudspeaker arrays at airport scale (proven at
+Frankfurt Central Station and event venues, not yet a mainline U.S. airport
+reference); Auracast at gate scale (standard is shipping, ecosystem is thin but
+growing fast); BLE-beacon boarding pushes via airline apps (works, but requires
+airline concurrence).
+
+**Hype more than substance:** "AI-driven" announcement generation; "smart"
+sensor-driven quiet-mode automation without measured baseline; airport-branded
+"silent" claims without measurement; sensory certifications marketed as design
+standards.
+
+**Genuinely missing:** A published, peer-reviewed airport quiet-terminal outcome
+study that ties Layer 1–4 investment to measured passenger, employee, and
+operational outcomes across seasons and irregular ops. If MWAA builds one, it
+would be the reference.
+
+---
+
+## 5. Verbatim data points a strategist can use
+
+1. "The intelligibility of an emergency communication system is considered
+   acceptable if at least 90 percent of the measurement locations within each
+   ADS have a measured Speech Transmission Index (STI) of not less than 0.45
+   (0.65 CIS) and an average STI of not less than 0.50 STI (0.70 CIS)."
+   — NFPA 72 Annex D, as quoted by industry compliance summaries. [Source: https://sdifire.com/ensuring-clear-communication/]
+
+2. "The airport advertises that these new policies have reduced the number of
+   announcements by 40% in boarding areas. In the International Terminal
+   they've eliminated over 90 minutes of unnecessary announcements a day."
+   — SFO Quiet Airport program, self-reported. [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]
+
+3. Helsinki-Vantaa became a silent airport on 1 June 2015 — "no flight or
+   passenger announcements will be made in the terminal," with exceptions
+   retained for gate-side changes, disruption, and FIDS failure. [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]
+
+4. London City Airport policy: "No tannoy announcements are made throughout the
+   departure lounge. Only in the case of emergency or during bad weather will
+   announcements be made." — LCY Silent Airport Policy page. [Source: https://www.londoncityairport.com/silent-airport-policy]
+
+5. "Acoustics is often called the forgotten dimension in architectural design"
+   and "the technology to achieve appropriate acoustics is readily available."
+   — ACRP Research Report 175, foreword. [Source: https://nap.nationalacademies.org/read/24839/chapter/11]
+
+---
+
+## 6. Implications for the MWAA standard
+
+Three implications flow from the technology scan:
+
+**Specify performance, name standards, avoid product names.** The MWAA design
+manual should adopt NFPA 72 Annex D as the emergency floor, adopt ACRP 175 as
+the design-and-commissioning method, adopt ISO 22955 (or its logic) for ADS
+categorization, and set per-ADS NC / RT / STI targets that are more demanding
+than the NFPA floor. It should not name vendors.
+
+**Require Layer 4 accessibility before permitting Layer 2 reduction.** Any
+reduction in ambient announcements at a MWAA gate should be gated on Auracast or
+equivalent broadcast coverage plus ADA §706 compliance plus documented
+airline-app push capability. This is the language that keeps a quiet-terminal
+standard from becoming an accessibility regression.
+
+**Build a measurement regime, not a policy count.** Quarterly STI/STIPA
+measurement per ADS, published; ambient NC monitoring against a live baseline;
+missed-boarding rates by gate benchmarked against pre-standard baseline. If the
+standard cannot be measured against these, it will drift into "fewer
+announcements" and inherit SFO's backlash.
+
+The Council's larger question — what is mandatory across MWAA, what varies by
+airport, what varies by terminal — has a clean technology-side answer.
+Mandatory: Layer 1 acoustic performance targets, NFPA 72 compliance envelope,
+STI measurement regime, Auracast/ADA §706 accessibility floor, ACRP 175
+commissioning. Airport-specific: PA governance policy (DCA's slot-constrained
+short-journey operation cannot tolerate the same announcement minimalism as
+IAD's international transfer hall). Context-dependent: directional array
+deployment (justified in acoustically hostile hold rooms, not everywhere) and
+Layer 3 screen density (a function of terminal geometry). That is the shape of a
+standard the design manual can actually enforce.

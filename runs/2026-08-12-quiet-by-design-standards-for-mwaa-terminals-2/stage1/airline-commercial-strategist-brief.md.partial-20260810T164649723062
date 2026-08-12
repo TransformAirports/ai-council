@@ -1,0 +1,111 @@
+# Airline Commercial Strategist — Independent Brief
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Author lens:** 20 years in airline network planning, 10 years across the table on the airport side. My veto question on any airport standard is: *what will the carriers do in response?* Quiet-by-design lives or dies on that answer.
+**Independence note:** This brief was written without reading any other Stage 1 output.
+
+---
+
+## Executive summary
+
+MWAA is being asked to adopt a common quiet-by-design standard while it enters the tightest coverage window of its capital cycle and while its two dominant carriers — United at IAD and American at DCA — sit at the maximum of their leverage. United is the co-author of a $20B+ IAD transformation. American controls 53% of DCA and holds three concourses. Both signed a 15-year Use and Lease that took effect January 1, 2025, with a $9B baseline capital program (now expanded) and majority-in-interest rights on cost recovery. A standard drafted without modeling these two carriers' operational responses will either be ignored, litigated at rate-hearing, or watered down through gate-podium equipment MWAA does not directly control.
+
+The good news for MWAA: standards are cheaper before design hardens, and Concourse E, Concourse C/D replacement, and DCA Terminal 1 are all inside the standards window. The airlines know this too. So the question isn't whether to write the standard — it's how to write it so that (a) it survives a majority-in-interest challenge, (b) it can be enforced against tenant-installed audio equipment MWAA doesn't own, and (c) it doesn't collapse the first time American misses a slot at DCA or United tries to recover an IROPS bank at IAD.
+
+SFO's precedent is real but partial: SFO physically disabled carriers' ability to page terminal-wide and took non-routine announcements in-house at the airport's own communications desk. That works when the airport controls the audio matrix. Southwest — the most vocal carrier resistor — blocked a similar Denver initiative. That is the response function the Council must model, not around.
+
+The airline-side recommendation: write the standard as a performance specification (STI, LEQ, zone spillover, redundant visual/mobile channels), not as an announcement-frequency cap. Bind it into the Design Manual and every new gate podium spec so it flows through consultant and tenant scopes at Concourse E, the C/D replacement, and DCA T1. Reserve announcement-volume policy for a separate governance track where airline consent is negotiated, not asserted. Anything else invites the airline reply the airport cannot afford to hear: "we'll do it our way, and we'll fight the cost recovery."
+
+---
+
+## Key findings
+
+1. **IAD's rate base is already leveraged, and the airlines know it.** IAD signatory CPE was reported at $12.77 for 2026 first-half and $12.88 in 2024; MWAA's adjusted debt per O&D enplanement is projected to peak near $400 in 2028 as $5.5B of new debt phases in and net coverage compresses from 1.63x to roughly 1.3x. Any standard that pushes commissioning cost into the rate base will be met at MII, not at the ribbon-cutting.
+
+2. **United has publicly rejected the arithmetic on the IAD program.** Scott Kirby's line on the $20B+ transformation — "The $90 CPE is not correct because there's going to be more Es" — is not reassurance. It is the CEO of the anchor carrier telling investors that he expects growth to spread the fixed cost. That expectation is the airline's veto over any incremental spec that raises fixed cost without producing more Es.
+
+3. **American Airlines' 53% share at DCA gives it MII-level leverage on any DCA-specific standard.** American operates from three concourses (C, D, E) at DCA T2. In a slot-controlled airport where a missed departure means a lost slot, not just a delayed passenger, American's operational tolerance for muted gate audio is structurally lower than at hubs with schedule slack.
+
+4. **The relevant carrier-response benchmark is not SFO — it is Denver.** SFO removed 90+ minutes of daily announcement time by taking gate podium terminal-paging away and centralizing non-routine announcements at SFO's own comms desk. Denver tried the same policy conceptually and was reportedly blocked by Southwest, its dominant carrier. IAD and DCA have dominant carriers. Southwest is not among them, but the mechanism is.
+
+5. **The airline audio path MWAA needs to reach is largely tenant-installed.** Gate podium PA, boarding-area speakers behind the podium, and airline club audio are typically airline-installed and airline-operated per Use and Lease specifications, with MWAA controlling the terminal-wide backbone. A quiet standard that only regulates MWAA-owned zones leaves the loudest and most contested audio uncovered. A standard that regulates tenant audio has to be written into Use and Lease amendments or Design Manual sections that survive tenant sign-off — a very different lift.
+
+6. **IROPS is where every quiet policy breaks.** IATA's IROPS interline guidance and every carrier's operational playbook depend on rapid, low-latency, high-volume messaging when a bank collapses. United's own app now pushes gate changes and boarding progress in real time — but push notification does not clear the concourse of the 30% of passengers who won't have opted in, don't have data, or are non-English-first-language international connectors. At IAD's 36%+ international mix, that population is not a rounding error.
+
+7. **The performance ceiling is fixed by acoustics, not by policy.** ACRP Research Report 175 recommends a minimum Speech Transmission Index of 0.45 and a signal-to-noise ratio of ~10 dB(A) for airport PA broadcasts and finds that terminals with reverberation over 2.0 seconds struggle to achieve STI 0.50 at all. Standards that specify STI, reverberation, and background LEQ get you a quieter, more intelligible terminal in one instrument. Standards that only cap announcement counts do neither, and the airlines can point that out at MII.
+
+8. **DCA's post-January 2025 operating environment is not the moment to add discretionary announcement volume.** The DCA midair collision produced FAA restrictions, a 5.4% YoY passenger decline in 2025, and heightened irregular-operations messaging load around helicopter route changes and runway restrictions. A quiet standard drafted for a slot-constrained airport in the middle of a safety-recovery cycle needs an explicit carve-out for safety and IROPS messaging or it will be argued out of the room the first time a runway closes.
+
+---
+
+## Evidence and analysis
+
+### The Use and Lease framework is the real battlefield
+
+MWAA's 15-year Airline Use and Lease Agreement took effect January 1, 2025, with a baseline $9 billion capital program (~$6.99B IAD, ~$2.39B DCA) that has since been expanded to a $20B+ IAD transformation announced July 29, 2026 [Source: https://www.mwaa.com/news/metropolitan-washington-airports-authority-completes-negotiations-new-use-and-lease-agreement][Source: https://www.transportation.gov/briefing-room/prepare-takeoff-president-donald-j-trump-us-transportation-secretary-sean-p-duffy]. The airport-context packet notes that MII thresholds and cost-recovery categorization were not verified from primary documents. That is the exact caveat a strategist should sit inside. What we know is that any airline-recoverable cost — commissioning, tenant equipment upgrades, PA backbone replacement, DSP-based zoning matrices — has to survive whatever MII language actually says. Standards work that pretends this constraint doesn't exist gets rewritten by the Chief Financial Officer on the way to the board.
+
+### CPE headroom is genuinely tight
+
+IAD's 2025 signatory CPE was $12.77 with FY2025 actuals at $9.56; DCA's 2025 signatory CPE was $8.41 with FY2025 actuals at $7.49 [Source: https://dwuconsulting.com/airports/iad][Source: https://dwuconsulting.com/airports/DCA][Source: https://www.mwaa.com/sites/mwaa.com/files/2025%20DCA%20Rates%20for%20Website.pdf]. IAD's number is heading up. Bond-market reporting has flagged the airport's expansion as raising questions [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions] and the Cranky Flier take on the program is bluntly skeptical [Source: https://crankyflier.com/2026/08/04/the-plan-for-dulles-is-ambitious-and-ridiculous-and-it-wont-happen/]. United's CEO said the quiet part out loud: he does not accept the arithmetic that would put IAD at $90 CPE, and he is depending on growth-driven denominator expansion to keep the rate defensible [Source: https://thepointsguy.com/news/united-dream-terminal-dulles/]. That framing tells you exactly where a quiet-by-design incremental cost will land in the airline conversation: it lands on top of a stack United already thinks is fragile.
+
+### United at IAD is not an anchor — it is a co-author
+
+Concourse E is a joint MWAA/United announcement: 14 new United gates, direct AeroTrain access, and a 40,000-square-foot United Club that United describes as its largest ever [Source: https://www.internationalairportreview.com/news/232900/united-and-mwaa-celebrate-500-million-concourse-e-expansion-to-enhance-passenger-experience-at-dulles/]. The $20B+ transformation was announced with the President, the DOT Secretary, and United's CEO on the podium together [Source: https://www.transportation.gov/briefing-room/prepare-takeoff-president-donald-j-trump-us-transportation-secretary-sean-p-duffy]. This is a partner relationship, not a landlord-tenant one. Standards written without United's operational sign-off are standards United will negotiate away during the C/D replacement design phase. Standards written with United's sign-off are the ones that ship.
+
+### American at DCA has structural reasons to resist announcement cuts
+
+American Airlines held 53% share at DCA at end of 2024, with more than five times the routes of the next competitor, and operates from Concourses C, D, and E [Source: https://simpleflying.com/american-airlines-washington-dc-routes-analysis-march-2025/]. DCA is a slot-controlled, high-frequency, largely domestic O&D operation. The FAA Reauthorization Act of 2024 added 10 beyond-perimeter slot exemptions awarded to American, Alaska, Delta, Southwest, and United in December 2024 [Source: https://www.congress.gov/crs-product/IN12504]. A slot missed at DCA is not just a delayed departure — it is a lost slot inside a 43-slot-per-hour cap. American has organizational memory around missed pushbacks in a way non-slot airlines don't. Every additional friction second between "close doors now" and "passenger present" is a slot-risk event. That is the operational fact underneath any American Airlines position on gate audio at DCA.
+
+### SFO's precedent depends on a mechanism MWAA has to copy explicitly
+
+SFO's 2018–2020 Quiet Airport program is the cited North American precedent. Reporting attributes to SFO a 90+ minute reduction in daily announcement time in the International Terminal and a 40%+ reduction in onsite noise [Source: https://viewfromthewing.com/san-francisco-airport-removed-90-minutes-of-daily-noise-travelers-say-it-changed-everything/][Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]. The methodology behind the 40% number is not primary-sourced and should be treated with the caveat the context packet already flagged. What is more useful for MWAA is the *mechanism*: SFO physically removed the boarding-area-wide paging capability from the gate podium audio systems, and non-routine announcements (final boarding, gate changes) are relayed through SFO's own communications staff on behalf of the carrier. That works only if the airport controls the PA backbone at the audio-matrix level and the tenant equipment tie-in. That is a Design Manual and Use and Lease question, not a policy memo.
+
+### The Denver counter-example is the risk you have to model
+
+Reporting on quiet-airport initiatives has flagged Southwest as the carrier that blocked a Denver quiet-zone program because Southwest opposed limits on non-essential gate announcements [Source: https://liveandletsfly.com/quiet-airports/]. Southwest's dominance at DEN gave it the leverage to say no. MWAA does not face Southwest as its dominant carrier, but it does face United at IAD and American at DCA. Both are structurally at least as capable of defending their operational audio as Southwest is. Any Council recommendation that treats airline compliance as a given, on the basis of SFO's success, is not modeling the carrier response function honestly.
+
+### The performance-spec route is where airline arguments have less room to run
+
+ACRP Research Report 175 is the standing U.S. reference on airport PA intelligibility. It recommends a minimum STI of 0.45 and a signal-to-noise ratio of ~10 dB(A) for PA broadcasts in departure lounges, and it observes that terminals with reverberation over 2.0 seconds rarely achieve STI 0.50 [Source: https://nap.nationalacademies.org/read/24839/chapter/5][Source: https://nap.nationalacademies.org/read/24839/chapter/6]. Standards written in these units — STI thresholds, LEQ ceilings, RT60 caps, zone-spillover dB drops — are hard for a carrier to argue with because they don't dictate what to say or how often. They dictate whether the message can be understood. That is a much more defensible standards conversation than "fewer announcements." It also gives MWAA a commissioning test a designer can pass or fail.
+
+### The passenger population at IAD makes visual-first assumptions dangerous
+
+IAD reported 10.53 million international passengers in 2025 — roughly 36%+ international share, one of the highest among major U.S. airports (per the airport-context packet). International connectors are disproportionately non-English-first-language, disproportionately less familiar with the specific carrier's app ecosystem, and disproportionately time-pressured on connections. A quiet standard that assumes push notifications and visual FIDS carry the load is a standard designed for the domestic frequent flyer at DCA, not for the Ethiopian Airlines or Emirates connector making a 55-minute hop at IAD. This is one of the strongest arguments for airport-specific implementation of a common performance framework, and against a uniform "silent airport" policy across both airports.
+
+---
+
+## Case studies of carrier response to airport decisions
+
+**San Francisco (SFO), 2018–2020 — carrier accommodation via mechanism control.** SFO successfully implemented gate-limited paging by removing terminal-wide broadcast capability from the airline-facing PA interface and by absorbing non-routine announcements into SFO's own communications operation [Source: https://parade.com/travel/this-major-u-s-airport-just-got-a-lot-quieter-thanks-to-a-new-policy]. Airline compliance did not require airline enthusiasm — it required the airport to control the audio matrix and the workflow. This is the model that generalizes.
+
+**Denver (DEN) — carrier veto in action.** Southwest, DEN's dominant carrier, is reported to have blocked a proposed quiet-zone initiative because it opposed limiting non-essential gate announcements [Source: https://liveandletsfly.com/quiet-airports/]. The lesson: when the dominant carrier's operating model runs on frequent podium messaging, and the airport does not restructure the audio path around that carrier, the policy dies at the negotiating table.
+
+**IAD Concourse E, 2026 — the airport-carrier partnership pattern.** United's 14-gate Concourse E and 40,000-sq-ft club are being delivered as a joint program, with United's CEO on the transformation announcement podium [Source: https://www.internationalairportreview.com/news/232900/united-and-mwaa-celebrate-500-million-concourse-e-expansion-to-enhance-passenger-experience-at-dulles/][Source: https://www.transportation.gov/briefing-room/prepare-takeoff-president-donald-j-trump-us-transportation-secretary-sean-p-duffy]. Whatever quiet-by-design provisions are written into the E specification set will effectively become the baseline for the C/D replacement, because United will not accept lower standards on its later gates than were delivered at E. This is the reverse of the "standards get argued as change orders" risk in the context packet: get it into the E spec and the standard rides the whole IAD program forward.
+
+**DCA post-January 29, 2025 — safety messaging load is not discretionary.** The NTSB final report in February 2026 pointed to FAA and ATC failures; the FAA restricted helicopter routes and imposed runway restrictions [Source: airport-context packet, §8]. A quiet standard for DCA has to have a formal safety-and-IROPS carve-out or American will use the first IROPS event to invalidate the framework in front of the Board.
+
+---
+
+## Direct quotes and data points a strategist can use verbatim
+
+- **Scott Kirby, United CEO, on the IAD program cost stack:** *"The $90 CPE is not correct because there's going to be more Es."* [Source: https://thepointsguy.com/news/united-dream-terminal-dulles/]
+- **IAD signatory CPE:** $12.77 (2026 first-half rate book); $12.88 (2024). DCA signatory CPE: $8.41 (2025); FY2025 actuals $9.56 IAD, $7.49 DCA [Source: https://dwuconsulting.com/airports/iad][Source: https://dwuconsulting.com/airports/DCA].
+- **American Airlines DCA share:** 53% at year-end 2024, more than 5x the next competitor's route count, across Concourses C, D, and E [Source: https://simpleflying.com/american-airlines-washington-dc-routes-analysis-march-2025/].
+- **SFO Quiet Airport claim:** 90+ minutes of daily announcement time removed, 40%+ onsite noise reduction. Methodology behind the 40% figure not primary-sourced and should be caveated in any Council citation [Source: https://viewfromthewing.com/san-francisco-airport-removed-90-minutes-of-daily-noise-travelers-say-it-changed-everything/].
+- **ACRP 175 performance thresholds:** minimum STI 0.45, SNR ~10 dB(A), reverberation over 2.0 seconds rarely compatible with STI 0.50 [Source: https://nap.nationalacademies.org/read/24839/chapter/5].
+
+---
+
+## Evidence gaps flagged for later stages
+
+- MWAA's actual MII trigger language and cost-recovery categorization under the January 2025 Use and Lease. Cannot argue airline economics of standards recovery without it.
+- Current allocation of gate-podium PA equipment ownership and installation responsibility between MWAA and each carrier at IAD and DCA gate leaseholds.
+- Whether the 2020 MWAA Design Manual (seven volumes) already contains binding STI, LEQ, or RT60 requirements — the standards conversation is very different if this is a *strengthening* versus a *new* spec.
+- SFO's own commissioning documentation on the audio-matrix modifications that enabled gate-limited paging — the mechanism, not the outcome.
+- United's and American's internal gate-agent boarding-script specifications and any airline-side quiet-terminal accommodations already agreed at other hubs.
+
+---
+
+## The veto question, applied
+
+Any standard the Council recommends should be run through this: *If MWAA adopts this standard on January 1, 2027, and United drafts the Concourse C/D replacement spec on July 1, 2027, and American reviews DCA T1 audio-matrix scope on October 1, 2027 — does each of these carrier reviews return the standard intact, or does it come back with change orders, MII challenges, or operational carve-outs that hollow it out?* If the answer is not "returns intact" for both, the standard is either not enforceable or not written in units the carriers can't argue against. Performance-spec framing (STI, LEQ, spillover dB, redundant channels) survives that test. Announcement-frequency framing does not.

@@ -368,11 +368,17 @@ PIPELINE_DEFINITION: tuple[PipelineStep, ...] = (
     ),
 )
 
+    # Standards bodies paywall their text: there is no free URL that resolves to
+    # NFPA 72 §18.4.11.2 or IEC 60268-16. Demanding one pressures an agent into
+    # inventing a plausible link, which is worse for the reader than an honest
+    # offline citation. `source_citation` is that honest third form — and it is
+    # accepted only with a locator, so it cannot become a way to skip sourcing.
 RESEARCH_EVIDENCE_CONTRACT = ArtifactContract(
     "jsonl",
     min_records=1,
     required_keys=("claim", "source_title", "source_type", "confidence"),
-    required_any=(("source_url", "source_path"),),
+    required_any=(("source_url", "source_path", "source_citation"),),
+    requires_with=(("source_citation", ("page_or_section",)),),
     optional=True,
 )
 
@@ -402,7 +408,9 @@ EVIDENCE_LEDGER_CONTRACT = ArtifactContract(
         "is_primary",
         "confidence",
     ),
-    required_any=(("source_url", "source_path"),),
+    required_any=(("source_url", "source_path", "source_citation"),),
+    # The ledger normalizes page_or_section into `locator`.
+    requires_with=(("source_citation", ("locator",)),),
 )
 
 CLAIM_LINEAGE_CONTRACT = ArtifactContract(
@@ -517,6 +525,80 @@ def _required_outputs_match_manifest(
             ):
                 return False
     return True
+
+
+def _sequester_unsourced_evidence(
+    path: Path, contract: ArtifactContract
+) -> list[tuple[int, str]]:
+    """Move records that fail the provenance rule into a sidecar file.
+
+    Research agents periodically write a professional-judgment line into the
+    evidence file — an honest claim they cannot attribute to any retrievable
+    document. It does not belong in the ledger (the fact-checker would treat it
+    as sourced), but discarding an entire agent's paid output over two lines out
+    of twenty-five is wildly disproportionate, and it has now killed two runs.
+
+    The unsourced records move to ``<name>.unsourced.jsonl`` so nothing is lost
+    and the operator can see exactly what was set aside. Only records failing
+    the *provenance* requirement are moved; a record that is malformed JSON or
+    missing required keys is a genuine defect and stays put, so the contract
+    still fails loudly for real breakage.
+    """
+
+    if contract.kind != "jsonl" or not path.is_file():
+        return []
+    groups = [g for g in contract.required_any if "source_url" in g]
+    if not groups:
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return []
+
+    keep: list[str] = []
+    moved: list[tuple[int, str]] = []
+    for number, line in enumerate(lines, start=1):
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            keep.append(line)
+            continue
+        if not isinstance(record, dict):
+            keep.append(line)
+            continue
+        if [k for k in contract.required_keys if k not in record]:
+            keep.append(line)  # a real structural defect; let it fail
+            continue
+        if all(
+            any(record.get(key) not in (None, "") for key in group)
+            for group in groups
+        ):
+            keep.append(line)
+            continue
+        moved.append((number, str(record.get("claim") or "")[:120]))
+
+    if not moved or not keep:
+        # Nothing to do, or everything failed — the latter is a real failure and
+        # must surface as one rather than silently emptying the evidence file.
+        return []
+
+    sidecar = path.with_suffix(path.suffix + ".unsourced.jsonl")
+    kept_records = [json.loads(line) for line in lines if line.strip()]
+    unsourced = [
+        r for r in kept_records
+        if isinstance(r, dict)
+        and not all(
+            any(r.get(key) not in (None, "") for key in group) for group in groups
+        )
+    ]
+    sidecar.write_text(
+        "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in unsourced),
+        encoding="utf-8",
+    )
+    path.write_text("\n".join(keep) + "\n", encoding="utf-8")
+    return moved
 
 
 def _quarantine_partial_output(path: Path | None) -> None:
@@ -822,12 +904,109 @@ async def _run_agent(
                         or subtype.casefold().startswith("error")
                         or fatal_stop
                     )
+                    # A session-level flag with no concrete fault behind it:
+                    # the CLI marked the session unsuccessful (is_error, or an
+                    # unusual stop such as `stop_sequence`) yet reported no
+                    # error text, no denial, no API status, and a benign
+                    # subtype. Seen live when a sampled draft matched a harness
+                    # stop sequence mid-write. The artifacts are the ground
+                    # truth for whether work finished; when they are incomplete
+                    # this is worth one retry, not a dead run.
+                    benign_session_flag = (
+                        failed_result
+                        and not result_errors
+                        and not permission_denials
+                        and not (
+                            isinstance(api_status, int) and api_status >= 400
+                        )
+                        and not subtype.casefold().startswith("error")
+                        and not fatal_stop
+                    )
                     if failed_result:
                         tally.add(step_label, cost)
                         if cost_journal is not None:
                             cost_journal(tally)
                         tally.release(step_label)
+                        if benign_session_flag:
+                            if completion_outputs and _required_outputs_complete(
+                                completion_outputs
+                            ):
+                                completed_cost = float(cost)
+                                completed_turns = int(turns)
+                                console.print(
+                                    f"  [yellow]↻ {step_label} ended with a "
+                                    f"session flag (stop reason: "
+                                    f"{stop_reason or 'none'}), but its complete "
+                                    "validated artifact set was accepted[/yellow]"
+                                )
+                                await emit(
+                                    "agent_session_flag_recovered",
+                                    step=step_label,
+                                    agent=agent.name,
+                                    stop_reason=stop_reason,
+                                    cost=completed_cost,
+                                    turns=completed_turns,
+                                    total=tally.total,
+                                )
+                                continue
+                            if attempts_left > 0:
+                                for candidate_path, _c in completion_outputs:
+                                    _quarantine_partial_output(candidate_path)
+                                if output_path is not None:
+                                    _quarantine_partial_output(output_path)
+                                console.print(
+                                    f"  [yellow]↻ {step_label} stopped early "
+                                    f"(stop reason: {stop_reason or 'none'}, "
+                                    "no error detail) — retrying in 5s[/yellow]"
+                                )
+                                await asyncio.sleep(5)
+                                last_exc = RuntimeError("spurious-success retry")
+                                break
+                        turn_limit_exhausted = (
+                            subtype.casefold() == "error_max_turns"
+                            or any(
+                                "maximum number of turns" in str(error).casefold()
+                                for error in result_errors
+                            )
+                        )
+                        non_turn_errors = [
+                            error
+                            for error in result_errors
+                            if "maximum number of turns"
+                            not in str(error).casefold()
+                        ]
+                        recoverable_turn_limit = bool(
+                            turn_limit_exhausted
+                            and completion_outputs
+                            and _required_outputs_complete(completion_outputs)
+                            and not non_turn_errors
+                            and not permission_denials
+                            and not (
+                                isinstance(api_status, int)
+                                and api_status >= 400
+                            )
+                        )
+                        if recoverable_turn_limit:
+                            completed_cost = float(cost)
+                            completed_turns = int(turns)
+                            console.print(
+                                f"  [yellow]↻ {step_label} reached {turns} turns, "
+                                "but its complete validated artifact set was "
+                                "accepted[/yellow]"
+                            )
+                            await emit(
+                                "agent_turn_limit_recovered",
+                                step=step_label,
+                                agent=agent.name,
+                                cost=completed_cost,
+                                turns=completed_turns,
+                                total=tally.total,
+                            )
+                            continue
                         _quarantine_partial_output(output_path)
+                        matched_stop = str(
+                            getattr(msg, "stop_sequence", None) or ""
+                        ).strip()
                         details = [
                             *result_errors[:3],
                             (
@@ -836,7 +1015,17 @@ async def _run_agent(
                                 else ""
                             ),
                             f"API status: {api_status}" if api_status else "",
+                            (
+                                "session flagged is_error"
+                                if getattr(msg, "is_error", False)
+                                else ""
+                            ),
                             f"stop reason: {stop_reason}" if stop_reason else "",
+                            (
+                                f"matched stop sequence: {matched_stop!r}"
+                                if matched_stop
+                                else ""
+                            ),
                             f"subtype: {subtype}" if subtype else "",
                         ]
                         detail = "; ".join(item for item in details if item)
@@ -844,12 +1033,13 @@ async def _run_agent(
                             f"{step_label} returned an unsuccessful model result"
                             + (f": {detail}" if detail else "")
                         )
-                    tally.add(step_label, cost)
-                    if cost_journal is not None:
-                        cost_journal(tally)
-                    tally.release(step_label)
-                    completed_cost = float(cost)
-                    completed_turns = int(turns)
+                    else:
+                        tally.add(step_label, cost)
+                        if cost_journal is not None:
+                            cost_journal(tally)
+                        tally.release(step_label)
+                        completed_cost = float(cost)
+                        completed_turns = int(turns)
             else:
                 # async-for completed cleanly without our break — done.
                 break
@@ -857,6 +1047,27 @@ async def _run_agent(
             continue
         except Exception as e:  # noqa: BLE001 — translate the SDK's spurious-success into a retry
             last_exc = e
+            # Claude Code emits an error ResultMessage at max_turns and the SDK
+            # may then raise the same condition again while closing the stream.
+            # If the ResultMessage was already accepted because every required
+            # artifact is complete, the duplicate close-time exception must not
+            # turn that successful recovery back into a failed run.
+            recovered_turn_limit_cleanup = bool(
+                completed_cost is not None
+                and "maximum number of turns" in str(e).casefold()
+                and completion_outputs
+                and _required_outputs_complete(completion_outputs)
+            )
+            if recovered_turn_limit_cleanup:
+                await emit(
+                    "agent_turn_limit_cleanup_recovered",
+                    step=step_label,
+                    agent=agent.name,
+                    cost=completed_cost,
+                    turns=completed_turns,
+                    total=tally.total,
+                )
+                break
             if SPURIOUS in str(e) and not saw_result and attempts_left > 0:
                 console.print(
                     f"  [yellow]↻ {step_label} hit subprocess startup race "
@@ -917,6 +1128,20 @@ async def _run_agent(
             f"choose Resume."
         )
     tally.release(step_label)
+    for candidate_path, candidate_contract in completion_outputs:
+        sequestered = _sequester_unsourced_evidence(candidate_path, candidate_contract)
+        if sequestered:
+            await emit(
+                "agent_warning",
+                step=step_label,
+                agent=agent.name,
+                message=(
+                    f"{candidate_path.name}: moved {len(sequestered)} unsourced "
+                    f"record(s) to {candidate_path.name}.unsourced.jsonl "
+                    f"(lines {', '.join(str(n) for n, _ in sequestered)}). "
+                    "Professional judgment belongs in the brief, not the ledger."
+                ),
+            )
     incomplete_companions = [
         (path, validate_artifact(path, contract))
         for path, contract in completion_outputs
@@ -1123,13 +1348,18 @@ def _stage1_prompt(agent: Agent, run_file: Path, output_path: Path, override: st
             "",
             f"Also write a structured evidence companion to: `{evidence_path}`",
             "Write one valid JSON object per line, with no markdown fence. Each record "
-            "must contain `claim`, `source_title`, `source_url` or `source_path`, "
+            "must contain `claim`, `source_title`, one of `source_url`, `source_path`, or `source_citation` (use `source_citation` plus `page_or_section` for paywalled or print-only standards such as NFPA, IEC, or ANSI, and never invent a URL to satisfy the schema), "
             "`source_type`, `is_primary`, `page_or_section`, "
             "`supporting_excerpt`, `source_date`, `data_vintage`, "
             "`airport_or_entity`, `units`, `denominator`, `caveat`, and "
             "`confidence`. Omit or use null for "
             "unknown optional fields; never invent metadata. The brief remains the "
-            "readable analysis and the JSONL is its claim-level evidence trail.",
+            "readable analysis and the JSONL is its claim-level evidence trail. "
+            "Professional judgment goes in the BRIEF, never in the evidence file: "
+            "if a claim rests on your expert read rather than a document a reader "
+            "could go and verify, write it in the brief's prose and leave it out "
+            "of the JSONL entirely. Every evidence record must carry a real "
+            "source.",
         ]
     if override:
         parts += [
@@ -2457,6 +2687,7 @@ async def run_word_visual_inspection(
     tally: CostTally,
     manifest_path: Path | None,
     step_label: str,
+    max_turns: int | None = None,
     revision_state_path: Path | None = None,
     revision_repo_root: Path | None = None,
     revision_dependencies: tuple[RevisionDependency, ...] = (),
@@ -2585,6 +2816,7 @@ async def run_word_visual_inspection(
                 step_label=step_label,
                 tally=tally,
                 output_path=None,
+                max_turns=max_turns,
                 emit_completion=False,
             )
         else:
@@ -4397,6 +4629,12 @@ def _persist_checkpoint_ratings(
     write_human_review(outputs_dir, ratings, review_id=review_id)
 
 
+# Bounded remediation attempts after a failed publication gate. Each pass costs
+# a fact-checker invocation, so this stays small; three is enough to converge a
+# 40-blocker gate in practice while capping the spend.
+MAX_REMEDIATION_PASSES = 3
+
+
 async def run_quality_gate_with_remediation(
     *,
     spec: RunSpec,
@@ -4407,7 +4645,7 @@ async def run_quality_gate_with_remediation(
     manifest_path: Path,
     agent_names: list[str],
 ) -> dict:
-    """Run the deterministic gate with one bounded verifier remediation pass."""
+    """Run the deterministic gate with bounded verifier remediation passes."""
 
     final_draft = outputs_dir / "stage3" / "final-draft.md"
     lineage_path = outputs_dir / "claim-lineage.jsonl"
@@ -4447,224 +4685,236 @@ async def run_quality_gate_with_remediation(
             report=str(report_path),
         )
 
-        by_name = {agent.name: agent for agent in all_agents}
-        verifier = by_name["fact-checker"]
-        remediated_path = outputs_dir / "stage3" / "final-draft-remediated.md"
-        remediation_inputs = (
-            outputs_dir / "stage3" / "remediation-inputs"
-        )
-        remediation_inputs.mkdir(parents=True, exist_ok=True)
-        snapshot_final = remediation_inputs / "final-draft-before-gate.md"
-        snapshot_gate = remediation_inputs / "quality-gate-before-remediation.json"
-        snapshot_fact_report = (
-            remediation_inputs / "fact-check-report-before-gate.md"
-        )
-        snapshot_lineage = (
-            remediation_inputs / "claim-lineage-before-gate.jsonl"
-        )
-        fact_report = outputs_dir / "stage3" / "fact-check-report.md"
-        for source, snapshot, artifact_id in (
-            (
+        # A single bounded pass cannot clear a large blocker set: this gate
+        # reported 45 errors in one run, and the verifier clears a subset
+        # each time. Re-gate after every pass and stop the moment it is
+        # clean, so a finished run is not discarded over blockers the next
+        # pass would have fixed. Still strictly bounded.
+        for _pass in range(1, MAX_REMEDIATION_PASSES + 1):
+            is_final_pass = _pass == MAX_REMEDIATION_PASSES
+            # Each pass must answer the CURRENT gate output, not the first.
+            first_payload = json.loads(report_path.read_text(encoding="utf-8"))
+            by_name = {agent.name: agent for agent in all_agents}
+            verifier = by_name["fact-checker"]
+            remediated_path = outputs_dir / "stage3" / "final-draft-remediated.md"
+            remediation_inputs = (
+                outputs_dir / "stage3" / "remediation-inputs"
+            )
+            remediation_inputs.mkdir(parents=True, exist_ok=True)
+            snapshot_final = remediation_inputs / "final-draft-before-gate.md"
+            snapshot_gate = remediation_inputs / "quality-gate-before-remediation.json"
+            snapshot_fact_report = (
+                remediation_inputs / "fact-check-report-before-gate.md"
+            )
+            snapshot_lineage = (
+                remediation_inputs / "claim-lineage-before-gate.jsonl"
+            )
+            fact_report = outputs_dir / "stage3" / "fact-check-report.md"
+            for source, snapshot, artifact_id in (
+                (
+                    final_draft,
+                    snapshot_final,
+                    "verification/remediation-input/final-draft",
+                ),
+                (
+                    report_path,
+                    snapshot_gate,
+                    "verification/remediation-input/quality-gate",
+                ),
+                (
+                    fact_report,
+                    snapshot_fact_report,
+                    "verification/remediation-input/fact-check-report",
+                ),
+                (
+                    lineage_path,
+                    snapshot_lineage,
+                    "verification/remediation-input/claim-lineage",
+                ),
+            ):
+                shutil.copy2(source, snapshot)
+                update_artifact(
+                    manifest_path,
+                    snapshot,
+                    validate_artifact(snapshot),
+                    artifact_id=artifact_id,
+                    producer="orchestrator",
+                    role="remediation_input",
+                    required=True,
+                )
+            remediated_fact_report = (
+                outputs_dir / "stage3" / "fact-check-report-remediated.md"
+            )
+            remediated_lineage = (
+                outputs_dir / "stage3" / "claim-lineage-remediated.jsonl"
+            )
+            remediation_dependencies = (
+                "run-manifest.json",
+                "stage3/remediation-inputs/final-draft-before-gate.md",
+                "stage3/remediation-inputs/quality-gate-before-remediation.json",
+                "stage3/remediation-inputs/fact-check-report-before-gate.md",
+                "stage3/remediation-inputs/claim-lineage-before-gate.jsonl",
+                "evidence-ledger.jsonl",
+            )
+            blockers = [
+                issue
+                for issue in first_payload.get("issues", [])
+                if issue.get("severity") == "error"
+            ]
+            prompt = (
+                f"Read `{run_file}`, `outputs/run-manifest.json`, "
+                "`outputs/stage3/remediation-inputs/final-draft-before-gate.md`, "
+                "`outputs/stage3/remediation-inputs/quality-gate-before-remediation.json`, "
+                "`outputs/stage3/remediation-inputs/fact-check-report-before-gate.md`, "
+                "`outputs/stage3/remediation-inputs/claim-lineage-before-gate.jsonl`, "
+                "and `outputs/evidence-ledger.jsonl`.\n\n"
+                "This is the single bounded remediation pass after the deterministic "
+                "publication gate. Fix every listed blocker without adding new facts or "
+                "weakening a well-supported conclusion. Convert internal source tags to "
+                "reader-facing primary-source footnotes; repair footnote structure; "
+                "use numeric footnote labels only; "
+                "remove or accurately qualify unsupported claims; and re-open primary "
+                "sources whenever the lineage says they were not checked. A claim that "
+                "cannot be verified must be removed from the reader-facing draft, not "
+                "left with an internal tag. If the gate reports a word-count blocker, "
+                "restore the requested range using only explanation, implications, and "
+                "decision mechanics already supported by verified evidence; do not add "
+                "new factual claims.\n\n"
+                f"Gate blockers:\n{json.dumps(blockers, indent=2)}\n\n"
+                "Write the remediated reader-facing draft to "
+                "`outputs/stage3/final-draft-remediated.md`. Write the remediated "
+                "lineage to `outputs/stage3/claim-lineage-remediated.jsonl` using "
+                "the canonical fields: exact "
+                "`claim`, exact `citation`, `footnote_id`, `evidence_ids`, boolean "
+                "`retained`, boolean `primary_source_checked`, and statuses verified, "
+                "qualified, corrected, removed, or unverified. Write the complete "
+                "updated fact-check report, including a "
+                "`## Publication-gate remediation` section to "
+                "`outputs/stage3/fact-check-report-remediated.md` describing every "
+                "change. Do not modify the immutable remediation-input snapshots."
+            )
+            prompt += manifest_prompt_block(
+                manifest_path, repo_root=outputs_dir.parent
+            )
+            await _run_agent(
+                agent=verifier,
+                user_prompt=prompt,
+                model=_model("factcheck"),
+                cwd=outputs_dir.parent,
+                step_label="stage3/fact-check-remediation",
+                tally=tally,
+                output_path=remediated_path,
+                artifact_contract=contract_for_path(final_draft),
+                manifest_path=manifest_path,
+                artifact_id="verification/remediated-draft",
+                required_outputs=(
+                    (
+                        remediated_lineage,
+                        CLAIM_LINEAGE_AGENT_CONTRACT,
+                    ),
+                    (
+                        remediated_fact_report,
+                        contract_for_path(remediated_fact_report),
+                    ),
+                ),
+                dependency_inputs=remediation_dependencies,
+            )
+            shutil.copy2(remediated_path, final_draft)
+            shutil.copy2(remediated_fact_report, fact_report)
+            shutil.copy2(remediated_lineage, lineage_path)
+            bound_dependencies = build_dependency_fingerprint(
+                manifest_path, remediation_dependencies
+            )
+            final_validation = validate_artifact(final_draft)
+            update_artifact(
+                manifest_path,
                 final_draft,
-                snapshot_final,
-                "verification/remediation-input/final-draft",
-            ),
-            (
-                report_path,
-                snapshot_gate,
-                "verification/remediation-input/quality-gate",
-            ),
-            (
-                fact_report,
-                snapshot_fact_report,
-                "verification/remediation-input/fact-check-report",
-            ),
-            (
+                final_validation,
+                artifact_id="stage3/final",
+                producer="fact-checker",
+                dependencies=bound_dependencies,
+            )
+            lineage, generated = ensure_claim_lineage(
+                final_draft=final_draft,
+                evidence_ledger=outputs_dir / "evidence-ledger.jsonl",
+                output_path=lineage_path,
+            )
+            lineage = bind_claim_lineage_to_draft(
+                final_draft=final_draft,
+                output_path=lineage_path,
+            )
+            lineage_validation = validate_artifact(
+                lineage_path, CLAIM_LINEAGE_CONTRACT
+            )
+            update_artifact(
+                manifest_path,
                 lineage_path,
-                snapshot_lineage,
-                "verification/remediation-input/claim-lineage",
-            ),
-        ):
-            shutil.copy2(source, snapshot)
-            update_artifact(
-                manifest_path,
-                snapshot,
-                validate_artifact(snapshot),
-                artifact_id=artifact_id,
-                producer="orchestrator",
-                role="remediation_input",
-                required=True,
-            )
-        remediated_fact_report = (
-            outputs_dir / "stage3" / "fact-check-report-remediated.md"
-        )
-        remediated_lineage = (
-            outputs_dir / "stage3" / "claim-lineage-remediated.jsonl"
-        )
-        remediation_dependencies = (
-            "run-manifest.json",
-            "stage3/remediation-inputs/final-draft-before-gate.md",
-            "stage3/remediation-inputs/quality-gate-before-remediation.json",
-            "stage3/remediation-inputs/fact-check-report-before-gate.md",
-            "stage3/remediation-inputs/claim-lineage-before-gate.jsonl",
-            "evidence-ledger.jsonl",
-        )
-        blockers = [
-            issue
-            for issue in first_payload.get("issues", [])
-            if issue.get("severity") == "error"
-        ]
-        prompt = (
-            f"Read `{run_file}`, `outputs/run-manifest.json`, "
-            "`outputs/stage3/remediation-inputs/final-draft-before-gate.md`, "
-            "`outputs/stage3/remediation-inputs/quality-gate-before-remediation.json`, "
-            "`outputs/stage3/remediation-inputs/fact-check-report-before-gate.md`, "
-            "`outputs/stage3/remediation-inputs/claim-lineage-before-gate.jsonl`, "
-            "and `outputs/evidence-ledger.jsonl`.\n\n"
-            "This is the single bounded remediation pass after the deterministic "
-            "publication gate. Fix every listed blocker without adding new facts or "
-            "weakening a well-supported conclusion. Convert internal source tags to "
-            "reader-facing primary-source footnotes; repair footnote structure; "
-            "use numeric footnote labels only; "
-            "remove or accurately qualify unsupported claims; and re-open primary "
-            "sources whenever the lineage says they were not checked. A claim that "
-            "cannot be verified must be removed from the reader-facing draft, not "
-            "left with an internal tag. If the gate reports a word-count blocker, "
-            "restore the requested range using only explanation, implications, and "
-            "decision mechanics already supported by verified evidence; do not add "
-            "new factual claims.\n\n"
-            f"Gate blockers:\n{json.dumps(blockers, indent=2)}\n\n"
-            "Write the remediated reader-facing draft to "
-            "`outputs/stage3/final-draft-remediated.md`. Write the remediated "
-            "lineage to `outputs/stage3/claim-lineage-remediated.jsonl` using "
-            "the canonical fields: exact "
-            "`claim`, exact `citation`, `footnote_id`, `evidence_ids`, boolean "
-            "`retained`, boolean `primary_source_checked`, and statuses verified, "
-            "qualified, corrected, removed, or unverified. Write the complete "
-            "updated fact-check report, including a "
-            "`## Publication-gate remediation` section to "
-            "`outputs/stage3/fact-check-report-remediated.md` describing every "
-            "change. Do not modify the immutable remediation-input snapshots."
-        )
-        prompt += manifest_prompt_block(
-            manifest_path, repo_root=outputs_dir.parent
-        )
-        await _run_agent(
-            agent=verifier,
-            user_prompt=prompt,
-            model=_model("factcheck"),
-            cwd=outputs_dir.parent,
-            step_label="stage3/fact-check-remediation",
-            tally=tally,
-            output_path=remediated_path,
-            artifact_contract=contract_for_path(final_draft),
-            manifest_path=manifest_path,
-            artifact_id="verification/remediated-draft",
-            required_outputs=(
-                (
-                    remediated_lineage,
-                    CLAIM_LINEAGE_AGENT_CONTRACT,
-                ),
-                (
-                    remediated_fact_report,
-                    contract_for_path(remediated_fact_report),
-                ),
-            ),
-            dependency_inputs=remediation_dependencies,
-        )
-        shutil.copy2(remediated_path, final_draft)
-        shutil.copy2(remediated_fact_report, fact_report)
-        shutil.copy2(remediated_lineage, lineage_path)
-        bound_dependencies = build_dependency_fingerprint(
-            manifest_path, remediation_dependencies
-        )
-        final_validation = validate_artifact(final_draft)
-        update_artifact(
-            manifest_path,
-            final_draft,
-            final_validation,
-            artifact_id="stage3/final",
-            producer="fact-checker",
-            dependencies=bound_dependencies,
-        )
-        lineage, generated = ensure_claim_lineage(
-            final_draft=final_draft,
-            evidence_ledger=outputs_dir / "evidence-ledger.jsonl",
-            output_path=lineage_path,
-        )
-        lineage = bind_claim_lineage_to_draft(
-            final_draft=final_draft,
-            output_path=lineage_path,
-        )
-        lineage_validation = validate_artifact(
-            lineage_path, CLAIM_LINEAGE_CONTRACT
-        )
-        update_artifact(
-            manifest_path,
-            lineage_path,
-            lineage_validation,
-            artifact_id="verification/claim-lineage",
-            producer="orchestrator" if generated else "fact-checker",
-            dependencies=bound_dependencies,
-        )
-        await emit(
-            "evidence_update",
-            kind="claim_lineage",
-            lineage_path=str(lineage_path),
-            record_count=len(lineage),
-            generated_fallback=generated,
-            remediation=True,
-        )
-        fact_report_validation = validate_artifact(fact_report)
-        update_artifact(
-            manifest_path,
-            fact_report,
-            fact_report_validation,
-            artifact_id="stage3/fact-check",
-            producer="fact-checker",
-            dependencies=bound_dependencies,
-        )
-        await emit(
-            "artifact_validated",
-            step="stage3/fact-check-report-remediated",
-            **fact_report_validation.to_dict(),
-        )
-        if not fact_report_validation.valid:
-            raise RuntimeError(
-                "The remediated fact-check report failed its artifact contract: "
-                + "; ".join(fact_report_validation.errors)
-            )
-        try:
-            payload = execute_gate()
-        except PublicationQualityError:
-            second_payload = json.loads(report_path.read_text(encoding="utf-8"))
-            second_validation = validate_artifact(report_path)
-            update_artifact(
-                manifest_path,
-                report_path,
-                second_validation,
-                artifact_id="verification/quality-gate",
-                producer="orchestrator",
+                lineage_validation,
+                artifact_id="verification/claim-lineage",
+                producer="orchestrator" if generated else "fact-checker",
+                dependencies=bound_dependencies,
             )
             await emit(
+                "evidence_update",
+                kind="claim_lineage",
+                lineage_path=str(lineage_path),
+                record_count=len(lineage),
+                generated_fallback=generated,
+                remediation=True,
+            )
+            fact_report_validation = validate_artifact(fact_report)
+            update_artifact(
+                manifest_path,
+                fact_report,
+                fact_report_validation,
+                artifact_id="stage3/fact-check",
+                producer="fact-checker",
+                dependencies=bound_dependencies,
+            )
+            await emit(
+                "artifact_validated",
+                step="stage3/fact-check-report-remediated",
+                **fact_report_validation.to_dict(),
+            )
+            if not fact_report_validation.valid:
+                raise RuntimeError(
+                    "The remediated fact-check report failed its artifact contract: "
+                    + "; ".join(fact_report_validation.errors)
+                )
+            try:
+                payload = execute_gate()
+            except PublicationQualityError:
+                second_payload = json.loads(report_path.read_text(encoding="utf-8"))
+                second_validation = validate_artifact(report_path)
+                update_artifact(
+                    manifest_path,
+                    report_path,
+                    second_validation,
+                    artifact_id="verification/quality-gate",
+                    producer="orchestrator",
+                )
+                await emit(
+                    "quality_gate",
+                    passed=False,
+                    attempt=_pass + 1,
+                    remediation_pending=not is_final_pass,
+                    error_count=second_payload.get("error_count", 1),
+                    warning_count=second_payload.get("warning_count", 0),
+                    report=str(report_path),
+                )
+                if is_final_pass:
+                    raise
+                continue
+            await emit(
                 "quality_gate",
-                passed=False,
-                attempt=2,
-                remediation_pending=False,
-                error_count=second_payload.get("error_count", 1),
-                warning_count=second_payload.get("warning_count", 0),
+                passed=True,
+                attempt=_pass + 1,
+                remediated=True,
+                error_count=payload.get("error_count", 0),
+                warning_count=payload.get("warning_count", 0),
                 report=str(report_path),
             )
-            raise
-        await emit(
-            "quality_gate",
-            passed=True,
-            attempt=2,
-            remediated=True,
-            error_count=payload.get("error_count", 0),
-            warning_count=payload.get("warning_count", 0),
-            report=str(report_path),
-        )
+            break
     else:
         await emit(
             "quality_gate",

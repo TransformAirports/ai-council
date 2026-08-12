@@ -1,0 +1,104 @@
+# Airport COO Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Author role:** Chief Operating Officer, top-tier US hub airport (25 years operations, airline-side experience, incident-command tenure).
+**Audience:** Strategist and Council synthesis.
+**Framing:** The person who has to make IAD and DCA work at 5:45 AM on the Monday after the standard ships.
+
+---
+
+## 1. Key findings
+
+1. **"Quiet" is not a lever the operator fully controls.** A large share of terminal audio is either federally required (Part 139 emergency communications, NFPA 72 emergency voice/alarm intelligibility), mandated by federal partners (TSA and CBP messages), or produced by airline agents and gate systems under the Use and Lease Agreement. MWAA can specify the envelope; it cannot unilaterally turn the volume down.
+2. **The Speech Transmission Index floor is 0.50 average / 0.45 minimum for 90 percent of measurement points inside each Acoustically Distinguishable Space.** That is a code requirement from NFPA 72 that flows through local building code adoption. Any "quiet-by-design" standard that does not begin with STI compliance for the emergency voice/alarm system will fail commissioning and delay a certificate of occupancy.
+3. **The real leverage is the acoustic envelope, not the announcement policy.** Reverberation time, ambient noise floor, zoning geometry, and loudspeaker density have to be spec'd in the program brief. They cannot be retrofitted at a defensible cost once a terminal is standing. This is the single design decision the operator most often loses because nobody in the room during schematic design has ever fielded a Monday-morning missed-connection queue at gate C17.
+4. **IROPS execution breaks any static "silent" model.** In the first 90 minutes of a major weather diversion, a runway closure, or a system outage, the airport operations center's job is to flood every channel — PA, FIDS, mobile push, staffed information desks, gate podium repaters — not to preserve ambience. The standard must define an IROPS override state, not pretend IROPS will not happen.
+5. **Concourse E has already sailed. The July 2026 $20–22.5 billion Dulles expansion has not.** Concourse E is set to open autumn 2026 with 14 United gates on a design that hardened years ago. Any quiet-by-design standard adopted now catches the C/D replacement, the AeroTrain extension, and the next 5 million square feet at IAD — but only if it is written into the program brief before schematic design begins on the expansion package. The window is measured in months, not years.
+6. **Historic-preservation constraints make greenfield the only realistic first application.** The Saarinen main terminal at IAD (1962, National Historic Landmark) and the Goodman Terminal 1 at DCA (1941, National Register) cannot absorb the acoustic treatment or ceiling penetrations a modern low-reverberation environment requires. The standard must be honest that its first application is Concourse E successors and DCA T1 replacement — not the historic envelopes.
+7. **The 2025 Use and Lease Agreement did not embed a technology or acoustic standard.** Any behavior expected of signatory airlines, common-use tenants, or concessionaires — script control, gate-agent PA discipline, TV volume caps, tenant sound-system limits — requires either a design-manual amendment enforced through construction review, or a negotiated addendum to the U&L. Neither is free.
+8. **The operator already knows the failure modes a "quiet" standard will inherit.** Jet bridge cabin blowers, HVAC air-handler noise at gate holdrooms, baggage-conveyor rumble bleeding through demising walls, and FIDS latency during airline schedule-change bursts are the ambient realities that dominate whatever the PA does. If the standard does not push upstream against those systems in the same design cycle, "quiet" is a label on the same noisy terminal.
+
+---
+
+## 2. Evidence
+
+### The regulatory floor is not negotiable
+
+NFPA 72, adopted through local building codes at both Arlington County (DCA) and Fairfax/Loudoun County (IAD), requires emergency voice/alarm communication systems to meet a minimum Speech Transmission Index of 0.45 at 90 percent of measurement locations within each Acoustically Distinguishable Space, with an average STI of not less than 0.50 [Source: https://sdifire.com/ensuring-clear-communication/][Source: https://en.wikipedia.org/wiki/NFPA_72]. A terminal that meets its dBA sound-pressure targets but fails STI is not code-compliant and will not receive a certificate of occupancy. That is the design floor. Anything the standard says about "reducing" announcements has to sit on top of it.
+
+FAA Advisory Circular 150/5200-31C, the governing document for Airport Emergency Plans under Part 139, requires the operator to maintain a communications network capable of prompt notification during emergencies [Source: https://www.faa.gov/documentlibrary/media/advisory_circular/150_5200_31c_consolidated.pdf]. Part 139 does not prescribe sound-pressure levels or announcement cadence, but it does not authorize the operator to design a communication capability out of the building. Any quiet-by-design standard needs an explicit statement of how the AEP's communications network is preserved when routine PA is minimized.
+
+### The intelligibility research is more useful than the "silent airport" branding
+
+ACRP Research Report 175, *Improving Intelligibility of Airport Terminal Public Address Systems*, is the most operationally useful document on this question in the US aviation literature. It recommends a signal-to-noise ratio of 10–15 dBA and a minimum STI of 0.45 for public-address broadcasts in pier-style departure lounges, and it specifically flags that hearing-impaired listeners and non-native speakers require higher SNR than the general population — meaning "quiet by design" without a specified announcement SNR degrades accessibility rather than improving it [Source: https://nap.nationalacademies.org/read/24839/chapter/5][Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/201/original/acrp_r175.pdf]. This is the same research base that the acoustic consultants MWAA will hire already work from; the standard should adopt it explicitly rather than describe intelligibility in narrative language.
+
+Measured terminal ambient noise in typical US hubs runs 50–55 dBA in the quietest areas, and premium lounges have drifted from a historical 55 dBA to over 72 dBA in recent operating measurements as passenger volume and mobile-device use have risen [Source: https://www.meetcofurniture.com/blog/soundproof-pods-for-airport-lounges/]. The 40–45 dBA figure sometimes cited as an "airport quiet" target is an engineering aspiration for empty terminals, not a peak-hour operating reality. The standard should specify the design ambient noise floor at design-day peak occupancy, not the empty-building number.
+
+### The "silent airport" peer set is not directly transferable
+
+Schiphol markets itself as a silent airport with virtually no routine announcements, relying on FIDS and its mobile app for boarding information [Source: https://aviavox.com/news-and-resources/white-papers/]. Copenhagen and Helsinki operate similar models. Trade coverage of these implementations notes that the model produces measurably higher missed-boarding rates among passengers who linger in concessions and among travelers unfamiliar with the airport, and creates elevated stress for passengers who do not speak the operator's default language [Source: https://www.vanemag.com/silent-airports-list-2026/]. Those peers also operate under single-entity governance that lets them enforce script control across every tenant and airline by contract — a lever MWAA does not have under a signatory-carrier U&L.
+
+### IROPS is where operational reality asserts itself
+
+ACRP Report 65, *Guidebook for Airport Irregular Operations (IROPS) Contingency Planning*, is the industry's reference document for IROPS execution and treats airport-airline-tenant communication as the load-bearing element of any effective response [Source: https://nap.nationalacademies.org/catalog/14667/guidebook-for-airport-irregular-operations-irops-contingency-planning]. The Southwest December 2022 event stranded more than two million passengers and produced a $140 million DOT fine, and the DOT's finding was specifically about communication failure — passengers arriving at airports to find flights canceled with no notification, and crews unable to reach dispatch [Source: https://www.cnn.com/2023/12/18/business/southwest-fine-canceled-flights/index.html][Source: https://en.wikipedia.org/wiki/2022_Southwest_Airlines_scheduling_crisis]. When the airline's system fails, the airport PA is the last mile between operations and the passenger standing in the concourse. A quiet-by-design standard has to write down what that last mile does at hour zero, hour one, and hour six.
+
+### The capital handoff realities are already known
+
+Passenger boarding bridges have a 20–25 year service life with $15,000–$25,000 in annual planned maintenance per bridge, and reactive-only maintenance regimes triple that cost while producing failure modes that cascade into 45-minute departure delays and airline-borne costs of roughly $100 per minute of aircraft delay [Source: https://oxmaint.com/industries/aviation-management/passenger-boarding-bridge-pbb-maintenance-preventing-delays]. The 14 gates at Concourse E are 14 new PBBs whose maintainability is being designed now [Source: https://www.businesstraveller.com/business-travel/2024/12/04/washington-dulles-concourse-e-to-open-in-late-2026/]. The cabin blower noise in each of those bridges will be a permanent ambient contributor at each holdroom for the next quarter century. That is a quiet-by-design decision — and it is being made in the boarding-bridge procurement, not in the acoustic manual.
+
+### The MWAA-specific frame
+
+The 2025 Use and Lease Agreement went into effect January 1, 2025 and runs through calendar 2039 [context: airport-context.md §3]. The airline capital program tied to that agreement was ~$9 billion; the July 2026 announcement expanded the IAD side to $20–22.5 billion over roughly ten years, including replacement of Concourses C and D and creation of more than 5 million square feet of new terminal space [context: airport-context.md §4]. The design cycle for that expansion has not begun. The window during which a standard can enter the program brief is measured in months from the CEO's decision to adopt it, not years.
+
+---
+
+## 3. The operational case — for and against
+
+### For the thesis
+
+Specifying acoustic performance, PA zoning, and announcement governance in advance of design saves the operator from three recurring failure modes I have watched play out on other capital handoffs:
+
+- Terminals delivered with reverberation times in the 2.5–4.0 second range that make the required NFPA 72 STI unreachable without post-occupancy foam panels, adding cost and disfiguring the design intent.
+- PA systems zoned by architectural convenience rather than operating logic — a single zone covering three hold-rooms because the ceiling grid was already laid out — which forces gate agents to broadcast their gate calls into two neighboring gates and produces the noise pollution the standard is meant to prevent.
+- FIDS wiring and screen placement designed by a low-voltage subcontractor working off a room-count schedule, with no operational review of sightlines, screen density at decision points, or fallback for outage.
+
+Each of these is a Monday-morning problem I did not create and cannot fix without a nine-figure retrofit. Writing the requirements down before schematic design is the cheapest intervention in the entire lifecycle. The Concourse E successors and the C/D replacement are the last chance in a generation to get this right at IAD.
+
+The standard also gives me an enforcement instrument I currently do not have. When a signatory airline installs a boarding-area TV at 78 dBA measured at seated ear level, or a concessionaire runs a coffee grinder that swamps the neighboring holdroom PA, my only recourse today is an OPSCOMM call and a request. A design-manual reference incorporated by the U&L and tenant handbook gives me a specification to point at.
+
+### Against the thesis
+
+The strategist should hear this bluntly: a standard written by people who have not stood on the C concourse at 6:00 AM during a Nor'easter push will make the airport worse.
+
+- **The "reduce announcements" instinct is the wrong headline.** Announcement volume is a symptom of PA zone geometry and gate-agent behavior. Fixing the zones changes the number of announcements a passenger hears without changing the number of announcements the system carries. A standard that starts from "fewer announcements" will produce compliance theater — quieter routine operations paired with worse intelligibility in IROPS.
+- **The accessibility exposure is asymmetric.** If we get quiet-by-design wrong, the passengers we harm first are older travelers, non-English speakers, hearing-impaired passengers using assistive listening, and infrequent travelers without the app. Those are the passengers whose complaints reach the Board. The redundant-channel requirement is not an ADA formality; it is what protects the standard from becoming a political liability.
+- **The IROPS override cannot be an afterthought.** A silent-airport rulebook that has to be suspended every time a thunderstorm rolls through the DCA area is a rulebook that gets suspended most peak-day afternoons in July. The standard needs one state, not two.
+- **Enforcement against airlines is a U&L problem.** The 2025 agreement did not include this. Any real teeth against carrier-side behavior — script content, gate-agent PA discipline, common-use system configuration — will require negotiation and probably concession. Do not pretend the design manual alone is enough.
+- **The post-2025 DCA political environment is unforgiving.** After the January 29, 2025 midair collision, any standard perceived to reduce safety-related communication at DCA will be litigated in the press before it is litigated in the courts. The standard must be able to demonstrate — with STI numbers, with coverage maps, with EAP integration language — that emergency communication is enhanced, not diminished.
+
+---
+
+## 4. Four concrete examples
+
+### Example 1 — Concourse E hold-room, September 2026
+
+Fourteen new gates, direct AeroTrain access, opening within weeks. The acoustic envelope is already built. The PA zoning is already loaded into the head-end. The FIDS wiring is pulled. If the quiet-by-design standard exists in December 2026, its first real-world application at Concourse E is a post-occupancy survey and a punch list of retrofits — the exact failure mode the standard is meant to prevent. Council recommendation should acknowledge that Concourse E is a measurement baseline, not the first application.
+
+### Example 2 — Concourses C and D replacement
+
+Inside the $20–22.5 billion expansion announced July 2026. Program brief has not been written. If the standard enters the program brief before consultant selection, it flows through schematic design, design development, and construction documents at negligible marginal cost. If it enters after design development, the acoustic requirements re-open the ceiling plan and the mechanical routing — a change order in the tens of millions. This is the operational leverage point.
+
+### Example 3 — The Southwest-scale IROPS at IAD, someday
+
+At 6:00 PM on a summer evening, a cascading airline-side technology failure grounds a hub carrier's departures across the East Coast. Within 90 minutes, IAD is holding 8,000 passengers in the main terminal, at Concourses A/B and (in 2027 and after) the new Concourse E. The airline's app is failing. The airline's gate agents cannot get through to dispatch. The operations center has to move information, water, and hotel-shuttle guidance to those 8,000 passengers using whatever channels the airport controls. This is not a hypothetical — it is the Southwest 2022 playbook run at a peer hub [Source: https://en.wikipedia.org/wiki/2022_Southwest_Airlines_scheduling_crisis]. The standard must define what the PA, FIDS, staffed desks, and mobile alerting do in that hour. If the answer is "the normal quiet policy is suspended," the standard has not solved the problem.
+
+### Example 4 — The DCA T2 vaulted concourse
+
+Cesar Pelli's National Hall opened 1997. Vaulted ceilings, hard finishes, long line-of-sight. Reverberation times in the vaulted areas make the code-required STI hard to hit today and impossible to hit with a naive announcement-reduction approach. Any DCA-side application of the standard has to acknowledge that the operator inherits an acoustic envelope that constrains what the PA and quiet-zone specifications can achieve. The quiet-by-design standard applied to DCA is either a T1 replacement standard or it is nothing.
+
+---
+
+## 5. Where the thesis is stronger than the Strategist may realize
+
+The thesis is right about one central thing: the design decisions that determine whether IAD and DCA sound like airports built for the people using them are made in the two years before a ribbon-cutting, not in the twenty years after. The operator's honest position is that the standard is worth writing, but only if it (a) starts from NFPA 72 STI and ACRP 175 intelligibility numbers rather than from "silent airport" branding, (b) writes an explicit IROPS override state, (c) is tiered — mandatory / recommended / context-dependent — so that DCA historic constraints and IAD greenfield opportunities receive appropriate treatment, (d) enters the July 2026 expansion program brief before consultant selection, and (e) includes the U&L amendment language needed to make it enforceable against tenants and signatory carriers.
+
+If the standard is written in that shape, the airport works better on the Monday morning after the ribbon-cutting than it did before. If it is written as an ambience document, it will be one more piece of paper the ops center works around.

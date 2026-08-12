@@ -1,0 +1,151 @@
+# Virtual Pat Brief — Quiet-by-Design at MWAA
+
+**Author lens:** engineer-tinkerer. First question is never "what should we buy?" — it is "what does the airport already own that nobody is using this way?" I am writing to make sure the Strategist always has the version of the argument that costs 2% as much and ships 20x sooner.
+
+**Scope of this brief:** the asset inventory, five ordered solutions built out of things MWAA already owns, precedents that already run something like each solution, three 90-day pilots that would generate real evidence before the next Concourse C/D NTP, and the honest kill list.
+
+---
+
+## 1. Asset Inventory — What MWAA Already Owns That Bears On This
+
+- **The MWAA Design Manual (2020, seven volumes) plus Specifications, plus the MASTERSPEC editing infrastructure the Office of Engineering already runs.** MWAA describes the Manual as a mandatory guide with the force of law on airport property, updated annually. That is the delivery vehicle. Standards do not need to become policy resolutions or Board-adopted "programs"; they need to become an amended Design Manual volume and three or four new specification sections. This asset is worth more than any technology in the room, and it is fully paid for.
+- **FIDS at every gate, on every concourse, and at baggage claim.** US DOT accessibility rules already require that audio pages be available as visual pages. That means every airport dollar spent on FIDS already carries latent capacity to be the primary passenger information channel. What is missing is a policy that treats FIDS as primary and overhead PA as exception, not the other way around.
+- **The two dominant airline apps at MWAA's two airports.** United (IAD anchor) and American (DCA anchor) already push gate changes and boarding-status updates directly to passengers' phones. That is a redundant, personalized, multilingual information channel MWAA neither owns nor pays for. What is missing is a tenant standard that makes it the primary passenger-notification channel and demotes the overhead PA.
+- **Airline gate-podium PAs.** Airlines already have local speakers. The problem is not a lack of local audio; it is that the centralized overhead PA repeats what the podium just said, at a different level, on a different delay, over a different acoustic path — the classic double-broadcast that destroys speech transmission at the very moment the passenger needs to hear it.
+- **The Concourse E opening (fall 2026) and every Concourse C/D and DCA T1 replacement package still upstream of NTP.** These are the commissioning windows in which a quiet-by-design standard is nearly free to instrument. After NTP they are change orders.
+- **The 2025 Airline Use & Lease Agreement (15-year term).** Not a blank slate — a defined tenant-standards attachment mechanism. Standards can be amended into that framework without reopening the base agreement.
+- **The MWAA Operations Center, MWAA Police dispatch, and the existing NFPA 72-compliant fire/mass-notification stack.** These are the "safety-critical" channel. They have to stay loud, redundant, and code-compliant. Every other audio pathway can be redesigned around them, not merged with them.
+
+The important observation: the assets exist. The gap is a governance decision to point them at "quiet by design" as a defined performance requirement instead of as a marketing sensibility.
+
+---
+
+## 2. Five Solutions, Ordered Most-to-Least Achievable
+
+### Solution 1 — Amend the Design Manual before the next NTP; do not build a "program"
+
+**Problem attacked:** every standard MWAA does not codify before Concourse C/D notice-to-proceed will be argued as a change order. Standards adopted late cost 10-40x standards adopted early.
+
+**Mechanism:** open the 2020 Design Manual's technology and architectural volumes, add a "Quiet-by-Design" section and four to six new specification sections (acoustic ceilings, room criteria, PA zoning, STI commissioning, tenant audio limits, quiet-space design). Adopt the ACRP Report 175 methodology as the reference basis — it is the domestic authoritative document and MWAA does not have to invent the science.
+
+**Recombination:** the Manual apparatus, the MASTERSPEC editing workflow, and the annual update cycle. All three already exist.
+
+**Cost:** low six figures for a consultant editor plus MWAA staff time. Nothing procured. No capex.
+
+**Path:** technical amendment, Chief Engineer signature, annual issuance. No Board resolution required if framed as a design standard, not a policy.
+
+**Resistance:** consulting engineers who quote from experience and who resist prescriptive commissioning language because it exposes their work to STI measurement. Handle by writing the STI thresholds at STI ≥ 0.50 for passenger-processing areas and STI ≥ 0.45 for concourse general boarding — numbers already sitting in ACRP 175 and NFPA 72 Ch. 24, so the argument is not with MWAA.
+
+**Failure mode:** the amendment gets written, sits in Volume 5, and nobody enforces it at the 50% design review because the plan-review checklist was not updated. Fix by amending the checklist in the same package.
+
+### Solution 2 — Put SFO's tenant sound clause verbatim into the next concession lease template
+
+**Problem attacked:** roughly 30-40% of ambient sound in a modern terminal comes from tenants — televisions, background music, sample-play kiosks, coffee grinders, radio-station kiosks. No acoustic ceiling and no PA zoning fixes this. Only the lease does.
+
+**Mechanism:** SFO has published concession sound-footprint language. Copy it into the next MWAA concession lease template and into the tenant Design Criteria. Cap tenant audio at a metered LEQ at the lease-line, not at the source. Require muted televisions in gate-adjacent airline clubs.
+
+**Recombination:** existing lease templates + existing tenant design-criteria manuals + existing plan-review process at fit-out.
+
+**Cost:** legal review, roughly $30-75K. Nothing procured.
+
+**Path:** next standard-lease revision cycle. Grandfather in-place tenants; enforce at first renewal or first major fit-out. Real coverage in five to seven years.
+
+**Resistance:** concessions and airline-club operators. Argument is empirical — SFO's 40% reduction in on-site noise came in significant part from this clause, not from the PA reprogramming.
+
+**Failure mode:** exceptions get granted casually. Fix by requiring the Real Estate Committee to see every exception in aggregate, quarterly.
+
+### Solution 3 — Make the airline app the primary boarding channel; demote overhead PA to exception
+
+**Problem attacked:** the PA fires because the gate agent has no faster way to reach the passengers. This is untrue since roughly 2019. United and American both push boarding-status notifications automatically to app users; the average boarding-pass-holder at a MWAA gate is carrying the device that would receive them.
+
+**Mechanism:** rewrite the MWAA Airline Operating Standards to require, at every gate, (a) a real-time app boarding push, (b) a full FIDS-text overlay ("BOARDING GROUP 3 — GATE C21"), and (c) directional-speaker or podium PA audio, in that order. The centralized overhead PA is reserved for irregular operations, safety, and passenger-name paging by airport staff, not routine boarding calls. Gate agents keep local audio at the podium; that is not what we are turning off.
+
+**Recombination:** airline apps that already exist and cost MWAA nothing; FIDS that already exist and are already required to be capable of visual paging; podium speakers that airlines already own.
+
+**Cost:** near zero capex. The cost is the Operating Standards amendment and the airline-relations lift.
+
+**Path:** amend Airline Operating Standards; work with United (IAD) and American (DCA) on a joint pilot at one concourse each. Both carriers already have the underlying app functionality; the pilot is about disciplining the gate-agent workflow, not about building new software.
+
+**Resistance:** airlines fear no-shows and misconnects during irregular operations. Legitimate concern. Answer: overhead PA remains the fallback and stays wired the same way. The pilot measures whether no-show rates change; they almost certainly do not, because the passenger who missed the boarding call almost certainly also missed the same information on FIDS, on the app, and on the podium PA. Missed boardings are usually a passenger-behavior problem, not a signal-path problem.
+
+**Failure mode:** the wrong metric wins the argument. The metric that matters is D0 completion rate and gate-hold-back duration, not "did we page." If the airline data show equivalent performance, the case closes.
+
+### Solution 4 — Directional gate speakers plus a hard cap on overhead PA zones
+
+**Problem attacked:** the physics of the double-broadcast. A gate PA firing at the same instant as an overhead PA cancels the intelligibility of both. Directional loudspeakers (parametric arrays that project a narrow beam of audible sound) contain audio within the gate hold-room and stop the acoustic spill into the adjacent hold-room.
+
+**Mechanism:** at each gate, install one Holosonics AS-168iX-class parametric speaker (list price roughly $1,300 per unit) aimed into the hold-room from the podium canopy. Then, in the PA head-end, redefine the announcement zones so that overhead PA zones stop at the airside/landside boundary and at every gate hold-room boundary. Zone count roughly doubles; per-zone content becomes much lighter.
+
+**Recombination:** parametric-speaker technology (mature, retail-priced), existing PA head-end (already zone-capable in every modern airport DSP), gate architecture (already delineated).
+
+**Cost:** unit hardware roughly $1,300; installed cost per gate roughly $3,500-6,000 including power, low-voltage, DSP integration, and commissioning. At IAD's roughly 100+ gates that is a $400-700K program; at DCA's roughly 50 gates roughly $200-300K. Total under $1M across both airports. That is a rounding error against the $20B+ IAD transformation, and it is a one-time capex.
+
+**Path:** commission at Concourse E during fall 2026 opening as the first live installation. Roll to Concourse C/D as those spaces come online. Retrofit older concourses opportunistically.
+
+**Resistance:** parametric speakers have real caveats — narrow beam pattern, sensitivity to reflective surfaces behind the listener, limited low-frequency response. These are not disqualifying; they are design inputs. Wilson Ihrig and other airport acousticians have working knowledge of the technology; the Design Manual amendment can specify where directional works and where it does not.
+
+**Failure mode:** parametric speaker installed pointing at a glass storefront and echoes hilariously. Handle by commissioning STI measurement at each installed unit.
+
+### Solution 5 — Retrofit sensory rooms out of underused back-of-house space; certify with KultureCity
+
+**Problem attacked:** the accessibility case for "quiet by design" cannot rest on absent announcements. It has to include a place a passenger with sensory-processing needs, a nonverbal child, or a person having a panic attack can actually go. IAD and DCA both have vacant retail bays and closed carrier-service kiosks post-Sprint / post-Verizon-store that have been unrented for months. That is airside real estate MWAA already owns and is already lighting and conditioning.
+
+**Mechanism:** convert two to four such bays per airport into 200-400 sq ft sensory rooms — acoustic isolation, dimmable lighting, no windows to the concourse, KultureCity signage, sensory bags at the info desks. KultureCity's certification model is turnkey and covers 3,000+ venues including airports (IND is a live example).
+
+**Recombination:** existing vacant airside real estate + existing FF&E budget + KultureCity's off-the-shelf certification pathway + existing customer-service staffing.
+
+**Cost:** roughly $50-100K per room installed, plus roughly $5K annual for KultureCity support. Four rooms across both airports is under $500K one-time and under $25K annual.
+
+**Path:** identify vacant bays now; scope one at each airport in the FY27 minor-capital budget; certify by end of 2027.
+
+**Resistance:** concessions team wants the vacant bay back on the RFP. Answer: the airline U&L agreement's amenities framework and MWAA's own passenger-experience KPIs create a defensible offset. If the bay's realistic re-lease value is $80-150K/yr, MWAA can carry the room instead and score against accessibility performance measures.
+
+**Failure mode:** the room is unstaffed and becomes a place people sleep. Handle by camera monitoring from the ops center and by locating adjacent to a staffed information desk.
+
+---
+
+## 3. Precedents — Operations Already Running Something Like Each Solution
+
+- **SFO Quiet Airport (Solutions 1, 2, 3).** SFO reworked its PA head-end in 2019 to broadcast gate announcements only in the immediate area around the departing flight; worked with airlines to cut roughly 40% of paging; wrote concessionaire sound-footprint rules. Result reported as 90 minutes/day of announcement time removed and roughly 40% on-site noise reduction. Reporting is secondary and the reduction methodology was not primary-sourced in this brief; the reported result nonetheless represents the closest US large-hub precedent. [Source: https://viewfromthewing.com/san-francisco-airport-removed-90-minutes-of-daily-noise-travelers-say-it-changed-everything/]
+
+- **London City Airport silent-airport policy (Solutions 3, 4).** Announcements only at gates except in true emergencies; flight communications relayed via FIDS, silent kiosks, text, and mobile apps. [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]
+
+- **Helsinki-Vantaa quiet airport since 2015 (Solutions 3, 4).** No flight or passenger announcements in the terminal outside gate areas and emergencies; FIDS-primary information architecture. [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]
+
+- **Indianapolis International Airport KultureCity certification (Solution 5).** First Indiana airport to receive sensory certification; two post-security sensory rooms; sensory bags at information desks; staff training. [Source: https://www.ind.com/about/media/media-releases/indy-airport-is-now-a-certified-sensory-inclusive-venue]
+
+- **Minneapolis-Saint Paul visual paging (Solution 3 + accessibility floor).** All audio pages made from MSP's paging office are simultaneously available as text on FIDS-family screens across both terminals. [Source: https://www.mspairport.com/airport/deaf-and-hard-hearing]
+
+- **Non-aviation analog: NFPA 72 Chapter 24 for mass notification (foundational for all solutions).** Sets a minimum intelligibility threshold of STI 0.45 for emergency communications, distinguishes audibility from intelligibility, and encourages multilingual messages. This is a domestic code baseline that a quiet-by-design standard has to sit on top of, not underneath. [Source: https://www.alertus.com/blog/nfpa-72-mass-notification-requirements-guide]
+
+---
+
+## 4. The "Do It By Thursday" Tier — Three Pilots for Under $100K, Ninety Days
+
+**Pilot A — Baseline commissioning at Concourse E opening.** Take Concourse E acceptance testing already scheduled for fall 2026 and add a Class 1 sound level meter with an STI module (roughly $15-20K, or borrowed from the acoustical engineer of record for zero). Run STI, ambient LEQ, and reverberation-time surveys at 20 measurement points on opening week. Cost: staff time plus meter rental. Output: the first defensible baseline data set MWAA has ever owned. Every future project has something to be measured against.
+
+**Pilot B — "Gate paging holiday" at two DCA gates for a 30-day window.** Turn off the overhead PA (not the podium PA, not the emergency channel, not the FIDS overlay, not the airline apps) at two adjacent gates for one full airline operating day per week. Instrument via the airline's D0 completion rate, gate-agent count of "help I missed my flight" incidents, and passenger-experience survey delta. Cost: coordination time with American and MWAA Ops; no procurement. Output: airline-owned empirical answer to "will people miss flights."
+
+**Pilot C — Two parametric speakers at Concourse E gates.** Install one Holosonics AS-168iX at each of two Concourse E gates on opening. Instrument with an STI reading inside the hold-room and 15 feet into the adjacent hold-room. Cost: under $10K in hardware plus installation labor. Output: a photograph-ready before/after that Council members and Board members can hear during a site visit. Nothing sells a design standard like standing in a hold-room and having someone talk quietly to you while the next gate is invisible.
+
+All three pilots share one property: they generate evidence that either kills or accelerates the full-scale case. Neither of them requires an RFP, a Board vote, or a program manager. Together they cost less than the graphics budget for a single Board presentation.
+
+---
+
+## 5. The Kill List
+
+- **Active noise cancellation in the terminal ceiling.** Physically implausible at architectural scale and airport ambient volumes. Grins nobody who has run the math.
+- **AI-generated "empathetic tone" filter on PA scripts.** The problem is announcement frequency, not tone. Solving the wrong variable.
+- **A total ban on terminal televisions.** Politically dead on arrival with airline-club operators, sports-bar concessionaires, and the traveling public who watch news at the gate.
+- **Retrofitting the 1962 Saarinen Main Terminal with new absorptive ceiling treatment.** NRHP-listed and AIA Honor Award-winning. Fights an unwinnable historic-preservation battle for marginal acoustic benefit; treat the Saarinen space as a legacy exception, not a compliance target.
+- **A single-vendor "quiet airport in a box" platform.** Locks MWAA into a proprietary stack in a technology segment (parametric audio, PA head-ends, FIDS content management) that is still evolving. Buy commodity hardware; specify performance.
+- **Repurposing the retiring mobile lounges as roving sensory rooms.** Grins-to-nods opportunity, but the lounges' mechanical, HVAC, and ADA compliance realities make the retrofit more expensive than a fixed room built out of a vacant bay.
+- **Mandatory noise-canceling headphones vending.** Nice amenity, wrong altitude for a design standard.
+
+---
+
+## Judgment (not source-cited, brief only)
+
+The most valuable thing the Council can hand MWAA on this thesis is not a technology recommendation. It is the observation that "quiet by design" costs almost nothing if it enters the Design Manual before the next Concourse C/D NTP, and costs tens of millions in change orders if it enters after. That is the sentence that goes in the Board packet. The five-solution stack above delivers roughly 80% of the quiet-airport benefit for well under $2M in one-time capex and under $250K in recurring cost — a rounding error against the $20B+ IAD transformation program. The remaining 20% (Saarinen acoustics, retroactive tenant enforcement, universal parametric coverage) either is not worth the fight or arrives naturally at each asset's next major renovation cycle.
+
+The engineer's discipline says: name the 20% you are not covering and argue for shipping anyway.

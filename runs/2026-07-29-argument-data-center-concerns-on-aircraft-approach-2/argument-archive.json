@@ -1,0 +1,351 @@
+{
+  "correction": "Independent visual QA removed unsupported slide 4 process assertions and regenerated the evidence-bound deck receipt.",
+  "cost_by_step": {
+    "argument/art-direction": 0.7982605,
+    "argument/presentation": 3.228107,
+    "argument/word-visual-inspection": 0.31918074999999996
+  },
+  "created_at": "2026-07-29T17:54:26+00:00",
+  "files": [
+    {
+      "path": ".DS_Store",
+      "sha256": "e5de05bd2c9fbfb2af09d65992eaf6d6e5d10db3e7eff408f4053977e905bd45",
+      "size_bytes": 6148
+    },
+    {
+      "path": ".active-run.json",
+      "sha256": "c8f42e2f7ff75864a8ab5868de95d3af92e5f5e89cd9e1c168775f3b2b09ba87",
+      "size_bytes": 345
+    },
+    {
+      "path": ".gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "claim-lineage.jsonl",
+      "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+      "size_bytes": 15816
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T124736216549",
+      "sha256": "8a9ad5bc71be7249b73e2d258a8a4de603c6e17cd91d359bb1146b071998c346",
+      "size_bytes": 16210
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T130107344259",
+      "sha256": "392d27148339510c0cc6600d5c64e44d9d93b3d5890ad7f7cc2fa5bf9491b2c2",
+      "size_bytes": 18947
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260727T140640918060",
+      "sha256": "4f37bfe053cb0e9873207293c42b87208f18cf1a91c90c7df4580b2165d48fea",
+      "size_bytes": 23501
+    },
+    {
+      "path": "claim-lineage.jsonl.partial-20260729T125722967318",
+      "sha256": "dbff317bee5ee0e115616b53ac81862c9fe97c22d94dea6c2e23627979149c30",
+      "size_bytes": 18719
+    },
+    {
+      "path": "context/argument-request.json",
+      "sha256": "eda4a67951b6972ea4d84bc40065277de3c51a35f436214a3a59fc5e4144af9e",
+      "size_bytes": 4306
+    },
+    {
+      "path": "context/argument-request.md",
+      "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+      "size_bytes": 4571
+    },
+    {
+      "path": "evidence-ledger.jsonl",
+      "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+      "size_bytes": 141940
+    },
+    {
+      "path": "publishing-quality.json",
+      "sha256": "c1009429d1e6d4db1363df09dc1634a8779358c740981dac7c6e5f607c03a0df",
+      "size_bytes": 1715
+    },
+    {
+      "path": "quality-gate.json",
+      "sha256": "d00f326b3cb2164d081dffa4f2d424929faec98fe197371287a43767aaac3013",
+      "size_bytes": 803
+    },
+    {
+      "path": "retrospective.md",
+      "sha256": "5037dcea7b41f5e0b23e1040e956bdc9b9473d68d95e066d5438d4ccf2789143",
+      "size_bytes": 609
+    },
+    {
+      "path": "run-manifest.json",
+      "sha256": "1a5a50093cd92e5b8ad858b533a6fc6c79a0eb129134d63a0db218be6287dc4e",
+      "size_bytes": 81023
+    },
+    {
+      "path": "sources/pasted-argument.md",
+      "sha256": "9e6b6f0a3bce9203827e318d43c6055332edd5cda9c6a34b350c591f1669ae82",
+      "size_bytes": 3746
+    },
+    {
+      "path": "stage1/airport-coo-brief.md",
+      "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a",
+      "size_bytes": 8112
+    },
+    {
+      "path": "stage1/airport-coo-evidence.jsonl",
+      "sha256": "9c083f569135e60d062a57e024853170e207f0c46b3791dfe84f02da4010df49",
+      "size_bytes": 19507
+    },
+    {
+      "path": "stage1/chief-engineer-brief.md",
+      "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82",
+      "size_bytes": 7537
+    },
+    {
+      "path": "stage1/chief-engineer-evidence.jsonl",
+      "sha256": "577b0a1bb4a3d623e251b9eb5d8dff5b49c891863aa339e1e306b7e70b9247d8",
+      "size_bytes": 16392
+    },
+    {
+      "path": "stage1/contrarian-brief.md",
+      "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7",
+      "size_bytes": 19773
+    },
+    {
+      "path": "stage1/contrarian-evidence.jsonl",
+      "sha256": "a6ccf760747b4cf13310a0a1f71b170c33c3c93958be2569ffc8ff5c62714b30",
+      "size_bytes": 13823
+    },
+    {
+      "path": "stage1/evidence-map.md",
+      "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+      "size_bytes": 6206
+    },
+    {
+      "path": "stage1/quantitative-analysis/README.md",
+      "sha256": "46ecc03bed25f3ea7daea005ae6ac747b806860de785ec7fe1412e2c996c80f3",
+      "size_bytes": 3768
+    },
+    {
+      "path": "stage1/quantitative-analysis/calculations.json",
+      "sha256": "491675edb3a1e8fe0ca4a060ac2c837e5793d86f976c57b26834a657cd07ce38",
+      "size_bytes": 16172
+    },
+    {
+      "path": "stage1/quantitative-analysis/iad_19r_approach_surface.csv",
+      "sha256": "f8cf7b41079d93d50242bec7a22588a493b0976f528ebd40ee157e1d8f20ab64",
+      "size_bytes": 645
+    },
+    {
+      "path": "stage1/quantitative-analysis/regulatory_risk_matrix.csv",
+      "sha256": "0f6ecb8bdeaf639533dd47a21a9281d1fcba340ec96122a52d5fec1a24e74d09",
+      "size_bytes": 4120
+    },
+    {
+      "path": "stage1/quantitative-analyst-brief.md",
+      "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b",
+      "size_bytes": 13547
+    },
+    {
+      "path": "stage1/quantitative-analyst-evidence.jsonl",
+      "sha256": "4049cacbcf1bdad74dba8f484a18d29190cd3136495a7765c053cadfff57aded",
+      "size_bytes": 20520
+    },
+    {
+      "path": "stage1/regulatory-political-analyst-brief.md",
+      "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251",
+      "size_bytes": 27541
+    },
+    {
+      "path": "stage1/regulatory-political-analyst-evidence.jsonl",
+      "sha256": "3e1f294d3515435c0a5c8c1dedce17d19cc4d6773a0e1a4ac8734ef99a5e3e30",
+      "size_bytes": 23483
+    },
+    {
+      "path": "stage1/virtual-chris-brief.md",
+      "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1",
+      "size_bytes": 21382
+    },
+    {
+      "path": "stage1/virtual-chris-evidence.jsonl",
+      "sha256": "47d83a6d33bc97ba5716e0c7fab174d9698de1c1ad3c4eca956c77fc7466bc6f",
+      "size_bytes": 19525
+    },
+    {
+      "path": "stage2/strategist-draft.md",
+      "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653",
+      "size_bytes": 6268
+    },
+    {
+      "path": "stage3/fact-check-report.md",
+      "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+      "size_bytes": 19104
+    },
+    {
+      "path": "stage3/fact-check-report.md.partial-20260729T125722966812",
+      "sha256": "c2618872bfc0c1a4fbe579c28c14181ece49fc17d21815bdea24d9daff31eac9",
+      "size_bytes": 24464
+    },
+    {
+      "path": "stage3/final-draft.md",
+      "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+      "size_bytes": 5892
+    },
+    {
+      "path": "stage3/final-draft.md.partial-20260729T125722965470",
+      "sha256": "a730edf82c6fdecd4ff6f3b62a058b73145e60dbab6de34674f74b5cc8354e60",
+      "size_bytes": 6399
+    },
+    {
+      "path": "stage3/lineage-remediation-input/claim-lineage.jsonl",
+      "sha256": "dbff317bee5ee0e115616b53ac81862c9fe97c22d94dea6c2e23627979149c30",
+      "size_bytes": 18719
+    },
+    {
+      "path": "stage3/lineage-remediation-input/fact-check-report.md",
+      "sha256": "c2618872bfc0c1a4fbe579c28c14181ece49fc17d21815bdea24d9daff31eac9",
+      "size_bytes": 24464
+    },
+    {
+      "path": "stage3/lineage-remediation-input/final-draft.md",
+      "sha256": "a730edf82c6fdecd4ff6f3b62a058b73145e60dbab6de34674f74b5cc8354e60",
+      "size_bytes": 6399
+    },
+    {
+      "path": "stage3/lineage-remediation-input/instructions.md",
+      "sha256": "6b3a6ab156b7ad30c207ebe50de5399dfc3f83c74feaba2a8a242e46be6c4fb0",
+      "size_bytes": 1925
+    },
+    {
+      "path": "stage3/lineage-remediation-input/quality-gate.json",
+      "sha256": "04e21a1b051a2f136c2407588ddb8ace5e869948d505b860eae598ded4cd9611",
+      "size_bytes": 3901
+    },
+    {
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-memo-word-visual-inspection.json",
+      "sha256": "971c7efa04abd459b8034ec81ce732e8b1de230719a74b86941a2c02f66771e2",
+      "size_bytes": 2258
+    },
+    {
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx",
+      "sha256": "afc08b2c76dd729aaefb415bbc099b4829cd4ba54737923312ff8b2ab638444e",
+      "size_bytes": 41238
+    },
+    {
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-qa.json",
+      "sha256": "bfa0d1ef058b32726389c1877a955576a41a3949687281b62495f424470f1351",
+      "size_bytes": 1589
+    },
+    {
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-visual-inspection.json",
+      "sha256": "0bccb02a6db0b78fcde4917e82431c95fa180807ae8a668ad5f8b8ddad2d1656",
+      "size_bytes": 3575
+    },
+    {
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach.pptx",
+      "sha256": "c38c88b641192fff314e26ffcd59bb49028aa11d36420886c5e453dab5315a94",
+      "size_bytes": 49453
+    },
+    {
+      "path": "stage4/build_argument_deck.py",
+      "sha256": "de20344c7d2e8f07efb3f312a980907d231c19dea106bd7a71ecf845cd508afb",
+      "size_bytes": 19140
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-1.png",
+      "sha256": "e888d80b378ad420ce0c6b03e0538dca09740501b61135500fa8fcb732032d29",
+      "size_bytes": 131329
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-2.png",
+      "sha256": "2dfc618d6dfebd2d5021187d25be56286314d1ef393f3322170f2e546b000b92",
+      "size_bytes": 190414
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-3.png",
+      "sha256": "13ede40b9e450519287895ee2f905019e9a52c5d57a2a197e363da959977b45b",
+      "size_bytes": 138409
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-4.png",
+      "sha256": "0057b453d855711b47883fb167ed4383dad1dd2ed7a9b097f6a9a81f51d6947a",
+      "size_bytes": 162219
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-5.png",
+      "sha256": "edcaa6217280fda839c25aaad77ba3e07e3ad0ba6270293aa992e0d5cb962be6",
+      "size_bytes": 117974
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach.pdf",
+      "sha256": "7d2523ceed284be7feb4f590cd65c3ce2a2e9db9d53b9a54d21dde61a8d862e8",
+      "size_bytes": 309274
+    },
+    {
+      "path": "stage4/inspection/data-center-concerns-on-aircraft-approach/montage.png",
+      "sha256": "532b151ffff72bbe14e3c143ced620255d80b2860dfe1c84948bc2b3efdeeb09",
+      "size_bytes": 253027
+    },
+    {
+      "path": "stage4/qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo-1.png",
+      "sha256": "412c6d4715c0623104fd5e5c2ca42cfa21bec9ef25ea577112a8bf2910cb32dd",
+      "size_bytes": 526982
+    },
+    {
+      "path": "stage4/qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo.pdf",
+      "sha256": "cc436f39240b36454719658fd0228fa35748c98c4e281d773d671c68bfc6c592",
+      "size_bytes": 130151
+    },
+    {
+      "path": "stage4/qa/argument-data-center-concerns-on-aircraft-approach-memo/montage.png",
+      "sha256": "bd13d754f930cecd5cb2b3690b5bf3bd2b5b566b4418aa257c15ef767adf8e90",
+      "size_bytes": 156037
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-1.png",
+      "sha256": "e888d80b378ad420ce0c6b03e0538dca09740501b61135500fa8fcb732032d29",
+      "size_bytes": 131329
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-2.png",
+      "sha256": "2dfc618d6dfebd2d5021187d25be56286314d1ef393f3322170f2e546b000b92",
+      "size_bytes": 190414
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-3.png",
+      "sha256": "13ede40b9e450519287895ee2f905019e9a52c5d57a2a197e363da959977b45b",
+      "size_bytes": 138409
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-4.png",
+      "sha256": "0057b453d855711b47883fb167ed4383dad1dd2ed7a9b097f6a9a81f51d6947a",
+      "size_bytes": 162219
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-5.png",
+      "sha256": "edcaa6217280fda839c25aaad77ba3e07e3ad0ba6270293aa992e0d5cb962be6",
+      "size_bytes": 117974
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach.pdf",
+      "sha256": "7d2523ceed284be7feb4f590cd65c3ce2a2e9db9d53b9a54d21dde61a8d862e8",
+      "size_bytes": 309274
+    },
+    {
+      "path": "stage4/qa/data-center-concerns-on-aircraft-approach/montage.png",
+      "sha256": "532b151ffff72bbe14e3c143ced620255d80b2860dfe1c84948bc2b3efdeeb09",
+      "size_bytes": 253027
+    },
+    {
+      "path": "stage4/visual-brief.json",
+      "sha256": "648772a0eead0728c197fc89ca8f27950ceba2b75654c4b949c66ce24b4118b6",
+      "size_bytes": 18035
+    }
+  ],
+  "mode": "strengthen",
+  "revision_of": "runs/2026-07-29-argument-data-center-concerns-on-aircraft-approach",
+  "schema_version": "2.0",
+  "slug": "data-center-concerns-on-aircraft-approach",
+  "title": "Data Center Concerns on Aircraft Approach"
+}

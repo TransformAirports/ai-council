@@ -1,0 +1,12 @@
+distance_from_threshold_ft,max_structure_height_above_threshold_elevation_ft,approach_surface_width_ft,slope_ratio,notes
+0,0,1000,50:1,"Inner edge at runway end; RPZ begins here"
+500,10,1025,50:1,"Inside RPZ"
+1000,20,1050,50:1,"Inside RPZ"
+1750,35,1087.5,50:1,"RPZ outer boundary (2500ft length)"
+2500,50,1125,50:1,"RPZ outer edge"
+5000,100,1250,50:1,"Well within approach surface"
+10000,200,1500,50:1,"End of first approach surface segment (50:1)"
+20000,450,1750,40:1,"Second segment begins (40:1); 40000ft long"
+30000,700,2000,40:1,"Second segment"
+40000,950,2250,40:1,"Second segment"
+50000,1200,2500,40:1,"End of protected approach surface"

@@ -1,0 +1,33 @@
+{
+  "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach.pptx",
+  "kind": "pptx",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": [],
+  "metadata": {
+    "slides": 5,
+    "aspect_ratio": 1.7777,
+    "visual_shapes": 5,
+    "numeric_slides": 1,
+    "sourced_numeric_slides": 1,
+    "minimum_title_pt": 35.0,
+    "minimum_body_pt": 16.0,
+    "minimum_source_pt": 10.0,
+    "profile": "client_release",
+    "deck_mode": "argument_brief",
+    "visual_brief_slides": 5,
+    "signature_visual_slide": 2,
+    "signature_visual_markers": [
+      2
+    ]
+  },
+  "rendered_files": [
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach.pdf",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-1.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-2.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-3.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-4.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-5.png"
+  ]
+}

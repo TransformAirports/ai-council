@@ -30,6 +30,10 @@ class ArtifactContract:
     min_records: int = 0
     required_keys: tuple[str, ...] = ()
     required_any: tuple[tuple[str, ...], ...] = ()
+    # (trigger_field, (fields that must then be present, ...)). Lets one
+    # provenance form carry a stricter burden than another: an offline citation
+    # is accepted only when it also names where in the work the claim lives.
+    requires_with: tuple[tuple[str, tuple[str, ...]], ...] = ()
     optional: bool = False
 
 
@@ -144,6 +148,14 @@ def _validate_json(path: Path, contract: ArtifactContract) -> tuple[list[str], l
                 errors.append(
                     "requires at least one of: " + ", ".join(group)
                 )
+        for trigger, dependents in contract.requires_with:
+            if payload.get(trigger) in (None, ""):
+                continue
+            absent = [k for k in dependents if payload.get(k) in (None, "")]
+            if absent:
+                errors.append(
+                    f"uses {trigger} and must also set: " + ", ".join(absent)
+                )
     return errors, [], 0, len(payload) if isinstance(payload, list) else 1
 
 
@@ -175,6 +187,15 @@ def _validate_jsonl(path: Path, contract: ArtifactContract) -> tuple[list[str], 
             if not any(record.get(key) not in (None, "") for key in group):
                 errors.append(
                     f"line {number} requires at least one of: {', '.join(group)}"
+                )
+        for trigger, dependents in contract.requires_with:
+            if record.get(trigger) in (None, ""):
+                continue
+            absent = [k for k in dependents if record.get(k) in (None, "")]
+            if absent:
+                errors.append(
+                    f"line {number} uses {trigger} and must also set: "
+                    + ", ".join(absent)
                 )
         records += 1
     if records < contract.min_records:

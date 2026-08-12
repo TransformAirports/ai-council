@@ -1,0 +1,6 @@
+scenario,capital_usd,amortization_years,rate,annual_debt_service_usd,IAD_enplanements,cpe_usd
+low_rigor_ConcE,3480000,30,0.0437,210387,13859735,0.0152
+mid_rigor_ConcE,9570000,30,0.0437,578563,13859735,0.0417
+high_rigor_ConcE,21315000,30,0.0437,1288618,13859735,0.0930
+mid_rigor_ProgramWide_5M_sqft,110000000,30,0.0437,6650152,13859735,0.4798
+high_rigor_ProgramWide_5M_sqft,245000000,30,0.0437,14811701,13859735,1.0687

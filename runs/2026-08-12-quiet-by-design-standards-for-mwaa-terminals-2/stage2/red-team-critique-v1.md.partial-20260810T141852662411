@@ -1,0 +1,173 @@
+# Red Team Critique v1 — Evidence Prosecution Brief
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Reviewer:** evidence-prosecutor
+**Target:** `outputs/stage2/strategist-draft-v1.md`
+**Inputs:** run prompt; `outputs/run-manifest.json` (14 selected briefs); `outputs/stage1/evidence-map.md`; `outputs/evidence-ledger.jsonl` (256 records); one primary-source verification fetch (DWU Consulting page underlying footnote 9).
+
+Jurisdiction: evidence and reasoning only. Verdict up front: the draft is better-sourced than most Strategist v1s — footnotes are honest about hedges, the do-not-claim list was largely respected, and the peer-airport section resists its own branding temptation. But the title-bearing claim is not in the record, one confidently stated enforcement mechanism appears to be invented, the code floor is overstated in a way the ledger itself contradicts, and the DCA dollarization chain has three broken links. Fifteen findings follow; five are decisive.
+
+---
+
+## Findings
+
+### F1 — The title claim asserts a contract term nobody has read
+
+- **Location:** "The hold room MWAA does not own," ¶2: *"the 2025 Use and Lease grants signatory carriers broadcast rights inside their leased envelope, and that grant is fifteen years long.[^1]"* Also exec summary ¶1.
+- **Charge:** Unsupported; citation mismatch.
+- **Evidence:** Footnote 1 cites the MWAA press release (`infrastructure-economist::ev-c76972ceca45`), which announces the 15-year residual structure and the $9.0B CCP — it says nothing about broadcast rights. The only ledger support is `contrarian::ev-ce6acd6c06a5`, a generic ACI textbook chapter: use-and-lease agreements *"typically identify airlines' rights and privileges."* The draft's own footnote 1 concedes the executed agreement's terms "are not fully disclosed on the public record."
+- **Why it matters:** This is the frame of the entire piece — the title, the opening image, and the argument for writing the standard into lease exhibits all depend on it. If the executed U&L is silent on gate-PA rights, the lease-exhibit lever may be easier to pull than the draft assumes, or harder; either way the draft states as contractual fact what is an industry-typical inference.
+- **Remedy:** Qualify. Write it as what it is: gate-PA operation inside the leased envelope is airline-controlled in practice and typically contractual in U.S. use agreements; whether the 2025 MWAA agreement addresses broadcast rights is the same GC diligence item as the MII thresholds. The thesis survives this honesty; the current sentence does not survive a reader who asks "which section?"
+
+### F2 — The fire-marshal enforcement mechanism appears invented
+
+- **Location:** "The floors the standard inherits": *"The Fairfax County (IAD) and Arlington County (DCA) fire marshals enforce this at certificate of occupancy."* Uncited.
+- **Charge:** Invented construction.
+- **Evidence:** No ledger record supports it. The only trace is an unsourced *caveat* inside `regulatory-political-analyst::ev-60ee2940be6b` (medium confidence) naming Fairfax and Arlington as AHJs. Three independent problems: (a) the IAD terminal complex sits in Loudoun County, not Fairfax; (b) MWAA operates both airports under a federal lease and runs its own fire-and-rescue and code functions (`director-of-public-safety::ev-4c16ee335059`, `ev-0801de71097d` establish MWAA's own police authority under Va. Code §5.1-158 — the ledger never establishes who the fire-code AHJ actually is); (c) footnote 3's claim that NFPA 72 is adopted "through the Virginia Statewide Fire Prevention Code and the D.C. Construction Codes" is half-irrelevant — both airports are in Virginia; no ledger record supports either adoption pathway.
+- **Why it matters:** The draft's enforcement story — "the standard fails plan review — first at the fire marshal" — is a load-bearing rebuttal to the Contrarian. If the named enforcer is wrong, a sophisticated MWAA reader discredits the whole regulatory-floor section on page one.
+- **Remedy:** Replace with "the authority having jurisdiction" and add AHJ identity at MWAA (federal lease, MWAA's own code function vs. county officials) to the diligence list alongside the MII question. Or source it.
+
+### F3 — The draft mandates STIPA; the code does not, and the ledger says so
+
+- **Location:** Exec ¶3 and "The floors": *"NFPA 72 requires … verified under IEC 60268-16 STIPA methodology"*; repeated as "verified … at commissioning."
+- **Charge:** Overstated — contradicted by the run's own evidence.
+- **Evidence:** `technology-scout::ev-c8266e48549a` (high): NFPA 72 *permits but does not mandate* quantitative STI/STIPA measurement; a listening test suffices unless another code or the owner's specification requires instrumentation. `regulatory-political-analyst::ev-60ee2940be6b`: verification method is deferred to the AHJ.
+- **Why it matters:** This is not cosmetic — it inverts the draft's best argument. If code mandated STIPA commissioning, the Contrarian would be right that the standard adds nothing. Because code does *not*, the owner specification is the only instrument that makes instrumented verification in occupied conditions mandatory. The draft's error hands its strongest card to its opponent.
+- **Remedy:** Recalculate the argument: state the numeric floor as code, state STIPA-in-occupied-conditions as the thing only a MWAA design-manual amendment can require, and cite the technology-scout record. This correction strengthens the thesis.
+
+### F4 — The code floor governs emergency communication, not the boarding call
+
+- **Location:** Exec ¶3: *"Every 'quiet' claim rides on top of these numbers."*
+- **Charge:** Overstated; hidden assumption.
+- **Evidence:** All ten NFPA records (`operations-analyst::ev-0b02c79dde7f`, `regulatory-political-analyst::ev-63adc52d8642`, `airport-ceo::ev-faa88bffb71f`, etc.) describe intelligibility requirements for *emergency communication / voice-evacuation systems*. The routine paging PA is bound by NFPA 72 only where it doubles as the ECS. The bridge to everyday announcements is ACRP 175 (a design guideline, not code) — and footnote 4 admits the ACRP thresholds were never machine-read from the primary PDF (`evidence-map.md` §5.7 flags this; the curator supplied the PDF URL in §9). Also note the caveat on `ev-0b02c79dde7f`: NFPA 72 is paywalled and the values are paraphrased from secondary technical literature.
+- **Why it matters:** "The intelligibility floor is code" is true for the emergency envelope and rhetorical for the boarding call. A fire-protection engineer on the review committee will make this distinction in the first meeting.
+- **Remedy:** Qualify the scope in one sentence (code floor = ECS; ACRP 175 = the industry target the standard would elevate to requirement), and have the fact-checker fetch the ACRP 175 PDF at the URL the curator provided before this number ships.
+
+### F5 — Denied-boarding costs are priced against the wrong event
+
+- **Location:** "Two airports, two calibrations": *"A denied boarding costs an airline between $2,300 and $16,000; a narrowbody delay minute costs roughly $100.[^22] At DCA those numbers move higher because a missed slot cannot be re-flown."*
+- **Charge:** Citation mismatch; overstated; missing counterevidence.
+- **Evidence:** The IATA figure (`airline-commercial-strategist::ev-7605ade542cb`, medium) prices *denied boardings* — oversale bumps, an airline inventory decision. A passenger who misses a boarding call is a no-show/gate no-show, a different event with different economics, mostly borne by the passenger. The delay figure (`ev-ee3fd41be8d6`, high) is a $98.41/min *system average* across all fleet types; the record's narrowbody range is $100–$300/min — the draft assigns the systemwide average to narrowbodies. The unused counter-record: `operations-analyst::ev-d0d7fef3e331` (GAO, high) — denied boardings are under 1 percent of boardings; the base rate of the event being priced is tiny. The final clause ("those numbers move higher … cannot be re-flown") cites nothing.
+- **Why it matters:** This paragraph carries the DCA-higher-floor argument's dollarization. Right conclusion, wrong receipts.
+- **Remedy:** Recalculate: drop the denied-boarding figure or reframe it as an outer-bound analog, label $98.41/min as the system average, and support "numbers move higher at DCA" with the slot-scarcity argument alone, which needs no invented dollar figure.
+
+### F6 — "A chargeable, unrecoverable event" is a three-link causal chain with zero evidenced links
+
+- **Location:** Exec ¶5: *"a boarding missed because a passenger was in a quiet zone is a chargeable, unrecoverable event.[^8]"*
+- **Charge:** Causal leap; citation mismatch.
+- **Evidence:** Footnote 8 (CRS IN12504, `airline-commercial-strategist::ev-6b14545d4f54`, high) supports the 67-slot cap and the Section 502 exemptions — nothing else. The chain quiet zone → missed boarding → delayed departure → forfeited slot has no ledger support at any link; slot-usage rules do not forfeit a slot over one late push. The draft itself concedes two sections later that *"no peer operator has published measured missed-boarding … data attributable to a silent-airport policy."* The exec summary asserts as fact what the body admits is unmeasured.
+- **Why it matters:** The internal contradiction is the kind of thing the airport-executive reviewer will quote back verbatim.
+- **Remedy:** Qualify to match the body: the *exposure* is asymmetric at DCA because slots are scarce and unrecoverable at the schedule level; the event-level cost is unmeasured, which is itself the argument for the DCA variance being conservative.
+
+### F7 — Two invented quantities in the opening frame
+
+- **Location:** Exec ¶2: *"will govern less than half of the noise floor"*; body: *"The single loudest thing in a US-hub hold room is almost always something MWAA neither installs nor operates."*
+- **Charge:** Invented construction.
+- **Evidence:** No record in the ledger measures noise-source composition in any hold room, at MWAA or anywhere. The only measured level in the ledger is ramp-side APU noise (`operations-analyst::ev-ad67da0a50d7`, 102–109 dB, wrong side of the glass). "Less than half" and "almost always" are precision without provenance.
+- **Why it matters:** The draft's central move — from acoustics to governance — is genuinely supported by the briefs (COO, DPS, airline strategist, Virtual Christian all converge on tenant/airline sources). Dressing a qualitative convergence in fabricated fractions invites exactly one question from a skeptical reader: "measured where?"
+- **Remedy:** Qualify. "MWAA specifies the shell; the airline, tenant, and handler sources layered on top of it are outside the base-building spec" carries the same argument with zero invented numbers.
+
+### F8 — The $2-CPE-advantage warning ignores the draft's own arithmetic
+
+- **Location:** Exec ¶5: *"Any DCA acoustic premium that closes that gap has contracted revenue consequences.[^9]"*
+- **Charge:** Overstated; denominator error.
+- **Evidence:** I fetched the underlying DWU page. It confirms footnote 9 verbatim — §9.05.8, $1M per beyond-perimeter pair from DCA net remaining revenue, conditioned on a ≥$2 DCA CPE advantage — and states the current gap is **$2.36** (IAD $12.77 vs. DCA $10.41, H1 2026; `ev-b0e0e35d59d5`, `ev-b9b6789bd07f`). So the headroom is $0.36. The draft's own Exhibit E6 (footnote 14) prices the entire two-airport quiet stack at $0.03–$0.11 per enplanement — and that figure is spread across ~27M *combined* enplanements, so no DCA-only CPE impact exists anywhere in the record. Meanwhile footnote 13 has IAD CPE rising to $20.71 by 2030, which *widens* the gap.
+- **Why it matters:** The mechanism is real and the draft deserves credit for surfacing it. But as written, it implies material revenue risk that the draft's own numbers size at roughly a dime against $0.36 of headroom on a gap that is projected to grow. A CFO reads this and marks the whole exec summary down for alarm inflation.
+- **Remedy:** Recalculate: state the $2.36 current gap, compute a DCA-allocated CPE impact from the E6 stack (DCA's share of the capital over DCA enplanements), and present §9.05.8 as a *monitoring* constraint, not a live threat. Keep the DWU-consultant hedge from footnote 9.
+
+### F9 — The Official Statement is cited as if read; it was not
+
+- **Location:** Exec ¶7 and footnote 13: CPE $12.77 → $20.71, ~$400 adjusted debt per O&D enplanement peaking 2028, ~$5.5B new debt.
+- **Charge:** Source-quality failure.
+- **Evidence:** Every underlying record traces to Bond Buyer trade press or the internal context packet, not the OS itself (`infrastructure-economist::ev-711bbeadb6f5`, `ev-6247da061ceb` — the latter is medium confidence, source `airport-context.md`, with the caveat "primary figure resides in the Official Statement"). The curator's §6 warned explicitly: cite the OS if reachable, Bond Buyer as secondary if not. The context packet is itself not a primary source (curator §6, final bullet).
+- **Why it matters:** These are the affordability numbers the whole cost case leans on, going to a bond-literate audience that can pull the OS off EMMA in ninety seconds.
+- **Remedy:** Re-source: fetch the 2025A OS on EMMA before Stage 3, or restate footnote 13 as "per the 2025A Official Statement as reported by Bond Buyer."
+
+### F10 — The flattering denominator is an unsigned press release
+
+- **Location:** Exec ¶7: *"0.06 to 0.20 percent of the announced IAD program."*
+- **Charge:** Denominator error; borderline violation of do-not-claim #7.
+- **Evidence:** The $20–22.5B denominator is the July 29, 2026 announcement, which the ledger flags as lacking project budgets, gate counts, schedule, and financing (`infrastructure-economist::ev-045ec927b44b`; `airport-ceo::ev-8ca3691d22ed` — partners "mostly mum" on financing). The signed, contractual denominator is the $9.0B CCP (`ev-c76972ceca45`, high). Against it, the same $12–40M stack is 0.13–0.44 percent — still trivially small. There is also a numerator/denominator mismatch inside footnote 14: cost expressed as a percentage of the *IAD* program, CPE impact spread over *combined* IAD+DCA enplanements.
+- **Why it matters:** The smallness argument is robust; it does not need an uncommitted denominator, and using one exposes the draft to the Cranky Flier critique already sitting in the ledger.
+- **Remedy:** Recalculate against the $9.0B CCP as primary; cite the announced program as the forward-looking secondary frame.
+
+### F11 — Berlin and Denver are doing more work than their sourcing permits
+
+- **Location:** "The counter-case, honestly," final ¶: *"Both were governance failures written into acoustics-adjacent specifications."*
+- **Charge:** Overstated analogy; source-quality.
+- **Evidence:** The BER "voice-notification integration" driver rests on a single medium-confidence aggregator (`infrastructure-economist::ev-b09e4cfcff40`, execution-atlas.com); the robustly attested driver is fire-protection/smoke-extraction. The €2B→€7.3B and nine-years-late figures are well supported (`ev-fb4c8ac3e4c2`, `ev-9a04a91aba59`) and properly hedged in footnote 24. Denver's baggage system (`ev-540cace0221c`) has no acoustic content whatsoever. "Acoustics-adjacent" is the draft's coinage, not the sources'.
+- **Why it matters:** The specify-early argument is the thesis. If its two flagship cautionary tales are revealed as generic integration-failure stories relabeled, a contrarian reader discounts the whole section.
+- **Remedy:** Qualify: these are *life-safety and systems-integration* failures against frozen designs — the class of failure that includes the PA/ECS envelope — and the draft should say exactly that, or defend the "voice-notification" characterization with a second source.
+
+### F12 — Concourse E is used for urgency after its specification window closed
+
+- **Location:** Exec ¶6 ("The timing is binding") and Exhibit E1's use downstream.
+- **Charge:** Stale framing; overstated.
+- **Evidence:** `virtual-chris::ev-50798056fcd9` (high, FFXnow): Concourse E scheduled to open **September 2026** — next month, as of this run. The specification decisions the draft wants made are already poured into that building. Exhibit E1's "avoided rework $1.3M–$17.4M applied to Concourse E's 435,000 sq ft" is a counterfactual, not an available saving.
+- **Why it matters:** Listing Concourse E first in the timing paragraph invites the response "you're a year late," which undercuts an urgency case that is genuinely strong for Concourses C and D.
+- **Remedy:** Recast Concourse E as what §"Where it gets written" already correctly makes it — the commissioning-data baseline — and hang the timing argument on the C/D program brief alone. Note also that the C/D brief timing itself ("before the Concourse C and D program brief is issued") carries no citation; if no public schedule exists, say so.
+
+### F13 — Tenant-television captioning is asserted under the wrong regulation
+
+- **Location:** "A last image": *"The tenant television is captioned and muted, per federal rule"*; exec ¶4 and footnote 5 rest captioning on 14 CFR Part 382.
+- **Charge:** Citation mismatch (moderate severity).
+- **Evidence:** Part 382 is a *carrier* rule covering facilities carriers own, lease, or control (`contrarian::ev-d8c021903d7c`, `director-of-public-safety::ev-89145dd9edb1`). The DOT captioning record (`operations-analyst::ev-a7559103ae6b`) is about airlines. The airport-operator obligation runs through federal-funding rules (`virtual-pat::ev-57312bf39016`, medium — 49 CFR Part 27 territory). Whether a *concessionaire's* TV inside a leased restaurant is covered by any of these is not established anywhere in the ledger — which is precisely why the draft's tenant-handbook lever matters.
+- **Remedy:** Qualify: carrier TVs under Part 382, airport TVs under the Section 504/49 CFR 27 funding conditions, concession TVs under the lease — the third being the gap the standard closes. This correction, like F3, converts an error into an argument.
+
+### F14 — The tightening federal accessibility baseline was ordered into the draft and left out
+
+- **Location:** Absent. The evidence map (§4.4) instructed the Strategist to name and answer the DOT ACAA/PRM rulemaking direction (2024–25 Part 382 revisions, toward more real-time accessible information).
+- **Charge:** Missing counterevidence.
+- **Evidence:** Regulatory & Political Analyst brief §2.2, per the curator. The draft answers Contrarian objections 1–3 and 5 from the map's anti-thesis list; item 4 is nowhere.
+- **Why it matters:** A standard that reads as reducing information flow will be judged against a moving federal baseline; a reviewer who knows the rulemaking will treat its absence as evasion. It also strengthens the draft's redundant-channel tier if faced squarely.
+- **Remedy:** Source and add one paragraph; have the fact-checker verify whether a final rule issued.
+
+### F15 — Minor sourcing debts, listed once
+
+- **Charge:** Source-quality (low severity, bundled).
+- (a) American's "roughly 53 percent" DCA share (footnote 15) is Simple Flying, medium (`ev-dc306919a3b9`) — keep "roughly," attribute as trade-press estimate.
+- (b) Helsinki's FIDS banners trace to one 2018 trade article (`contrarian::ev-e8a16cbb7e2d`, medium), not Finavia's release as footnote 17 implies — split the footnote honestly.
+- (c) Copenhagen (footnote 19) is correctly hedged; leave it exactly as is.
+- (d) "$1 million per day" Denver carrying cost is medium confidence (`ev-e0c158a66be4`); footnote 25's "widely accepted" is fair but keep the approximation language in body text too.
+
+---
+
+## Claim-to-evidence coverage summary
+
+Of the draft's 27 footnotes, 21 trace cleanly to ledger records at stated or better confidence, with hedges preserved (a genuinely good ratio for a v1). The failures cluster: two footnotes cite sources that do not contain the claim attached to them ([^1] broadcast rights, [^8] "chargeable, unrecoverable"); one attributes secondary-sourced figures to an unread primary ([^13]); one rests a threshold spine on an admittedly unread PDF ([^4], disclosed). Four load-bearing assertions carry no citation at all: the fire-marshal enforcement sentence, "less than half of the noise floor," "the single loudest thing … almost always," and the C/D program-brief timing.
+
+## The five most load-bearing claims, and whether each survives
+
+1. **NFPA 72 STI 0.45/0.50 floor.** Survives — ten corroborating records — but only after F3 (STIPA is not code-mandated) and F4 (ECS scope) are fixed. As drafted, partially overturned by the run's own ledger.
+2. **"MWAA doesn't own the microphone" as a term of the 2025 U&L.** Does not survive as stated. Survives readily as an operational-reality and industry-typical-contract claim pending GC diligence (F1).
+3. **Specify-early economics (2–4× retrofit premium; $12–40M stack; trivial CPE impact).** Survives directionally; honestly hedged as analyst calculation; needs the F10 denominator swap and the F12 Concourse E recast.
+4. **DCA needs a higher announcement floor than IAD.** The reasoning survives — it is the run's best non-obvious finding. Its dollarization (F5, F6, F8) does not; strip the false precision and the claim is stronger.
+5. **CPE $12.77 → $20.71 affordability envelope.** Survives via consistent multi-record trade-press sourcing; must be re-sourced to the OS or attributed as secondary before the fact-check gate (F9).
+
+## Counterevidence minimized or omitted
+
+- DOT ACAA/PRM rulemaking direction — omitted entirely (F14).
+- GAO base rate: denied boardings <1% of boardings (`ev-d0d7fef3e331`) — omitted while denied-boarding costs are deployed (F5).
+- MII carve-outs commonly exempt safety/security-mandated projects (`airline-commercial-strategist::ev-68224abef774`, high) — omitted, and it *helps* the draft's board-resolution path; unused ammunition.
+- Handled well, for the record: SFO passenger complaints, Chennai backlash, the Contrarian's no-new-requirement argument, and the absence of peer outcome data are all confronted in text, not buried.
+
+## Narrative flourish outrunning the record
+
+"Less than half of the noise floor"; "the single loudest thing … almost always" (F7); "chargeable, unrecoverable event" (F6); "Every 'quiet' claim rides on top of these numbers" (F4); "before the concrete cures" (harmless, keep it). The closing hold-room vignette is fine — it is framed as a design intention, not a finding — except the captioning clause (F13).
+
+## Acquittals — well-supported claims the Strategist should defend without blinking
+
+1. The 67-hourly-slot cap and Section 502 exemption awards, including the March 17, 2025 service deadline (CRS, high).
+2. The §9.05.8 / $1M / $2-advantage mechanism as a consultant-reported contract term — verified by this reviewer against the underlying DWU page, which the footnote characterizes accurately, current gap $2.36.
+3. Peer programs as exception-governance regimes (LCY 2008, HEL 2015, AMS, CPH, SFO 2018, Chennai 2017) — multi-record, correctly hedged, and the "no published operational outcome data" admission is exactly right.
+4. DCA CY2025 traffic (24.9M, –5.3%, lowest since 2022) and its three cited drivers, including the seven-week fall 2025 shutdown — four independent high-confidence records.
+5. IAD CY2025 records (~29M total, 10.5M international) — high confidence.
+6. Concourse E facts (435,000 sq ft, 14 gates, ~46,000 sq ft concessions, 40,000 sq ft United Club, AeroTrain access) — six corroborating records including MWAA primary.
+7. The July 29, 2026 announcement's existence, scale range, and *unsigned* status — the draft's footnote 11 hedge matches the ledger exactly.
+8. OSHA 29 CFR 1910.95 thresholds; 28 CFR §35.160 "primary consideration"; Part 382's flight-critical information list (as applied to carriers).
+9. The 19 July 2024 CrowdStrike outage as the analog-fallback rationale, and the ATL/FLL resilience cases per the curator's ranking.
+10. Acoustic ceiling cost ranges ($5–15 new / $18–45 retrofit) presented as analyst calculation with the 1:10:100 heuristic explicitly demoted to direction-only — exactly what the curator required.
+
+---
+
+**Priority for revision:** F1, F2, F3, F6, F8 are decisive and must be answered before Stage 3. F4, F5, F9, F10, F11, F12 are required qualifications. F13–F15 are fit-and-finish. Two of the fixes (F3, F13) convert current errors into affirmative arguments for the standard; the Strategist should treat them as gifts, not concessions.

@@ -1,0 +1,281 @@
+# Infrastructure Economist Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Author:** Infrastructure economist (Stage 1, independent lens)
+**Run:** quiet-by-design-standards-for-mwaa-terminals-2
+**Date:** 2026-08-07
+
+The question in front of MWAA is not whether a quiet-by-design standard is nice
+to have. It is whether the acoustic, PA-zoning, mass-notification, and
+information-display performance of new and substantially renovated terminals at
+IAD and DCA will be set before the design freezes or after — and who pays the
+difference. Every airport capital economist I have worked with will tell you
+the same thing: the difference is not a rounding error, but the standard
+itself is. That asymmetry is the entire economic argument for acting now.
+
+## 1. Key findings
+
+1. **MWAA is committing to a program whose scale dwarfs the cost of any
+   defensible acoustic and PA standard, while its own rate base is already
+   tightening.** MWAA's 2025 Official Statement forecasts cost per enplanement
+   (CPE) rising to $20.71 by 2030 *before* the July 29, 2026 Dulles program is
+   layered on [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions]. The
+   announced Dulles transformation — "more than $20 billion," reported at
+   $22.5 billion in press accounts — is roughly three times the $7 billion
+   Dulles allocation the Board previously endorsed [Source: https://www.prnewswire.com/news-releases/americas-newest-capital-gateway-unveiled-more-than-20-billion-transformation-at-washington-dulles-international-airport-302838221.html].
+   Against a program that size, a fully specified acoustic and
+   audio-communication standard is a fraction of one percent of program cost —
+   trivial as CapEx, disproportionate as risk relief.
+
+2. **The historical failure mode on airport megaprograms is precisely the
+   family of systems a quiet-by-design standard governs.** Denver's automated
+   baggage system opened 16 months late with an estimated $560M program
+   overrun and a system that, by the time DIA opened in 1995, served one
+   airline, one concourse, one direction [Source: https://www5.in.tum.de/persons/huckle/Drexel_DIA.htm].
+   Heathrow Terminal 5 was built for £4.3B and then lost roughly 15,000 bags
+   and cancelled ~300 flights inside its first weeks because the baggage and
+   IT stack had not been commissioned to real-world load [Source: https://www.nbcnews.com/news/amp/wbna23117153]. Berlin
+   Brandenburg's opening slipped nine years, in significant part because fire
+   suppression, smoke control, and ventilation — the same
+   life-safety/communication stack governed by NFPA-72-adjacent codes — were
+   found to be non-compliant during commissioning [Source: https://www.airportwatch.org.uk/2020/10/nine-years-late-and-x3-over-budget-due-to-problems-berlins-brandenburg-airport-finally-opens-during-a-pandemic/].
+   Systems that carry safety announcements, wayfinding, and passenger
+   information are the ones that most often fail commissioning.
+
+3. **US airport demand for capital is not slackening.** The FAA's NPIAS
+   2025–2029 identified approximately $67.5B in AIP- and BIL-eligible airport
+   development needs across ~18,100 projects at 3,287 airports — an 8%
+   increase over the prior report's $62.4B [Source: https://acconline.org/industry-news-new-faa-npias-identifies-over-62-billion-in-aip-eligible-needs/].
+   ACI World projects roughly $2.4T in global airport capital investment to
+   2040, with about $400B (17%) in North America [Source: https://blog.aci.aero/airport-capacity/airports-need-significant-capital-expenditure-to-alleviate-slot-constraints/].
+   The industry-wide implication: the marginal capital dollar must earn its
+   keep. Standards that reduce late-stage change orders on communication
+   systems are among the cheapest yield the industry has.
+
+4. **The MacLeamy cost-of-change curve is the underlying economic mechanism.**
+   Formalized by Patrick MacLeamy (then at HOK) in 2004, the curve shows that
+   the ability to influence cost falls, and the cost of change rises,
+   monotonically from predesign through construction documentation to
+   construction [Source: https://www.danieldavis.com/macleamy/]. Airport
+   experience is consistent with the general construction-industry finding
+   that change orders during construction cost multiples of what the same
+   change would cost during schematic design. For acoustic geometry (ceiling
+   volume, hard-surface area, RT60), PA loudspeaker density and zoning, and
+   MNS pathways, the "keystrokes-not-change-orders" window closes at
+   60–90% design. That window is where a quiet-by-design standard has to
+   land.
+
+5. **The technical performance target itself is close to already-required
+   code, not aspirational.** NFPA 72 Chapter 24 governs emergency
+   communications-system voice intelligibility in life-safety applications,
+   and the IEC 60268-16 Voice Alarm (VA) target of STI = 0.50 is the
+   industry-recognized minimum for intelligible speech in transportation
+   assembly spaces [Source: https://nap.nationalacademies.org/read/24839/chapter/5].
+   ACRP Research Report 175, *Improving Intelligibility of Airport Terminal
+   Public Address Systems*, provides the specific airport-terminal design
+   guidance [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+   Recent airport-terminal research recommends STI ≥ 0.45 for pier-style
+   departure lounges as the minimum to satisfy ISO 9921 / IEC 60268-16 for
+   safety-critical announcements [Source: https://doi.org/10.3390/buildings15030426].
+   A quiet-by-design standard that specifies STI, RT60, and background-noise
+   criteria is not asking for more than code and consensus already require —
+   it is asking for it to be measured at commissioning rather than left to
+   chance.
+
+6. **IAD and DCA are two entirely different economic problems and a single
+   uniform standard will misallocate.** IAD posted ~29.0M passengers in
+   calendar 2025 (all-time record, 10.5M international) [Source: https://www.mwaa.com/financial-and-governance]
+   and enters a decade-long program adding ~5M sf of new or renovated space
+   [Source: https://www.prnewswire.com/news-releases/americas-newest-capital-gateway-unveiled-more-than-20-billion-transformation-at-washington-dulles-international-airport-302838221.html].
+   DCA posted ~24.9M passengers in 2025, down 5.3% from 26.3M in 2024 — its
+   lowest count since 2022 — and operates within a historic-district Terminal
+   1 and a Pelli-designed Terminal 2 whose retrofit envelope is small [context
+   packet §6, §5.2]. A quiet-by-design standard that is mandatory only at the
+   floor (STI, RT60, background noise, MNS intelligibility) and tiered above
+   that (PA zoning granularity, quiet-zone provisioning, dynamic
+   announcement-content control) is the only economically defensible shape.
+   Anything else either overspends at DCA or undershoots at IAD.
+
+7. **Even conservatively sized, the standard is an infinitesimal share of
+   the program and a real share of downside protection.** Concourse-scale
+   US construction is running from roughly $50/sf to well over $1,000/sf
+   depending on program complexity; JAX Concourse B is at approximately
+   $1,178/sf for a $220M six-gate project [Source: https://www.jaxdailyrecord.com/news/2024/may/09/220-million-permit-means-concourse-b-airport-construction-can-take-off/].
+   In that context, incremental acoustical treatment, loudspeaker density,
+   zoning-controller channel counts, and FIDS density are almost always
+   sub-single-digit-percent line items. The economic question is not whether
+   MWAA can afford the standard; it is whether MWAA can afford *not* to
+   commission against one. The Heathrow, Denver, and BER precedents say no.
+
+8. **Opportunity cost is real but it cuts toward, not away from, adopting
+   the standard.** The Bond Buyer reporting on the Dulles announcement quotes
+   industry analyst Edward Russell projecting a $90 CPE could ultimately be
+   required to finance the program [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions] —
+   an outer-bound figure worth caveating, but a directional signal
+   nonetheless. Airline signatories will look at every dollar in that stack.
+   Preventing the kind of post-open PA-and-baggage debacle that cost British
+   Airways ~£16M in a single event at T5 in 2008 (and again at T5 in May
+   2026, with BA reportedly demanding up to £10M from Heathrow for a single
+   20,000-bag failure) [Source: https://www.nomadlawyer.org/heathrow-baggage-failure-travel-chaos-british-airways-demands-compensation]
+   is a cost avoidance that is easier to sell to signatories than most.
+
+## 2. Evidence and analysis
+
+### 2.1 The MWAA financial envelope
+
+MWAA carries approximately $4.9B in outstanding revenue-bond debt as of July
+2025 disclosures [context packet §3]. Its most recent primary-market issuance
+was $714.4M in June 2025, with Aa3/AA- AMT bonds pricing at ~4.37% for the
+2036 maturity [Source: https://dwuconsulting.com/images/OS/MWAA%202025A%20OS.pdf; context §3].
+The FY2025 signatory CPE was $9.56 at IAD and $7.49 at DCA per the ACFR, with
+2026 first-half rate-book figures of $12.77 at IAD and $10.41 at DCA
+[Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions].
+By 2030 the pre-transformation projection is $20.71 CPE; the transformation
+layers on top of that. This matters for the quiet-by-design question because
+airline consent to premises-affecting standards runs through the same
+use-and-lease framework that governs the rate base — the 15-year use agreement
+adopted in 2024 and effective January 1, 2025 [context §4]. Standards that are
+specified early, priced into the program brief, and consulted through the MII
+process are far less likely to become airline-consent flashpoints than
+retrofit specifications that arrive after tenants have signed off on gate
+layouts.
+
+### 2.2 The MacLeamy mechanics, in airport context
+
+The MacLeamy curve is not an airport concept, but it applies with unusual
+force in terminal work because so many airport systems (PA, MNS, FIDS, tenant
+IT, airline paging, security-checkpoint messaging, gate-hold-room audio) are
+overlapping tenants of the same physical volumes. Change one and you touch
+others. The curve's basic finding — that design decisions in schematic and
+design-development are 5–10x cheaper than the same decisions during
+construction documentation, and 20–100x cheaper than during construction
+[Source: https://www.danieldavis.com/macleamy/] — maps directly to the
+economics of specifying loudspeaker density, ceiling absorptive treatment,
+partition acoustics, and control-system zoning. IAD's Concourse E — 435,000
+sf, 14 gates, scheduled to open in September 2026 with HOK designing the
+future Tier 2/3 concourses — sits at exactly the design phase where
+quiet-by-design specifications are cheap [context §5.1]. For future concourses
+that will begin schematic design in 2027–2029, the window is now.
+
+### 2.3 The historical failure record
+
+The cases the operator asked me to weigh — Berlin Brandenburg, LAX APM,
+Heathrow T5, Denver baggage, JFK T1, IAD AeroTrain — are worth reading as a
+single pattern rather than six anecdotes.
+
+- **Berlin Brandenburg (BER):** planned 2011 open, actually opened October
+  2020. Reported cost escalation from an initial €2.4B budget to a
+  €6.5B–€7.3B final cost (~2.3–2.6x), with some sources including interest
+  and reaching ~€10B [Source: https://www.airportwatch.org.uk/2020/10/nine-years-late-and-x3-over-budget-due-to-problems-berlins-brandenburg-airport-finally-opens-during-a-pandemic/].
+  Root cause of the biggest slips: fire suppression, smoke evacuation, and
+  emergency-communication systems failing certification [Source: https://erena.me/2025/01/28/german-construction-fiasco/].
+- **Denver International (DIA) baggage:** $186M system, part of a program
+  whose overrun is commonly estimated at ~$560M, and a 16-month opening
+  delay costing the city ~$1M/day [Source: https://www5.in.tum.de/persons/huckle/Drexel_DIA.htm].
+  Scope was expanded mid-project from one airline to all airlines without
+  commensurate risk analysis. This is the archetype of "specification drift
+  after design freeze."
+- **Heathrow Terminal 5:** built for £4.3B, opened March 2008; within days,
+  ~300 flights cancelled and ~15,000 bags separated from passengers due to
+  baggage system and staff-familiarization issues [Source: https://www.nbcnews.com/news/amp/wbna23117153].
+  Recurrence in May 2026: ~20,000 bags failed to make outbound flights and
+  BA demanded up to £10M in compensation [Source: https://www.nomadlawyer.org/heathrow-baggage-failure-travel-chaos-british-airways-demands-compensation].
+- **LAX Automated People Mover:** original $1.9B budget; costs escalated
+  ~$880M, reaching roughly $3.34B after a 2024 settlement; opening slipped
+  from 2023 into 2026 with contractor–owner litigation [Source: https://laist.com/news/transportation/lax-people-mover-delay-grand-jury-report].
+- **JFK New Terminal One:** $9.5B project; November 2026 opening after a
+  slip from June 2026; Moody's downgraded the JFK NTO LLC outlook from
+  stable to negative citing construction delays; total borrowings above $6B
+  [Source: https://simpleflying.com/6-billion-debt-clock-ticking-new-york-jfk-delayed-new-terminal-1/].
+- **IAD AeroTrain:** opened January 2010 at $1.5B, left Concourse D
+  without a station for the 16 years since — a stranded-asset outcome that
+  the July 2026 program is now trying to unwind at a reported ~$3.75B
+  extension cost [Source: https://airportimprovement.com/article/dulles-debuts-15-billion-train-system/;
+  https://www.travelerstoday.com/articles/60677/20260801/dulles-airport-ditches-people-movers-225-billion-overhaul-fares-may-rise.htm].
+
+The pattern is not "big airport projects overrun." It is "the systems that
+carry information — bags, passengers, voice, alarm — are where design freezes
+break." A quiet-by-design standard governs three of four of those systems.
+
+### 2.4 The technical floor is cheap
+
+ACRP Research Report 175 exists precisely because the industry has repeatedly
+found that PA intelligibility is not achievable without integrated acoustic
+and electronic design [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+The IEC 60268-16 Voice Alarm target of STI ≥ 0.50, and the newer
+airport-specific research recommending STI ≥ 0.45 in pier-style departure
+lounges [Source: https://doi.org/10.3390/buildings15030426], are performance
+metrics that a design team can be held to at commissioning. NFPA 72 already
+requires voice-evacuation intelligibility in occupancies MWAA operates. The
+economic contribution of the quiet-by-design standard is not raising the
+substantive bar so much as *making the existing bar buildable* — by requiring
+that ceiling acoustics, PA zoning, and background noise be co-designed rather
+than sequentially value-engineered.
+
+## 3. Caveats and limitations
+
+- **No public MWAA design-manual acoustic or PA specification was retrieved
+  at stage zero** [context §9]. If MWAA already has a superseded internal
+  standard, some findings here understate the baseline.
+- **The $22.5B and $20B+ Dulles figures are announcement-stage.** Financing
+  plan, board resolutions amending the CCP, and airline-consent posture are
+  not yet publicly documented [context §5.1, §10]. Treat CPE projections
+  built on those numbers as directional, not authoritative.
+- **Cost-per-square-foot benchmarks for terminals span an order of
+  magnitude** and are not comparable across regions and program types. The
+  JAX $1,178/sf reference is one data point, not a benchmark; per-sf claims
+  about acoustic subsystem cost should be built up bottom-up in RFP
+  documents.
+- **The MacLeamy curve is a graphical intuition, not a validated empirical
+  distribution.** The airport-specific multiplier of design-vs-construction
+  change cost has not been systematically measured in the public literature.
+  Treat it as directional evidence of a real mechanism, not a coefficient.
+- **ACRP Report 175 is authoritative for PA-intelligibility guidance but is
+  not a code-adopted standard.** NFPA 72 Ch. 24 and IEC 60268-16 are the
+  enforceable references.
+- **Comparability of BER, DIA, LAX APM, and T5 to a US authority's terminal
+  fit-out is limited.** These cases show what happens when
+  information-carrying systems fail commissioning; they do not translate
+  directly into $/sf or schedule days.
+
+## 4. Data points a strategist can use verbatim
+
+1. "MWAA's 2025 Official Statement projected cost per enplanement rising to
+   $20.71 by 2030 — before the July 29, 2026 Dulles transformation was
+   announced." [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions]
+
+2. "The Dulles program is roughly three times the $7 billion capital
+   allocation MWAA's Board previously endorsed, with press accounts placing
+   the total at $22.5 billion over ten years." [Sources: https://www.bondbuyer.com/news/dulles-expansion-raising-questions;
+   https://www.prnewswire.com/news-releases/americas-newest-capital-gateway-unveiled-more-than-20-billion-transformation-at-washington-dulles-international-airport-302838221.html]
+
+3. "The FAA's NPIAS 2025–2029 identified approximately $67.5 billion in
+   AIP- and BIL-eligible airport development needs across roughly 18,100
+   projects at 3,287 airports — a 8% increase over the prior report."
+   [Source: https://acconline.org/industry-news-new-faa-npias-identifies-over-62-billion-in-aip-eligible-needs/]
+
+4. "The Denver International Airport baggage system opened 16 months late
+   with a program overrun estimated at $560 million, in part because
+   mid-project scope expansion added complexity to a system that had already
+   compressed a four-year delivery into two years." [Source:
+   https://www5.in.tum.de/persons/huckle/Drexel_DIA.htm]
+
+5. "For airport terminal applications the IEC 60268-16 Voice Alarm target
+   of STI = 0.50 is the industry-recognized minimum for intelligible speech,
+   with recent airport-specific research recommending STI ≥ 0.45 in
+   pier-style departure lounges." [Sources:
+   https://nap.nationalacademies.org/read/24839/chapter/5;
+   https://doi.org/10.3390/buildings15030426]
+
+## 5. Bottom line
+
+The economic case for a MWAA quiet-by-design standard is not that quiet is
+valuable in itself — that is an operations and passenger-experience case,
+which my colleagues will make. The economic case is that the airport
+capital record shows information-carrying systems (bags, voice, alarm) are
+where large programs fail commissioning, and that the marginal cost of
+specifying performance for those systems collapses if it is done before
+schematic freeze and explodes if it is done after. With $20B+ moving into
+design at IAD and a small but real retrofit envelope at DCA, MWAA's window
+to spend a few million dollars specifying against a defensible floor — and
+to save many multiples of that in change orders, litigation, and
+airline-consent friction — is now.

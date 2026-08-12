@@ -1,0 +1,8 @@
+metric,IAD_value,DCA_value,delta_or_direction,source
+2025_total_passengers_millions,29.0,24.9,IAD 16.5% larger,MWAA 2025 traffic disclosures
+2025_international_passengers_millions,10.5,de_minimis,IAD dominates,MWAA 2025 traffic disclosures
+traffic_trajectory,growing_toward_90M,declining_from_26.3M_in_2024,divergent,MWAA master plan / MWAA 2025 traffic
+historic_preservation_constraint,Saarinen_main_terminal_preserved,Terminal_1_Historic_District_plus_Pelli_intent,DCA more constrained,MWAA / NRHP
+capital_envelope,$20B_plus_new_program_2026,Project_Journey_complete_no_megaproject,IAD greenfield IAD brownfield,MWAA July 29 2026 announcement
+standard_lever_new_build,dominant,limited,IAD favored for design-time spec,analyst construction
+standard_lever_retrofit,secondary,dominant,DCA forced to retrofit toolkit,analyst construction

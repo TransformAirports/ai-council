@@ -1,0 +1,163 @@
+# MWAA Doesn't Own the Microphone
+
+*A quiet-by-design standard is a governance question about tenant volumes, airline lease exhibits, and commissioning discipline, not a design-taste question about ceiling tiles.*
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Author:** humanizer (from editor, from strategist v3)
+**Draft:** stage3 humanized
+
+---
+
+## Executive summary
+
+1. The loudest instrument in an MWAA hold room during a slot-constrained departure is not the airport PA. It is a gate agent's handheld, layered over concessionaire audio and tenant televisions. MWAA specifies the shell; the airline, tenant, and handler sources sit outside the base-building spec.[^1]
+
+2. A standard written only into the base-terminal design volume governs only the shell. The real levers are the tenant volumes, the tenant handbook, and the commissioning protocol — instruments MWAA already uses to regulate fitouts and acceptance.[^2] Airline lease exhibits are the 2039 U&L target, not a Day-1 requirement.
+
+3. Code governs emergency communication, not the boarding call. NFPA 72 requires a Speech Transmission Index of 0.45 at 90 percent of locations, averaging 0.50, yet permits an unmeasured listening test.[^3] ACRP 175 lifts the target to STI 0.50 with 10 dB(A) of signal-to-noise margin in pier hold rooms.[^4] Only a design-manual amendment makes those owner-required and mandates STIPA at commissioning; the Airports Authority Fire Marshal enforces the code floor under 49 U.S.C. §49104.[^5]
+
+4. Redundant channels are federal law — for whichever actor owns each surface. 14 CFR Part 382 binds carriers;[^6] Section 504 and 49 CFR Part 27 bind MWAA;[^7] 28 CFR §35.160 requires "primary consideration" of the passenger's requested aid.[^8] The concessionaire's television sits in a gap only the tenant handbook closes. DOT is rulemaking toward real-time accessible information;[^9] Chennai 2017 is the failure benchmark.[^10]
+
+5. DCA needs a higher announcement floor than IAD, not a lower one. Sixty-seven hourly slots on a single main runway make a schedule-level miss unrecoverable.[^11] Under §9.05.8 of the 2025 Use and Lease, $1 million per beyond-perimeter pair is conditioned on a $2 DCA-vs-IAD CPE advantage; the current gap is $2.36 — a monitoring constraint, not a live threat.[^12]
+
+6. Timing binds at Concourses C and D. Concourse E opens September 2026, which makes it a commissioning baseline, not a design opportunity.[^13] The July 2026 MWAA–United–USDOT announcement puts more than 5 million square feet into design at $20–22.5 billion.[^14] Acoustic ceiling treatment runs $5–15 per square foot new, $18–45 as retrofit.[^15]
+
+7. The stack is affordable: $12–40 million of capital — 0.13 to 0.44 percent of the signed $9.0 billion CCP, $0.03 to $0.11 per enplanement[^17] — plus roughly $600 thousand to $1.8 million a year of O&M recovered through airline rates and charges.[^18] IAD CPE rises from $12.77 to $20.71 by 2030 regardless.[^16]
+
+8. Adopt it as a Design Manual amendment executed by the VP of Design and Construction under delegated authority, with a concurrent Board information item. Name it the Terminal Acoustic and Information Performance Standard. Never use the word "quiet" in the resolution.
+
+---
+
+## The hold room MWAA does not own
+
+Gate 35, DCA Terminal 2, a weekday morning. The 1997 Pelli National Hall opens into a long, hard-surfaced concourse. American, with roughly 53 percent of DCA departures [FC: trade-press estimate], turns slot-capped narrowbodies against the 67-slot hourly cap.[^19] A gate agent calls Group 4 on a handheld, competing with a muted-but-audible television across the way, a neighboring gate's announcements in a zone the agent cannot silence, and the pier-length HVAC. A passenger with hearing aids two rows back leans in. A passenger without a smartphone watches for the visual cue that is not there. Her boarding pass says Group 3.
+
+MWAA owns the room. It does not own the sound.
+
+That is the operative fact. The Authority controls the shell — ceiling, finishes, base-building PA — and controls tenant fitouts through the Design Manual volumes.[^2] It does not control the airline gate microphone: gate PA inside the leased envelope is airline-run in practice, and whether the executed 2025 U&L names broadcast rights is a GC diligence item [FC/GC: broadcast-rights clause].[^1] It does not control the tenant television, which lives in the concessionaire's lease, or the handler's handheld, which lives in another contract.
+
+None of this is a reason to abandon the standard. It is the reason to write it where the microphones live.
+
+## What the peers actually did
+
+Every airport the trade press calls "silent" governs exceptions. London City, silent since 2008, retains announcements for short-notice gate changes, disruption, and FIDS failure.[^20] Helsinki-Vantaa, silent since June 2015, retains gate and emergency calls, and later added banners telling passengers to track time themselves.[^21] Schiphol runs "virtually no announcements" alongside a formal accessibility program.[^22] Copenhagen zones quiet by gate area.[^23] San Francisco, the only documented U.S. large-hub program, reports a 40 percent cut in boarding-area announcements and 90 minutes a day removed from the International Terminal — alongside a public record of complaints about missed information.[^24] Chennai's 2017 rollout drew a backlash serious enough that officials conceded "no separate provisions for the visually-challenged are available."[^10]
+
+No peer has published measured missed-boarding, missed-connection, or IROPS data attributable to a silent-airport policy. An argument from peer branding is design conservatism, and it should be defended as such. Notice, too, that every one of these programs is an exception-governance regime rather than the absence of a PA. The variable at MWAA is not how much silence to inherit. It is what the exceptions are, who authorizes them, and in which zone.
+
+## The floors the standard inherits — and the one it adds
+
+The standard inherits its floors. For emergency communication, NFPA 72 requires an STI of 0.45 at 90 percent of locations in each Acoustically Distinguishable Space, averaging 0.50.[^3] The code permits instrumented STIPA verification but does not require it; a listening test satisfies it. That gap is the affirmative case for a design-manual amendment. Only the owner specification can elevate ACRP 175's targets — STI 0.50 for terminal PA, 10 dB(A) of signal-to-noise margin in pier hold rooms [FC: verify against primary PDF] — to required performance, and only the owner specification can mandate occupied-condition STIPA at commissioning.[^4] The Airports Authority Fire Marshal, the AHJ inside the federal-leased perimeter [FC/GC: written delegation unconfirmed], enforces the code floor at certificate of occupancy; the owner specification enforces the delta above it.[^5]
+
+The second floor is accessibility: three regulations, three actors. 14 CFR Part 382 binds carriers on facilities they control, including captionable televisions.[^6] Section 504 and 49 CFR Part 27 bind MWAA on airport-controlled communication;[^7] 28 CFR §35.160 adds "primary consideration" of a passenger's requested aid.[^8] The concessionaire's television sits in a gap no federal regulation squarely occupies — which is why the tenant handbook is the lever, and why DOT's rulemaking toward real-time accessible information matters even where Part 382 does not reach [FC: final-rule status].[^9] The redundant-channel floor also protects grant assurance under 49 U.S.C. §47107 where grant funds touch the stack.
+
+## Two airports, two calibrations
+
+DCA closed 2025 at 24.9 million passengers — down 5.3 percent, its lowest since 2022 — absorbing the January midair collision and a seven-week fall shutdown.[^25] It runs one runway capped at 67 hourly slots; the 2024 FAA Reauthorization added ten beyond-perimeter exemptions in December 2024.[^11]
+
+Do not price the DCA argument in denied-boarding dollars. A passenger who misses a boarding call is a no-show — under 1 percent of boardings per GAO, the cost mostly the passenger's.[^26] The DCA argument is exposure. Slot scarcity makes a schedule-level miss asymmetric in a way it is not at IAD, and §9.05.8 monetizes that asymmetry at $1 million per beyond-perimeter pair, conditioned on a $2 CPE advantage. The current gap is $2.36 [FC: §9.05.8 rests on consultant analysis, not public text], leaving $0.36 of headroom; the standard's job is to keep DCA's audible channel reliable enough that it never starts consuming it.[^12] The delivery vehicle is Terminal 2's gate-area renovations inside the $2.39 billion DCA CCP, reached through the program brief while the design is open.[^27]
+
+IAD ran roughly 29 million passengers in 2025, 10.5 million international — both records.[^28] Its journeys are longer, its populations more multilingual, its transfers more dependent on visual and digital redundancy than on English audio. So calibrate IAD for the visual and digital channels and DCA for the audible one: a common intelligibility floor, with an explicit DCA variance for announcement density and IROPS PA envelope.
+
+## The counter-case, honestly
+
+The strongest argument against a new standard is that MWAA does not need one. NFPA 72, ADA Title II, the ACAA, and a competent commissioning specification already require most of it; a consultant-scope paragraph requiring occupied-condition STIPA would deliver most of the value without a board resolution. The Board has not asked for this. And the January 2025 midair is still in memory; a "quiet" framing will be read against it.
+
+The standard concedes three things. It is not a new requirement but the integration layer across requirements that today live in different consultants' scopes on different projects with no owner for the seam. It never carries the word "quiet" in an external MWAA document — the Schiphol and Helsinki pattern is to brand silence and govern intelligibility — so it is the Terminal Acoustic and Information Performance Standard. And it says nothing on Day 1 about airline announcement scripting inside the leased envelope. That is a 2039 U&L review target, staged through bilateral MOUs with United at IAD and American at DCA, negotiated on MWAA's data rather than through a lease-exhibit fight the Authority does not need now.
+
+What it does say: what the base building must achieve, what the tenant volumes add, what each signatory MOU commits to on gate-PA discipline, and what commissioning must verify before substantial completion. Berlin Brandenburg shows what happens when that layer is missing — a life-safety and systems-integration failure against a frozen design, €2 billion closing at €7.3 billion, nine lost years.[^29] Denver's baggage system is the same class of failure: $193 million past $400 million, abandoned in 2005.[^30] Both were preventable at design.
+
+The 17-seat Board splits three ways: a seven-seat Virginia majority oriented to the Dulles program, D.C. and Maryland appointees who hear from the disability communities most exposed to a reduced-information framing, and federal appointees carrying the July 2026 White House and USDOT posture. A safety-and-accessibility performance floor is legible to all three. A "quiet" resolution is not.[^31] On the airline side, use-and-lease majority-in-interest carve-outs commonly exempt safety- and security-mandated capital, which is why the standard must sit inside that carve-out from the first draft, conditioned on GC confirming the executed 2025 U&L follows the pattern [FC/GC: MII carve-out unverified].[^32]
+
+## Where it gets written, and by when
+
+Adopt the standard as a Design Manual amendment, executed by the VP of Design and Construction under existing delegated authority, with a concurrent information item to the Board's Business Administration Committee — a new performance section in Volume 1 and the tenant volumes, inside the FY26 revision cycle.[^2] Convert to a Board resolution only if GC's MII memo finds it materially alters airline rates and charges.
+
+The mandatory floor at both airports: NFPA 72 STI verified by IEC 60268-16 STIPA in occupied conditions; ACRP 175 signal-to-noise margin in every pier hold room; a redundant-channel obligation — audible, visual/digital, staffed — for every safety-critical, boarding-critical, and IROPS message; and PA-push authority anchored to a named position. Add an emergency-notification stack on generator, UPS, and local battery, with a duty-officer analog fallback for the day the managed-IT layer fails, as on 19 July 2024;[^33] a 60-second FIDS SLA from AODB update to gate-change display; and an IROPS clause permitting temporary relaxation under duty-officer sign-off, exercised annually. Recommended practice: NC/RC targets by space type, quiet-zone locations, and annual OSHA 1910.95 dosimetry at the ten noisiest locations per airport.[^34] Context-dependent: the DCA variance, plus SHPO-consulted preservation carve-outs for the Saarinen Main Terminal and DCA's 1941 Terminal 1 — defined character-defining features, not blanket exemptions.
+
+Funding sits in four places. Design fees ride existing consultant budgets on the C/D and E lines. The construction premium is incremental scope inside the $20–22.5 billion envelope, financed through the CCP GARB stack. The mobile-notification platform is an IT acquisition — 2 CFR Part 200 and DBE if grant-funded — pending the CIO's finding on whether the existing stack extends before any 9-to-18-month procurement. Lifecycle O&M, $600 thousand to $1.8 million a year, flows through the operating budget and recovers through the airline O&M line.[^18]
+
+The President and CEO owns it; the COO, VP D&C, and VP Airline Affairs co-sponsor. The first 90 days: GC returns the MII memo and confirms the AHJ delegation in writing; VP D&C convenes the working group and signs the Concourse E acoustics-and-commissioning contract inside 30 days, or the baseline recasts to first C/D substantial completion; VP Airline Affairs pre-briefs United and American; the CIO returns the platform finding; the Airports VPs open the tenant-handbook amendment on the concession renewal schedule.
+
+Leading indicators are process inputs: C/D deliverables with acoustic sections, renewals on amended handbook language, signatory meetings held, FY27 scopes naming the standard. The acceptance tests — STIPA at commissioning and again 60 days after opening — judge them.
+
+Stop conditions, each owned and dated: the MII carve-out does not cover the standard — convert to a signatory side letter (GC, Day 45); the AHJ declines occupied-condition STIPA — negotiate an alternative protocol (Fire Marshal, Day 60); a signatory formally objects to the DCA framing — drop the variance (VP Airline Affairs, Day 90); the DOT final rule contradicts a clause — amend on publication (GC); the Concourse E baseline lands inside the ACRP band — defer C/D application (VP D&C, Day 120 after opening); FY27 budgets cannot absorb the O&M line (CFO, at markup). The failure mode to guard against is scope migration into an announcement-policy standard the airlines contest under the Use and Lease.
+
+Labor is owned: DCA's higher floor means more voice work at American's gates — a CBA matter for American, a training matter for MWAA staff, with a plan inside 180 days. The bond-covenant test is trivial at this sizing; Treasury confirms in routine rating dialogue.
+
+## A last image
+
+Return to Gate 35. The ceiling and wall absorption are different; the base-building loudspeakers reach every seat at an STI the Fire Marshal will accept in occupied conditions. The airline gate PA is unchanged; American still calls Group 3. The concessionaire's television is captioned and muted per the amended handbook — reaching the full portfolio only as leases renew, a horizon, not a date. The FIDS updates within 60 seconds. The passenger with hearing aids hears the call cleanly; the passenger without a smartphone reads the same information off a display. The gate agent, no longer fighting adjacent-zone spillover, spends four minutes with the family that missed the sequence instead of with the microphone.
+
+Nothing in that room is quiet in the marketing sense. Every message that matters lands. That is the standard MWAA can write, and the only one worth writing before the concrete cures.
+
+---
+
+## Footnotes
+
+[^1]: MWAA press release, December 2024, announcing completion of the 15-year, two-airport residual Use and Lease Agreement effective 1 January 2025, with a 140 percent airline-funded debt-service coverage target and a $9.0 billion Capital Construction Program (approximately $6.99 billion IAD, $2.39 billion DCA). Whether the executed agreement explicitly grants signatory carriers broadcast rights inside the leased envelope is not on the public record; the operational reality — gate-PA operation is airline-run in practice — is corroborated across the run's COO, DPS, and airline-strategy briefs. Both the broadcast-rights question and the MII thresholds are diligence items for MWAA General Counsel.
+
+[^2]: MWAA Airports Authority Design Manual, seven-volume publicly indexed structure covering IAD Vol. 1 (airport design and signing), Vol. 2 (Main Terminal / Concourse Z tenant standards), Vol. 3 (Concourse B tenant standards), and parallel DCA volumes, per the Authority's published design-manual index. Whether the current volumes contain explicit acoustic performance criteria (NC/RC, RT60, STI, adjacent-zone spillover, PA loudspeaker density) is not disclosed on the public index; on the operating assumption that they do not, the amendment is treated as insertion of a new performance section under the FY26 revision cycle rather than a redline of existing text.
+
+[^3]: NFPA 72, National Fire Alarm and Signaling Code (2022 edition), Chapter 24 and Annex D: emergency communication systems achieve intelligibility if at least 90 percent of measurement locations within each Acoustically Distinguishable Space achieve STI of not less than 0.45 (CIS 0.65) with an average STI of not less than 0.50 (CIS 0.70). NFPA 72 permits quantitative STI/STIPA measurement but does not mandate it — a listening test suffices absent another code or owner requirement. IEC 60268-16 (2020 edition) defines the STIPA method the owner specification would invoke. Primary NFPA 72 text is paywalled; values are paraphrased from secondary technical literature and cross-checked across ten independent evidence records.
+
+[^4]: ACRP Research Report 175, *Improving Intelligibility of Airport Terminal Public Address Systems*, Transportation Research Board / Wilson Ihrig, 2017. Recommends an STI target of 0.50 (acceptable band 0.46–0.53) for terminal PA and a signal-to-noise ratio of at least 10 dB(A) in pier-style departure lounges; identifies RT60 greater than 1 second as the primary physical barrier to speech intelligibility. Analyst note: thresholds cited here derive from the researcher-verified summary in the ACRP 175 report; the exact target-band and SNR floor language was not machine-read from the primary PDF in the research window and is on the fact-checker's fetch list.
+
+[^5]: 49 U.S.C. §49104 vests operational and code-enforcement authority for Ronald Reagan Washington National and Washington Dulles International in the Metropolitan Washington Airports Authority under the federal lease from the U.S. Department of Transportation. The Airports Authority Fire Marshal is the operational AHJ for building- and fire-code plan review and certificate of occupancy inside the airport perimeter; Loudoun County (for IAD) and Arlington County (for DCA T1/T2) do not run plan review or CO on airport-controlled space. Analyst note: the specific written delegation of NFPA 72 STIPA enforcement authority to the Fire Marshal's office is a General Counsel confirmation item and is retained here as a decision-critical assumption in the recommendation, not as a citable document reference.
+
+[^6]: 14 CFR Part 382 (Air Carrier Access Act implementing regulation), including §382.51 (accessible terminal facilities and flight-critical information — safety, delays, cancellations, schedule changes, boarding, connections, gate assignments, paging, aircraft changes, and emergencies) and captioning provisions applicable to carrier-controlled televisions capable of displaying captions. Part 382 binds air carriers on facilities they own, lease, or control.
+
+[^7]: Section 504 of the Rehabilitation Act and 49 CFR Part 27 bind federal-funding recipients — MWAA among them — to nondiscriminatory and accessible communication in airport-controlled space.
+
+[^8]: 28 CFR §35.160 (ADA Title II, Subpart E): public entities must ensure communications with individuals with disabilities are "as effective as" communications with others, and must give "primary consideration" to the individual's requested auxiliary aid or service.
+
+[^9]: DOT ACAA/PRM rulemaking direction, 2024–2025: proposed Part 382 revisions toward more real-time accessible flight information for passengers with disabilities. Final-rule status flagged for fact-checker verification before publication.
+
+[^10]: Deccan Chronicle, "How will visually impaired flyers manage in silent terminals," 7 May 2017, reporting airport officials' concession that "no separate provisions for the visually-challenged are available" following the Chennai silent-terminal rollout.
+
+[^11]: Congressional Research Service, IN12504, "Beyond-Perimeter Flights at Reagan National Airport," documenting the 67-hourly-slot cap and the ten additional beyond-perimeter exemptions authorized by Section 502 of the FAA Reauthorization Act of 2024 (P.L. 118-63), with awards issued in December 2024 (two exemptions each to Alaska/SAN, American/SAT, Delta/SEA, Southwest/LAS, United/SFO); service was required to begin by 17 March 2025.
+
+[^12]: MWAA 2025 Use and Lease Agreement, §9.05.8, as reported through DWU Consulting analysis of the executed agreement: MWAA receives $1 million per new beyond-perimeter flight pair from DCA net remaining revenue, conditioned on DCA maintaining a $2 CPE advantage over IAD. Current gap $2.36 (IAD $12.77 vs. DCA $10.41, H1 2026), leaving $0.36 of headroom; the IAD $12.77 → $20.71 CPE trajectory (footnote 16) widens the gap over the standard's implementation horizon. Analyst note: primary contract text not fully public; the section reference is drawn from consultant analysis of the executed agreement.
+
+[^13]: Concourse E timing: opening scheduled for September 2026 per FFXnow reporting; 435,000 square feet, 14 United gates, approximately 46,000 square feet of concessions, a 40,000-square-foot United Club, direct AeroTrain access, per MWAA / United disclosures. Program-brief timing for Concourses C and D is not currently public and is a diligence item.
+
+[^14]: Joint MWAA / United Airlines / U.S. Department of Transportation announcement, 29 July 2026, "America's Newest Capital Gateway Unveiled — More Than $20 Billion Transformation at Washington Dulles International Airport," describing a multi-decade program to replace Concourses C and D, extend AeroTrain, retire the mobile lounges, and create or renovate more than 5 million square feet, at an order-of-magnitude of $20 billion to $22.5 billion. The financing structure for incremental scope beyond the existing $7 billion IAD CCP has not been publicly detailed; the announcement is not yet a signed program of record.
+
+[^15]: Analyst calculation, quantitative-analysis Exhibit E1: commercial contractor benchmarks for installed acoustic ceiling tile (basic to premium NRC) at $5–$15/sq ft in new construction and $18–$45/sq ft as retrofit, exclusive of after-hours badging premium, escort, and airside-specific complications. The 2× to 4× premium is the ratio of these ranges; the direction is well-attested in AACE cost engineering literature (the "1:10:100" rule) but exact multipliers at MWAA would require the Authority's own cost history.
+
+[^16]: MWAA Series 2025A Official Statement (accompanying the $714.4 million Airport System Revenue and Refunding Bond issuance), as reported by Bond Buyer and confirmed against the airport-context packet compiled at run start: signatory CPE at IAD projected to rise from $12.77 (current) to $20.71 by 2030 under the $9.0 billion CCP; adjusted debt per O&D enplanement projected to peak near $400 in 2028; approximately $5.5 billion of additional debt planned across 2025–2028. Credit affirmations May 2025: Moody's Aa3, S&P AA-, Fitch AA-, all stable. Fact-checker to verify against the OS on EMMA before publication.
+
+[^17]: Analyst calculation, quantitative-analysis Exhibit E6: order-of-magnitude range for a MWAA-wide quiet-by-design capital stack (ceiling treatment premium plus FIDS redundancy plus mobile-notification platform) of $12 million to $40 million one-time; 0.13 to 0.44 percent of the signed $9.0 billion CCP; financed at approximately 7.5 cents of annual debt service per dollar of principal (informed by the June 2025 MWAA issuance), producing $0.03 to $0.11 per enplanement against approximately 27 million combined enplanements. The percentage-of-program and per-enplanement figures both use the signed CCP and combined enplanements as their denominators; the announced $20–22.5B program is a forward-looking comparator, not a primary denominator.
+
+[^18]: Analyst calculation: lifecycle O&M sizing at 5 percent per year of the $12-$40 million capital stack, comprising STIPA re-measurement on a 3-year cycle, loudspeaker replacement on a 10-15-year cycle, FIDS SLA infrastructure renewal, mobile-notification platform hosting and licensing, and periodic acoustic tile replacement in high-wear zones. The 5 percent factor is a commercial-facility-management benchmark rather than an MWAA-specific figure and is retained here as an order-of-magnitude for the Board-memo affordability check; the CFO's office will replace it with an MWAA-native number as part of the FY27 O&M markup.
+
+[^19]: American Airlines share of approximately 53 percent of DCA departures per Simple Flying route-level analysis (March 2025); trade-press estimate, retained here as an order-of-magnitude anchor. DCA slot cap of 67 hourly slots per the FAA High Density Rule; see also footnote 11.
+
+[^20]: London City Airport, "Silent Airport Policy," operator publication in effect since 2008: no tannoy announcements in the departure lounge; announcements retained for short-notice gate changes, disruption, and flight information display failure.
+
+[^21]: Finavia press release, 1 June 2015 announcement of Helsinki-Vantaa's silent-airport policy: no terminal-wide flight or passenger announcements; departure-gate and emergency announcements retained. The supplementary banners added under FIDS displays trace to 2018 trade coverage rather than to Finavia's original release.
+
+[^22]: Amsterdam Schiphol press release, "Silence at Amsterdam Airport Schiphol," describing "virtually no announcements" and directing passengers to FIDS, website, and Schiphol app; paired with a documented accessibility program for deaf and blind passengers on the airport's assistance pages.
+
+[^23]: Copenhagen Airport (CPH), zoned quiet-terminal model — dedicated sound-dampened areas near specified gates with no overhead announcements coexisting with conventional PA in other zones. Sourced through secondary reporting; specific gate identifiers are not directly verified against the primary CPH operator page.
+
+[^24]: San Francisco International Airport, Quiet Airport program (in effect since 2018), self-reported metrics: approximately 40 percent reduction in announcements in boarding areas and roughly 90 minutes per day of announcements removed from the International Terminal. Passenger complaints regarding missed information are documented in trade-press coverage.
+
+[^25]: MWAA operational reporting for calendar year 2025, per Airports Authority publications and regional press: DCA approximately 24.9 million passengers, down 5.3 percent from 26.3 million in 2024 and the lowest annual total since 2022; drivers publicly cited include the 29 January 2025 midair collision between a PSA Airlines CRJ-700 (PSA 5342) and a U.S. Army UH-60 near DCA and the subsequent flight restrictions, a seven-week federal government shutdown in fall 2025, and softer federal-workforce travel demand.
+
+[^26]: Airlines for America U.S. passenger-carrier delay-cost dataset: approximately $98.41 per block minute for the U.S. system average across all fleet types (higher for widebodies; narrowbody range approximately $100–$300/min). U.S. Government Accountability Office base-rate data placing denied boardings at under 1 percent of boardings; note that a passenger who misses a boarding call is a no-show rather than a denied boarding.
+
+[^27]: DCA CCP allocation of approximately $2.39 billion inside the $9.0 billion signed program (footnote 1), with public program descriptions naming gate-area capacity, curb/roadway, and terminal repair work as the principal DCA-side scope. Analyst identification of Terminal 2 gate-area renovations as the first DCA project through which the standard reaches drawings is a diligence anchor rather than a confirmed procurement designation.
+
+[^28]: MWAA CY2025 operational reporting: IAD approximately 29 million total passengers and 10.5 million international passengers, both all-time highs.
+
+[^29]: Berlin Brandenburg Airport (BER) case-study literature: initial cost estimate approximately €2 billion (2006), final outturn approximately €7.3 billion at 31 October 2020 opening. Principal driver of the 2012 opening cancellation was a fire-protection and voice-notification integration that never certified against the frozen design; the fire-protection framing is uncontested across post-mortems, the voice-notification specificity rests on a single case-study aggregator and is retained here as illustrative of the life-safety and systems-integration class of failure rather than a definitive characterization.
+
+[^30]: Denver International Airport automated baggage system: contract from $193 million to over $400 million; approximately 16-month opening delay at roughly $1 million per day of carrying cost; system abandoned August 2005. Widely accepted engineering case-study numbers; carrying-cost figure is order-of-magnitude.
+
+[^31]: MWAA Board composition of 17 members — seven appointed by the Governor of Virginia, four by the Mayor of the District of Columbia, three by the Governor of Maryland, and three by the President of the United States — per the Metropolitan Washington Airports Act and MWAA governance disclosures. Board officer positions and the July 2026 White House / USDOT / United political posture are described here in geometric rather than seat-by-seat terms; a private Board read is the President and CEO's, not the strategist's.
+
+[^32]: Airline-commercial-strategy research: majority-in-interest carve-outs in U.S. airport use-and-lease agreements commonly exempt safety- and security-mandated capital from airline veto rights. Whether the executed MWAA 2025 U&L follows this pattern for a safety/accessibility performance standard is the GC memo condition on which the recommendation's approval route depends.
+
+[^33]: 19 July 2024 CrowdStrike outage impact on U.S. hub operations, national press and vendor post-mortems: IT-managed notification stacks and airline check-in systems failed simultaneously at major hubs, requiring fallback to voice, radio, and floor-walkers.
+
+[^34]: OSHA 29 CFR 1910.95: hearing conservation program action level of 85 dBA on an 8-hour time-weighted average; permissible exposure limit of 90 dBA, above which engineering or administrative controls become mandatory.

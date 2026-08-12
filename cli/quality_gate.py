@@ -80,6 +80,20 @@ DEFAULT_WORD_COUNT_BOUNDS: dict[str, tuple[int, int]] = {
     "brief": (700, 1_000),
     "recommendations": (400, 700),
 }
+EXECUTIVE_MEMO_HEADINGS: tuple[str, ...] = (
+    "bottom line",
+    "why it holds",
+    "strongest objection",
+    "what to do now",
+)
+ACADEMIC_MEMO_PHRASES: dict[str, str] = {
+    "this paper": r"\bthis paper\b",
+    "this report": r"\bthis report\b",
+    "the literature": r"\bthe literature\b",
+    "it is important to note": r"\bit is important to note\b",
+    "in conclusion": r"\bin conclusion\b",
+    "a review of": r"\ba review of\b",
+}
 WORD_COUNT_RANGE_RE = re.compile(
     r"(?<!\d)(\d[\d,]*)\s*[–—-]\s*(\d[\d,]*)"
     r"\s*(?:-\s*)?words?\b",
@@ -161,6 +175,99 @@ def publication_word_count(text: str) -> int:
     body = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", body)
     body = URL_RE.sub("", body)
     return len(re.findall(r"\b[\w'’.-]+\b", body, flags=re.UNICODE))
+
+
+def inspect_executive_memo_markdown(text: str) -> list[QualityIssue]:
+    """Enforce the short, plain-English shape used by Strengthen an argument.
+
+    This is intentionally a narrow release profile, not a general-purpose
+    readability score. It catches the failure modes that make an executive
+    memo feel like a compressed academic article: missing decision structure,
+    long blocks, long sentence runs, and scholarly throat-clearing.
+    """
+
+    issues: list[QualityIssue] = []
+    body = FOOTNOTE_BLOCK_RE.sub("", text)
+    headings = {
+        re.sub(r"\s+", " ", match.group(1)).strip().casefold()
+        for match in re.finditer(r"(?m)^##\s+(.+?)\s*$", body)
+    }
+    missing = [heading for heading in EXECUTIVE_MEMO_HEADINGS if heading not in headings]
+    if missing:
+        _issue(
+            issues,
+            severity="error",
+            code="memo_structure_missing",
+            message="the executive memo is missing required sections: " + ", ".join(missing),
+            count=len(missing),
+        )
+
+    prose_paragraphs: list[str] = []
+    for paragraph in re.split(r"\n\s*\n", body):
+        paragraph = paragraph.strip()
+        if not paragraph or paragraph.startswith("#"):
+            continue
+        paragraph_lines = [line for line in paragraph.splitlines() if line.strip()]
+        if paragraph_lines and all(
+            line.lstrip().startswith(("- ", "* ", "> "))
+            for line in paragraph_lines
+        ):
+            prose_paragraphs.extend(
+                re.sub(r"^\s*[-*>]\s+", "", line).strip()
+                for line in paragraph_lines
+            )
+            continue
+        prose_paragraphs.append(re.sub(r"\s+", " ", paragraph))
+    oversized = [
+        paragraph
+        for paragraph in prose_paragraphs
+        if len(re.findall(r"\b[\w'’.-]+\b", paragraph)) > 90
+    ]
+    if oversized:
+        _issue(
+            issues,
+            severity="error",
+            code="memo_paragraph_too_long",
+            message="the executive memo contains prose paragraphs longer than 90 words",
+            count=len(oversized),
+        )
+
+    sentences = [
+        sentence
+        for paragraph in prose_paragraphs
+        for sentence in split_claim_units(paragraph)
+        if sentence.strip()
+    ]
+    sentence_lengths = [
+        len(re.findall(r"\b[\w'’.-]+\b", sentence)) for sentence in sentences
+    ]
+    if sentence_lengths:
+        average = sum(sentence_lengths) / len(sentence_lengths)
+        long_count = sum(length > 36 for length in sentence_lengths)
+        if average > 26 or long_count > max(1, len(sentence_lengths) // 5):
+            _issue(
+                issues,
+                severity="error",
+                code="memo_sentence_density",
+                message=(
+                    "the executive memo is too syntactically dense "
+                    f"(average {average:.1f} words per sentence; "
+                    f"{long_count} sentence(s) exceed 36 words)"
+                ),
+                count=max(long_count, 1),
+            )
+
+    for label, pattern in ACADEMIC_MEMO_PHRASES.items():
+        count = len(re.findall(pattern, body, re.IGNORECASE))
+        if count:
+            _issue(
+                issues,
+                severity="error",
+                code="memo_academic_register",
+                message=f"replace academic framing phrase '{label}' with direct English",
+                count=count,
+            )
+    return issues
 
 
 def _issue(
@@ -274,6 +381,9 @@ def _evidence_matches_citation(record: dict, citation: str) -> bool:
     source_candidates = (
         record.get("source_title"),
         record.get("source"),
+        # Paywalled standards carry their full written citation here instead of
+        # a URL; it is the only string that identifies them to a reader.
+        record.get("source_citation"),
         Path(str(record.get("source_path") or "")).name,
     )
     for candidate in source_candidates:
@@ -612,6 +722,7 @@ def run_publication_quality_gate(
     claim_lineage_path: Path | None = None,
     output_format: str | None = None,
     length_instruction: str | None = None,
+    readability_profile: str | None = None,
     raise_on_failure: bool = True,
 ) -> dict:
     """Inspect and persist a release-gate report.
@@ -637,6 +748,8 @@ def run_publication_quality_gate(
         issues.extend(
             inspect_publication_markdown(text, agent_names=agent_names)
         )
+        if readability_profile == "executive_memo":
+            issues.extend(inspect_executive_memo_markdown(text))
         if output_format is not None or length_instruction:
             word_count = publication_word_count(text)
             word_count_bounds = resolve_word_count_bounds(
@@ -1050,6 +1163,7 @@ def run_publication_quality_gate(
             if word_count_bounds is not None
             else None
         ),
+        "readability_profile": readability_profile,
         "evidence_records": len(evidence_ids),
         "claim_lineage_records": len(lineage_records),
         "issues": [asdict(issue) for issue in issues],

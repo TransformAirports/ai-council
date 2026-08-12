@@ -1,0 +1,99 @@
+# Infrastructure Economist Brief — Quiet-by-Design Standards at MWAA
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Author lens:** Infrastructure economist. Twenty years auditing airport capital programs.
+**Assignment:** Cost the decision to specify (or not specify) acoustic, PA, FIDS, and communications requirements before the physical program at IAD and DCA hardens.
+**Independence:** No other Stage 1 briefs read.
+
+---
+
+## 1. Key findings
+
+1. **The capital envelope this decision governs is not marginal.** MWAA's adopted 2025 program is roughly $9.0B combined ($6.99B IAD + $2.39B DCA); the July 2026 expansion announcement raised the Dulles program alone to a projected **$20–22.5B over ~10 years** and MWAA has told the bond market it plans to issue **~$5.5B of new debt between 2025 and 2028** on top of the ~$4.9B outstanding. A design standard that touches every substantially renovated square foot in that pipeline is not a stylistic choice; it is a spec that will be priced into contracts totaling nine to eleven figures. [Source: https://airportscouncil.org/wp-content/uploads/2025/03/2025-Infrastructure-Needs-Study.pdf] [Source: https://www.bondbuyer.com/news/mwaa-goes-to-market]
+
+2. **US airport infrastructure need has decoupled from the funding mechanisms designed to pay for it.** ACI-NA's 2025 study puts five-year U.S. airport capital needs at **$173.9B (2025–2029), up 15.1% from $151B two years earlier**. The FAA's NPIAS (2023–2027) identifies **$62.4B of AIP-eligible development, up ~43%** from the prior cycle. Meanwhile the Passenger Facility Charge cap has been frozen at **$4.50 per segment since 2000**. The delta gets closed with revenue debt — which is exactly what MWAA is doing. A specification decision that avoids expensive retrofits is a leverage point in the funding stack, not a design refinement. [Source: https://airportscouncil.org/wp-content/uploads/2025/03/2025-Infrastructure-Needs-Study.pdf] [Source: https://www.faa.gov/sites/faa.gov/files/npias-2023-2027-narrative.pdf] [Source: https://en.wikipedia.org/wiki/Passenger_facility_charge]
+
+3. **The empirical base rate for on-time, on-budget airport megaprojects is low; the base rate for programs that got the design brief wrong at the start is disastrous.** Berlin Brandenburg (BER) opened **nine years late** and ran an initial ~€2.83B budget to roughly **€6.5–7.3B** — a 2.3–2.6× overrun driven substantially by an idiosyncratic downward smoke-extraction system that never certified, escalators that did not reach the correct floors, and 90,000 mislabeled doors. Denver's automated baggage system started as a $250M scope for one concourse for one carrier, then expanded mid-flight to three concourses and twenty carriers; the airport opened **16 months late** with ~$560M of overrun tied to the system. LAX's Automated People Mover was $1.9B in 2018 dollars; a July 2024 settlement pushed the total to **~$3.34B, roughly $1.49B per mile**, and the opening slid from 2023 to 2026, missing the FIFA World Cup deadline the program was justified against. [Source: https://boardinggroup.one/travel/news/berlin-brandenburg-airport-germanys-e7-billion-monument-to-chaos/] [Source: https://www.wrike.com/blog/lessons-learned-from-project-failure-at-denver-international-airport-why-checking-bags-is-still-a-pain/] [Source: https://laist.com/news/transportation/lax-people-mover-delay-grand-jury-report]
+
+4. **The counter-example — Heathrow T5 — validates the "spec early, hold the risk centrally" thesis.** Budgeted £4.3B, delivered at **£4.2B and on time in March 2008**. BAA (the operator) explicitly held all program risk under the T5 Agreement rather than pushing it into fixed-price supplier contracts, and required an integrated design brief before ground broke. That is the closest available analog to what MWAA is being asked to do: define the performance envelope centrally, before individual concourse packages are procured. [Source: https://infrastructuredeliverymodels.gihub.org/case-studies/heathrow-terminal-5/]
+
+5. **The MacLeamy curve is not a slogan; it is the reason this decision has to be made now, not later.** The design/construction literature consistently shows change cost rises **roughly 20× from schematic design to change-order-during-construction**. Acoustic performance, PA zoning, FIDS density, and EVACS intelligibility are all cross-discipline requirements that must be set in schematic design because they drive room geometry, structural attachments, ceiling voids, cable pathways, and RCP coordination. Specifying them after Concourse E opens (autumn 2026) or after the C/D replacement design hardens is exponentially more expensive than specifying them now. [Source: https://www.danieldavis.com/macleamy/]
+
+6. **IAD's cost per enplanement is trending materially higher independent of any quiet-by-design decision.** MWAA's own Official Statement for the June 2025 $714.4M revenue bond issuance forecasts **IAD CPE rising from ~$12.88 (2024) to ~$20.71 by 2030** — a ~61% increase in six years, before the $20–22.5B expansion is priced in. Any additional standard must be defended against that trajectory: the airlines are already writing checks for a rising unit cost. [Source: https://dwuconsulting.com/airports/iad] [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions]
+
+7. **The evidence base on acoustic retrofits in existing terminals argues strongly for upfront specification.** ACRP Report 175 (the primary US authority on airport PA intelligibility) documents a representative terminal remediation of **3,200 m² of suspended acoustic baffles plus 800 m² of wall panels at $2.8M** — added to a completed building. That is roughly $700/m² of treated area for a targeted acoustic-only intervention. In a 5-million-square-foot IAD expansion (~465,000 m²), treating even 20% of the envelope post-hoc is a $65M+ line item that a schematic-design specification could avoid at close to zero marginal cost. [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/201/original/acrp_r175.pdf]
+
+8. **MWAA's balance sheet can absorb the standard; the question is not affordability but opportunity cost.** MWAA reported airport-system DSCR of **2.77× in 2023, forecast 2.54× in 2024**, well above the 1.40× U&L target. The ratings (Moody's Aa3 / S&P AA- / Fitch AA-) are stable. So the constraint is not "can we pay for the standard." It is: every dollar of design and commissioning capacity spent unnecessarily late is a dollar not available for the AeroTrain extension ($3.75B budgeted), the Concourse C/D replacement, or the eventual DCA Terminal 1 rebuild. [Source: https://www.mwaa.com/editorial-section/debt-management] [Source: https://www.ffxnow.com/2026/05/12/report-new-plan-to-overhaul-dulles-airport-would-eliminate-mobile-lounges/]
+
+---
+
+## 2. Evidence section
+
+### 2.1 The macro envelope: what MWAA is committing to
+
+The 2025 U&L took effect January 1, 2025 and runs through 2039. It was signed alongside a $9.0B capital plan (~$7.0B IAD + ~$2.39B DCA). The July 2026 White House/DOT/United/MWAA announcement of a **$20–22.5B expanded Dulles program** replaced the IAD envelope; MWAA has since begun disclosing that the funding structure is unresolved and that CPE trajectories in the current Official Statement do not yet reflect the expanded program. Trade press (Bond Buyer, FFXnow, Cranky Flier) has been openly skeptical of the executability of the announced scope in the announced timeframe. [Source: https://www.airwaysmag.com/new-post/dulles-20-billion-overhaul-mobile-lounges] [Source: https://crankyflier.com/2026/08/04/the-plan-for-dulles-is-ambitious-and-ridiculous-and-it-wont-happen/]
+
+For the infrastructure economist, three implications follow. First, the near-term construction pipeline that any MWAA standard will govern includes: Concourse E (~435,000 sq ft, opens autumn 2026 — already too late to influence beyond commissioning); a DCA Terminal 2 refresh (~$63.9M, near-term); the AeroTrain extension (~$3.75B); and the Concourse C/D replacement. Second, the specification decision is bimodal: it either enters the design manual before the C/D replacement RFP goes out, or it enters as a modification later at MacLeamy-curve prices. Third, because the funding structure of the expansion is unresolved, any standard that materially moves CPE is politically constrained by airline signatory concurrence under the U&L.
+
+### 2.2 The base rate on terminal megaprojects
+
+The historical distribution of large terminal projects is not normal; it has a long tail. BER is the modal cautionary tale — €2.83B budget, ~€6.5–7.3B delivered, nine-year delay — and the specific mechanism of failure was a bespoke, insufficiently specified emergency system that could not be certified after construction. The system tried to push smoke down through the floor instead of up through the roof; it was unprecedented and it did not work. Post-hoc redesign of a life-safety system in a completed building is the paradigmatic example of the MacLeamy curve realized. [Source: https://boardinggroup.one/travel/news/berlin-brandenburg-airport-germanys-e7-billion-monument-to-chaos/]
+
+Denver's baggage system is the direct cross-discipline analog to acoustic and PA specification. It failed because scope grew mid-project (from one concourse and one carrier to three and twenty) without re-baselining, and because the contractor accepted a two-year delivery on a four-year design. GAO's contemporaneous review documents ~$560M of overrun and 16 months of delay. LAX APM tells the same story in current dollars: the settlement package pushed the project to $3.34B and slid the opening past its justifying event. [Source: https://www.gao.gov/assets/rced-95-35br.pdf] [Source: https://www.westsidecurrent.com/la_city_news/lax-built-one-of-the-priciest-airport-trains-in-the-u-s-years-later-it/article_a54d1b77-095e-4c23-b50e-ee6d09dac268.html]
+
+Heathrow T5 is the positive control. £4.3B budgeted, £4.2B delivered, on-time March 2008, in a UK infrastructure environment where every studied comparable had opened late. The mechanism was procurement discipline: BAA held program risk centrally rather than pushing it to suppliers, and it required a locked design brief. The single sentence in the T5 case literature most relevant to MWAA is that "no UK project had delivered to budget, time and quality" prior to T5 — the base rate was that bad, and T5 beat it by changing the specification and risk-holding model, not by working harder inside the same model. [Source: https://infrastructuredeliverymodels.gihub.org/case-studies/heathrow-terminal-5/]
+
+### 2.3 The MacLeamy arithmetic applied to acoustic/PA/EVACS
+
+Acoustic treatment, PA zoning, FIDS placement, and EVACS intelligibility are the classic examples of requirements that are cheap in schematic design and expensive after construction because they drive:
+
+- Ceiling geometry and ceiling void depth (structural and MEP coordination)
+- Wall assemblies and STC ratings (envelope specifications)
+- Loudspeaker density, aiming, and tap counts (electrical routing and rough-in)
+- FIDS sightlines (millwork, tenant lease-line, and signage coordination)
+- Assistive-listening looping and captioning infrastructure (below-slab and above-ceiling rough-in)
+
+ACRP Report 175 puts a concrete number on retrofit: **3,200 m² of suspended baffles plus 800 m² of wall panels at $2.8M**, or approximately $700/m² of treated area, for one representative terminal remediation. That number does not include operational disruption, contractor mobilization at a live terminal, or the cost of replacing a PA head-end that was specified against the wrong intelligibility target. In new construction, the same acoustic performance is achieved by specifying ceiling and wall assemblies that are only marginally more expensive than the base case (and often identical after value engineering), because the labor and general conditions are already priced. [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/201/original/acrp_r175.pdf]
+
+The design literature converges on a ~20× multiplier for late change. Applied to a $22.5B program, a 1% acoustic scope that costs $225M to specify correctly at schematic design costs $4.5B if it enters as change orders. That is the order of magnitude the strategist should hold in mind.
+
+### 2.4 Cost per enplanement, debt service, and financial headroom
+
+IAD's FY2024 CPE was approximately $12.88, near the median for the 47 large-hub US airports (which ranged from $3.93 at ATL to $36.01 at JFK in FY2024). MWAA's Official Statement for the June 2025 issuance forecasts CPE reaching ~$20.71 by 2030 — a trajectory that reflects the pre-expansion $9.0B plan, not the announced $20–22.5B envelope. If the airline signatories are asked to fund the expanded program at rates and charges, IAD CPE could plausibly move to the upper quartile of large-hub CPE. [Source: https://dwuconsulting.com/airport-finance/large-hub/cpe] [Source: https://dwuconsulting.com/airports/iad]
+
+Financial capacity to absorb the standard is not the constraint. MWAA carries Aa3/AA-/AA- ratings, historical DSCR of 2.77× (2023) and forecast 2.54× (2024) against a 1.40× U&L target, and ~$4.9B outstanding debt with ~$5.5B of planned issuance through 2028. What is constrained is airline patience with rate increases and the political optics of a rising CPE curve at a hub whose largest signatory (United) has just signed a long-term lease. Every dollar of avoidable rework becomes an issue at the next rates hearing. [Source: https://www.mwaa.com/editorial-section/debt-management]
+
+### 2.5 The opportunity cost argument, priced
+
+At IAD's expected FY2025 enplanements of ~13.9M, a $10M rework cost added to the rate base pumps CPE by ~$0.72 for one year, or spreads across a bond life of 25 years as debt service. That is a small number until it is stacked against the pipeline: AeroTrain extension ($3.75B), Concourse C/D replacement, mobile lounge retirement infrastructure, and the DCA Terminal 1 replacement. Every $100M of avoidable acoustic/PA rework is roughly a **1.3–1.5% increment on the DCA T1 program envelope** (~$2.39B DCA program), or a similar-order increment on any one Dulles concourse package.
+
+The stronger opportunity cost argument is capacity, not dollars. MWAA's engineering, program-management, commissioning, and design-review staff are not scalable on demand; every hour spent retrofitting acoustic and PA performance in Concourse E after opening is an hour not spent on the C/D replacement or the AeroTrain extension. In a program of this size and complexity, the binding constraint is executive attention and commissioning throughput, not capital. [Source: https://www.ffxnow.com/2026/05/12/report-new-plan-to-overhaul-dulles-airport-would-eliminate-mobile-lounges/]
+
+---
+
+## 3. Caveats and limitations
+
+- **No primary MWAA acoustic data.** The airport context packet explicitly names "executed acoustic performance of existing IAD and DCA terminal spaces" as a gap. I have not been able to source measured ambient level, reverberation time, or STI values for existing MWAA terminal spaces. All economic argument assumes representative rather than measured baseline conditions.
+- **Funding structure of the expanded Dulles program is unresolved.** As of the July 2026 announcement, MWAA and DOT have not disclosed how the $20–22.5B envelope will be funded (rates and charges, general airport revenue bonds, federal contribution, private participation). Trade coverage (Bond Buyer, FFXnow) has flagged this as an open question. All CPE trajectories in the current Official Statement predate the expansion.
+- **ACRP retrofit cost is a single data point.** The $2.8M / 3,200 m² baffle + 800 m² panel figure in ACRP 175 is representative, not statistically pooled. Real retrofit costs at MWAA scale would need to be sourced from bid history or from a controlled construction estimator.
+- **Cost overrun cases are selection-biased.** BER, Denver, LAX APM, and IAD AeroTrain are famous because they failed; the reference class of terminal projects that worked and did not become case studies is larger. Heathrow T5 is included precisely to counteract this selection bias, but the empirical claim "megaprojects run over" is stronger than any point estimate I can defend.
+- **MacLeamy 20× multiplier is a design-literature convention, not a measured airport-specific value.** I have used it as an order-of-magnitude anchor, not as a precise coefficient. A quantitative-analyst pass should replace it with an airport-specific rework multiplier if one exists.
+- **I have not verified funding-structure or MII terms of the 2025 U&L.** Any claim about airline signatory ability to block a standard on cost grounds is analytical inference, not a reading of the executed agreement.
+
+---
+
+## 4. Data points a strategist can use verbatim
+
+1. **"The 2025 U&L committed MWAA airlines to a $9.0B capital plan; the July 2026 announcement raised the Dulles envelope alone to $20–22.5B over roughly a decade. Every substantially renovated square foot in that pipeline will be built against a design standard — either one MWAA writes now, or one imposed by rework after opening."** [Source: https://airportscouncil.org/wp-content/uploads/2025/03/2025-Infrastructure-Needs-Study.pdf] [Source: https://www.airwaysmag.com/new-post/dulles-20-billion-overhaul-mobile-lounges]
+
+2. **"IAD's cost per enplanement is forecast to rise from $12.88 in 2024 to $20.71 by 2030 in MWAA's own bond disclosure — a 61% increase before the expanded program is priced in. Avoidable acoustic and PA rework is not a rounding error against that trajectory; it is the increment airlines will fight."** [Source: https://dwuconsulting.com/airports/iad] [Source: https://www.bondbuyer.com/news/dulles-expansion-raising-questions]
+
+3. **"Berlin Brandenburg was budgeted at €2.83B and delivered at roughly €6.5–7.3B, nine years late, largely because a bespoke life-safety system was specified too late and never certified. Heathrow T5 was budgeted at £4.3B and delivered at £4.2B on time — because BAA held the design brief centrally and locked it before construction. The difference between those two outcomes is the decision MWAA is being asked to make."** [Source: https://boardinggroup.one/travel/news/berlin-brandenburg-airport-germanys-e7-billion-monument-to-chaos/] [Source: https://infrastructuredeliverymodels.gihub.org/case-studies/heathrow-terminal-5/]
+
+4. **"ACRP Report 175 documents a representative acoustic retrofit at $2.8M for 3,200 m² of ceiling baffles and 800 m² of wall panels — roughly $700/m² of treated area, delivered inside a live terminal. The same acoustic performance specified at schematic design is close to zero marginal cost. The 20× MacLeamy multiplier is not a metaphor."** [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/201/original/acrp_r175.pdf] [Source: https://www.danieldavis.com/macleamy/]
+
+5. **"MWAA reported airport-system debt service coverage of 2.77× in 2023 and forecast 2.54× in 2024, against a 1.40× Use-and-Lease target, with Aa3/AA-/AA- ratings. The balance sheet can absorb the standard. The constraint is airline willingness to fund a rising CPE curve and MWAA's own commissioning throughput — both of which get worse, not better, if the specification decision is deferred."** [Source: https://www.mwaa.com/editorial-section/debt-management] [Source: https://www.bondbuyer.com/news/mwaa-goes-to-market]
+
+---
+
+*End of brief. Companion evidence records in `infrastructure-economist-evidence.jsonl`.*

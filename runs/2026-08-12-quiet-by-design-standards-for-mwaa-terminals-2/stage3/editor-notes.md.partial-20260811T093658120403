@@ -1,0 +1,39 @@
+# Editor notes — Stage 3
+
+**Input:** `outputs/stage2/strategist-draft-v3.md` (exec summary 535 words; body 3,010; internal handoff notes 369; footnotes ~2,070)
+**Output:** `outputs/stage3/edited-draft.md` (exec summary 450; body 1,975; all footnotes [^1]–[^25], [^7a], [^9a], [^10a], [^13a] retained and referenced)
+
+## The size of the cut, and why
+
+The run contract fixes the body at 1,500–2,000 words; publication checks that range deterministically. The Strategist's body ran 3,010 — so this was a 34% cut, beyond the normal 15–25% ceiling, forced by the contract rather than by editorial taste. The extra 9 points came from three places, none of them evidence:
+
+1. **The Strategist's "Handoff notes" section (369 words) moved out of the reader-facing draft.** Its disclosures are carried in this file (below) for the Fact-checker.
+2. **Prose hedges converted to terse bracketed tags.** "Whose language this run has not verified" and similar constructions became `[VERIFY: …]`.
+3. **Cross-section restatements deleted, keeping the better instance.** Examples: the dominant-carrier-objection pause appeared in both the MII section and stop condition 2 — kept in the stop condition, where it binds; "the medical numbers do not transfer, the mechanism does" duplicated its own section heading; the Contrarian's "if the 2020 manual already binds" duplicated stop condition 1.
+
+No evidence, number, or conclusion was removed. Where a supporting detail was cut from the body, the existing footnote already carried it (screens-vs-paging detail → [^10]; beyond-perimeter exemption → [^22]; seven-hour tarmac aircraft → [^13a]).
+
+## Other significant changes
+
+- **Section headings shortened and made argumentative** ("The airlines will read it as MII"; "The decision: tiers, stops, and a 90-day plan"). Transitions now run through the argument, not topic-sentence announcements.
+- **Voice anchors preserved intact:** the Fort Lauderdale opening, the winter-IROPS holdroom image, "Say that first," "Each is true in its own sentence. None is true across the seam," and the change-order closing.
+- **Buzzword scan clean** against the CLAUDE.md banned list; no consultant reflexes ("it is important to note," "in other words," etc.) remain.
+- Exec summary is 450 words against a ~400 target — I judged the remaining 50 words load-bearing (the CPE arithmetic and the tiered-recommendation sentence); trim further only if publication enforces ~400 strictly.
+
+## For the Fact-checker — inline [VERIFY] tags (7)
+
+1. **Exec summary:** IAD transformation square footage (>5M sq ft) vs. the July 29, 2026 primary release — trade-press figure.
+2. **Exec summary:** whether the current Design Manual already carries binding STI/LEQ/RT60/PA-zoning language (not public).
+3. **Peer-canon section:** AHJ arrangement and applicable NFPA 72 edition on MWAA's federally leased property.
+4. **Concourse E section:** MWAA head-end share of audible surface — briefs disagree (30–40% vs. 60–70%); no MWAA measurement exists ([^18]).
+5. **Concourse E section:** Use-and-Lease flow-down language reaching airline gate audio ([^19]).
+6. **MII section:** whether the 2025 U&L treats a Design Manual amendment of this kind as an MII voting item ([^19]).
+7. **Timing section:** Concourse C/D procurement status (pre-advertisement / mid-selection / under contract) — not public.
+
+## Strategist disclosures carried forward (from the dropped handoff notes)
+
+- Denver quiet-zone blocking by dominant carrier is **single-source** ([^21]); draft flags it as such.
+- SFO's self-reported 40% noise reduction and 90-minute claims were **excluded**; only the mechanistic 47% paging-event / 60% duration figures are used ([^7]).
+- The 1:10:100 late-change heuristic was rejected; the draft defends only a 2×–4× commercial-construction premium.
+- DCA T1 concourse replacement has **no published schedule** ([^11]).
+- NTSB DCA final-report characterization paraphrased ("route placed too close to a runway approach") — confirm against the February 2026 probable-cause language ([^16]).

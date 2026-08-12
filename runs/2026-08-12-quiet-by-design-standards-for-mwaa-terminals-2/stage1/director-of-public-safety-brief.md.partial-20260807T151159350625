@@ -1,0 +1,408 @@
+# Director of Public Safety — Independent Brief
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Author lens:** Director of Public Safety at a top-tier US hub airport (sworn
+police + ARFF + PSAP under one command)
+**Date:** 2026-08-07
+
+---
+
+## Framing the question the way public safety actually sees it
+
+Most airport executives read "quiet-by-design" as a customer-experience thesis.
+From the public safety chair it is a life-safety commissioning problem
+disguised as a customer-experience thesis. Every dB of ambient reduction, every
+loudspeaker moved from ceiling broadcast to seat-back array, and every gate
+agent's throat mic replaced with a phone push notification is a change to the
+system MWAA police, fire, and dispatch will have to use — under duress, at
+2:47 AM, when a passenger has stepped through a jet-bridge access door onto
+the AOA and the fire alarm has annunciated on Concourse E.
+
+Two things are simultaneously true. First: the current PA environment at both
+airports is a mess and a quiet-by-design standard is overdue. Second: if the
+standard is written by acousticians, terminal designers, and passenger
+experience consultants without a hard public-safety envelope inside it, MWAA
+will discover during a real event — a bomb threat, a wildcat evacuation, an
+active-shooter deployment, an IROPS meltdown with 25,000 people trapped in
+Concourses B and C — that the "quiet" configuration cannot be overridden
+fast enough, loud enough, or intelligibly enough to matter.
+
+That is the public safety case: quiet only if the safety envelope is
+mandatory, verified in occupied conditions, and airline-enforceable.
+
+---
+
+## Key findings
+
+1. **NFPA 72 already sets the floor. It is non-negotiable and it is
+   frequently missed.** The 2022/2025 editions require voice evacuation and
+   mass-notification systems to achieve an average Speech Transmission Index
+   (STI) of at least 0.50 in each acoustically distinguishable space (ADS),
+   with 90 percent of measurement points at 0.45 or greater. This applies
+   whether a terminal is a "quiet" airport or a bazaar of announcements.
+   Airports routinely commission the fire-alarm voice-evacuation system in an
+   empty terminal at 4 AM, pass, and fail the same test in occupied peak-hour
+   conditions. A quiet-by-design standard that does not require occupied-
+   condition STI commissioning is worse than no standard — it hardens the
+   assumption that the system is compliant when it is not.
+
+2. **Zoned PA reduces spillover but multiplies the audit surface.** Moving
+   from terminal-wide broadcast to zoned or directional audio does not
+   eliminate the NFPA obligation; it multiplies it. Every ADS becomes an
+   independent test. A concourse renovation that creates 30 hold-room zones
+   creates 30 acoustic environments that each need STI verification, each
+   need a documented police/ARFF override path, and each need periodic
+   retest as concessions and tenants change the acoustic space.
+
+3. **The airline gate PA is the loudest thing in the terminal and it is not
+   MWAA's to silence unilaterally.** United, American, Delta, Southwest,
+   Alaska, JetBlue, and Air Canada Express make the boarding calls that
+   drive most passenger complaints about airport noise. Their gate-podium
+   PAs are governed by the airline's own scripts, tenant lease terms, and
+   crew habits. A quiet-by-design standard that does not enter the 2025 Use
+   & Lease through the MII process — or through a corresponding revision to
+   airline gate-lease exhibits — will be enforceable against MWAA capital
+   projects and unenforceable against the actual noise sources.
+
+4. **Air Carrier Access Act (14 CFR Part 382, Subpart D) requires
+   redundant channels, not fewer channels.** Carriers must ensure that
+   flight-safety, boarding, delay, gate-change, and emergency information at
+   airports they own, lease, or control is accessible to passengers with
+   disabilities — visually for the deaf and hard of hearing, audibly for
+   the blind and low-vision. "Quiet" is not a defense against Part 382. A
+   silent-terminal design that pushes information to a mobile app fails
+   passengers without a smartphone, without a data plan, in roaming, or
+   with cognitive or language barriers, and creates federal exposure that
+   sits on the airlines and on MWAA jointly.
+
+5. **Fort Lauderdale 2017 is the reference case, and it says the same
+   thing every after-action report has said since: the plan was not the
+   problem, the communication was.** The airport had an emergency
+   operations plan, mutual aid agreements, and active-shooter training. What
+   it did not have on January 6, 2017 was: an announced staging area for
+   inbound responders (multiple ad-hoc staging locations were established
+   and never broadcast), a Mobile Command Vehicle sited in a location where
+   its comms actually worked, and access to IPAWS to push emergency
+   messaging to passengers self-evacuating onto the airfield. Thousands of
+   passengers went out onto the ramp, into tunnels, and onto adjacent
+   roadways with no coordinated notification. Any quiet-by-design standard
+   at IAD/DCA must resolve — before commissioning, not after an incident —
+   who can push what to which zone, whose override authority survives
+   airline tenant preferences, and whether the airport is authenticated to
+   IPAWS/WEA channels for the passengers already fleeing.
+
+6. **The DCA midair collision on January 29, 2025 is not a quiet-terminal
+   case study, but it changed the tolerance for quiet at DCA.** 67 fatal
+   injuries on a CRJ-700/UH-60 collision on approach; DCA halted airfield
+   operations, terminal stayed open, and the public safety burden shifted
+   inside the building — family reunification, media, mass casualty family-
+   information messaging, congressional and White House visits. Any DCA
+   terminal standard written after January 2025 will be read against this
+   incident. A design that assumes the terminal can operate as a low-
+   ambient, low-broadcast environment during mass-casualty family
+   coordination will not survive board scrutiny.
+
+7. **OSHA 1910.95 makes a quiet terminal a workforce-health argument, not
+   only a passenger argument.** OSHA's hearing-conservation action level is
+   85 dBA on an 8-hour time-weighted average; the permissible exposure
+   limit is 90 dBA TWA before engineering or administrative controls
+   become mandatory. Gate agents, TSOs at busy checkpoints, and ramp-
+   adjacent MWAA employees in loud hold-rooms are documented as
+   consistently in the action-level range. A quiet-by-design standard that
+   drops ambient by 5–8 dB in gate areas is a measurable workers'-comp
+   and OSHA risk reduction for MWAA and its tenants — and should be
+   argued that way to the board, not just as a customer benefit.
+
+8. **The PSAP question at MWAA is not hypothetical. It is the single
+   dispatcher a passenger reaches when they call 911 from Gate D34.**
+   MWAA operates its own sworn police department with Virginia certification
+   and concurrent jurisdiction with Arlington County (DCA) and Loudoun and
+   Fairfax Counties (IAD). Wireless 911 calls placed inside a terminal
+   route based on cell-tower location, not building geometry. The FCC's
+   2024 Location-Based Routing and NG911 rulemakings are still in
+   deployment; most 911 delivery networks cannot yet do geospatial routing.
+   In practice, a passenger dialing 911 from a jet bridge at IAD is likely
+   to be answered first by Loudoun County ECC; the call is then transferred
+   or callback-routed to MWAA's own dispatch. That is 90 to 180 seconds of
+   friction in an active-shooter or medical timeline. A quiet-by-design
+   standard that increases smartphone-mediated passenger behavior — muted
+   TVs, silent boarding, information via app — will increase 911 call
+   volume from cellphones inside the terminal. The routing needs to be
+   addressed at the same time as the acoustics, or the terminal will be
+   quieter and the response will be slower.
+
+---
+
+## Evidence
+
+### NFPA 72 speech intelligibility
+
+NFPA 72 (National Fire Alarm and Signaling Code) requires that emergency
+communication systems achieve, in each acoustically distinguishable space, an
+average Speech Transmission Index of ≥ 0.50 with ≥ 90 percent of measurement
+points ≥ 0.45; equivalent to 0.70 on the Common Intelligibility Scale. This
+is the code floor for any voice-evacuation or mass-notification loudspeaker,
+including in airport terminals [Source:
+https://sdifire.com/ensuring-clear-communication/]. NFPA 72 Chapter 24
+defines four layers of emergency communication — indoor, outdoor, personal
+notification (text/email), and public (radio/TV) — and requires that each
+mass-notification application be specific to the risks of the facility, which
+maps directly to airport terminal design [Source:
+https://prod-edam.honeywell.com/content/dam/honeywell-edam/hbt/en-us/documents/literature-and-specs/whitepapers/notifier-us/hon-ba-fire-nf-wp-massnotification-m-wp-mn-05-10.pdf].
+An intelligibility measurement discipline is documented in the Eaton white
+paper on the NFPA 72 audibility-vs-intelligibility distinction [Source:
+https://www.eaton.com/content/dam/eaton/products/safety-security-emergency-communications/lsmns/waves/documents/lsmns-intelligibility-white-paper.pdf].
+
+### NFPA 415 — airport terminal buildings
+
+NFPA 415 sets the minimum fire-protection requirements for airport terminal
+buildings, fueling ramp drainage, and loading walkways, including exit
+capacity for peak-holiday-occupancy conditions and smoke-removal in large-
+volume spaces where sprinkler protection alone is insufficient [Source:
+https://firelogai.com/blog/fire-protection-airports-aviation-terminals-nfpa-415].
+Current editions include 2016, 2022, and 2026; MWAA design manuals must
+name the edition applied, because peak-occupancy egress and smoke-removal
+assumptions change edition-to-edition [Source:
+https://www.fire-police-ems.com/NFPA415-2026.shtml].
+
+### 14 CFR Part 382 Subpart D — accessibility of airport facilities
+
+Air-carrier obligations under Part 382 Subpart D require carriers to make
+terminal facilities they own, lease, or control accessible for individuals
+with disabilities, with information provided for flight safety, ticketing,
+check-in, delays, cancellations, schedule changes, boarding, connections,
+gate assignments, baggage, oversales, paging, aircraft changes affecting
+persons with disabilities, and emergencies [Source:
+https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382/subpart-D].
+
+### Fort Lauderdale-Hollywood International Airport, 6 Jan 2017 — after-action
+
+The Police Executive Research Institute after-action report on the FLL
+active-shooter incident documents that staging areas were established "on
+the fly" and never broadcast to responding units, and that the Mobile
+Command Vehicle was placed in a location that rendered its communications
+capability useless [Source:
+https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf].
+Follow-on coverage documents that FLL subsequently obtained access to
+IPAWS (Integrated Public Alert and Warning System) as a post-incident
+corrective action; before the shooting, the airport had no direct authority
+to push emergency messaging to passengers evacuating onto the ramp
+[Source:
+https://airportimprovement.com/article/fort-lauderdale-int-l-shares-lessons-learned-2017-active-shooter-tragedy/].
+
+### TSA and public-area security post-FLL
+
+Under the 2018 TSA Modernization Act, TSA and CISA established the Public
+Area Security Working Group; TSA subsequently mandated active-shooter
+training drills, installed duress alarms at screening checkpoints, and
+revised directives on local law enforcement coverage of passenger screening
+checkpoints and adjacent public areas [Source:
+https://www.gao.gov/products/gao-20-278]. TSA's Public Area Security
+National Framework and its 2019 Best Practices update document the current
+federal expectation for airport-operator response to soft-target attacks
+[Source: https://www.tsa.gov/sites/default/files/pass_national_framework.pdf].
+
+### OSHA occupational noise (29 CFR 1910.95)
+
+OSHA's occupational-noise standard requires a hearing-conservation program
+at an 8-hour TWA of 85 dBA (action level); engineering or administrative
+controls become mandatory before PPE reliance at 90 dBA TWA (permissible
+exposure limit) [Source: https://www.osha.gov/noise]. Airport ramp and
+gate-adjacent environments regularly exceed the action level, with peak
+impulse events well above 115 dBA [Source:
+https://hearingprotect.com/en/blog/hearing-protection-aviation-airport-ground-crews-guide/].
+
+### Wireless 911 location routing (FCC)
+
+The FCC's 2024 Report and Order on Facilitating Implementation of Next
+Generation 911 Services and Location-Based Routing for Wireless 911 Calls
+proposed that CMRS providers use location-based routing when horizontal-
+location accuracy meets specified thresholds (approximately 165 meters at
+90 percent confidence); the Commission noted at the time that most 911
+delivery networks did not yet have the ability to provide geospatial
+routing and that timing for universal deployment remained unknown
+[Source:
+https://www.federalregister.gov/documents/2024/09/24/2024-18603/facilitating-implementation-of-next-generation-911-services-ng911-location-based-routing-for]
+[Source:
+https://www.federalregister.gov/documents/2024/03/13/2024-03157/location-based-routing-for-wireless-911-calls].
+
+### MWAA police jurisdiction and dispatch
+
+MWAA operates a sworn police department with Virginia state certification
+and concurrent jurisdiction in Loudoun, Fairfax, and Arlington Counties;
+the county law enforcement agencies retain concurrent jurisdiction over
+Authority facilities within their boundaries [Source:
+https://www.mwaa.com/policefireems/mwaa-police-department]. MWAA's police
+authority derives from § 5.1-158 of the Code of Virginia and related
+provisions governing the Metropolitan Washington Airports Authority
+[Source: https://law.lis.virginia.gov/vacode/title5.1/chapter10/section5.1-158/].
+
+### Schiphol as the operative "silent airport" reference
+
+Schiphol publicly describes itself as a silent airport with virtually no
+announcements, with information delivered through FIDS and the airport
+app, and with PA reserved for weather-driven delays and genuine
+emergencies [Source: https://www.vanemag.com/silent-airports-list-2026/].
+The gap between that operating model and the FLL/DCA regulatory and
+mutual-aid environment is the load-bearing caveat for MWAA: Schiphol
+operates under Dutch fire and telecommunications codes, ICAO Annex 14
+airport standards, and a hard-integrated national IPAWS-equivalent for
+public alerting.
+
+### DCA 29 Jan 2025 collision context
+
+The January 29, 2025 midair collision between American Eagle Flight 5342
+(CRJ-700 operated by PSA) and a US Army UH-60L on approach to DCA killed
+67. All takeoffs and landings at DCA were halted; the terminal itself
+remained open [Source: https://www.ntsb.gov/investigations/Pages/DCA25MA108.aspx]
+[Source: https://aviationweek.com/air-transport/safety-ops-regulation/no-survivors-after-midair-collision-american-airlines-crj-army].
+The NTSB's January 2026 findings sharply criticized the FAA for helicopter
+route design and for failing to analyze years of near-collision data
+[Source: https://www.cnn.com/2026/01/27/us/ntsb-plane-crash-dc-potomac].
+This is the political and operational backdrop against which any new DCA
+terminal standard will be read.
+
+---
+
+## The public safety case for and against the thesis
+
+### For (the case for a mandatory quiet-by-design standard, from public safety)
+
+- **Intelligibility rises with lower ambient.** The single largest
+  contributor to failed STI measurements in existing airport terminals is
+  background noise from concessions, TVs, unmanaged airline gate PA, and
+  overlapping ceiling loudspeakers stepping on each other. A well-executed
+  quiet standard — meaning specified NC target, RT60 range, PA zoning, and
+  suppression of overlapping loudspeaker fields — usually raises STI. A
+  fire-alarm voice-evacuation system in a quieter room is a better
+  emergency notification system, not a worse one.
+- **Zoned PA gives police and fire a scalpel.** A terminal-wide broadcast
+  is unusable for a police shelter-in-place at one gate. Zoned
+  loudspeakers, if governance is written correctly, let ARFF push
+  evacuation to Concourse C without disturbing the security lines at the
+  other end of the terminal.
+- **Employee hearing exposure drops.** Quieter concourses reduce OSHA
+  1910.95 exposure for MWAA and airline employees; over a 15-year Use &
+  Lease that is real audiometric-testing, hearing-conservation, and
+  workers'-comp cost.
+- **Passenger attention to visual signage and emergency messaging
+  increases.** In a lower-ambient environment, a visual alert on a FIDS or
+  gate monitor is more likely to be seen. In a saturated announcement
+  environment, passengers have learned to tune it all out — including the
+  ones they need to hear.
+
+### Against (the case against or in caution, from public safety)
+
+- **Compliance is not competence.** A design that meets NFPA 72 on paper,
+  in a Sunday-4-AM commissioning test, in an empty terminal, is not a
+  system that meets NFPA 72 during a real Wednesday-5-PM Nor'easter with
+  25,000 people in the concourse. Occupied-condition testing is expensive,
+  disruptive, and almost never done. Without it, "quiet" hides
+  intelligibility failures rather than exposes them.
+- **The override path is where systems die.** A police officer, fire
+  captain, or dispatcher needs to be able to seize any zone, silence
+  airline gate PAs, and broadcast in under 15 seconds. Every additional
+  zone, every additional tenant PA, every additional smart-audio device
+  in a "quiet" terminal is an additional integration that must be tested
+  and rehearsed. In the FLL 2017 timeline, response happened in seconds;
+  in a distributed quiet-audio architecture, the override plumbing has
+  more places to break.
+- **The airline gate PA is the noise source and the airlines will not
+  concede it easily.** If the standard cannot enter the airline gate-lease
+  exhibits and the tenant standards in the MWAA Design Manual with
+  enforceable audit, the airport will build a quiet terminal and the
+  gates will remain loud. The 2025 Use & Lease was signed to a $9 B CCP
+  without a quiet-standard exhibit; adding it now requires airline
+  concurrence.
+- **The accessibility, digital-exclusion, and irregular-ops floor is
+  higher than the industry admits.** International "silent airport"
+  models (Schiphol, Copenhagen, Helsinki, London City) operate on much
+  higher smartphone penetration, much lower elderly and infrequent-flier
+  populations, and different regulatory backstops. IAD's international
+  arrivals include first-time US visitors from 100+ countries; DCA
+  carries a heavy federal-employee and constituency-visitor mix. Both
+  populations need a lower dependence on the app than "silent airport"
+  practice assumes.
+- **PSAP routing has not caught up.** Wireless 911 calls from inside an
+  MWAA terminal do not reliably route to MWAA police dispatch first. The
+  NG911 rulemaking will not solve this at every carrier, on every tower,
+  by the time Concourse E opens. Building a quiet-terminal standard that
+  assumes passengers will "just call 911" as a substitute for PA is
+  building on unfinished federal infrastructure.
+
+---
+
+## Operational realities a strategist could use
+
+1. **Occupied-condition acceptance testing is the single lever that
+   converts quiet-by-design from a compliance exercise into a real
+   life-safety upgrade.** Write it into the MWAA Design Manual and the
+   commissioning specifications for every terminal project — STI verified
+   by an independent acoustician at 60 percent and 100 percent peak-hour
+   occupancy, retested after each substantial tenant fit-out, with a
+   corrective-action bond if the space fails post-opening. Nobody in US
+   airport practice does this consistently. It costs six figures per
+   concourse. It is a cheaper insurance policy than an after-action
+   report.
+
+2. **Fort Lauderdale-Hollywood, January 6, 2017: five killed, six shot,
+   thirty-six injured in the follow-on ramp evacuation, 12,000+ passengers
+   self-evacuated onto the AOA.** The after-action found that the airport
+   had a good plan and bad execution because staging was ad-hoc, the MCV
+   was sited where its radios did not work, and the airport was not
+   authorized on IPAWS. MWAA should verify — and the run should state —
+   that both airports are IPAWS-authorized, that the MWAA dispatch center
+   has active WEA (Wireless Emergency Alert) origination, and that the
+   quiet-by-design standard names WEA and IPAWS as required override
+   channels, not just PA.
+
+3. **NFPA 72 STI ≥ 0.50 average and ≥ 0.45 at 90 percent of measurement
+   points, in every acoustically distinguishable space, verified with a
+   calibrated test source.** This is the single number the standard needs
+   to name. It is the number a plaintiff's expert will name in a
+   post-incident deposition. It is what an independent acoustician can
+   test in an afternoon. It is what most airport commissioning skips.
+
+4. **MWAA sworn officer authority derives from § 5.1-158 of the Code of
+   Virginia with concurrent jurisdiction in Arlington, Fairfax, and
+   Loudoun Counties.** MWAA can control the terminal-side response. It
+   cannot control what a passenger's cellphone does when they dial 911.
+   Any quiet-by-design standard should be accompanied by a documented
+   PSAP-transfer test — pick up a phone on ten jet bridges across IAD and
+   DCA, dial 911, and time and log where the call lands and how long the
+   transfer to MWAA dispatch takes. If the answer is "Loudoun County ECC,
+   90 seconds," write it in the brief and use it to fund the NG911
+   integration in parallel.
+
+5. **NFPA 415, 14 CFR Part 382 Subpart D, OSHA 1910.95, NFPA 72 Chapter
+   24, and 14 CFR Part 139 emergency-notification obligations form the
+   non-negotiable envelope.** A quiet-by-design standard is a subset of
+   that envelope, not a substitute for it. The correct sequence in the
+   MWAA design manual is: state the federal and code floor first
+   (audibility, intelligibility, accessibility, egress, employee
+   exposure), then layer quiet-by-design targets on top (ambient NC, RT60,
+   zone spillover, announcement-frequency governance, tenant broadcast
+   rights). Written in that order, a quiet standard is defensible; written
+   in the reverse order, it invites the executive-review board to strike
+   the quiet targets the first time the general counsel notices what the
+   standard actually promises.
+
+---
+
+## Evidence gaps the brief did not close
+
+- Whether MWAA is currently IPAWS-authorized at IAD and DCA, and which
+  agency holds the origination authority.
+- Current STI performance data (if any) from MWAA's existing voice-
+  evacuation systems at IAD Concourses A/B/C/D and DCA Terminals 1/2.
+- Whether MWAA has ever executed an occupied-condition STI acceptance
+  test on a completed terminal project.
+- Whether the 2025 Use & Lease MII language treats "passenger-experience"
+  or "design manual" changes as airline-review triggers, and therefore
+  whether a quiet-by-design standard requires MII concurrence.
+- Employee sound-exposure monitoring practice for MWAA and tenant staff
+  in the noisiest concourse zones at both airports.
+
+These are surfaced as open questions rather than answered by inference. A
+public safety brief that guesses at any of them is the brief that gets
+quoted in the wrong deposition.

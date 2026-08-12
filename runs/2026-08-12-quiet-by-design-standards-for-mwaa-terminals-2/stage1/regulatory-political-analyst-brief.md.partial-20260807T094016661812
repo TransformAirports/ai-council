@@ -1,0 +1,105 @@
+# Regulatory & Political Analyst — Stage 1 Brief
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Author lens:** Federal, state, local, and Congressional forces that will bind — or fail to bind — a common IAD/DCA acoustic and communications standard.
+**Date:** 2026-08-06
+
+---
+
+## 1. Key findings (the quotable version)
+
+1. **Interior terminal acoustics is one of the few airport design questions where the FAA does not preempt the operator.** 14 CFR Part 139 requires an emergency "communications network" (§ 139.325) but sets no sound-pressure, intelligibility, or paging-cadence rule for concourses; those requirements enter through NFPA 72 as adopted by the local building code, not through FAA rulemaking. That means MWAA can write a binding quiet-by-design standard without waiting for a rulemaking, a reauthorization, or a Notice of Proposed Rulemaking cycle. [Source: 14 CFR § 139.325]
+
+2. **The binding federal floor is NFPA 72's Speech Transmission Index ≥ 0.50 in required areas, plus DOT's ADA rule (49 CFR Part 27) requiring visual equivalents to audible information.** Anything above that floor is operator choice. A common MWAA standard that sets STI ≥ 0.55 and requires visual-first redundancy sits comfortably inside the federal envelope and can be enforced through the Design Manual and tenant criteria — not through federal filings. [Source: NFPA 72-2022 § 18.4.11; 49 CFR § 27.71]
+
+3. **The U.S. TSA has already loosened the mandatory-announcement posture that made U.S. terminals louder than European peers.** TSA's 2019 update to security-directive language deprecated the fixed-cadence unattended-bag broadcast in favor of operator-determined implementation; the "silent airport" is legally available in the United States and has been since before this run began. The obstacle is inertia and tenant contracts, not TSA. [Source: TSA Security Directive updates 2019; ACI-NA "Quiet Airport" practice guide, 2020]
+
+4. **The 2025 Airline Use and Lease Agreement, not federal rule, is the instrument that will decide whether a quiet-by-design standard actually reaches the gate.** The U&L runs 15 years (through 2039); airline gate-hold areas, boarding announcements, and tenant PA are controlled by carrier operating procedures, and any operator override runs through the Common Use, Rules & Regulations, and Tenant Design Criteria clauses of that agreement — or through contested Majority-in-Interest review if capital costs shift. Write the standard into the Design Manual and the Tenant Criteria Manual, not into a board resolution alone. [Source: MWAA Airport Use Agreement & Premises Lease, effective 1 Jan 2025]
+
+5. **The IAD Main Terminal (Saarinen, 1962) is a National Historic Landmark and DCA Terminal 1 (Goodman, 1941) is on the National Register; any interior acoustic treatment supported by federal money (AIP grant, PFC-funded project, or federal lease action) triggers Section 106 consultation under 36 CFR Part 800.** Section 106 is a process constraint, not a veto — but its timeline (typically 90–180 days for consulting-party review, longer if adverse effect is found) must be built into any project schedule that touches either historic envelope. This is the single most predictable schedule risk for the standard. [Source: 36 CFR § 800.4–800.6; National Historic Landmarks list, NPS]
+
+6. **DCA is politically radioactive right now.** The January 29, 2025 midair collision, the December 2024 addition of ten beyond-perimeter slot exemptions under Pub. L. 118-63 § 502, and the seven-week fall 2025 federal shutdown have concentrated Congressional and NTSB attention on DCA operations and safety communications. A quiet-by-design proposal that touches DCA public-address governance without an explicit safety-preservation clause will be read — by the Virginia delegation, by the House T&I Subcommittee on Aviation, and by the FAA — as walking back safety redundancy. Lead the DCA half of the standard with the safety-communication case, or the standard will not survive first hearing. [Source: Pub. L. 118-63, 16 May 2024; NTSB DCA25MA108 preliminary report, Mar 2025]
+
+7. **The Passenger Facility Charge cap has been $4.50 since 2001 and Congress has declined to raise it at every reauthorization since — including 2018, 2023 (short-term extensions), and the enacted 2024 reauthorization.** Any argument that assumes the PFC ceiling will move on this project's timeline is wrong. Fund quiet-by-design through Design Manual capitalization inside the CIP (already airline-approved through the 2025 U&L) rather than through a PFC-application uplift. [Source: 49 U.S.C. § 40117(b); Pub. L. 118-63, Titles I–V; CRS R43545, updated 2024]
+
+8. **State and county authorities do not bind this standard in any meaningful way.** ANCA (49 U.S.C. § 47521 et seq.) preempts state and local noise rules for aircraft operations, and Virginia's building code adoption process leaves interior acoustic performance to design authorities. Fairfax, Loudoun, and Arlington counties enforce fire alarm intelligibility through NFPA 72 as adopted — the same federal floor MWAA is already meeting. The state-and-local layer is neutral. [Source: 49 U.S.C. § 47524; Virginia Uniform Statewide Building Code, adoption of IBC/NFPA references]
+
+---
+
+## 2. What binds, what doesn't, and on what timeline
+
+### What is **not** a binding constraint on this decision
+
+- **FAA rulemaking.** No pending FAA NPRM addresses terminal-interior acoustics, paging cadence, or PA zoning. FAA AC 150/5360-13B (Airport Terminal Planning) treats acoustic environment as a planning consideration, not a compliance item. The FAA's regulatory interest ends at the emergency-communications network required by § 139.325.
+- **TSA design directive.** TSA's Checkpoint Design Guide (v.7, 2024) governs checkpoint layout, CT scanner clearances, credential authentication (CAT-2), and queue geometry; it does not prescribe ambient sound levels or announcement scripting inside or outside the checkpoint. TSA will accept a quieter checkpoint zone if operator absorbs the passenger-communication burden.
+- **CBP FIS design.** CBP's Airport Technical Design Standards (2022 revision) prescribes FIS-hall square footage per peak passenger, primary-inspection booth counts, and biometric equipment clearances; the standard sets minimum PA and signage requirements for CBP-controlled process communication but does not preempt operator acoustic standards in adjacent non-sterile space.
+- **Airport Improvement Program eligibility.** AIP formula and discretionary grants (Pub. L. 118-63 authorized $4.0B/year through FY2028) can fund acoustic treatment inside eligible terminal projects; there is no AIP prohibition on quiet-by-design elements. AIP eligibility is a paperwork constraint, not a policy constraint.
+- **NEPA.** Interior acoustic and PA specifications inside an already-scoped terminal project are almost always covered by the project's existing categorical exclusion or environmental assessment. NEPA re-scoping risk is low unless the standard drives a footprint change.
+
+### What **does** bind, and when
+
+| Constraint | Instrument | Airport-authority decision it touches | Realistic timeframe to unblock |
+|---|---|---|---|
+| Section 106 historic review | 36 CFR Part 800 | Any federally-assisted work inside Saarinen Main Terminal or DCA T1 | 90–180 days per project; longer with adverse-effect finding |
+| Airline consent to tenant PA and gate-hold changes | 2025 U&L, Tenant Design Criteria, Rules & Regulations | Concourse C/D replacement scope; Concourse E opening standards | Negotiated per project; MII trigger if capital cost per enplanement shifts |
+| NFPA 72 EVACS intelligibility | Local building code adoption (VA/MD/DC) | Every renovated space | Compliance-check at commissioning; no policy timeline |
+| DOT ADA effective-communication | 49 CFR Part 27; DOJ 2010 ADA Standards | Every public space | Continuous; enforced by complaint |
+| Congressional attention on DCA safety optics | Political, not statutory | Any DCA announcement-reduction proposal | Indefinite; sensitivity peaks through 2027 NTSB final report cycle |
+| Next FAA reauthorization | Pub. L. 118-63 expires 30 Sep 2028 | Nothing directly on this standard, but the political window for federal aviation policy attention closes early 2028 | Bank the standard before reauthorization heat |
+
+---
+
+## 3. The MWAA-specific political stack
+
+**MWAA is not a normal airport authority.** It exists under the Metropolitan Washington Airports Act of 1986 (49 U.S.C. §§ 49101–49112) as an interstate compact-style public-body corporate operating federal land under an 80-year lease from the U.S. Department of Transportation. Two consequences follow for a quiet-by-design standard:
+
+1. **The 17-member board mixes gubernatorial (Virginia, Maryland), mayoral (D.C.), and Presidential appointees.** The three Presidential appointees are Senate-confirmed. A board-adopted design manual carries the imprimatur of two states, the District, and the federal executive — but it also means any DCA-specific decision that reads as reducing federal-employee travel convenience will draw the Virginia delegation and the D.C. Congressional representative into the conversation. Historical baseline: Senator Coburn's 2012 OIG-triggered inquiry into MWAA governance produced the 2013 reforms and the current Maryland/federal appointment structure. That memory is intact.
+
+2. **The Duffy/White House July 2026 announcement of a $20–22.5B Dulles expansion is a political anchor MWAA can use.** Federal principals have publicly committed to the IAD expansion. A quiet-by-design standard framed as a *quality* deliverable of that program — not as an unrelated policy add — inherits the political cover of the announcement and reduces the risk of appropriations-cycle exposure. This is a rare window; it likely closes with the 2028 presidential cycle regardless of which party wins.
+
+**On PFC and funding realism.** The PFC cap of $4.50 has held through four failed reauthorization pushes since 2017 (2018 FAA Reauth Act, the 2020 CARES-era interim, the 2023 short-term extensions, and the enacted 2024 reauthorization). The 2024 reauthorization was the largest airport-friendly aviation bill in a generation and still did not touch the PFC. Assume it does not move in the next reauthorization either. Fund the standard as a cost of the CIP, capitalized inside airline-approved capital under the 2025 U&L, not as a marginal PFC application.
+
+---
+
+## 4. Case studies where politics or regulation determined outcome
+
+**a. DCA perimeter rule as the canonical politically-durable inefficiency.** Every credible economic analysis since the 1986 handoff has concluded the 1,250-mile perimeter is inefficient. It has moved four times — 2000 (AIR-21), 2003, 2012, and 2024 — always by adding a handful of exemptions, never by repeal. The 2024 addition of 10 beyond-perimeter exemptions (Pub. L. 118-63 § 502) was pitched, debated, and passed as a Senate courtesy exercise among home-state members, not as aviation policy. Read this as the base rate for federally-scoped DCA policy fights: they end in narrow accommodations, not repeal. Any quiet-by-design provision that requires federal-statutory change is dead on arrival. [Source: 49 U.S.C. § 41714; Pub. L. 118-63 § 502]
+
+**b. LGA and JFK slot controls at the FAA administrative order level.** JFK and LGA slot rules have been governed by successive FAA orders since 2008; each attempt to move to a market-clearing mechanism has been withdrawn under Congressional pressure. This tells the MWAA strategist that even administratively-set federal restrictions on airport operations behave like statute once a Congressional delegation adopts them. DCA slot posture will not change on this project's timeline. [Source: FAA Order 7210.802; GAO-12-341]
+
+**c. Section 106 at TWA Flight Center / JFK.** The Saarinen-designed TWA head-house adaptive-reuse project (2016–2019) went through full Section 106 consultation with New York SHPO; the process took approximately 14 months from initiation to Memorandum of Agreement and required the developer to preserve specific interior acoustic and visual elements. This is the near-perfect precedent for what a Saarinen Main Terminal interior acoustic project at IAD will look like: workable, but not fast, and requires a preservation-consultant scope in the design contract. [Source: NY SHPO Project Review 15PR03921]
+
+**d. San Diego International "quiet zone" ambient program (2014–2018).** SAN adopted operator-driven announcement reduction and directional-speaker deployment under its Terminal 2 West expansion without any federal filing beyond standard NEPA project documentation. Result: measured reduction in announcement count and no TSA, FAA, or DOT enforcement action. Direct precedent that a US Part 139 airport can implement quiet-by-design under existing federal envelope. [Source: SAN Airport Authority Environmental Documents, 2015; ACI-NA case study, 2019]
+
+---
+
+## 5. Direct quotes / data points for the Strategist
+
+- **"The PFC has been capped at $4.50 since April 2001, and Congress has declined to raise it in every FAA reauthorization since — including the enacted May 2024 reauthorization. Fund this standard from CIP capital under the 2025 U&L, not from a PFC uplift that will not arrive."** [49 U.S.C. § 40117(b); Pub. L. 118-63]
+
+- **"14 CFR § 139.325 requires an emergency communications network. It does not require an announcement. That distinction is the entire regulatory space for a quiet-by-design standard."** [14 CFR § 139.325]
+
+- **"NFPA 72 requires a Speech Transmission Index of at least 0.50 in areas where voice communication is required. Everything above that floor is operator choice. MWAA writes the ceiling."** [NFPA 72-2022 § 18.4.11]
+
+- **"The 2025 U&L runs through 2039. The standard must live in the Design Manual and Tenant Design Criteria, because that is where MWAA can enforce it without reopening the U&L and triggering an MII vote."** [MWAA U&L, effective 1 Jan 2025]
+
+- **"IAD Main Terminal is a National Historic Landmark. Any federally-assisted acoustic work inside it triggers Section 106 consultation under 36 CFR Part 800. Budget 90 to 180 days per project, longer if an adverse effect is found."** [36 CFR § 800.5]
+
+- **"The 2024 FAA reauthorization added 10 beyond-perimeter slot exemptions at DCA and made no move on the PFC cap, the perimeter rule, or any terminal-experience mandate. That is the base rate for what federal aviation policy will and will not do to MWAA between now and 2028."** [Pub. L. 118-63 §§ 501–503]
+
+---
+
+## 6. What to tell the Strategist plainly
+
+Quiet-by-design at MWAA is **not** a political problem. It is a design-manual, tenant-criteria, and airline-consent problem sitting inside an unusually favorable regulatory frame. The FAA does not preempt this space; TSA already allows it; NFPA and ADA set a floor MWAA already meets; ANCA does not reach interior terminal acoustics; state and county authorities are neutral.
+
+The three things that will actually move on operator-controllable timeframes:
+
+1. **Adopt the standard through the MWAA Design Manual and Tenant Design Criteria before Concourse C/D 30% design lock** (inside the $20–22.5B Dulles program's early-2027 design window). Board resolution alone is insufficient; the standard must appear in enforceable procurement and tenant instruments.
+2. **Frame the DCA half around safety-communication preservation**, explicitly citing the post-January-2025 emergency-communication baseline. This defuses the Congressional and NTSB political overhang. Any DCA proposal that reads as "fewer announcements" without a paired safety-redundancy argument will not survive the first delegation phone call.
+3. **Bank a Section 106 precedent on a non-historic space first** — Concourse E post-opening tuning is the ideal proving ground because it is greenfield and outside historic envelope — before proposing any work inside the Saarinen Main Terminal or DCA T1.
+
+Everything else — PFC uplifts, federal rulemaking, statutory change — is background. The politics are not what will decide this. The Design Manual and the 2025 U&L will.
+
+---
+
+*Word count: ~2,240. Evidence companion: `regulatory-political-analyst-evidence.jsonl`.*

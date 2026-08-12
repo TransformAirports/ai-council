@@ -1,0 +1,281 @@
+# Operations-Analyst Brief — Quiet-by-Design Standards for MWAA Terminals
+
+Run: `quiet-by-design-standards-for-mwaa-terminals-2`
+Author: operations-analyst (independent Stage 1)
+Date: 2026-08-07
+
+## What this brief is
+
+The run frames the question as design specification. I frame it as an operations
+question: what does the operational record — measured intelligibility, boarding
+outcomes, employee exposure, and irregular-operations behavior — say about how
+much silence a terminal can absorb, and where the operational floor sits below
+which "quiet-by-design" starts costing MWAA money and safety margin? I read no
+other Stage 1 agent's brief; this is a distinct lens by design.
+
+## Executive summary (approx. 400 words)
+
+The framing that "quiet" means "fewer announcements" is the wrong operational
+argument. The right one is: the airport is a communications system operating
+against a measurable noise floor, and every message it broadcasts costs
+something — attention, gate-agent speech, employee sound exposure, and passenger
+tolerance. What a quiet-by-design standard actually specifies is where each
+message is required, at what intelligibility, on which channel, and where it is
+prohibited. Silence is not the outcome. Channel discipline is.
+
+The intelligibility floor is not a choice. NFPA 72 requires a Speech
+Transmission Index of at least 0.45 at each measurement location and an average
+of at least 0.50 within each Acoustically Distinguishable Space, with 90% of
+measurement locations meeting the individual threshold. That is not aspirational;
+it is what any voice evacuation system in a MWAA space has to demonstrate at
+commissioning under Chapter 24. A quiet-by-design standard that does not commit
+IAD and DCA to that floor is not a standard; it is a preference.
+
+The peer record — Helsinki (silent since 2015), London City (2008), Chennai
+(2017), Changi (2017), and Copenhagen's zoned model — shows the pattern that
+holds up operationally: eliminate the courtesy and marketing announcements,
+retain gate and emergency announcements, invest in the redundant visual and
+mobile channels, and treat the hold-room as a distinct acoustic environment
+from the concourse. What no peer has publicly demonstrated is a measured
+reduction in missed boardings driven by more announcements, or a measured
+increase driven by fewer, once redundant channels are in place. The evidence
+runs the other direction: passenger self-report and satisfaction data favor the
+quieter model, with wayfinding effects reported as neutral.
+
+The operational floor at DCA is higher than at IAD, and the standard should
+say so. DCA runs slot-constrained on a single main runway; a missed boarding
+that would be a passenger inconvenience at IAD can cost a slot pair, cascade
+through the gate rotation, and interact with the January 2025 flight
+restrictions the airport is still operating under. IAD's international transfer
+journey is longer, more multilingual, more dependent on wayfinding, and less
+tolerant of information starvation between AeroTrain stations and gates. The
+mandatory MWAA floor should be common. The context-dependent layer above it
+should not pretend the two airports are the same operation.
+
+The window to specify this cheaply is open now, before Dulles Concourses C and
+D and the AeroTrain extension harden into procurement. It closes soon.
+
+## The peer record, read operationally
+
+Five sites are cited in the run prompt: Schiphol, Copenhagen, Helsinki, London
+City, Dubai. What the record actually documents:
+
+- **London City Airport (LCY)** implemented a silent terminal policy in 2008.
+  The airport's own published policy states that "no tannoy announcements are
+  made throughout the departure lounge" and that customers rely on information
+  screens; announcements are retained for gate changes and emergencies. The
+  airport's director of customer experience states that passengers "scored the
+  airport favourably for the terminal environment and noise." That is a
+  self-reported satisfaction claim; it is not a measured operational-throughput
+  claim. But no missed-boarding penalty has been published in the years since.
+- **Helsinki Airport (HEL)** made the same move in 2015, with a smartphone
+  application and airline-partner channels serving the notification role that
+  gate-area PA used to serve. A 2016 study cited in the trade press found the
+  concept "more positive than neutral" and wayfinding effects neutral. The
+  neutral finding is more useful than the positive one: it means passengers
+  didn't get more lost, which was the specific operational risk.
+- **Copenhagen (CPH)** runs a zoned model rather than a whole-airport policy:
+  dedicated sound-dampened areas near specific gates (publicly reported at A10
+  and C15) with no overhead announcements, coexisting with conventional PA in
+  other zones. Passenger feedback is mixed and includes complaints about gate
+  announcements coming too late in the departure sequence — which is a
+  scripting and timing problem, not a silence problem.
+- **Chennai (May 2017)** and **Singapore Changi (December 2017)** extended the
+  pattern outside Europe, substituting SMS and app-based notification for
+  boarding announcements.
+- **Schiphol's** publicly reported "quieter" program is primarily an
+  aircraft-noise and airfield-charge story rather than a terminal-PA story. It
+  is a cautionary read on how the "quiet airport" label gets applied to
+  fundamentally different interventions.
+
+**What the peer record does not show, and MWAA should not claim it does.**
+None of the five sites has published a measured before-and-after change in
+missed-boarding rate, denied-boarding rate, or block-time performance
+attributable to their quiet-terminal practice. The absence of such data cuts
+both ways: the practice is not demonstrably harmful, but it is also not
+demonstrably an operational improvement in throughput terms. It is a passenger-
+experience and employee-environment intervention with an operational floor
+that has to be preserved. That is a defensible standard, and it should be sold
+as such.
+
+## The intelligibility floor is not a choice
+
+Three primary sources set the floor:
+
+1. **NFPA 72 Chapter 24 and Annex D**: STI of at least 0.45 at each
+   measurement location, average of at least 0.50 across each Acoustically
+   Distinguishable Space, 90% of measurement locations meeting the individual
+   threshold. This is a code obligation for voice evacuation and mass
+   notification.
+2. **IEC 60268-16 (2020)** defines the STI methodology and the five
+   qualitative bands: Bad below 0.30; Poor 0.30 to 0.45; Fair 0.45 to 0.60;
+   Good 0.60 to 0.75; Excellent above 0.75. NFPA 72's floor sits at the top of
+   "Poor" and the bottom of "Fair." That is a floor, not a target.
+3. **ACRP Research Report 175 (Improving Intelligibility of Airport Terminal
+   Public Address Systems)** is the American airport-industry document on this
+   question. It identifies reverberation greater than 1 second as problematic
+   for speech intelligibility and reverberation control as the single most
+   effective terminal design intervention. Reverberation is a function of
+   surfaces and geometry — hard, tall, and reflective is worse — which is
+   exactly the design regime of Saarinen's IAD Main Terminal and, to a lesser
+   extent, Pelli's DCA National Hall.
+
+The operational implication is direct. The two most acoustically challenging
+spaces in the MWAA system are also the two the standard cannot rebuild:
+Saarinen's Main Terminal at IAD and Pelli's National Hall at DCA. In those
+spaces, achieving the NFPA 72 STI floor at the design level is a real
+engineering problem that will require absorptive treatment, PA zone density,
+and possibly directional loudspeakers. If MWAA writes a quiet-by-design
+standard that reduces announcement volume without also raising intelligibility
+per announcement in those spaces, the standard will fail its own safety
+requirement at commissioning. That is where the operational risk lives.
+
+## The operational cost of announcements
+
+The case for reducing gate-area PA rests on three operational facts, not on
+comfort:
+
+- **Employee sound exposure.** OSHA sets the action level for a hearing
+  conservation program at 85 dBA on an 8-hour time-weighted average and the
+  permissible exposure limit at 90 dBA. Gate agents and concessions staff
+  spend full shifts in the hold-room. Public MWAA data on measured sound
+  exposure at gate positions is not disclosed in the record for this brief; if
+  those levels approach 85 dBA under peak PA density (they can, in reverberant
+  hold rooms with overlapping airline and airport channels), MWAA already has
+  an OSHA obligation that a quiet-by-design standard would help discharge.
+  That is a professional-judgment call, not a claim from a document.
+- **Signal-to-noise cost.** Every additional announcement raises the ambient
+  level and lowers the effective signal-to-noise ratio of the next one. ACRP
+  175's underlying finding is that announcement density is self-defeating
+  above a threshold: more announcements produce less understood information,
+  not more. Reducing courtesy and marketing announcements is not a comfort
+  intervention; it is a way to raise the operational intelligibility of the
+  gate and safety announcements that remain.
+- **Gate-agent time.** Every announcement a gate agent makes over the podium
+  microphone is time not spent resolving the boarding-group irregularity in
+  front of them. When app-based and screen-based notification substitutes for
+  the courtesy call, the agent is available for the exception rather than the
+  broadcast. This is a well-understood pattern in operations research
+  generally; the specific magnitude at MWAA is not in the public record.
+
+## The operational cost of NOT announcing
+
+The case against blind silence is equally operational, and it is where the
+run's insistence on redundant channels is right:
+
+- **DOT bumping data** show that involuntary denied-boarding in 2024 ran at
+  0.25 per 10,000 passengers in Q4, with combined voluntary and involuntary
+  denied boardings under 1% of passenger boardings. This is the operational
+  floor: the airport is not designing for 30% of passengers missing flights,
+  it is designing for a very small fraction that any change in notification
+  cannot afford to move upward.
+- **The Air Carrier Access Act, the ADA, and Section 504** require effective
+  communication with passengers who have hearing, vision, cognitive, or
+  language differences. USDOT rules require captioning at all times on
+  televisions and audio-visual displays, and airlines must give hearing- and
+  vision-impaired passengers "prompt access to the same trip information as
+  other passengers." A silent terminal without a captioning-and-visual layer
+  is a Title II and ACAA violation, not a passenger-experience win. A
+  quiet-by-design standard has to specify the visual channel with the same
+  rigor as the audible one.
+- **Digital exclusion.** Roughly one in eight U.S. adults do not carry a
+  smartphone; the fraction is materially higher among older travelers and
+  infrequent travelers. Any silent-terminal approach that assumes an
+  application on every passenger's phone is designing around the customer
+  base MWAA actually serves.
+- **Irregular operations.** The specific window in which announcements matter
+  most is the diversion, ground-stop, and gate-swap window — the moments when
+  FIDS is chasing an operations decision made minutes earlier. In that window,
+  a gate agent on a microphone is the fastest and most authoritative channel.
+  A standard that eliminates the ability to use that channel operationally is
+  not resilient; it is brittle.
+
+## DCA and IAD are not the same operation
+
+The context packet's traffic and slot data force a specific conclusion. DCA is
+slot-constrained under the FAA High Density Rule with the 2024 Reauthorization
+adding 10 beyond-perimeter exemption slots. A missed boarding at DCA can
+interact with slot economics and single-runway capacity in a way it does not at
+IAD. The operational floor for gate-area notification at DCA — how loud, how
+redundant, how frequent — is materially higher than at IAD. IAD, in contrast,
+runs longer curb-to-gate journeys, a much larger international transfer volume
+(10.5 million international passengers in 2025), and passenger populations for
+whom the visual and multilingual FIDS channel does more work than the
+audible-English channel ever could.
+
+The right shape of the MWAA standard is therefore two-layer:
+
+- **Common mandatory floor**: NFPA 72 STI at commissioning; ACAA/ADA visual
+  redundancy on every gate; captioning always on for televisions; reverberation
+  targets for new construction; PA zoning with adjacent-zone spillover
+  requirements; announcement-category permissions (safety, emergency,
+  operational, courtesy, marketing) with courtesy and marketing prohibited by
+  default in gate areas; measured post-opening verification.
+- **Context-dependent layer**: gate-area notification density and boarding-
+  call scripting are set at the terminal-context level, higher at DCA than at
+  IAD; historic-space carve-outs for the Saarinen Main Terminal and the
+  Pelli National Hall that recognize the engineering cost of achieving the
+  STI floor in those geometries and specify absorptive and PA-zoning
+  compensations.
+
+## What to specify before design hardens
+
+Three things, in order of leverage:
+
+1. **Acoustic performance criteria** written into the Airports Authority
+   Design Manual by space type (hold room, concourse, retail, immigration,
+   arrivals hall, mobile lounge boarding, AeroTrain platform): target
+   ambient-noise range in dBA, RT60 range, STI floor at commissioning, and
+   adjacent-zone spillover limit. Without these, no downstream consultant
+   scope can be written to a defensible standard.
+2. **PA governance policy**: announcement categories, scripting standards,
+   frequency caps, quiet hours, zoning rules, tenant broadcast rights, and
+   the change-control process. This is a policy document, not a design
+   document, and its absence is the single biggest reason airports "go
+   silent" and then drift back to noisy within two years.
+3. **Redundant-channel specification**: FIDS density and refresh, captioning
+   requirement, app-notification integration, staffed roving-agent position
+   requirements in irregular operations, and quiet-space provisions for
+   neurodivergent and sensory-sensitive passengers. This is the part that
+   makes the standard defensible against the accessibility counter-argument.
+
+## Evidence gaps I could not close
+
+The following would materially sharpen the operational argument and are not in
+the reviewed public record:
+
+- Whether the current MWAA Design Manual already contains any acoustic
+  performance criteria (NC, RT60, STI) at all.
+- Whether IAD or DCA has ever piloted a quiet-boarding, silent-hold-room, or
+  reduced-announcement practice at a concourse or gate, and any measured
+  operational result.
+- Current measured employee sound exposure at gate positions in the noisiest
+  concourse zones at either airport.
+- Any measured before-and-after data from Helsinki, LCY, CPH, Chennai, or
+  Changi on missed-boarding rates or denied-boarding rates attributable to
+  the quiet-airport practice.
+
+The Council should treat those gaps as open questions in the final
+deliverable, not fill them with inference.
+
+## Data points a strategist can use verbatim
+
+1. NFPA 72 requires a Speech Transmission Index of at least 0.45 at each
+   measurement location and an average of at least 0.50 within each
+   Acoustically Distinguishable Space, with 90% of measurement locations
+   meeting the individual threshold.
+2. IEC 60268-16 (2020) classifies STI 0.45–0.60 as "Fair." NFPA 72's floor
+   sits at the boundary between "Poor" and "Fair" — a code minimum, not a
+   design target.
+3. Involuntary denied-boarding across the 10 U.S. reporting marketing
+   carriers ran at 0.25 per 10,000 passengers in Q4 2024. Combined voluntary
+   and involuntary denied boarding is under 1% of passenger boardings.
+4. OSHA's action level for a hearing conservation program is 85 dBA on an
+   8-hour time-weighted average; the permissible exposure limit is 90 dBA.
+5. Helsinki Airport has operated as a silent airport since 2015; London City
+   Airport since 2008. Both retain gate and emergency announcements and
+   substitute app and screen notification for the courtesy and marketing
+   layer.
+6. ACRP Research Report 175 identifies reverberation greater than 1 second as
+   the primary physical barrier to speech intelligibility in airport terminal
+   PA systems.

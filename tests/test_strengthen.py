@@ -134,8 +134,10 @@ class StrengthenReleaseTests(unittest.TestCase):
             archive = root / "runs" / "2026-07-27-argument-operating-case"
             archive.mkdir(parents=True)
             final = root / "final.md"
+            memo = root / "memo.docx"
             deck = root / "deck.pptx"
             final.write_text("# Operating case\n\nA verified argument.\n", encoding="utf-8")
+            memo.write_bytes(b"validated one-page memo bytes")
             deck.write_bytes(b"validated presentation bytes")
             request = StrengthenRequest(
                 title="Operating case",
@@ -145,10 +147,11 @@ class StrengthenReleaseTests(unittest.TestCase):
                 slide_count=6,
                 slug="operating-case",
             )
-            argument, presentation = _publish_strengthen_release(
+            argument, word_memo, presentation = _publish_strengthen_release(
                 repo_root=root,
                 request=request,
                 final_argument=final,
+                memo=memo,
                 deck=deck,
                 archive_dir=archive,
             )
@@ -157,6 +160,9 @@ class StrengthenReleaseTests(unittest.TestCase):
             )
             self.assertIsNotNone(release)
             self.assertEqual(argument, reports / "argument-operating-case.md")
+            self.assertEqual(
+                word_memo, reports / "argument-operating-case-memo.docx"
+            )
             self.assertEqual(presentation, reports / "argument-operating-case.pptx")
             argument.write_text("tampered", encoding="utf-8")
             self.assertIsNone(
@@ -202,9 +208,55 @@ class StrengthenUploadTests(unittest.TestCase):
             self.assertEqual(removed.status_code, 200, removed.text)
             self.assertFalse(staged[0].exists())
 
+    def test_report_and_scope_uploads_are_isolated(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.object(
+            server, "REPO_ROOT", Path(directory)
+        ):
+            headers = {
+                "origin": ORIGIN,
+                "x-council-session": server._SESSION_TOKEN,
+                "x-council-client": CLIENT_ID,
+                "content-type": "application/octet-stream",
+            }
+            report = self.client.post(
+                "/api/source?purpose=report&name=material.txt",
+                headers=headers,
+                content=b"report material",
+            )
+            scope = self.client.post(
+                "/api/source?purpose=scope&name=material.txt",
+                headers=headers,
+                content=b"scope material",
+            )
+            self.assertEqual(report.status_code, 200, report.text)
+            self.assertEqual(scope.status_code, 200, scope.text)
+
+            report_path = server._resolve_argument_uploads(
+                CLIENT_ID,
+                [report.json()["token"]],
+                Path(directory),
+                purpose="report",
+            )[0]
+            scope_path = server._resolve_argument_uploads(
+                CLIENT_ID,
+                [scope.json()["token"]],
+                Path(directory),
+                purpose="scope",
+            )[0]
+            self.assertNotEqual(report_path, scope_path)
+            self.assertEqual(report_path.read_bytes(), b"report material")
+            self.assertEqual(scope_path.read_bytes(), b"scope material")
+
+            rejected = self.client.post(
+                "/api/source?purpose=unknown&name=material.txt",
+                headers=headers,
+                content=b"not accepted",
+            )
+            self.assertEqual(rejected.status_code, 400, rejected.text)
+
 
 class StrengthenPipelineTests(unittest.IsolatedAsyncioTestCase):
-    async def test_pipeline_releases_only_the_concise_argument_without_word(self) -> None:
+    async def test_pipeline_releases_the_verified_argument_and_one_page_word_memo(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "outputs").mkdir()
@@ -238,11 +290,23 @@ class StrengthenPipelineTests(unittest.IsolatedAsyncioTestCase):
                 "caveat": "Pilot only.",
                 "confidence": "high",
             }
-            filler = " ".join(["Evidence improves the reasoning."] * 90)
+            filler_paragraphs = [
+                " ".join(["Evidence improves the reasoning."] * 22)
+                for _ in range(4)
+            ]
+            filler = "\n\n".join(filler_paragraphs)
             final_text = (
                 "# A bounded operating change\n\n"
+                "## Bottom line\n\n"
+                "Authorize the bounded test and keep the scope narrow.\n\n"
+                "## Why it holds\n\n"
                 + filler
                 + f"\n\n{reader_claim}[^1]\n\n"
+                "## Strongest objection\n\n"
+                "A narrow test may not prove the model at full scale. That is why the "
+                "first decision should buy evidence, not lock in expansion.\n\n"
+                "## What to do now\n\n"
+                "Name an owner, set the operating limits, and authorize the test.\n\n"
                 "[^1]: Official operating record, 2026, Operating limits.\n"
             )
             fact_steps: list[str] = []
@@ -265,6 +329,10 @@ class StrengthenPipelineTests(unittest.IsolatedAsyncioTestCase):
                     if required.name.endswith("-evidence.jsonl"):
                         required.write_text(
                             json.dumps(evidence_record) + "\n", encoding="utf-8"
+                        )
+                    elif required.name == "evidence-map.md":
+                        required.write_text(
+                            "# Argument kit\n\n" + filler, encoding="utf-8"
                         )
                     elif required.name == "fact-check-report.md":
                         required.write_text(
@@ -297,10 +365,43 @@ class StrengthenPipelineTests(unittest.IsolatedAsyncioTestCase):
                         )
                 return {"skipped": False, "cost": 0.0, "turns": 1, "provider": "anthropic"}
 
+            def fake_build_memo(*, slug, title, final_draft, out_dir):
+                from docx import Document
+
+                out_dir.mkdir(parents=True, exist_ok=True)
+                memo = out_dir / f"argument-{slug}-memo.docx"
+                document = Document()
+                document.add_heading(title, level=1)
+                document.add_paragraph(final_draft.read_text(encoding="utf-8"))
+                document.save(memo)
+                receipt = out_dir / f"{memo.stem}-word-visual-inspection.json"
+                receipt.write_text("{}\n", encoding="utf-8")
+                (out_dir.parent / "publishing-quality.json").write_text(
+                    json.dumps(
+                        {
+                            "artifact": str(memo),
+                            "kind": "argument_memo_bundle",
+                            "ok": True,
+                            "issues": [],
+                        }
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+                return memo, receipt
+
             with (
                 patch("cli.strengthen._run_agent", side_effect=fake_run_agent),
                 patch("cli.strengthen.emit", new=AsyncMock()),
                 patch("cli.strengthen._notify_done"),
+                patch(
+                    "cli.docx_builder.build_one_page_argument_memo",
+                    side_effect=fake_build_memo,
+                ),
+                patch(
+                    "cli.orchestrator.run_word_visual_inspection",
+                    new=AsyncMock(),
+                ),
             ):
                 result = await run_strengthen_pipeline(
                     request=request, repo_root=root, budget_usd=60
@@ -308,8 +409,12 @@ class StrengthenPipelineTests(unittest.IsolatedAsyncioTestCase):
 
             self.assertTrue(result.completed)
             self.assertTrue(result.argument_path.is_file())
+            self.assertTrue(result.memo_path.is_file())
             self.assertIsNone(result.deck_path)
-            self.assertFalse(any((root / "reports").glob("*.docx")))
+            self.assertEqual(
+                [path.name for path in (root / "reports").glob("*.docx")],
+                ["argument-a-bounded-operating-change-memo.docx"],
+            )
             self.assertIsNotNone(
                 server._verified_argument_release(result.public_slug, root / "reports")
             )

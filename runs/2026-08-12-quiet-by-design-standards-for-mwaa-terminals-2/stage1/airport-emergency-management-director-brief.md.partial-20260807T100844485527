@@ -1,0 +1,107 @@
+# Independent Brief — Airport Emergency Management Director
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Chair:** Director of Emergency Management, top-tier US hub airport (25-year tenure)
+**Date:** 2026-08-07
+**Audience:** MWAA executives, capital planners, and the Council Strategist
+
+---
+
+## Where I sit and why it matters
+
+I have run the EOC through weather events, an active shooter, a mass-casualty tarmac incident, a multi-hour utility failure, a cyber outage, and a pandemic. In every one of those activations the same three questions were asked in the first ten minutes: *Can we reach the public? Can the public reach us? Are the people who cannot hear, cannot read English, or do not have a phone, being reached anyway?* Everything downstream — evacuation, shelter-in-place, reunification, IROPS mitigation, media control — turns on the answer.
+
+The quiet-by-design thesis, read from my chair, is neither a comfort argument nor a branding argument. It is a mass-notification architecture argument. The question I care about is whether the standard MWAA adopts leaves me with more capability to communicate under duress at IAD and DCA on the worst day of the year, or with less. My argumentative edge: operational emergency-management capability is the single most under-specified requirement in most terminal programs — invisible until the day it decides whether a bad event becomes a catastrophic one — and any "quiet" standard that treats PA and EVACS as a nuisance to be minimized rather than a life-safety backbone to be optimized will be corrected by an activation, at cost, later.
+
+## 1. Key findings
+
+1. **A quiet-by-design standard, done well, is a preparedness upgrade, not a preparedness cut.** Emergency voice/alarm communication (EVACS) intelligibility is measured, not vibed. NFPA 72 requires an average Speech Transmission Index (STI) of ≥ 0.50 across each Acoustically Distinguishable Space, with no more than 10 percent of measurement locations below 0.45 [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/]. A design specified up front for STI compliance, reverberation control, and PA zoning outperforms the retrofit alternative on both passenger experience *and* life-safety metrics. The only losing move is to reduce announcements without engineering intelligibility for the ones that remain.
+
+2. **The FAA regulatory floor requires a working communications network — not a quiet one.** 14 CFR §139.325(a)(1) requires each Part 139 airport's Airport Emergency Plan to include "a communications network" capable of prompt response to the hazards listed in paragraph (b), and FAA AC 150/5200-31C is the governing guidance [Source: https://www.ecfr.gov/current/title-14/chapter-I/subchapter-G/part-139/subpart-D/section-139.325] [Source: https://www.faa.gov/documentlibrary/media/advisory_circular/150_5200_31c_consolidated.pdf]. Nothing in Part 139 sets an STI threshold, an ambient dB target, or a paging-frequency ceiling — those enter through NFPA 72, the ADA/ABA accessibility standards, and the operator's own Design Manual. That is why an MWAA standard is the correct instrument: no federal authority is going to write it for us.
+
+3. **Every real activation I've watched fail publicly failed on communications first.** At FLL on January 6, 2017, the shooting itself lasted seconds; the multi-hour breakdown that followed — passengers streaming onto the airfield, families unreunited, mutual-aid units stranded outside the perimeter — was driven by radio-network saturation and by an information vacuum on the terminal floor. Roughly 2,600 responding officers overwhelmed the radio and cellular systems, and command-and-control degraded accordingly [Source: https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf]. Ironically, the last PA announcement most FLL passengers remember hearing before the incident was a Delta gate agent paging the shooter to pick up his checked firearm. When PA works only for airline paging and fails for mass notification, that is a design defect the airport owns.
+
+4. **The 2017 ATL power outage is the definitional case for "PA is not enough — but no PA is a catastrophe."** Eleven hours of blackout stranded roughly 30,000 travelers, cancelled ~1,500 flights, and cost the airport, airlines, and traveling public hundreds of millions of dollars [Source: https://abcnews.go.com/US/power-outages-atlantas-busy-airport-grounding-flights/story?id=51846395] [Source: https://money.cnn.com/2017/12/20/news/delta-atlanta-power-outage/index.html]. FIDS went dark, PA went silent, and cellular capacity collapsed under load. The corrective actions across the industry after ATL were about resilience of the communication *stack* — dual-fed FIDS, EVACS on emergency power, battery-backed digital signage, PA head-end redundancy, staffed floor-walker protocols — not about reducing announcement volume. Any quiet-by-design standard that does not force those resilience specs into the base building program is a step backward on lessons already paid for.
+
+5. **The CrowdStrike day at hub airports proved the mobile-first assumption is fragile.** On July 19, 2024, a single defective content update grounded roughly 8.5 million Windows hosts globally and cancelled about 7,000 Delta flights over five days, concentrated at ATL, at a Delta-estimated out-of-pocket cost of $500 million [Source: https://en.wikipedia.org/wiki/2024_Delta_Air_Lines_disruption] [Source: https://www.marketplace.org/story/2024/07/24/atlanta-airport-delta-crowdstrike-outage]. Airline apps stopped rebooking; airline agents lost visibility; FIDS in some terminals showed stale data. In that state, the terminal PA and the human at the podium are the *only* trustworthy channels. A standard that assumes "passengers will get it on their phone" designs for the good day.
+
+6. **Accessibility is not a soft requirement; it is a redundancy requirement.** ADA/ABA and DOT 49 CFR Part 27 require effective communication with visual counterparts to audible information, assistive listening, and accessible wayfinding. ACRP Research Report 201 (*Airport Emergency Communications for People with Disabilities and Others with Access and Functional Needs*) is the operator-authored playbook and it treats redundancy as the substantive safety requirement, not as a compliance box [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/221/original/acrp_r201.pdf]. From the EM chair, every redundancy the ADA requires me to provide for a Deaf traveler on a Tuesday is a redundancy I need for *every* traveler on the day the PA head-end fails.
+
+7. **The strong programs specify announcement governance the same way they specify egress width — as a design constraint, not a policy.** The weak version of quiet-by-design is a memo asking gate agents to page less. The strong version is: zoned PA with adjacent-zone spillover < 6 dB, mass-notification override with pre-authorized message library and single-touch activation from the EOC, tenant PA systems federated into the airport EVACS head-end under contract, and post-opening STI verification at 90 percent of ADS locations. That is a specification a design-review board can enforce. The memo is not.
+
+8. **MWAA has two live-fire test cases already on the calendar.** IAD Concourse E opens autumn 2026 — the first substantial greenfield terminal space at Dulles in decades, and the last chance to write this standard into a program brief before it hardens. The expanded ~$20–22.5B Dulles program (July 2026 announcement) will replace Concourses C and D over the coming decade [Source: airport-context.md §4]. DCA's post-January-29-2025 midair-collision environment has already raised the political cost of any communication-during-emergency failure at Reagan National. The window to install a quiet-by-design standard with EM in the room is now, not after Concourse E's commissioning finds STI failures at price.
+
+## 2. Evidence and regulatory frame
+
+### The federal floor
+
+**14 CFR §139.325(a)(1)** requires the Airport Emergency Plan to contain "instructions for response to" a list of emergencies including a communications network [Source: https://www.ecfr.gov/current/title-14/chapter-I/subchapter-G/part-139/subpart-D/section-139.325]. The FAA does not prescribe how that network sounds. **FAA AC 150/5200-31C** (consolidated, Change 2) is the governing guidance and institutionalizes NIMS/ICS as the operating framework for the AEP [Source: https://www.faa.gov/documentlibrary/media/advisory_circular/150_5200_31c_consolidated.pdf]. Neither document sets STI, dB, or paging-cadence targets. The absence of a federal specification is precisely why the operator's Design Manual carries the weight.
+
+### The life-safety code that actually binds
+
+**NFPA 72** (National Fire Alarm and Signaling Code), adopted through the local building codes MWAA has adopted for both airports, is the technical authority. Its intelligibility rule for emergency voice/alarm systems is that the average STI in an Acoustically Distinguishable Space must be ≥ 0.50, with ≥ 90 percent of measurement points at ≥ 0.45 [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/]. A system that hits dB targets and fails STI is not code-compliant. This is the number MWAA's standard should adopt as the mandatory floor for all life-safety announcements; discretionary informational PA can and should be tighter still.
+
+### The airport-specific playbooks
+
+**ACRP Synthesis 73** (*Emergency Communications Planning for Airports*), **ACRP Research Report 170** (*Guidebook for Preparing Public Notification Programs at Airports*), **ACRP Research Report 201** (*Airport Emergency Communications for People with Disabilities and Others with Access and Functional Needs*), and **ACRP Synthesis 115** (*Practices in Airport Emergency Plans*) are the operator-authored, peer-reviewed body of practice on what a mass-notification-capable terminal actually looks like [Source: https://nap.nationalacademies.org/catalog/23591/emergency-communications-planning-for-airports] [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/221/original/acrp_r201.pdf]. Report 201 in particular translates the ADA compliance frame into concrete redundancy specifications and should be cited directly in the MWAA standard.
+
+### The activations the field remembers
+
+**FLL, January 6, 2017 — Active Shooter.** The National Policing Institute after-action report (September 2017) documents that mutual-aid saturation, radio-network overload, and command-post confusion — not the shooter — produced the multi-hour post-event chaos, and that terminal-communication failures drove passenger self-evacuation onto the AOA [Source: https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf]. The Broward radio system was later reported to have "throttled" under load during the 2018 Parkland event as well, a systemic communications-capacity gap [Source: https://www.campussafetymagazine.com/news/broward-radio-failures-throttling/52633/].
+
+**ATL, December 17, 2017 — Power Outage.** An underground Georgia Power switch-gear fire took the airport dark for approximately 11 hours; ~1,500 flights cancelled, ~30,000 passengers stranded, aircraft with passengers held on the tarmac past fuel and provisioning limits [Source: https://abcnews.go.com/US/power-outages-atlantas-busy-airport-grounding-flights/story?id=51846395] [Source: https://money.cnn.com/2017/12/20/news/delta-atlanta-power-outage/index.html]. The event drove industry-wide reinvestment in redundant power to FIDS, EVACS, and terminal IT.
+
+**RSW, September–October 2022 — Hurricane Ian.** RSW closed to non-military traffic from September 28 to October 4, reopened with limited hours October 5–10, and returned to full commercial operations October 11. Terminal took approximately two inches of standing water on the first floor; concessions and potable water were unavailable during the reopening window [Source: https://www.wgcu.org/2022-10-05/rsw-reopens-after-hurricane-ian] [Source: https://979kissfm.iheart.com/featured/florida-news/content/2022-10-04-rsw-airport-in-fort-myers-reopens-wednesday-following-hurricane-ian/]. The operational reopening was throttled by information-systems, not runway, readiness.
+
+**Cross-industry, July 19, 2024 — CrowdStrike.** A single defective CrowdStrike content update crashed roughly 8.5 million Windows hosts globally; Delta cancelled about 7,000 flights over five days, concentrated at ATL, at a self-estimated $500 million cost [Source: https://en.wikipedia.org/wiki/2024_Delta_Air_Lines_disruption] [Source: https://www.marketplace.org/story/2024/07/24/atlanta-airport-delta-crowdstrike-outage]. Airline mobile channels became actively misleading in the first hours; terminal-side PA and staffed floor-walker communication were the only trustworthy information source at hub scale.
+
+## 3. The preparedness case — for and against the thesis
+
+### For
+
+The thesis, taken at its literal wording, is a preparedness upgrade for four specific reasons.
+
+First, it forces intelligibility to be *specified*, not aspirationally hoped-for. Every retrofit STI project I have ever seen inside an existing terminal fails on adjacent-zone spillover the operator did not plan for. Concourse E is the last time MWAA can specify PA zoning at IAD in a program brief rather than at a change order. A binding STI ≥ 0.50 (NFPA 72 floor, tightened to ≥ 0.55 in emergency-critical zones — hold rooms, security checkpoints, arrivals) is achievable at design cost and is roughly an order of magnitude more expensive as a retrofit.
+
+Second, "PA zoning" as a mandatory requirement lets the EOC do the two things that matter most in a live activation: broadcast globally when the whole facility needs to move, and localize when only one hold room or one concourse needs to. Every operator that has fought a bomb threat in the last decade wanted zoned PA and did not have it.
+
+Third, the thesis requires "redundant visual, digital, and staffed communication." That language, in a MWAA standard, becomes: dual-fed FIDS on emergency power, battery-backed digital wayfinding, tenant PA federated into the airport EVACS head-end, and staffed floor-walker protocols in the AEP. Those are exactly the corrective actions the field wrote after ATL 2017 and CrowdStrike 2024. Codifying them in a Design Manual clause is preparedness that outlasts the individuals who negotiated it.
+
+Fourth, an ADA-first redundancy posture is preparedness for the general population, not just for the accommodated population. ACRP Report 201 makes this argument in detail; the standard should cite it verbatim [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/221/original/acrp_r201.pdf].
+
+### Against
+
+The preparedness risk of this thesis is entirely in its interpretation. Four failure modes to watch:
+
+1. **"Quiet" gets read as "fewer announcements" by procurement.** If the standard translates in the contract as "reduce PA cadence," and the compliance metric becomes announcement-per-hour rather than intelligibility-per-message, the EOC loses the tool it uses under duress. The standard must specify STI, ambient dB, spillover, and reachability — not paging frequency.
+
+2. **Mobile-first assumptions replace terminal-side infrastructure.** If the standard leans on airline apps and airport wayfinding apps as substitute for FIDS or PA capital, CrowdStrike day repeats at MWAA. Mobile is additive, not substitutive.
+
+3. **Historic-preservation constraints in the Saarinen main terminal at IAD and the Goodman terminal at DCA get used to defer EVACS upgrades.** Section 106 review is a legitimate constraint; it is not a preparedness exemption. NFPA 72 STI compliance in life-safety zones is not negotiable because the ceiling is a National Historic Landmark. The standard should make that explicit.
+
+4. **Tenant PA systems remain outside the standard.** Airlines page passengers, page missing crew, and page checked-firearm claims (see FLL, above). If tenant PA is not federated into the airport EVACS head-end under contract, the EOC cannot silence-and-override during an activation. This is a U&L and tenant-agreement clause, not just a design clause; MWAA's 2025 U&L is the vehicle.
+
+The activation that most directly bears on the thesis, from my chair, is not a hurricane and not an active shooter — it is the ATL 2017 power outage combined with the CrowdStrike day, read together. Both events show that when the ordinary channels degrade, the survivor is a hardened, redundant, staffed, zoned terminal-communications stack. A quiet-by-design standard that installs that stack is a preparedness upgrade. One that assumes it away is a loss the operator will pay for in a subsequent activation.
+
+## 4. Anchors a strategist can use
+
+1. **IAD Concourse E opening, autumn 2026.** The first live-fire test of any MWAA quiet-by-design standard, because it is greenfield airside space with a program brief that can still be amended. Anchor the standard's mandatory tier to the Concourse E commissioning acceptance test and require published STI-verification measurements at 90 percent of ADS locations before beneficial occupancy.
+
+2. **FLL 2017 active shooter after-action report, National Policing Institute, September 2017.** The most-cited operator-side AAR on mass-notification failure in a U.S. hub terminal in the last decade; anchor the standard's tenant-PA federation and EOC-override requirement to its findings [Source: https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf].
+
+3. **ATL 2017 power outage — 11 hours, ~1,500 flights, ~30,000 passengers, hundreds of millions of dollars.** Anchor the standard's resilience tier — dual-fed FIDS, EVACS on emergency power, PA head-end redundancy — to the ATL corrective-action pattern the industry adopted after this event [Source: https://money.cnn.com/2017/12/20/news/delta-atlanta-power-outage/index.html].
+
+4. **ACRP Research Report 201 (Emergency Communications for People with Disabilities and Others with Access and Functional Needs) and ACRP Synthesis 73 (Emergency Communications Planning for Airports).** Cite these directly in the standard so the accessibility-as-redundancy posture is not left to procurement to reinterpret [Source: https://crp.trb.org/acrp0715/wp-content/themes/acrp-child/documents/221/original/acrp_r201.pdf] [Source: https://nap.nationalacademies.org/catalog/23591/emergency-communications-planning-for-airports].
+
+5. **NFPA 72 STI ≥ 0.50 (average) / ≥ 0.45 (90 percent of locations) as the mandatory intelligibility floor.** Set the emergency-critical-zone (hold rooms, checkpoints, arrivals halls, FIS) requirement one notch tighter at ≥ 0.55 average. Require STIPA field measurement at commissioning and every five years thereafter [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/].
+
+## 5. Named evidence gaps
+
+- Current MWAA Design Manual sections on acoustics, PA zoning, EVACS, FIDS, and tenant technology standards were not retrieved in this pass and should be pulled from MWAA's engineering portal before drafting.
+- No published post-opening STI or STIPA measurements exist for any current IAD or DCA terminal space; this is a testable gap, not a design gap.
+- Current TSA guidance on announcement cadence, wording, and multilingual coverage was not independently verified in this pass.
+- Federation of tenant (airline, concessionaire, TSA-side) PA into a single airport EVACS head-end at IAD and DCA — status and enforceability under the 2025 U&L — was not verified in this pass. This is the single highest-leverage gap for the standard.
+
+## 6. Bottom line for the Strategist
+
+The quiet-by-design thesis, correctly implemented, is one of the more consequential preparedness upgrades MWAA can make inside the next capital cycle at a cost that is trivial against the ~$20–22.5B Dulles program. Incorrectly implemented — as fewer announcements without engineered intelligibility, mobile-first without terminal-side redundancy, or a design memo without tenant-agreement teeth — it will show up as a mass-notification failure in an activation somewhere between Concourse E's second year of operation and the completion of C/D replacement. The specification is the difference between the two outcomes. Write it with the EM director in the room, or expect to write it later in a corrective-action plan.

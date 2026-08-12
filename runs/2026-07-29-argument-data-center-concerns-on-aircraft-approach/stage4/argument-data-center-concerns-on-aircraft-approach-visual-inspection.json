@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "artifact": {
+    "path": "argument-data-center-concerns-on-aircraft-approach.pptx",
+    "sha256": "4ba9579fcd93b4e7b41f0676686c4bfaaf0aa9e3aae7b9a5ace5303ec88025ba",
+    "size_bytes": 48412
+  },
+  "visual_brief": {
+    "path": "visual-brief.json",
+    "sha256": "2c3f6c65d0ce691b89a597c3e5a9cd558c8af1ccdcae33bbaba1a5a8601aaf34"
+  },
+  "deck_mode": "argument_brief",
+  "slide_count": 5,
+  "rendered_slides": [
+    {
+      "slide_number": 1,
+      "path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-1.png",
+      "sha256": "e888d80b378ad420ce0c6b03e0538dca09740501b61135500fa8fcb732032d29",
+      "size_bytes": 131329
+    },
+    {
+      "slide_number": 2,
+      "path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-2.png",
+      "sha256": "2dfc618d6dfebd2d5021187d25be56286314d1ef393f3322170f2e546b000b92",
+      "size_bytes": 190414
+    },
+    {
+      "slide_number": 3,
+      "path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-3.png",
+      "sha256": "13ede40b9e450519287895ee2f905019e9a52c5d57a2a197e363da959977b45b",
+      "size_bytes": 138409
+    },
+    {
+      "slide_number": 4,
+      "path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-4.png",
+      "sha256": "353f107ad8dafe8f75014602f580b749f11bc0cb8504639f18cb7f8a496626d4",
+      "size_bytes": 159626
+    },
+    {
+      "slide_number": 5,
+      "path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-5.png",
+      "sha256": "edcaa6217280fda839c25aaad77ba3e07e3ad0ba6270293aa992e0d5cb962be6",
+      "size_bytes": 117974
+    }
+  ],
+  "montage": {
+    "path": "inspection/data-center-concerns-on-aircraft-approach/montage.png",
+    "sha256": "cdf1f6781e211bb60ae6fccce0a439ba8ef2eae0785c0da40f59ca7b8a6ad22b",
+    "size_bytes": 251383
+  },
+  "signature_visual": {
+    "slide_number": 2,
+    "concept": "Annotated side-view cross-section of the RWY 19R/1L approach and departure corridor: aircraft on the Cat II/III glide path, ALSF-2 approach lights at the 19R end, and the proposed data center below with three labeled interference vectors — (1) thermal plume turbulence rising 'over 1,000 feet above the top of the stack or cooling tower' per AIM § 7-6-16, (2) open-water stormwater basin attracting wildlife into the corridor against AC 150/5200-33C's no-standing-water design standard, (3) metallic mass and UPS/generator emissions against the ILS signal, with FAA Order 6750.16E's warning that clearing the critical area does not guarantee non-interference.",
+    "visual_type": "annotated_corridor_cross_section",
+    "rendered_path": "inspection/data-center-concerns-on-aircraft-approach/argument-data-center-concerns-on-aircraft-approach-2.png",
+    "rendered_sha256": "2dfc618d6dfebd2d5021187d25be56286314d1ef393f3322170f2e546b000b92"
+  },
+  "inspection": {
+    "inspector": "presentation-designer",
+    "full_size_each_slide_inspected": true,
+    "montage_inspected": true,
+    "signature_exhibit_present": true,
+    "signature_exhibit_matches_brief": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Slide 2: aircraft marker rendered as a detached upward triangle floating above the glide path; replaced with a touchdown arrowhead on the glide-path line and a 'Cat II/III glide path' label, then re-rendered and re-inspected."
+    ],
+    "unresolved_findings": []
+  }
+}

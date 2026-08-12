@@ -1,0 +1,122 @@
+# Operations-Analyst Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Author lens:** Airport operations analyst — throughput, delay, and coordination metrics applied to the acoustic and PA-governance question at IAD and DCA.
+**Independent of other Stage 1 outputs.** Written before reading any other brief.
+**Date:** 2026-08-07.
+
+---
+
+## 1. Reframing the question in operational terms
+
+The run prompt asks whether MWAA should adopt a quiet-by-design standard for IAD and DCA. The word "quiet" is dangerous shorthand. From an operations standpoint the decision is not "fewer announcements" versus "more announcements." It is a set of measurable design and governance inputs — ambient sound-pressure level, reverberation time, Speech Transmission Index (STI), zoning granularity, announcement scripting, and information-channel redundancy — that together determine whether a passenger receives the right information in the right place with acceptable operational noise cost.
+
+The right operational question is: **which of those inputs should be specified before design and procurement harden, because they are cheap to embed and expensive to retrofit?**
+
+The evidence below argues that four inputs are load-bearing (STI, ambient dB(A), RT60, and PA zoning), that announcement volume is a governance question downstream of them, and that "silent" airports as commonly reported are misdescribed — every named peer preserves emergency and gate-area voice, and the operational gain comes from targeting, not from silence.
+
+## 2. Key findings
+
+1. **The technical intelligibility target is already fixed by codes and by ACRP-derived guidance.** NFPA 72 requires STI ≥ 0.50 in areas served by emergency voice/alarm systems [Source: ACRP-derived STI targets summarized in AcousPlan / IEC 60268-16 review]. ACRP Research Report 175 (Wilson Ihrig, 2017), the profession's reference document for airport terminal PA, recommends designing to RT60 of 1.1–1.5 s in the 500–2,000 Hz octave bands, ambient noise ≤ 59 dB(A), and a signal-to-noise ratio of 10–15 dB [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf, ACI-NA 2018 conference session; https://crp.trb.org/acrpwebresource2/improving-intelligibility-of-airport-terminal-public-address-systems/]. MWAA does not need to invent numbers; it needs to bind these numbers into the Design Manual and commissioning contracts.
+
+2. **STI target should be tiered to project type, not uniform.** ACRP 175 and BS 7827:2011 practice differentiate design STI: 0.60 for PA replacement in existing space, 0.65 when the acoustic environment can also be controlled, and 0.70 for new construction and major renovation [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. That tiering maps directly to the MWAA portfolio: Concourse E (new build, aim 0.70), the Concourse C/D replacements inside the $20–22.5B Dulles expansion (new build, 0.70), DCA Terminal 2 refresh and IAD main terminal work inside the Saarinen envelope (retrofit, aim 0.65 where reverberation is controllable, 0.60 elsewhere), DCA Terminal 1 historic (retrofit, minimum 0.50, document the constraint).
+
+3. **"Silent airport" as a class does not exist. Every named peer keeps voice where the operation requires it.** Helsinki-Vantaa began its silent policy in June 2015; it eliminated general terminal flight and passenger announcements but explicitly retained "announcements in the gate areas as well as emergency announcements" [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]. London City introduced its silent terminal from 18 August, eliminating tannoy calls in the departure lounge but preserving information screens throughout the lounge and restaurants and, per airport statements, retaining emergency communication [Source: https://www.holidayextras.com/airport-parking/london-city/on-airport/silent-terminal.html]. Copenhagen minimizes but does not remove voice, and requires passengers to monitor FIDS [Source: https://www.sleepinginairports.net/guides/copenhagen-kastrup-airport-guide.htm]. The operational architecture is not "silence." It is "voice moved from central to local zones, with visual and digital redundancy replacing what was subtracted."
+
+4. **The single technical enabler behind the peer group is PA zoning granularity, not decibel reduction.** All five named peers rely on gate-level or hold-room-level zoning with automated, multilingual scripts. AviaVox — the vendor behind Schiphol and Heathrow among ~50 airports — automates gate announcements against live flight data across 40+ native languages [Source: https://aviavox.com/about-us/our-customers/]. The mechanism that makes those airports feel quiet is not fewer words: it is that words are delivered only where they are actionable. That capability is a specification decision (zone density, DSP head-end, integration to AODB) that must be baked into the PA scope at design, not procured as an upgrade.
+
+5. **Emergency communication is the immovable constraint and it sets the floor for the standard.** 14 CFR § 139.325 requires each Part 139 airport to maintain a communications network capable of prompt notification, and NFPA 72 governs emergency voice/alarm communication systems (EVACS) with an STI floor of 0.50 in required areas [Source: airport-context.md §8; NFPA 72 Annex D as summarized in AcousPlan]. Any MWAA quiet-by-design standard must be written as a two-layer specification: (a) an EVACS layer that meets NFPA 72 unconditionally, and (b) a general-PA layer where zoning, scripting, and announcement cadence are governed. Conflating the two is the most common failure mode in reduced-announcement programs.
+
+6. **Redundancy is the accessibility guarantee — and it is quantifiable, not aspirational.** Reduced-voice operations exclude passengers who cannot use FIDS or a mobile phone unless every subtracted audio message has a redundant visual and, on request, staffed channel. The Sunflower Hidden Disabilities lanyard is already active at IAD and DCA at pre-security, baggage, and USO information desks [Source: https://patch.com/virginia/herndon/sunflower-hidden-disabilities-program-debuts-dcs-2-airports]. IAD and DCA have interfaith chapels but no publicly documented dedicated sensory room, unlike SFO, PIT, PDX, and LGA [Source: https://dustinsdynastyusa.com/resources/air/usairports/]. A quiet-by-design standard that reduces PA volume without adding sensory-room and staffed-assist capacity redistributes the burden onto the population least able to bear it.
+
+7. **DCA's post-January-2025 operating environment raises the bar on emergency-communication design, not lowers it.** The January 29, 2025 midair collision between a PSA/American CRJ700 and a U.S. Army UH-60 triggered temporary flight restrictions and a helicopter-route review, and traffic dropped 5.3% year over year, in part attributable to that event [Source: airport-context.md §6]. Any DCA terminal work adopted under a quiet-by-design standard will be reviewed against a heightened safety political environment; the standard therefore should over-specify emergency-communication testing and post-opening verification at DCA rather than treat it as a code-minimum tick.
+
+8. **There is no published operational data quantifying missed-boarding rate change after a silent-terminal transition at any named peer.** Vendor materials (AviaVox), airport statements (Finavia, London City), and secondary trade press describe qualitative outcomes — "less stress," "relaxed environment," "faster boarding" — without disclosing missed-boarding percentages, on-time-departure deltas, or complaint-rate baselines [Source: https://aviavox.com/resource/achieving-a-silent-airport/; https://www.holidayextras.com/airport-parking/london-city/on-airport/silent-terminal.html]. This is the single most important evidence gap the standard must close. Any MWAA adoption should require post-opening measurement of a defined KPI set (see §5) precisely because the peer literature has not established one.
+
+## 3. Evidence
+
+### 3.1 Technical standards that already exist
+
+The ACRP Research Report 175, *Improving Intelligibility of Airport Terminal Public Address Systems* (Transportation Research Board, 2017), remains the authoritative U.S. reference. The 2018 ACI-NA session presenting its findings summarizes the design envelope: "Design for RT60 (reverberation time) 1.1 to 1.5 seconds at 500 to 2,000 Hz to support adequate speech intelligibility of the PA system"; "Design for daytime and nighttime ambient noise levels 59 dBA or less"; "A good target for announcement levels is a signal-to-noise ratio (SNR) of 10 to 15 dB" [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+
+IEC 60268-16:2020, the international STI measurement standard, classifies STI values as Bad (0.00–0.30), Poor (0.30–0.45), Fair (0.45–0.60), Good (0.60–0.75), and Excellent (0.75–1.00), with a "Good" value corresponding to approximately 90–96% sentence comprehension [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. NFPA 72 Annex D sets a daytime STI target of 0.50 for emergency voice communication and recommends 0.60–0.70 for commissioning tests conducted in unoccupied ("dry") conditions to account for occupancy noise degradation. BS 7827:2011 and EN 54-16:2008 similarly floor transport-terminal PA at STI ≥ 0.50.
+
+### 3.2 What the named "silent airport" peers actually do
+
+**Helsinki-Vantaa (Finavia):** Silent policy from June 2015. General terminal announcements eliminated. Gate-area and emergency announcements retained. Passengers directed to FIDS, airport website, and mobile app. Finavia stated objectives were "to improve the comfort in the waiting areas at the airport and to reduce the stress many passengers feel when travelling" [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]. Finavia has not published measured outcome data on missed boardings or complaints.
+
+**London City Airport:** Silent departure lounge from August 18 (year not specified in retrieved source). No tannoy in the lounge. Information screens throughout lounge and restaurants. Airport cited "extensive research" showing rising satisfaction and passengers describing "a relaxed environment" [Source: https://www.holidayextras.com/airport-parking/london-city/on-airport/silent-terminal.html]. Sample size, methodology, and baseline not disclosed in publicly retrievable materials.
+
+**Copenhagen (CPH):** Minimizes voice announcements; passengers must monitor FIDS [Source: https://www.sleepinginairports.net/guides/copenhagen-kastrup-airport-guide.htm]. No operator-published measurement of operational impact found in this pass.
+
+**Amsterdam Schiphol:** Long-time AviaVox site, one of only two airports named on AviaVox's customer page (the other being Heathrow) [Source: https://aviavox.com/about-us/our-customers/]. Schiphol's reduced-general-announcement approach depends on automated, multilingual, zone-targeted delivery — not on removing voice.
+
+**Dubai (DXB):** Trade-press description of a policy that limits announcements to emergencies and lost-and-found, with the caveat that this description is not sourced to an operator publication in this pass [Source: general trade coverage summarized during web search].
+
+Every one of these implementations preserves emergency voice. Every one of them assumes visual and digital channels that are actually present and working. The design lesson is not "go silent"; it is "spend the announcement budget where the passenger is standing when the message becomes actionable."
+
+### 3.3 Vendor and technology base
+
+AviaVox counts more than 130 airline customers and states "over 50 airports" as customers, with 40+ languages supported and integration to live flight data [Source: https://aviavox.com/about-us/our-customers/]. The vendor's own marketing lists benefits — "improved passenger compliance and flow, less stress for passengers and employees, more on-time departures, greater regulatory compliance, lower operating costs" — but does not tie them to measured, named-airport baselines [Source: https://aviavox.com/]. The technology is available and mature; the honest gap is measurement, not capability.
+
+### 3.4 Accessibility redundancy
+
+The Sunflower Hidden Disabilities program is active at both IAD and DCA at pre-security, baggage-claim, and USO information desks [Source: https://patch.com/virginia/herndon/sunflower-hidden-disabilities-program-debuts-dcs-2-airports]. Neither MWAA airport has a publicly documented dedicated sensory or quiet room comparable to those at SFO, PIT, PDX, or LGA; both maintain interfaith chapels (IAD in Concourse A near Gate A32; DCA in Terminal 2 near Gates B10–B22) [Source: https://www.flydulles.com/travel-information/services-amenities/interfaith-chapel; https://www.flyreagan.com/travel-information/services-amenities]. Any quiet-by-design standard that reduces auditory information channels must fund the visual, digital, and physical alternatives before it activates the reduction.
+
+### 3.5 Regulatory floor
+
+14 CFR Part 139 (via FAA AC 150/5200-31C) requires an Airport Emergency Plan with a communications network capable of prompt notification but does not prescribe SPL, STI, or paging cadence for terminals [Source: airport-context.md §8]. NFPA 72 governs EVACS through local building code adoption. ADA/ABA and 49 CFR Part 27 require visual counterparts to audible information and effective communication. TSA-published security announcements have historically been operator-implemented and recent guidance has allowed reductions and localization; current TSA guidance was not confirmed in this pass and remains an evidence gap named in airport-context.md §12.
+
+## 4. Counterexamples — where operations alone cannot solve the problem
+
+A rigorous operations lens must acknowledge where design and construction are the right answer and no amount of announcement policy will substitute:
+
+- **The Saarinen main terminal at IAD (National Historic Landmark, 1962).** The building's tall, curved concrete envelope produces long reverberation and adverse first-reflection paths that PA scripting cannot correct. Meaningful STI gain here requires acoustic treatment (absorptive panel systems, ceiling treatments compatible with historic review) or additional distributed loudspeakers with tighter beam control. A pure "reduce announcements" policy in this space either strands passengers or forces existing PA to be pushed louder into an already reverberant room, degrading intelligibility. The historic constraint is architectural, and Section 106 review applies.
+
+- **DCA Terminal 2 (Cesar Pelli National Hall, 1997).** High-volume vaulted spaces produce a reverberation profile that is not fixable through governance changes to announcement frequency. The ACRP 175 RT60 target of 1.1–1.5 s cannot be reached inside the existing volume without acoustic treatment that would alter the architectural expression. Any DCA-specific quiet-by-design specification must acknowledge this and either (a) accept a higher RT60 in the National Hall and compensate with denser zoning and higher-directivity loudspeakers, or (b) commit to acoustic treatment that survives Pelli-envelope review.
+
+- **DCA Terminal 1 (Charles M. Goodman, 1941, National Register).** Similar historic constraint. STI ≥ 0.50 is the honest floor; higher targets are aspirational and need documented exceptions in the standard.
+
+- **Concourse E at IAD (new build, opening autumn 2026).** This is the opposite case: greenfield airside space where every ACRP 175 target is achievable if specified now. If MWAA does not embed STI 0.70, ambient ≤ 59 dB(A), RT60 1.1–1.5 s, and zoned PA with hold-room granularity into the Concourse E acceptance testing before opening, retrofit later will cost multiples of embed-at-design cost — the general pattern in acoustic construction is that late change orders on ceiling and wall systems run 3–10× embedded-scope cost, though I have not confirmed a project-specific factor for Concourse E.
+
+The pattern: operations governance controls announcement volume, script content, and channel choice. Physical acoustics controls whether any of that even reaches the passenger clearly. MWAA needs both, sized to the room.
+
+## 5. Direct quotes and data points a strategist can use verbatim
+
+1. "Design for RT60 (reverberation time) 1.1 to 1.5 seconds at 500 to 2,000 Hz to support adequate speech intelligibility of the PA system." — ACRP Research Report 175, as presented at ACI-NA 2018 [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+
+2. "Design for daytime and nighttime ambient noise levels 59 dBA or less with noise control techniques to maintain low ambient noise conditions and maximize PA system SNR." — ACRP Research Report 175, as presented at ACI-NA 2018 [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+
+3. "A good target for announcement levels is a signal-to-noise ratio (SNR) of 10 to 15 dB." — ACRP Research Report 175, as presented at ACI-NA 2018 [Source: https://airportscouncil.org/wp-content/uploads/2018/10/2018Annual-bit-session9-Glickman.pdf].
+
+4. "No flight or passenger announcements will be made in the terminal. Announcements in the gate areas as well as emergency announcements will not be affected." — MorePremium reporting on Finavia's June 2015 Helsinki-Vantaa silent-airport policy [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]. This is the single most useful sentence in the peer literature: it is the operational template — general terminal voice off, gate voice on, emergency voice untouched.
+
+5. STI class table from IEC 60268-16:2020: Bad 0.00–0.30 (<50% comprehension), Poor 0.30–0.45, Fair 0.45–0.60, Good 0.60–0.75 (~90–96% comprehension), Excellent 0.75–1.00 (>96%). NFPA 72 Annex D floor for EVACS: 0.50. BS 7827:2011 transport-terminal PA floor: 0.50 [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement].
+
+## 6. Proposed operations-KPI set for the MWAA standard (what to measure to close the peer literature's evidence gap)
+
+Because the named peers have not published missed-boarding or complaint deltas, MWAA has an opportunity to publish first. A defensible KPI set that a design manual can require post-opening:
+
+- STI at ≥ 20 measurement points per hold room and ≥ 40 per general concourse, commissioned dry and re-verified wet within 90 days of substantial completion.
+- Ambient A-weighted equivalent sound level (L_Aeq,1h) at peak, off-peak, and irregular-operations conditions, measured at 1.5 m height at representative passenger positions.
+- RT60 at 500 Hz, 1 kHz, and 2 kHz octave bands per room.
+- Announcement rate: announcements per hour per zone, and share of announcements delivered in a targeted zone vs. broadcast across zones.
+- Missed-boarding rate per 10,000 boarded passengers, by carrier and by hold-room, with a pre-standard baseline collected at comparable existing rooms.
+- Complaint rate per 100,000 passengers, categorized as "too loud," "too quiet," "missed information," and "accessibility."
+- Sunflower and hidden-disabilities assist-request rate per 100,000 passengers, as a proxy for whether reduced-audio design is redistributing burden onto the accessibility program.
+- Employee A-weighted exposure (L_ex,8h) for gate agents, TSA, retail, and F&B staff assigned to reduced-PA zones.
+
+Bind these into commissioning and the first-year post-occupancy verification. Without them, MWAA's standard would inherit the same qualitative-only track record the peer literature is stuck in.
+
+## 7. What I do not know (evidence gaps this brief flags rather than fills)
+
+- Missed-boarding rates before and after silent-terminal transitions at Helsinki-Vantaa, London City, Copenhagen, Schiphol, or Dubai — not published in retrievable sources.
+- The current MWAA Design Manual's existing acoustic, PA, EVACS, and FIDS sections — not retrieved in this pass; airport-context.md §12 flags the same gap.
+- Measured ambient dB(A), RT60, and STI in existing IAD and DCA terminal spaces — none on public record per airport-context.md §12.
+- Current TSA guidance on announcement frequency, wording, and multilingual coverage — flagged in airport-context.md §12; not confirmed here.
+- Concourse E acoustic specification status — whether ACRP 175 targets are already embedded, partially embedded, or absent. This is the single most time-sensitive gap given the autumn 2026 opening.
+
+These are the sources Stage 2 synthesis should push against, not questions the operations lens can close from public data alone.
+
+---
+
+**Bottom line.** The operational bottleneck at MWAA is not whether to be "quiet." It is that new terminal space is being designed and delivered — Concourse E in months, the $20–22.5B Dulles expansion over a decade — without a common, measurable, tiered acoustic and PA specification bound into the Design Manual, procurement, commissioning, and post-occupancy verification. The technical numbers exist. The peer implementations exist. The regulatory floor is fixed. What is missing is a standard that treats acoustics, PA zoning, announcement governance, visual and digital redundancy, and accessibility as one specification, tiered to project type and room geometry, with KPIs the airport actually measures after opening. Adopt that standard now and Concourse E becomes MWAA's proof point. Adopt it after Concourse E opens and MWAA is buying its own retrofit.

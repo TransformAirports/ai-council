@@ -280,13 +280,19 @@ Open **Strengthen an argument** in the app when the desired outcome is a
 concise case rather than a long-form report. Paste the existing argument,
 attach supporting documents, or do both; describe what needs stronger proof;
 then choose the research agents whose lenses fit the question. The Council
-runs those agents independently, reconciles their evidence and
-counterevidence, and releases a source-checked Markdown argument.
+runs one focused research wave, then ranks the evidence and rewrites the case
+in a single synthesis pass. The fast default seats four lenses in one parallel
+wave; the balanced and full rosters remain available. The release is an exact
+one-page, source-checked Word memo (350–550 words), with the verified Markdown
+kept in the app reader.
 
-A PowerPoint is optional. When selected, the operator supplies an exact slide
-count from 3 to 30. The presentation contract, production checks, and release
-gate all enforce that count. Argument releases are hash-bound, archived, and
-kept in the Library alongside report and scope releases.
+A six-slide PowerPoint is selected by default and can be turned off or changed
+to any exact count from 3 to 30. Its claim-stakes-mechanism-proof-objection-ask
+sequence uses assertion headlines, one visual idea per slide, and a lower text
+density than the full report decks. The presentation contract, production
+checks, and release gate enforce the requested count. Argument releases are
+hash-bound, archived, and kept in the Library alongside report and scope
+releases.
 
 ### The pipeline, precisely
 

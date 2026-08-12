@@ -1,0 +1,234 @@
+{
+  "run": "data-center-concerns-on-aircraft-approach",
+  "analyst": "quantitative-analyst",
+  "date": "2026-07-29",
+  "airport": "Washington Dulles International Airport (IAD / KIAD)",
+  "runway_subject": "RWY 01L/19R",
+
+  "runway_specifications": {
+    "source": "FlightAware Runway Database, KIAD RWY 01L/19R",
+    "source_url": "https://www.flightaware.com/resources/airport/KIAD/runway/01L/19R",
+    "data_vintage": "current (accessed 2026-07-29)",
+    "length_ft": 9400,
+    "width_ft": 150,
+    "surface": "Concrete",
+    "approach_type": "ILS/DME (precision instrument)",
+    "approach_light_system": "ALSF-2",
+    "declared_distances_ft": {
+      "TORA": 9400,
+      "TODA": 9400,
+      "ASDA": 9400,
+      "LDA": 9400,
+      "displaced_threshold": 0
+    },
+    "notes": "Both ends equipped with ILS/DME and ALSF-2. Precision instrument approaches at both ends."
+  },
+
+  "part_77_approach_surface": {
+    "calculation_label": "14 CFR 77.19 Precision Instrument Approach Surface Dimensions for RWY 19R",
+    "source": "14 CFR § 77.19 - Civil Airport Imaginary Surfaces",
+    "source_url": "https://www.law.cornell.edu/cfr/text/14/77.19",
+    "regulation": "14 CFR Part 77, Subpart C",
+    "inputs": {
+      "runway_type": "Precision instrument (ILS/DME)",
+      "inner_edge_width_ft": 1000,
+      "inner_edge_position": "at runway end (0 ft from threshold)",
+      "first_segment_length_ft": 10000,
+      "first_segment_slope": "50:1 (2.0%)",
+      "first_segment_outer_width_ft": "expands proportionally",
+      "second_segment_length_ft": 40000,
+      "second_segment_slope": "40:1 (2.5%)",
+      "total_approach_surface_length_ft": 50000
+    },
+    "outputs": {
+      "total_protected_corridor_length_ft": 50000,
+      "total_protected_corridor_length_miles": 9.47,
+      "height_at_10000_ft_from_threshold_ft": 200,
+      "note": "At 10,000 ft from threshold, the 50:1 slope requires 200 ft clearance above threshold elevation. Any structure must clear this surface."
+    },
+    "formula": "Surface height limit = (distance from runway end) / slope ratio. At distance d (ft) from runway end: allowed height = d / 50 for first 10,000 ft; = 200 + (d - 10000) / 40 for next 40,000 ft.",
+    "analyst_note": "RWY 19R has ILS/DME precision approach. The data center site is described as within this protected corridor. Even if below the surface (height-compliant), locating any structure here commits valuable protected airspace land."
+  },
+
+  "runway_protection_zone": {
+    "calculation_label": "RPZ Dimensions for a Precision Instrument Runway (IAD RWY 19R)",
+    "source": "FAA AC 150/5300-13B, Airport Design (March 2022); FAA AC 150/5190-4B",
+    "source_url": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC-150-5300-13B-Airport-Design-Chg1-w-errata.pdf",
+    "inputs": {
+      "runway_type": "Precision instrument approach (ILS/DME)",
+      "inner_width_ft": 1000,
+      "outer_width_ft": 1750,
+      "rpz_length_ft": 2500,
+      "starts_at": "end of runway safety area / declared threshold"
+    },
+    "outputs": {
+      "rpz_area_sqft": 3437500,
+      "rpz_area_acres": 78.9,
+      "formula": "Trapezoid: Area = 0.5 * (inner_width + outer_width) * length = 0.5 * (1000 + 1750) * 2500 = 3,437,500 sq ft"
+    },
+    "rpz_use_restrictions": {
+      "source": "FAA AC 150/5190-4B; FAA Compliance Manual Order 5190.6C Chapter 20",
+      "prohibited_in_rpz": [
+        "Residences and places of public assembly (churches, schools, hospitals, office buildings, shopping centers)",
+        "Fuel storage facilities",
+        "Any structure causing congregation of people",
+        "Uses that introduce incompatible development within RPZ where airport owner controls land"
+      ],
+      "note": "Data centers are not explicitly enumerated as prohibited in RPZ, but fall under the broad prohibition on structures causing congregation of workers and incompatible development. The key issue is not the RPZ classification alone but the combination of thermal, electromagnetic, lighting, and wildlife hazards."
+    }
+  },
+
+  "wildlife_attractant_distance": {
+    "calculation_label": "Minimum Distance from Runway End for Hazardous Wildlife Attractants (Turbojet Airport)",
+    "source": "FAA AC 150/5200-33B, Hazardous Wildlife Attractants On or Near Airports",
+    "source_url": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_150_5200-33B.pdf",
+    "inputs": {
+      "airport_category": "Turbojet aircraft served (IAD is a major international hub)",
+      "minimum_distance_from_runway_end_ft": 10000,
+      "attractant_type": "Stormwater management/retention facility",
+      "ac_citation": "AC 150/5200-33B"
+    },
+    "outputs": {
+      "minimum_distance_ft": 10000,
+      "minimum_distance_miles": 1.89,
+      "stormwater_pond_classification": "Listed as hazardous wildlife attractant in AC 150/5200-33B",
+      "design_requirement_if_permitted": "Maximum 48-hour detention after design storm; must remain completely dry between storms; steep-sided, rip-rap or concrete lined, narrow, linear shape recommended"
+    },
+    "analyst_note": "A stormwater retention facility paired with the data center would violate the 10,000 ft distance standard from a runway end at a turbojet airport. The data center site is within 2,500 ft of the runway end (inside the RPZ), well within the prohibited zone."
+  },
+
+  "thermal_plume_hazard": {
+    "calculation_label": "Thermal Plume Risk Assessment for Data Center at Approach End",
+    "source_1": {
+      "citation": "FAA Aeronautical Information Manual, Section 7-6-16, Avoid Flight in the Vicinity of Exhaust Plumes",
+      "source_url": "https://faraim.org/faa/aim/chapter-7/section-7-6-16.html"
+    },
+    "source_2": {
+      "citation": "AOPA News, Thermal Plumes a Potential Danger Near Airport, August 5, 2010",
+      "source_url": "https://www.aopa.org/news-and-media/all-news/2010/august/05/thermal-plumes-a-potential-danger-near-airport"
+    },
+    "source_3": {
+      "citation": "Facilities Dive, Data Centers Raise Temperatures Up to 4 Degrees in Nearby Neighborhoods, study citing ASU/Sailor research",
+      "source_url": "https://www.facilitiesdive.com/news/data-centers-raise-temperatures-4-degrees-ASU-Sailor-thermal-plume/821164/"
+    },
+    "inputs": {
+      "data_center_discharge_temp_above_ambient_F": "14 to 25 (air-cooled condensers/cooling towers)",
+      "thermal_plume_vertical_extent_above_stack_ft": "1,000+",
+      "temperature_effect_at_one_third_mile_F": "1.3 to 4.0",
+      "phase_of_flight_at_risk": "Final approach and departure (lowest altitude, least recovery margin)",
+      "documented_aircraft_incident": "Aircraft flying over cooling towers encountered turbulence that knocked plane ~50-60 degrees off center"
+    },
+    "outputs": {
+      "regulatory_response": "FAA added AIM 7-6-16 after studies found plumes extend 1,000+ ft above stack height and cause turbulence, vertical shear, and risk of airframe damage, aircraft upset, or engine failure",
+      "most_critical_condition": "Low altitude flight in calm and cold air — exactly the condition prevailing during instrument approaches to RWY 1L (arrival end of RWY 19R departure)",
+      "analogous_case": "Byron Municipal Airport, CA: FAA expressed concern about a 200-MW natural gas facility with four exhaust stacks at 2.6 miles from airport; proposed data center is within the RPZ (< 0.5 miles)"
+    },
+    "sensitivity": {
+      "worst_case": "Large-scale data center (50+ MW) with air-cooled condensers and on-site backup generators: multiple thermal point sources, continuous 24/7 operation, discharge at 14-25°F above ambient",
+      "better_case": "Liquid-cooled facility with low-profile HVAC, but still generates heat and requires mechanical cooling",
+      "analyst_note": "Scale of thermal plume is roughly proportional to data center power draw. Hyperscale facilities (50-200 MW) create hazards comparable to small power plants. The hazard is not definitively ruled out without a plume dispersion study — which has not been conducted."
+    }
+  },
+
+  "electromagnetic_interference": {
+    "calculation_label": "EMI Risk to ILS and Navigation Aids from Data Center",
+    "source": {
+      "citation": "FAA Order 6750.16E, Siting Criteria for Instrument Landing Systems (April 2014)",
+      "source_url": "https://www.faa.gov/documentLibrary/media/Order/FINAL_SIGNED_Order_6750_16E_ILS_Siting_Criteria_06-09-2014_for_Web_posting[1].pdf"
+    },
+    "additional_source": {
+      "citation": "ACRP Report 108, Guidebook for Energy Facilities Compatibility with Airports and Airspace (2014)",
+      "source_url": "https://crp.trb.org/acrpwebresource2/acrp-report-108-guidebook-for-energy-facilities-compatibility-with-airports-and-airspace/"
+    },
+    "inputs": {
+      "ils_critical_area": "Established near each localizer and glide slope antenna; vehicles and aircraft prohibited during low visibility operations",
+      "emi_source_types_in_data_centers": ["Server power supplies", "Uninterruptible power supplies (UPS)", "Backup generators", "Cooling tower motors and pumps", "Substation equipment", "High-voltage transmission infrastructure"],
+      "interference_principle": "Any structure subtending a vertical angle greater than 1 degree from ILS antenna is usually cause for concern; multipath reflections distort localizer/glide slope signal"
+    },
+    "outputs": {
+      "key_risk": "Data centers emit broadband EMI across UPS, server, generator, and substation infrastructure. The proximity to ILS localizer and glide slope antennas for RWY 19R creates unquantified but plausible multipath interference risk.",
+      "required_study": "FAA Order 6750.16E requires ILS siting study to protect critical area; a structure this close to the approach end would require FAA flight inspection validation",
+      "current_status": "No FAA ADO coordination has occurred; EMI impact is unknown and unquantified — the risk has not been ruled out"
+    },
+    "analyst_note": "ACRP Report 108 specifically identifies high-energy production and transmission facilities as potential sources of navaid interference and recommends compatibility assessment. This assessment is absent from the 2025 planning review."
+  },
+
+  "grant_assurance_exposure": {
+    "calculation_label": "AIP Grant Assurance Risk Assessment",
+    "source": {
+      "citation": "49 U.S.C. § 47107; FAA Airport Sponsor Assurances (May 2022 version)",
+      "source_url": "https://www.faa.gov/airports/aip/grant_assurances/assurances-airport-sponsors"
+    },
+    "enforcement_source": {
+      "citation": "14 CFR Part 16, Rules of Practice for Federally-Assisted Airport Enforcement Proceedings; 49 U.S.C. § 46301",
+      "source_url": "https://www.ecfr.gov/current/title-14/chapter-I/subchapter-B/part-16"
+    },
+    "assurances_at_risk": {
+      "19_operation_maintenance": {
+        "obligation": "Operate and maintain airport and facilities in serviceable condition; no activity that would interfere with operations",
+        "risk": "Data center generating thermal plumes, EMI, and bright lights in approach corridor constitutes interference with operations"
+      },
+      "20_hazard_removal_mitigation": {
+        "obligation": "Take appropriate action to ensure terminal airspace is cleared and protected; prevent future airport hazards",
+        "risk": "Permitting new development that introduces thermal, EMI, lighting, and wildlife hazard constitutes establishing a new airport hazard"
+      },
+      "21_compatible_land_use": {
+        "obligation": "Restrict use of land adjacent to or in immediate vicinity of airport to activities and purposes compatible with normal airport operations including landing and takeoff of aircraft",
+        "risk": "Data center with cooling infrastructure, EMI sources, bright lights, and associated stormwater retention is not compatible with normal precision instrument approach operations"
+      },
+      "22_economic_nondiscrimination": {
+        "obligation": "Make airport available for aeronautical activities on reasonable terms; not grant exclusive right for use of airport",
+        "risk": "Occupying strategic approach-end land with non-aeronautical use could impair future aeronautical access to that corridor"
+      },
+      "29_airport_layout_plan": {
+        "obligation": "Maintain current layout plan; Secretary must review and approve alterations; no alterations that adversely affect safety, utility, or efficiency of aircraft operations",
+        "risk": "Data center is not on approved ALP; was not designated during master planning; adding it requires FAA ALP review and approval under SOP 2.00",
+        "statutory_basis": "49 U.S.C. § 47107(a)(16)"
+      }
+    },
+    "enforcement_consequences": {
+      "administrative": "FAA Director's Determination via Part 16 proceeding; corrective-action order",
+      "financial": "Withholding of future AIP grants; civil penalties up to 3× illegally diverted revenue (49 U.S.C. § 46301(a)(3))",
+      "worst_case": "Requirement to remove structure and restore land to aeronautical use at airport's cost"
+    }
+  },
+
+  "alp_process_gap": {
+    "calculation_label": "ALP Process Requirements for Non-Aeronautical Development",
+    "source_1": {
+      "citation": "FAA ARP SOP 2.00, Airport Layout Plan Review (effective October 1, 2013)",
+      "source_url": "https://www.faa.gov/sites/faa.gov/files/airports/resources/sops/arp-SOP-200-ALP-Review.pdf"
+    },
+    "source_2": {
+      "citation": "FAA Memorandum, ALP Approval Preliminary Instructions (October 3, 2024)",
+      "source_url": "https://www.faa.gov/airports/planning_capacity/alp-approval-preliminary-instructions"
+    },
+    "key_findings": {
+      "current_status": "Dulles Master Plan approved by MWAA Board on July 16, 2025; submitted to FAA for concurrence but FAA approval not yet received (as of 2026-07-29)",
+      "non_aeronautical_area_designated": "Areas adjacent to Autopilot Drive — NOT the RWY 19R/1L end area",
+      "process_required": "Adding non-aeronautical development to ALP requires full review applying FAA guidance (ACs, ALP SOP 2.00) equivalent to master planning standards",
+      "three_part_disapproval_test": {
+        "A": "Would materially impact safe and efficient operation of aircraft at, to, or from the airport",
+        "B": "Would adversely affect safety of people or property on ground as result of aircraft operations",
+        "C": "Would adversely affect value of prior federal investments to a significant extent"
+      },
+      "faa_authority": "FAA can disapprove ALP items meeting any one of the three criteria above; cannot approve ALP that would establish new hazards or compromise safety/utility/efficiency"
+    }
+  },
+
+  "opportunity_cost": {
+    "calculation_label": "Strategic Land Value: Approach-End Land vs. Data Center Revenue",
+    "inputs_needed_from_operator": [
+      "Proposed data center lease/revenue terms ($/sq ft/year or total annual rent)",
+      "Estimated runway extension cost per foot (typical range: $5M-$15M per runway foot for major airport)",
+      "Current runway length (9,400 ft) vs. maximum practical extension potential",
+      "Estimated cost to relocate or remove data center if needed for future aeronautical use"
+    ],
+    "analyst_note": "Without operator-supplied data on lease terms and potential extension value, the opportunity cost cannot be calculated with precision. The analytical point stands: approach-end land is the only land on the property that enables runway extension. Once committed to a non-aeronautical use — particularly one with a permanent structure — the option to extend is permanently lost or costs an order of magnitude more to recover. A transparent range is more honest than a point estimate here.",
+    "reference_cost": {
+      "description": "Cost to remove a major non-aeronautical structure from an approach zone and restore aeronautical use, based on general infrastructure economics",
+      "range": "High seven figures to mid-nine figures depending on structure size and remediation requirements",
+      "source": "Analyst construction; no primary source available for site-specific figure"
+    }
+  }
+}

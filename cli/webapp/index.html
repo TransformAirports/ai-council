@@ -7,6 +7,15 @@
 <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
+<div id="app-loading" class="app-loading" role="status" aria-live="polite">
+  <div class="app-loading-card">
+    <div class="app-loading-spinner" aria-hidden="true"></div>
+    <div>
+      <b id="app-loading-title">Loading the Council</b>
+      <span id="app-loading-detail">Reading agents, settings, and recent work…</span>
+    </div>
+  </div>
+</div>
 <div class="shell">
 
   <!-- ───────────── SIDEBAR ───────────── -->
@@ -20,7 +29,7 @@
     </div>
 
     <nav class="side-nav">
-      <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New report</button>
+      <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New Research Report</button>
       <button class="side-link" data-nav="scope"><span class="sl-ic">⛭</span> Fulfill a scope</button>
       <button class="side-link" data-nav="strengthen"><span class="sl-ic">◆</span> Strengthen an argument</button>
       <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
@@ -185,7 +194,14 @@
 
           <label class="field-label">Output format</label>
           <div id="format-pills" class="pill-row"></div>
-          <div id="sources-note" class="sources-note hidden"></div>
+
+          <label class="field-label">Supplemental documents <span class="opt">optional</span></label>
+          <div id="report-dropzone" class="source-dropzone" tabindex="0" role="button" aria-controls="f-files">
+            <input id="f-files" class="hidden" type="file" multiple accept=".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv,.json,.yaml,.yml" />
+            <div class="source-drop-icon">＋</div>
+            <div><b>Choose files or drop them here</b><span>Plans, studies, data, or background material · 40 MB each</span></div>
+          </div>
+          <div id="report-files" class="source-file-list"></div>
         </div>
 
         <!-- step 2 -->
@@ -231,8 +247,13 @@
       <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Fulfill a scope</h1></div>
       <div class="panel">
         <p class="muted" style="margin-top:0;">Hand the Council a client scope of work — an RFP, a statement of work, an emailed scope — and it plans every required deliverable, researches the grounding, and builds the full set: Word documents, PowerPoint decks, assessments, guides. You approve the plan before production begins, and review the acceptance audit before packaging.</p>
-        <div id="scope-sources" class="sources-note hidden"></div>
-        <div id="scope-nosources" class="auth-banner hidden">No scope documents found. Drop the scope (PDF, Word, or text) into the <code>sources/</code> folder, then reload this page.</div>
+        <div class="section-head sub"><h3>Scope and supplemental documents</h3><span class="muted scope-required-note">At least one document required</span></div>
+        <div id="scope-dropzone" class="source-dropzone" tabindex="0" role="button" aria-controls="s-files">
+          <input id="s-files" class="hidden" type="file" multiple accept=".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv,.json,.yaml,.yml" />
+          <div class="source-drop-icon">＋</div>
+          <div><b>Choose files or drop them here</b><span>Add the RFP, statement of work, email, and supporting material · 40 MB each</span></div>
+        </div>
+        <div id="scope-files" class="source-file-list"></div>
         <label class="field-label" for="s-title">Engagement name</label>
         <input id="s-title" class="text-input" placeholder="e.g. SMS Role-Based Training Development" />
         <label class="field-label" for="s-notes">Notes for the planner <span class="opt">optional</span></label>
@@ -243,6 +264,7 @@
         </div>
         <p class="field-hint">A multi-deliverable engagement is a large run — expect several hours and substantially more than a single report. The plan checkpoint shows you exactly what will be built before production spends anything.</p>
         <button id="scope-launch" class="btn-primary big">⛭&nbsp; Plan the engagement</button>
+        <div id="scope-auth" class="auth-banner hidden"></div>
       </div>
     </section>
 
@@ -250,7 +272,7 @@
     <section id="view-strengthen" class="view hidden">
       <div class="page-head"><button class="back-btn" data-nav="home">← Home</button><h1>Strengthen an argument</h1></div>
       <div class="panel argument-intro">
-        <p class="muted">Give the Council an argument in text, supporting documents, or both. The research lenses you choose find the evidence and counterevidence that matter; the Council returns one concise, source-checked argument. It can also turn that argument into a presentation with exactly the slide count you specify.</p>
+        <p class="muted">Give the Council an argument in text, supporting documents, or both. One focused research wave tests the evidence and counter-case; the Council returns a source-checked, one-page Word memo in direct English and, when selected, a sharp presentation with the exact slide count you specify.</p>
       </div>
 
       <div class="panel">
@@ -271,19 +293,20 @@
         <textarea id="a-goal" class="text-input" rows="3" maxlength="4000" placeholder="What needs strengthening? For example: prove the mechanism, find airport precedents, quantify the exposure, or answer a specific objection."></textarea>
 
         <label class="field-label">Supplemental documents <span class="opt">optional</span></label>
-        <div id="argument-dropzone" class="argument-dropzone" tabindex="0" role="button" aria-controls="a-files">
+        <div id="argument-dropzone" class="source-dropzone" tabindex="0" role="button" aria-controls="a-files">
           <input id="a-files" class="hidden" type="file" multiple accept=".pdf,.docx,.pptx,.xlsx,.md,.txt,.csv,.json,.yaml,.yml" />
-          <div class="argument-drop-icon">＋</div>
+          <div class="source-drop-icon">＋</div>
           <div><b>Choose files or drop them here</b><span>PDF, Word, PowerPoint, Excel, Markdown, or text · 40 MB each</span></div>
         </div>
-        <div id="argument-files" class="argument-file-list"></div>
+        <div id="argument-files" class="source-file-list"></div>
       </div>
 
       <div class="panel">
         <div class="panel-head argument-council-head">
           <div><h2>2 · Choose the research lenses</h2><p class="muted" id="argument-seated-count">0 agents seated</p></div>
           <div class="preset-row">
-            <button class="ghost-btn" data-argument-preset="default">Balanced airport council</button>
+            <button class="ghost-btn" data-argument-preset="fast">Fast core · 4 lenses</button>
+            <button class="ghost-btn" data-argument-preset="default">Balanced · 8 lenses</button>
             <button class="ghost-btn" data-argument-preset="all">All standard</button>
             <button class="ghost-btn" data-argument-preset="none">Clear</button>
           </div>
@@ -296,17 +319,17 @@
         <div class="argument-output-grid">
           <div class="argument-output-card selected">
             <div class="argument-output-check">✓</div>
-            <div><b>Strengthened argument</b><span>Always included · concise Markdown, not a long-form report</span></div>
+            <div><b>One-page Word memo</b><span>Always included · 350–550 words, source-checked, plain English</span></div>
           </div>
-          <label class="argument-output-card optional" for="a-pptx">
-            <input type="checkbox" id="a-pptx" />
-            <div><b>PowerPoint presentation</b><span>Optional · built from the verified argument</span></div>
+          <label class="argument-output-card optional selected" for="a-pptx">
+            <input type="checkbox" id="a-pptx" checked />
+            <div><b>PowerPoint presentation</b><span>Selected by default · one claim per slide, built from the verified memo</span></div>
           </label>
         </div>
-        <div id="argument-slide-field" class="argument-slide-field hidden">
+        <div id="argument-slide-field" class="argument-slide-field">
           <label for="a-slide-count">Exact slide count</label>
-          <input id="a-slide-count" class="num-input" type="number" min="3" max="30" step="1" value="10" />
-          <span>3–30 slides; the production contract enforces this exact number.</span>
+          <input id="a-slide-count" class="num-input" type="number" min="3" max="30" step="1" value="6" />
+          <span>Six is the sharp default; 3–30 slides are supported.</span>
         </div>
         <div class="launch-row argument-launch-row">
           <div class="budget-field"><label for="a-budget">Claude budget ceiling&nbsp;$</label><input id="a-budget" class="num-input" type="number" min="0" step="5" value="60" /></div>

@@ -1,0 +1,215 @@
+{
+  "analysis_id": "quiet-by-design-mwaa-terminals-quant-v1",
+  "analyst": "quantitative-analyst",
+  "date": "2026-08-07",
+  "airport_or_entity": "MWAA / IAD / DCA",
+  "purpose": "Provide reproducible arithmetic and scenarios for a MWAA quiet-by-design terminal standard covering acoustics, PA zoning, and passenger-communication redundancy.",
+  "conventions": {
+    "currency": "USD, nominal, year-of-source unless labeled",
+    "acoustic_targets": {
+      "STI_unit": "unitless [0.00-1.00] per IEC 60268-16",
+      "NC_unit": "Noise Criterion curves per ANSI/ASA S12.2",
+      "RT60_unit": "seconds, mid-frequency (500-2000 Hz)",
+      "LAeq_unit": "A-weighted equivalent continuous sound pressure level in dB",
+      "SNR_unit": "dB(A), announcement level minus ambient LAeq"
+    },
+    "labels": {
+      "SOURCE": "value from cited source; verifiable",
+      "ASSUMPTION": "analyst-supplied working number, labeled as such",
+      "COMPUTED": "derived from listed inputs by stated formula"
+    }
+  },
+  "exhibits": [
+    {
+      "id": "E1_design_vs_retrofit_cost",
+      "title": "Acoustic treatment: design-time vs. retrofit unit-cost delta",
+      "why_it_matters": "The economic case for a quiet-by-design standard is that acoustic and PA specification is materially cheaper when it enters the program brief before schematic design freezes finish palette and ceiling geometry. Retrofit removes and replaces work already installed and paid for.",
+      "inputs": [
+        {"name": "acoustic_ceiling_new_build_low", "value": 5.00, "units": "USD/sqft installed", "label": "SOURCE", "source_ref": "designtransitionstudio_acoustical_ceiling_2026"},
+        {"name": "acoustic_ceiling_new_build_high", "value": 15.00, "units": "USD/sqft installed", "label": "SOURCE", "source_ref": "designtransitionstudio_acoustical_ceiling_2026"},
+        {"name": "acoustic_retrofit_low", "value": 18.00, "units": "USD/sqft installed", "label": "SOURCE", "source_ref": "acousticmod_retrofit_vs_newconstruction_2026"},
+        {"name": "acoustic_retrofit_high", "value": 45.00, "units": "USD/sqft installed", "label": "SOURCE", "source_ref": "acousticmod_retrofit_vs_newconstruction_2026"},
+        {"name": "concourse_E_area_sqft", "value": 435000, "units": "sqft", "label": "SOURCE", "source_ref": "flydulles_next_2026"}
+      ],
+      "formulas": [
+        "retrofit_premium_low = acoustic_retrofit_low - acoustic_ceiling_new_build_high",
+        "retrofit_premium_high = acoustic_retrofit_high - acoustic_ceiling_new_build_low",
+        "concourse_E_new_build_cost_range = concourse_E_area_sqft * [new_build_low, new_build_high]",
+        "concourse_E_retrofit_cost_range = concourse_E_area_sqft * [retrofit_low, retrofit_high]",
+        "retrofit_delta_at_concourse_E = concourse_E_retrofit_cost_range - concourse_E_new_build_cost_range"
+      ],
+      "outputs": {
+        "retrofit_premium_per_sqft_range_USD": [3, 40],
+        "concourse_E_new_build_acoustic_cost_range_USD": [2175000, 6525000],
+        "concourse_E_retrofit_acoustic_cost_range_USD": [7830000, 19575000],
+        "retrofit_extra_spend_range_USD": [1305000, 17400000],
+        "midpoint_retrofit_premium_USD": 6810000
+      },
+      "sensitivity": {
+        "scenario_50pct_ceiling_only": "If quiet-by-design touches only 50% of concourse area (holdrooms + circulation, excluding back-of-house), premium range halves.",
+        "scenario_50pct_ceiling_only_range_USD": [652500, 8700000]
+      },
+      "caveats": [
+        "Cost sources are 2026 commercial contractor benchmarks, not airport-specific bid data. Airport secure-side installation adds badging, escort, and after-hours premium that these figures do not capture.",
+        "Range spans product spec (NRC 0.55 to 0.95+) as well as install complexity. Airport terminal ceilings typically require the higher end due to height, MEP coordination, and fire-rating.",
+        "This is the ceiling-only delta. Full acoustic package (walls, floor, PA zoning, absorptive fixtures) is materially larger; the ratio between design-time and retrofit tends to be similar."
+      ]
+    },
+    {
+      "id": "E2_acoustic_share_of_terminal_cost",
+      "title": "Acoustic package as a share of a mid-scale MWAA concourse build",
+      "why_it_matters": "Frames the size of the specification decision relative to the program the Board is approving. If the incremental acoustic ask is fractions of a percent of concourse cost, the debate is not affordability — it is discipline.",
+      "inputs": [
+        {"name": "concourse_E_budget_low_USD", "value": 500000000, "units": "USD", "label": "SOURCE", "source_ref": "dcist_concourse_e_2022"},
+        {"name": "concourse_E_budget_high_USD", "value": 900000000, "units": "USD", "label": "SOURCE", "source_ref": "travelagentcentral_20b_plan_2026"},
+        {"name": "concourse_E_area_sqft", "value": 435000, "units": "sqft", "label": "SOURCE", "source_ref": "flydulles_next_2026"},
+        {"name": "acoustic_package_new_build_low_USD", "value": 2175000, "units": "USD", "label": "COMPUTED", "note": "from E1"},
+        {"name": "acoustic_package_new_build_high_USD", "value": 6525000, "units": "USD", "label": "COMPUTED", "note": "from E1"}
+      ],
+      "formulas": [
+        "concourse_E_cost_per_sqft_range = budget_range / area = [500M/435k, 900M/435k]",
+        "acoustic_share_of_budget = acoustic_package_new_build_range / concourse_E_budget_range"
+      ],
+      "outputs": {
+        "concourse_E_all_in_cost_per_sqft_USD": [1149, 2069],
+        "acoustic_share_of_budget_pct_range": [0.24, 1.31],
+        "acoustic_share_of_cost_per_sqft_pct": [0.24, 1.30]
+      },
+      "caveats": [
+        "Concourse E budget figures span reporting dates (2022 through 2026) and may reflect scope, phasing, and inflation differences. The upper number is press reporting on the current program; the lower is the earlier board-adopted figure.",
+        "Acoustic share is ceiling-treatment only; a full package including PA zoning hardware and absorptive wall systems is 2-3x this share but still under 5% of program cost in any plausible scenario."
+      ]
+    },
+    {
+      "id": "E3_intelligibility_criteria_table",
+      "title": "Speech-intelligibility criteria that a MWAA standard would inherit",
+      "why_it_matters": "A quiet-by-design standard cannot go below the intelligibility floor set by code and consensus practice. These numbers set that floor and give MWAA a defensible ceiling for how quiet 'quiet' is allowed to be.",
+      "criteria_rows": [
+        {"source": "NFPA 72 (2022) Chapter 24 — Emergency Communications Systems", "metric": "STI (measured)", "threshold": "avg >= 0.50 per Acoustically Distinguishable Space; at least 90% of measurement points >= 0.45", "equivalent_CIS": ">= 0.70", "scope": "voice evacuation and mass notification, code-binding"},
+        {"source": "IEC 60268-16 Annex G", "metric": "STI target for voice-address (VA) systems", "threshold": ">= 0.50", "equivalent_CIS": ">= 0.70", "scope": "consensus target for public-address, non-emergency"},
+        {"source": "ACRP Research Report 175 (TRB, 2017)", "metric": "STI target range", "threshold": "0.46 to 0.53 acceptable; target 0.50 for terminal PA", "equivalent_CIS": "~0.66-0.73", "scope": "airport terminal PA design guideline"},
+        {"source": "ACRP Report 175, pier-style departure lounge study", "metric": "SNR at listener", "threshold": ">= 10 dB(A) announcement level above ambient LAeq; STI floor 0.45", "equivalent_CIS": "n/a", "scope": "holdroom-specific evidence-based recommendation"},
+        {"source": "ANSI/ASA S12.60 (schools; used here as a benchmark for low-stimulation zones only)", "metric": "background sound", "threshold": "<= 35 dB(A), roughly NC 27, for core learning space", "equivalent_CIS": "n/a", "scope": "benchmark for MWAA-defined sensory-quiet spaces, not for main terminal"}
+      ],
+      "MWAA_recommended_translation": {
+        "mandatory_floor": "STI >= 0.50 average, >= 0.45 at 90% of measurement points, tested per ADS at commissioning and re-verified every 5 years or after any material acoustic change. Aligns MWAA with NFPA 72 for emergency and IEC 60268-16 for non-emergency VA.",
+        "SNR_target": ">= 10 dB(A) announcement-to-ambient in holdrooms and passenger-processing zones; recorded during commissioning at defined listener positions.",
+        "sensory_quiet_zone_target": "<= 40 dB(A) ambient LAeq during typical operating hour; no PA except emergency; NC 30-35 background criterion. This is analyst-recommended, not code-mandatory."
+      }
+    },
+    {
+      "id": "E4_announcement_burden",
+      "title": "Announcement-density arithmetic: how much PA output a busy MWAA holdroom actually produces",
+      "why_it_matters": "The 'silent airport' framing turns on how much announcement time a terminal produces per hour. If PA output is compressed by 60-80% at busy hubs like IAD, the acoustic ceiling loosens, letting designers hit ambient LAeq targets that are otherwise infeasible.",
+      "inputs": [
+        {"name": "IAD_2025_total_passengers_M", "value": 29.0, "units": "million passengers", "label": "SOURCE", "source_ref": "mwaa_2025_traffic_iad"},
+        {"name": "IAD_operating_hours_per_year", "value": 6570, "units": "hours", "label": "ASSUMPTION", "note": "18 hours/day * 365 days; represents effective PA-eligible hours"},
+        {"name": "avg_holdroom_boardings_per_hour_peak", "value": 12, "units": "gates simultaneously boarding", "label": "ASSUMPTION", "note": "typical peak at a wide-body concourse; not a measured MWAA number"},
+        {"name": "announcements_per_boarding_current_practice", "value": 6, "units": "distinct PA calls", "label": "ASSUMPTION", "note": "board-by-zone practice: pre-boarding, priority, 4 zones"},
+        {"name": "avg_announcement_duration_sec", "value": 20, "units": "seconds", "label": "ASSUMPTION"},
+        {"name": "announcements_per_boarding_reduced_practice", "value": 2, "units": "distinct PA calls", "label": "ASSUMPTION", "note": "final-call + all-zones-open only, per Helsinki/LCY model"}
+      ],
+      "formulas": [
+        "current_PA_seconds_per_gate_hour = announcements_per_boarding_current * avg_announcement_duration_sec",
+        "reduced_PA_seconds_per_gate_hour = announcements_per_boarding_reduced * avg_announcement_duration_sec",
+        "PA_duty_cycle_current_pct = current_PA_seconds_per_gate_hour / 3600",
+        "PA_duty_cycle_reduced_pct = reduced_PA_seconds_per_gate_hour / 3600",
+        "PA_time_reduction_pct = 1 - (reduced / current)"
+      ],
+      "outputs": {
+        "current_PA_seconds_per_gate_per_hour": 120,
+        "reduced_PA_seconds_per_gate_per_hour": 40,
+        "PA_duty_cycle_current_pct": 3.3,
+        "PA_duty_cycle_reduced_pct": 1.1,
+        "PA_time_reduction_pct": 66.7
+      },
+      "acoustic_implication": "A 60-70% cut in PA time is roughly the announcement-density delta between a typical US hub concourse and Helsinki/London City-style operating models. The lower duty cycle materially reduces the LAeq contribution of PA to the ambient soundscape and permits softer per-announcement gain, which in turn improves intelligibility for the announcements that do run.",
+      "caveats": [
+        "Announcement-per-boarding and duration inputs are professional estimates for a mainline US concourse, NOT measured MWAA data. Actual MWAA operator data (PA logs, VOIP paging telemetry) would replace these.",
+        "Reduction of PA time does not translate one-for-one into lower LAeq; the acoustic effect depends on gain setting, loudspeaker directivity, and background sound. This exhibit sizes the operational input, not the acoustic response."
+      ]
+    },
+    {
+      "id": "E5_communication_channel_redundancy_cost",
+      "title": "Cost of the redundant visual, digital, and staffed channels that a quiet standard implies",
+      "why_it_matters": "The quiet-by-design case fails on accessibility grounds unless the standard mandates equivalent-or-better information delivery through non-audio channels. That mandate has capital and operating cost consequences that the standard must own.",
+      "inputs": [
+        {"name": "IAD_gates_current", "value": 139, "units": "gates", "label": "ASSUMPTION", "note": "approximate current IAD gate count across Concourses A/B/C/D + Concourse E phase 1; MWAA public counts vary by counting rule"},
+        {"name": "DCA_gates_current", "value": 59, "units": "gates", "label": "ASSUMPTION", "note": "post-Project Journey; MWAA public counts vary"},
+        {"name": "gate_area_fids_display_cost_low_USD", "value": 8000, "units": "USD per gate", "label": "ASSUMPTION", "note": "commercial-grade high-brightness display + mount + integration"},
+        {"name": "gate_area_fids_display_cost_high_USD", "value": 18000, "units": "USD per gate", "label": "ASSUMPTION", "note": "larger format + redundant unit + AV integration"},
+        {"name": "mobile_notification_platform_annual_opex_USD", "value": 500000, "units": "USD/year", "label": "ASSUMPTION", "note": "SMS/push notification integration with airline flight ops; scales with volume"}
+      ],
+      "formulas": [
+        "gate_display_capex_range_MWAA = (IAD_gates + DCA_gates) * [display_cost_low, display_cost_high]"
+      ],
+      "outputs": {
+        "MWAA_gate_display_capex_range_USD": [1584000, 3564000],
+        "mobile_notification_platform_5yr_TCO_USD": 2500000,
+        "combined_channel_redundancy_5yr_range_USD": [4084000, 6064000]
+      },
+      "caveats": [
+        "These are order-of-magnitude numbers to size the ask, not vendor quotes. Actual capital would flow through MWAA IT and airline tenant systems.",
+        "The relevant counter-question is not 'can MWAA afford this' — combined range is ~0.03% of the $20B+ IAD program — but 'who owns the operating burden' when gate FIDS and airline PA are on different systems.",
+        "This exhibit assumes MWAA does NOT pass the cost to airlines under the 2025 use agreement. If passed through, this becomes a CPE line and would need to be sized against the projected 2030 CPE of $20.71."
+      ]
+    },
+    {
+      "id": "E6_CPE_impact",
+      "title": "Cost-per-enplanement sensitivity of the quiet-by-design capital stack",
+      "why_it_matters": "If the standard is bundled into a $20B+ Dulles program, the CPE effect is buried. If it is presented as a discrete line item to the airline majority-in-interest, the number needs to be defensible against the ~$20.71 CPE ceiling MWAA already projected for 2030.",
+      "inputs": [
+        {"name": "IAD_2025_enplanements_M", "value": 14.5, "units": "million enplanements", "label": "COMPUTED", "note": "approximate: total passengers / 2; used for order-of-magnitude only"},
+        {"name": "DCA_2025_enplanements_M", "value": 12.45, "units": "million enplanements", "label": "COMPUTED", "note": "approximate: total passengers / 2"},
+        {"name": "MWAA_combined_enplanements_M", "value": 26.95, "units": "million enplanements", "label": "COMPUTED"},
+        {"name": "MWAA_projected_2030_CPE_USD", "value": 20.71, "units": "USD per enplanement", "label": "SOURCE", "source_ref": "mwaa_2025_official_statement"},
+        {"name": "quiet_standard_incremental_capex_low_USD", "value": 12000000, "units": "USD, one-time", "label": "COMPUTED", "note": "sum of E1 low + E5 low"},
+        {"name": "quiet_standard_incremental_capex_high_USD", "value": 40000000, "units": "USD, one-time", "label": "COMPUTED", "note": "sum of E1 high + E5 high + program-wide contingency"},
+        {"name": "debt_service_factor", "value": 0.075, "units": "annual debt service per USD principal", "label": "ASSUMPTION", "note": "30-year AMT revenue bond at ~4.4% coupon plus reserve; approximates the MWAA cost of capital observed in the June 2025 issuance"}
+      ],
+      "formulas": [
+        "annual_debt_service = capex * debt_service_factor",
+        "CPE_impact = annual_debt_service / combined_enplanements"
+      ],
+      "outputs": {
+        "annual_debt_service_range_USD": [900000, 3000000],
+        "CPE_impact_range_USD_per_enplanement": [0.033, 0.111],
+        "CPE_impact_as_pct_of_2030_projected_CPE": [0.16, 0.54]
+      },
+      "sensitivity": {
+        "if_incremental_capex_doubles_USD": [24000000, 80000000],
+        "if_incremental_capex_doubles_CPE_impact_range": [0.067, 0.223],
+        "if_only_new_construction_covered": "The standard applied only to Concourse E and future Tier-2/Tier-3 concourses would spread the same capex over a longer schedule and roll into program financing already contemplated; incremental CPE effect approaches zero."
+      },
+      "caveats": [
+        "Enplanements computed as passengers/2 is an approximation; actual O&D vs connecting mix at IAD (a hub) means the true enplanement count differs. This is order-of-magnitude only. Replace with MWAA's ACFR enplanement figures for a defensible board-facing number.",
+        "Debt-service factor is a heuristic. Real MWAA structure includes senior/subordinate lien, cap-i, and grant funding that materially soften the CPE hit for eligible components (federal grants for accessibility-supporting technology are the interesting angle).",
+        "Bundled into a $20B+ program, the standalone CPE case is not the political test. The political test is whether the majority-in-interest carriers will consent to the standard as part of the larger consent package."
+      ]
+    },
+    {
+      "id": "E7_IAD_vs_DCA_context_delta",
+      "title": "Why one standard cannot mean identical prescriptions at IAD and DCA",
+      "why_it_matters": "The standard is 'common' at the requirement layer, not the prescription layer. This exhibit shows the physical and operational deltas that force different implementations of the same targets.",
+      "comparison_rows": [
+        {"metric": "2025 total passengers (M)", "IAD": 29.0, "DCA": 24.9, "delta_pct": 16.5, "source_ref_IAD": "mwaa_2025_traffic_iad", "source_ref_DCA": "mwaa_2025_traffic_dca"},
+        {"metric": "Traffic trajectory", "IAD": "growing to ~90M master plan envelope", "DCA": "declining from 26.3M in 2024; near physical envelope", "delta_pct": "n/a", "source_ref_IAD": "mwaa_master_plan_2025", "source_ref_DCA": "mwaa_2025_traffic_dca"},
+        {"metric": "International share (M)", "IAD": 10.5, "DCA": "de minimis (perimeter rule + 10 slot exemptions)", "delta_pct": "n/a", "source_ref_IAD": "mwaa_2025_traffic_iad", "source_ref_DCA": "faa_reauth_2024"},
+        {"metric": "Terminal historic-preservation constraint", "IAD": "Saarinen main terminal preserved; new build governs concourses", "DCA": "Terminal 1 (Bolling, 1941) is Historic District; Terminal 2 (Pelli) has strong architectural intent", "delta_pct": "n/a", "source_ref_IAD": "context_packet_sec5_1", "source_ref_DCA": "context_packet_sec5_2"},
+        {"metric": "Announcement-content mix", "IAD": "boarding + connecting + international transfer + CBP + wayfinding", "DCA": "boarding + short-dwell wayfinding + security", "delta_pct": "n/a", "source_ref_IAD": "analyst_construction", "source_ref_DCA": "analyst_construction"}
+      ],
+      "standard_design_implications": [
+        "Requirement-level convergence: STI >= 0.50, SNR >= 10 dB(A), commissioning-verified per ADS, sensory-quiet zones defined by policy.",
+        "Prescription-level divergence: IAD new-build lets designers pick acoustic ceilings, absorptive walls, and PA zoning ex ante; DCA retrofits at Terminals 1 and 2 must reach the same STI target through absorptive-object placement, PA re-aiming, and directional loudspeakers rather than ceiling replacement.",
+        "Announcement-governance divergence: IAD's international content mix pushes toward multilingual visual-first display and staffed information rather than PA density; DCA's short-dwell short-distance mix permits a lower PA duty cycle without accessibility penalty if visual channels are strengthened."
+      ]
+    }
+  ],
+  "evidence_gaps": [
+    "No public MWAA acoustic standard, PA-zoning standard, or announcement-governance policy located. Absence is the operative fact for this run and cannot be substituted with international peer data.",
+    "No published measured STI, RT60, or ambient LAeq data for existing IAD or DCA terminals located in public sources. Operator would need to supply commissioning reports for Concourse E and any prior DCA acoustic surveys.",
+    "London City, Helsinki, Schiphol, and Copenhagen 'silent airport' claims are supported by press releases and passenger-satisfaction narrative — not by published intelligibility measurements or missed-boarding data. Operator-relevant peer benchmarking requires direct FOIA-equivalent requests to those operators.",
+    "Missed-boarding rate at IAD and DCA under current PA practice is not public. Airline no-show industry ranges (5-18%) conflate no-shows with missed-boarding-at-gate; the latter would be the direct control number for an announcement-reduction pilot.",
+    "PA duty-cycle, gate-boarding-call scripts, and IAD/DCA holdroom acoustic finish inventories are operator data. Everything in Exhibit E4 collapses if any of these become measurable inputs."
+  ]
+}

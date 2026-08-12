@@ -1,0 +1,109 @@
+# Regulatory and Political Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Author:** Regulatory-Political Analyst
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Date:** 2026-08-07
+**Length:** ~2,300 words
+
+---
+
+## Frame
+
+A "quiet-by-design" standard is not primarily an acoustics problem. It is a codified operator standard that has to survive four layers of federal preemption, a signatory-carrier lease that MWAA just re-executed for fifteen years, a heightened DCA safety environment created by a fatal midair collision on January 29, 2025, and a bond market that is about to underwrite a $20–22.5B Dulles program. The engineering community will treat the constraint as NFPA 72 speech intelligibility and TSA security messaging. Those are floors. The binding ceilings are political and contractual, and they sit above the design manual, not inside it.
+
+The good news for the Strategist: most of the binding forces here are on MWAA's side of the fence. The **MWAA Design Manual** has "the force of law on the Airport" for anyone designing or building on MWAA property [Source: https://www.mwaa.com/sites/mwaa.com/files/2021-09/01_DM_2020.pdf]. That is a policy lever a design-manual amendment can pull without new federal rulemaking, without airline consent for common-use standards, and without congressional action. The bad news: the pieces that touch **airline gate operations, TSA checkpoint messaging, CBP FIS communications, and DCA political optics** cannot be pulled that way, and the standard has to acknowledge them explicitly or it will collapse the first time a signatory carrier or a federal partner tests it.
+
+---
+
+## Key Findings
+
+1. **The MWAA Design Manual is the vehicle. Nothing else is.** The 2020 Design Manual is described as "a mandatory guide" with "the force of law on the Airport" [Source: https://www.mwaa.com/sites/mwaa.com/files/2021-09/01_DM_2020.pdf]. A quiet-by-design standard adopted there governs every new-build and substantially renovated space at IAD and DCA without a board vote, without airline majority-in-interest approval, and without a rate-and-charge fight — provided it does not force capital cost increases that trigger MII review under the 2025 U&L.
+
+2. **NFPA 72 sets a hard technical floor: STI ≥ 0.50 in required areas.** The 2022 edition of NFPA 72 requires a Speech Transmission Index of 0.50 minimum (Common Intelligibility Scale ~0.70) for voice evacuation systems in the areas the code designates [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/]. Any "quiet" design that reduces reverberation control, PA power, or loudspeaker density below what commissioning-verified STI 0.50 requires is not just poor practice — it fails building code as adopted by Fairfax, Loudoun, and Arlington counties through MWAA's own building code adoption.
+
+3. **The DCA 1,250-mile perimeter rule and slot cap are the canonical case of a policy Congress cannot move.** Section 502 of the FAA Reauthorization Act of 2024 (Pub. L. 118-63, enacted May 16, 2024) added 10 beyond-perimeter exemptions after H.R. 3185/S. 1933 had sought 56 [Source: https://www.everycrsreport.com/reports/IN12504.html]. That is the fifth congressional round of DCA slot bargaining (2000, 2003, 2012, 2018, 2024) and it produced a fractional change. **The lesson for a quiet-by-design standard: any element that requires an act of Congress to enforce will not be enforced on this decade's construction timeline.** Design around what MWAA controls.
+
+4. **The DCA political environment after January 29, 2025 has raised the cost of any change that touches emergency communication.** Local officials, MWAA staff, and airline safety leaders have publicly framed the fatal midair collision as a factor in DCA operational and safety decisions going forward (context packet, §7). Reducing announcements at DCA — even those that are demonstrably ineffective — is now a political act that will attract NTSB, congressional, and press attention. IAD does not carry that overhang. **The standard must permit divergent DCA/IAD announcement policies or it will get rejected on DCA political grounds and drag the IAD case down with it.**
+
+5. **ADA effective-communication rules require visual counterparts, and DOT recently tightened them.** 49 CFR § 27.71(i) now requires airport operators to "enable or ensure high-contrast captioning at all times on all televisions and other audio-visual displays" in gate, ticketing, lounge, and common terminal areas at airports with 10,000+ annual enplanements [Source: https://www.corada.com/documents/49-cfr-part-27/subpart-b-accessibility-requirements-in-specific-operating-administration-programs-airports-railroads-and-highways]. A quiet standard that leans on visual channels must fund the visual channels; the regulation makes the caption side non-optional.
+
+6. **The PFC cap of $4.50 has been frozen since 2000 and every FAA reauthorization since has kept it there.** The last statutory increase was in the Wendell H. Ford Aviation Investment and Reform Act signed in 2000, raising the cap from $3 to $4.50 [Source: https://en.wikipedia.org/wiki/Passenger_facility_charge] [Source: https://reason.org/wp-content/uploads/modernizing-passenger-facility-charge.pdf]. This is not a lever available inside the fifteen-year U&L horizon. Any capital element of a quiet-by-design standard has to be funded from bond proceeds, AIP formula and discretionary grants, BIL Airport Terminal Program dollars, or the airline rate base — not from PFC expansion. Assume the ceiling stays at $4.50 through the next reauthorization (FY2029) and probably longer.
+
+7. **The 2025–2039 Use and Lease Agreement is a fifteen-year contract lock that the standard must fit inside.** The current Airport Use Agreement and Premises Lease took effect January 1, 2025 and runs through calendar 2039, alongside a $9.0B joint capital plan (~$7.0B IAD, ~$2.39B DCA) (context packet, §3). Any quiet-by-design element that raises airline-recoverable costs materially will run into majority-in-interest review; the specific MII thresholds in the 2025 U&L are an unresolved gap and should be verified before publication. **The Strategist should distinguish sharply between (a) elements MWAA can adopt without airline MII approval and (b) elements that require it.**
+
+8. **Historic preservation binds the Saarinen main terminal and DCA Terminal 1, and it binds through Section 106 whenever federal funds or approvals are present.** The original Saarinen main terminal is on the National Register (listed 1997), and MWAA has expanded IAD under a Programmatic Memorandum of Agreement (PMOA) with the Virginia SHPO tied to the 1964 Saarinen master plan [Source: https://www.achp.gov/sites/default/files/2021-03/2020_FAA_Section3_ProgressReport.pdf] [Source: https://parametric-architecture.com/trumps-22-5-billion-dulles-airport]. Any interior acoustic intervention in the main terminal envelope — new absorptive treatments, ceiling changes, loudspeaker replacements — should be assumed to trigger PMOA consultation on schedule critical paths.
+
+---
+
+## Evidence — Organized by Binding Force
+
+### 1. What is technically fixed (federal safety and accessibility floors)
+
+**NFPA 72 (2022), Chapter 18 (Notification Appliances) and Chapter 24 (Emergency Communications Systems).** Enforced through local building code adoption. Speech intelligibility in required areas must meet STI ≥ 0.50, verified per Annex D methodology (STIPA measurement) [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/] [Source: https://bedrock-elite.com/applications/alarm-paga-testing]. **What this binds:** any zone the code designates as requiring voice evacuation must be commissioned to STI 0.50 with documented STIPA results. "Quiet" cannot mean fewer or weaker EVACS loudspeakers; it can mean absorptive treatments that improve STI at the same or lower sound-pressure level.
+
+**14 CFR Part 139 (§ 139.325).** Requires an Airport Emergency Plan that includes "a communications network" capable of prompt notification, per FAA AC 150/5200-31C. **Part 139 does not prescribe PA sound-pressure levels, STI thresholds, or paging frequency** for terminal announcements. This is important: Part 139 is not the reason terminals are loud. Operator policy and NFPA 72 are.
+
+**49 CFR § 27.71 — Airport facilities (DOT ADA rule).** Applies to every DOT-financial-assistance recipient at a commercial service airport. Subsection (i) requires high-contrast captioning at all times on all TVs and audio-visual displays in gate, ticketing, lounge, and common terminal areas at 10,000+ enplanement airports [Source: https://www.corada.com/documents/49-cfr-part-27/subpart-b-accessibility-requirements-in-specific-operating-administration-programs-airports-railroads-and-highways] [Source: https://www.ecfr.gov/current/title-49/subtitle-A/part-27/subpart-B/section-27.71]. The Air Carrier Access Act (14 CFR Part 382) adds airline-side obligations for effective communication at gates, including visual counterparts to audible flight information. **What this binds:** any "muted televisions" element must specify captioning, not muting alone; any "visual-first" element still requires audible counterparts for blind and low-vision passengers, and vice versa.
+
+**TSA required security messaging.** TSA retains authority over checkpoint messaging and security announcements; airport-general security announcements (e.g., unattended-bag reminders) are operator-implemented against TSA guidance. Current TSA guidance on cadence, wording, and multilingual coverage was not verifiable in this pass and is a **named research gap.** **What this binds:** any announcement-governance standard has to route non-emergency TSA messaging through a TSA-approved script and cannot unilaterally suppress it.
+
+**CBP FIS-hall communication.** CBP governs communication and signage inside the sterile international arrivals process at the IAD FIS. Anything airside of the FIS entry doors — including announcement policy inside the sterile hall — needs CBP concurrence, not just MWAA approval. **What this binds:** the IAD international-arrivals experience cannot be standardized purely by MWAA design manual language.
+
+### 2. What is politically fixed (Congress-set, decade-plus half-lives)
+
+**DCA slot and perimeter rule (49 U.S.C. § 41714 and FAA reauthorization additions).** Section 502 of Pub. L. 118-63 added 10 beyond-perimeter exemptions in 2024, against a bill (H.R. 3185/S. 1933) that had sought 56 [Source: https://www.everycrsreport.com/reports/IN12504.html]. MWAA officially opposed the expansion, arguing "the DC region is well served by the bigger IAD, which is located about 30 miles west" [Source: https://www.everycrsreport.com/reports/IN12504.html]. **Relevance to quiet-by-design:** the DCA traffic profile is now marginally busier per gate than it was in 2023, and the marginal beyond-perimeter flights concentrate at peaks. Announcement density at DCA Terminal 2 gates will not go down on its own.
+
+**PFC cap frozen at $4.50 since 2000.** Every FAA reauthorization since (2003, 2012, 2018, 2024) has left it there [Source: https://en.wikipedia.org/wiki/Passenger_facility_charge]. ACI-NA and airport lobbies have been pressing DOT and Congress for an increase since at least 2017 [Source: https://aviationweek.com/air-transport/airports-networks/aci-na-meeting-dot-push-pfc-increase]. **Relevance:** do not assume PFC-funded terminal enhancements as a way to underwrite quiet-by-design capital. The next realistic window is the FY2029 reauthorization cycle, i.e., after Concourse E opens and while the expanded Dulles program is in its early construction years.
+
+**Federal AIP formula/discretionary split and BIL aviation dollars.** AIP formula grants at large hubs top out well below what a $20–22.5B program consumes; the discretionary tranche is competitive and politically allocated. BIL's Airport Terminal Program (FY22–FY26 appropriations) provided a supplemental terminal-specific pot. **Relevance:** federal terminal grants prefer visible passenger-experience elements. Acoustics, absorption, and zoned PA infrastructure are grant-fundable when packaged inside a broader accessibility or modernization narrative; specifying them as free-standing "quiet" upgrades reads as amenity spend and grades poorly.
+
+**Metropolitan Washington Airports Act of 1986 (49 U.S.C. §§ 49101–49112).** MWAA is a 17-member board authority: 7 Virginia, 4 D.C., 3 federal, 3 Maryland [Source: https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title49-section49106&num=0&edition=prelim]. Federal appointees (Presidential, with Senate advice and consent) create a political vector that a pure city or state authority does not have. **Relevance:** design-manual amendments do not go to the board; a standard that stays inside operator authority avoids the federal appointment vector entirely.
+
+### 3. What is operator-fixed (MWAA's own instruments, adjustable on MWAA's timeline)
+
+**MWAA Design Manual (August 2020, 7-volume).** "Mandatory guide … with the force of law on the Airport" [Source: https://www.mwaa.com/sites/mwaa.com/files/2021-09/01_DM_2020.pdf]. Current sections on acoustics, PA zoning, EVACS, FIDS, and tenant technology standards are a named gap that should be pulled from MWAA's engineering portal before drafting. This is the correct vehicle.
+
+**2025 U&L (effective Jan 1, 2025; expires Dec 31, 2039).** Fifteen-year contract lock, with a $9.0B linked capital plan (context packet, §3). Specific MII thresholds are an unresolved gap.
+
+**MWAA Design Review process** sits under the Chief Engineer / VP of Engineering. Amendments to the design manual are administrative; changes that materially affect rates or U&L obligations require board notice.
+
+**Concourse E (IAD).** Design is largely frozen; construction underway; opens autumn 2026 (context packet, §4). **This building is not a real test bed for a new standard.** Post-opening measurement can, however, calibrate the standard: STIPA readings, ambient dBA, and reverberation time in a modern MWAA-built concourse would set an empirical baseline for the standard's thresholds.
+
+### 4. The Air Carrier Access Act flank
+
+14 CFR Part 382 (DOT ACAA) makes airlines — not just airports — responsible for effective communication at gates. This is worth flagging because the MWAA quiet-by-design standard cannot silence what airlines are separately required to communicate. Gate-agent boarding announcements, ADA-compliant boarding assistance calls, and irregular-operations messaging live inside airline obligations. **The standard can prescribe how loud, in which zone, and through which equipment — but cannot cut what airlines must communicate.**
+
+---
+
+## Case Studies
+
+**1. DCA slot expansion (2024): politics beat efficiency, again.** MWAA opposed beyond-perimeter expansion in writing. United Airlines, whose Washington hub is IAD, joined the "Coalition to Protect America's Regional Airports" against expansion. Delta and the "Capital Access Alliance" pushed for expansion. Congress delivered 10 slots — a compromise closer to the operator's position than the sponsor's ask [Source: https://www.everycrsreport.com/reports/IN12504.html]. **Read-across:** MWAA's institutional weight at Congress is real when it aligns with a plausible technical position (IAD has the capacity), and a well-constructed quiet-by-design standard that MWAA can point to as safety-and-accessibility-neutral will hold. A standard that reads as brand-work will not.
+
+**2. London City "silent airport" policy: transferability is limited.** LCY publishes a policy that "announcements only [are] made in case of emergency" and directs passengers to screens [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]. LCY is a UK regulator's airport, has no TSA presence, no CBP FIS, no NFPA 72 code adoption, no Part 139 emergency-plan overlay, no signatory-carrier lease structure, and a passenger profile heavily weighted to business travelers on European short-haul. **Read-across:** the LCY policy is a design intent, not a transferable operating model. The MWAA standard should cite it as a target for gate-level ambient conditions, not as an announcement-governance model.
+
+**3. Saarinen main terminal historic preservation on the Dulles expansion.** The $20–22.5B program preserves Saarinen's main terminal explicitly; MWAA has expanded under the Virginia SHPO PMOA for decades [Source: https://parametric-architecture.com/trumps-22-5-billion-dulles-airport] [Source: https://www.achp.gov/sites/default/files/2021-03/2020_FAA_Section3_ProgressReport.pdf]. **Read-across:** acoustic interventions inside the main terminal envelope will be Section 106 / PMOA events. Assume 6–12 months of preservation consultation on any interior finish or ceiling change and plan schedule floats accordingly.
+
+---
+
+## Quotable Lines and Data Points for the Strategist
+
+1. "The MWAA Design Manual is 'a mandatory guide' with 'the force of law on the Airport.' Any quiet-by-design standard that lives there governs every new-build and substantially renovated space at IAD and DCA without a board vote, without MII airline approval, and without congressional action." [Source: https://www.mwaa.com/sites/mwaa.com/files/2021-09/01_DM_2020.pdf]
+
+2. "The PFC cap has been $4.50 since 2000. Every FAA reauthorization since — 2003, 2012, 2018, 2024 — has kept it there. The next realistic window is FY2029, after Concourse E opens." [Source: https://en.wikipedia.org/wiki/Passenger_facility_charge] [Source: https://reason.org/wp-content/uploads/modernizing-passenger-facility-charge.pdf]
+
+3. "NFPA 72 requires a Speech Transmission Index of 0.50 minimum in required areas. Quiet cannot mean weaker EVACS. Quiet means better acoustics that let a smaller PA meet the same STI at a lower dBA." [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/]
+
+4. "In 2024, sponsors sought 56 new DCA beyond-perimeter slots (H.R. 3185/S. 1933). Congress delivered 10 (§ 502, Pub. L. 118-63). MWAA opposed expansion, arguing 'the DC region is well served by the bigger IAD, which is located about 30 miles west.' That is the shape of DCA politics: incremental change, MWAA credible when aligned with a plausible technical position." [Source: https://www.everycrsreport.com/reports/IN12504.html]
+
+5. "49 CFR § 27.71(i) already requires 'high-contrast captioning at all times on all televisions and other audio-visual displays' in gate, ticketing, lounge, and common terminal areas. Muting televisions is not compliance. Captioning is." [Source: https://www.corada.com/documents/49-cfr-part-27/subpart-b-accessibility-requirements-in-specific-operating-administration-programs-airports-railroads-and-highways]
+
+---
+
+## Named Evidence Gaps
+
+- Current MWAA Design Manual (2020, plus any 2021–2025 addenda) sections on acoustics, PA zoning, EVACS, FIDS, and tenant technology standards. Not retrieved in this pass; must be pulled from MWAA's engineering portal.
+- Specific MII thresholds and project-approval categories under the 2025 U&L.
+- Current TSA guidance on required non-emergency terminal security announcements (frequency, wording, multilingual coverage).
+- Executed acoustic performance of existing IAD and DCA terminal spaces (measured ambient dBA, reverberation time, STI). No public measurement on record.
+
+None of these should be inferred; each is a call for primary-source retrieval before publication.

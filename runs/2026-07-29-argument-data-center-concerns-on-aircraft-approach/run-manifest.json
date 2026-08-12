@@ -1,0 +1,2333 @@
+{
+  "argument_identity": {
+    "agents": [
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "contrarian",
+        "prompt_path": ".claude/agents/contrarian.md",
+        "prompt_sha256": "491d1c7841858f5348ceff3083a3d1aa51b301716661e800343d0b87edd86cc3",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "quantitative-analyst",
+        "prompt_path": ".claude/agents/quantitative-analyst.md",
+        "prompt_sha256": "427fd99e778becd4c478ef66739f4d55c7caf6b7e1faf31bbb4a86c34f7edf62",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "airport-coo",
+        "prompt_path": ".claude/agents/airport-coo.md",
+        "prompt_sha256": "e694150da2718462b173a671d9b872764c093f0e85931ae4b6da5dddc000b19c",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "regulatory-political-analyst",
+        "prompt_path": ".claude/agents/regulatory-political-analyst.md",
+        "prompt_sha256": "18d9426b96c3a7f120a5da8c6cfae97277dc576b8d70518ab13b3da2d049b8c1",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "virtual-chris",
+        "prompt_path": ".claude/agents/virtual-chris.md",
+        "prompt_sha256": "5ee19650a79a312b7abe0e2c675a96f84e6e94cac8deb8c75e11040d08cebd81",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "chief-engineer",
+        "prompt_path": ".claude/agents/chief-engineer.md",
+        "prompt_sha256": "4efced33e015065b65cd8c83b3233d1d3117f7b8619a5cf51bf4c0edd4362782",
+        "provider": "anthropic"
+      },
+      {
+        "model": "opus",
+        "name": "strategist",
+        "prompt_path": ".claude/agents/strategist.md",
+        "prompt_sha256": "8ed48a3acf612c41ab4466366c0d98d5773075c301dffb31fdf0528936a1e92d",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-sonnet-4-6",
+        "name": "fact-checker",
+        "prompt_path": ".claude/agents/fact-checker.md",
+        "prompt_sha256": "c574650ae0e6ed65c74295e6c53c2721ebc0d15804116bb5fe6acd92cb825c86",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-fable-5",
+        "name": "art-director",
+        "prompt_path": ".claude/agents/art-director.md",
+        "prompt_sha256": "f5d5113eb720528190e1b266cb6b75caf14a691e3cb681c00af64d618051773f",
+        "provider": "anthropic"
+      },
+      {
+        "model": "claude-fable-5",
+        "name": "presentation-designer",
+        "prompt_path": ".claude/agents/presentation-designer.md",
+        "prompt_sha256": "f19b5c100bc95a70665c82aef01df7896499fd6e1346c15e7d0bc98ac41c453d",
+        "provider": "anthropic"
+      }
+    ],
+    "execution_contract": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "4b62ee0b0a2a30b23430774ced011658e8337510ca227423a9a9b91e597e3d78",
+        "size_bytes": 5208
+      },
+      {
+        "path": "CLAUDE.md",
+        "sha256": "696d773cf49d95fa32b238502d9013e3fc490de652bba59a56337949c48e4fb5",
+        "size_bytes": 5221
+      },
+      {
+        "path": "assets/brand/README.md",
+        "sha256": "93058ab4445feca8ec7f64525f8f8a37eaf3abb4b115bc8dbf8c35b9866627fe",
+        "size_bytes": 2449
+      },
+      {
+        "path": "assets/brand/design-system.json",
+        "sha256": "1b91f59008c98fb41f64b6cd752b57bd81a8aebf7041ad8bf7c2b61c540d16f2",
+        "size_bytes": 1958
+      },
+      {
+        "path": "assets/brand/visual-brief.schema.json",
+        "sha256": "9671bf617f9b98cb8f82d5a672ca261b4027cc98fdaaffc6c9d5a3e0b67386a0",
+        "size_bytes": 11680
+      },
+      {
+        "path": "cli/__init__.py",
+        "sha256": "720ee08148e7b675ac77338d0dc14843b4bef6d5bae605569b42399dfc319f43",
+        "size_bytes": 64
+      },
+      {
+        "path": "cli/__main__.py",
+        "sha256": "3bfc6c80c1a54dd916adeda56fa72d10a612f894f81b6722f878e9c7b7ef6c44",
+        "size_bytes": 13059
+      },
+      {
+        "path": "cli/agents.py",
+        "sha256": "3371cdeebf7e767b2b165136e0ad2e6d3291e85c40aac5a363d3a07c90a1f88d",
+        "size_bytes": 5073
+      },
+      {
+        "path": "cli/archive.py",
+        "sha256": "19ab1afb967e847f5fdf58e80f5bf6bbe0932782ceb42f9551d49daab76936fa",
+        "size_bytes": 20460
+      },
+      {
+        "path": "cli/artifacts.py",
+        "sha256": "a88ff4a1eb9dd09e46cd4062bef5dbcc355087cc356f21ac1c50c1836ce5c2f7",
+        "size_bytes": 8834
+      },
+      {
+        "path": "cli/audit.py",
+        "sha256": "4a9385f74732c732f5baafabf2994cc87feb863fac1ad7766afc6516448d9075",
+        "size_bytes": 31687
+      },
+      {
+        "path": "cli/checkpoints.py",
+        "sha256": "31d1df0469583e16fd8a3e07e84907e480a46550d1b9a16d8fb50ea36477fd73",
+        "size_bytes": 6450
+      },
+      {
+        "path": "cli/claim_text.py",
+        "sha256": "9bbbdeb553e36d768ccfc797545a774f8dcf605ac5ee261dd5f937bbcd381384",
+        "size_bytes": 2342
+      },
+      {
+        "path": "cli/config.py",
+        "sha256": "6251f899b5874f8f155232c88a8e0f57c65a4d1aaf35d3a807ab1362a822f4b9",
+        "size_bytes": 6146
+      },
+      {
+        "path": "cli/docx_builder.py",
+        "sha256": "d6f54cbb1f6b8a2d6a033aaf5cfb11cfc831a6362d9ab7737430e975416e2c66",
+        "size_bytes": 96768
+      },
+      {
+        "path": "cli/evaluation.py",
+        "sha256": "660eb8eb4b2b8231d714665e7602407848751cdfb03bbb905c5c9f214017e380",
+        "size_bytes": 38651
+      },
+      {
+        "path": "cli/events.py",
+        "sha256": "5f3c95c8bb9c7f58dd0d09ef5243e8ba0d5d73b76647fd102185a17da2368bc9",
+        "size_bytes": 5186
+      },
+      {
+        "path": "cli/evidence.py",
+        "sha256": "c5a940d88a3217820eeaee6daa154cf9f22271a3f31cbd797acf98698c9478bd",
+        "size_bytes": 19373
+      },
+      {
+        "path": "cli/interactive.py",
+        "sha256": "4087bda51db649e4db15685e7cf4272bcf74c0bcb96f00431bf8584753f0d197",
+        "size_bytes": 16384
+      },
+      {
+        "path": "cli/menu.py",
+        "sha256": "128e1da2d898356869467195d2f303d34b51f311d83f01fd85f03c6eb295e75b",
+        "size_bytes": 34535
+      },
+      {
+        "path": "cli/orchestrator.py",
+        "sha256": "0b558c26c99906ccab18cf62a7cb4d7ad17e1f1cb8b2aa4bd5924cda15cb75a8",
+        "size_bytes": 244903
+      },
+      {
+        "path": "cli/presentation_qa.py",
+        "sha256": "f1b1ee8b821236011e43e593260d317a18f1dd159d71f3d54905b0e0f0501a5c",
+        "size_bytes": 48926
+      },
+      {
+        "path": "cli/publish.py",
+        "sha256": "8c7a80bfbb057eb8c3735572a9680bd2bd5a379af1e8d0d15b567f7094258655",
+        "size_bytes": 72631
+      },
+      {
+        "path": "cli/publishing_quality.py",
+        "sha256": "a38e4fb170f67da1a889f95c55b91592b99ff2e6ae816e992dda6c96b10a0e69",
+        "size_bytes": 29885
+      },
+      {
+        "path": "cli/quality_gate.py",
+        "sha256": "44dc2cf54c9f4680e3f23a429289a4fc18d3cc547475f74d8043e78feb35a8c8",
+        "size_bytes": 40790
+      },
+      {
+        "path": "cli/revise.py",
+        "sha256": "61723c363a606a750118dbbcf9f68f032193c70346175955cd6071b10d7b56bd",
+        "size_bytes": 19560
+      },
+      {
+        "path": "cli/revision_state.py",
+        "sha256": "1c9cf127bebc61dfeb8a238dc85f4f0109ad99b739acf33cc68e775d857febce",
+        "size_bytes": 21096
+      },
+      {
+        "path": "cli/run_manifest.py",
+        "sha256": "0d4a0dd165fdb0c7592b3ee1ed58fe7020807172821c81b19b2152997525840c",
+        "size_bytes": 52111
+      },
+      {
+        "path": "cli/runfile.py",
+        "sha256": "f3c8828c37de4e093947a6da15d128be3e90134cb9ca2fbb5e523bfc8b464285",
+        "size_bytes": 16635
+      },
+      {
+        "path": "cli/scope.py",
+        "sha256": "90bfb799abb483f53bad524928deb47b7962b54c0f43dcc7ed8f9cba7eac5e8b",
+        "size_bytes": 52653
+      },
+      {
+        "path": "cli/server.py",
+        "sha256": "c91cb6302111c5a8aaff1de027110fa91f8b6c868046f60f835554907631d7ff",
+        "size_bytes": 65347
+      },
+      {
+        "path": "cli/sources.py",
+        "sha256": "eabf995b7f331987e08615972dcf5ab437582264a8ef08f319fe5d81b7c5cda1",
+        "size_bytes": 20781
+      },
+      {
+        "path": "cli/strengthen.py",
+        "sha256": "2f14133513776219530822ae87440a0ff2a2cb13fd1d439c1682682b83d17dfa",
+        "size_bytes": 74876
+      },
+      {
+        "path": "council.toml",
+        "sha256": "7c3b882658b48a991e060d6b24746e0c4806fe1868d6e05c04a8da2b6ae6df61",
+        "size_bytes": 568
+      },
+      {
+        "path": "prompts/orchestration.md",
+        "sha256": "33b6e83ad5076808e99ff64790a1153a78f83f4c72cf159e67961b1cb248be17",
+        "size_bytes": 10390
+      },
+      {
+        "path": "prompts/research-contract.md",
+        "sha256": "34d01dd637bb9799fb457b68c2422ba1cf5b821eb57f0e9db7c476687179d222",
+        "size_bytes": 1408
+      },
+      {
+        "path": "pyproject.toml",
+        "sha256": "89eebb686d2d18d4ea6d18ea4f8b046f2aa73345f8d7ee6a6ca467c25811a975",
+        "size_bytes": 684
+      }
+    ],
+    "request": {
+      "argument_text": "Chris,\n \nSince we last connected on the proposed data center at IAD, I was copied on a project email allowing me to review the project. This proposal has not been coordinated with the FAA ADO, so I will try to frame my comments from an airport planning and airspace analysis perspective.\n \nI recommend that MWAA does not move forward with construction of a data center in the currently proposed location.\n \nAirport Planning Concerns:\nThe proposed data center will be located within the RWY 19R departure and RWY 1L approach surfaces. Even if the project doesn’t penetrate these surfaces, this land should be considered some of the most important and strategic on the airport property. It is prudent to protect this area for both existing and future capacity. We don’t want to preclude our ability to extend the runway or not meet FAA airport design standards per AC 150/5300-13 in the future.\nThe proposal is located very close to the approach lighting system at the RWY 19R end. Data centers generate bright lights which can interfere with a pilot’s ability to identify the approach light pattern. We also don’t know if there will be impacts to navigational aids, communications, radar or any other electronic interference with FAA equipment.\nThis proposal is not meet AC 150/5190-4B from a land use compatibility perspective, it is critical to maintain unobstructed space for aircraft to maneuver above ground. Further, limiting atmospheric interference (such as the air turbulence from thermal plumes) near airports is critical to maintaining aircraft control. Data centers are energy intensive sometimes requiring on-site power generation. Airspace can be atmospherically disrupted by thermal plumes emitted from this power.\nThere is a stormwater retention facility proposed next to the development. These types of facilities create a wildlife attractant within the landing and departure airspace and should be avoided according to FAA AC 150/5200-33.\nThis area was not designated as non-aeronautical development during the most recent master planning process.\n \nOutside of planning, I believe we are at risk of violating the following AIP Grant Assurances as a result of this proposal:\n#19 Operation and Maintenance (does not permit activity that would interfere with operations),\n#20 Hazard Removal and Mitigation (prevents the establishment of future airport hazards),\n#21 Compatible land uses (restricts the use of land adjacent to or in the immediate vicinity of the airport to activities and purposes compatible with normal airport operations, including landing and takeoff of aircraft)\n#22 Economic Nondiscrimination (need to make the airport available for aeronautical activities)\n#29 Airport Layout Plan (needs to be on an Approved ALP),\n \nIt appears Planning did review this back in 2025, but it appears to be more of a land use review primarily focused on height and some preliminary environmental considerations. For something to be added to the ALP, it should be considered during the master planning process. If we are outside of that time period, it should be evaluated using the same principles using FAA guidance (ACs, ALP SOP 2.00). Review and approval of the ALP is to ensure we don’t adversely affect the safety, utility, or efficiency of aircraft operations:\n \n(A) materially impact the safe and efficient operation of aircraft at, to, or from the airport;\n(B) adversely affect the safety of people or property on the ground as a result of aircraft operations; or\n(C) adversely affect the value of prior Federal investments to a significant extent.\n \nLet me know if you have any questions. Thank you.\n \nSincerely,\n \nJen\nJennifer I. Kandel\nAirspace/Airfield Planner\nPlanning Department, MA-32",
+      "audience": "Airport executives and sophisticated aviation readers",
+      "research_goal": "find airport or regulatory precedence and don't lean so much on personal thoughts",
+      "selected_agents": [
+        "contrarian",
+        "quantitative-analyst",
+        "airport-coo",
+        "regulatory-political-analyst",
+        "virtual-chris",
+        "chief-engineer"
+      ],
+      "slide_count": 5,
+      "slug": "data-center-concerns-on-aircraft-approach",
+      "source_tokens": [],
+      "title": "Data Center Concerns on Aircraft Approach",
+      "want_pptx": true
+    },
+    "schema_version": "strengthen-v10",
+    "sources": [
+      {
+        "path": "pasted-argument.md",
+        "readable": true,
+        "sha256": "9e6b6f0a3bce9203827e318d43c6055332edd5cda9c6a34b350c591f1669ae82",
+        "size_bytes": 3746
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "completed_at": "2026-07-29T15:32:11+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:airport-coo-evidence.jsonl",
+      "path": "stage1/airport-coo-evidence.jsonl",
+      "producer": "airport-coo",
+      "record_count": 16,
+      "required": true,
+      "role": "artifact",
+      "sha256": "9c083f569135e60d062a57e024853170e207f0c46b3791dfe84f02da4010df49",
+      "size_bytes": 19507,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/airport-coo-evidence.jsonl",
+        "record_count": 16,
+        "sha256": "9c083f569135e60d062a57e024853170e207f0c46b3791dfe84f02da4010df49",
+        "size_bytes": 19507,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/airport-coo",
+      "path": "stage1/airport-coo-brief.md",
+      "producer": "airport-coo",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a",
+      "size_bytes": 8112,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/airport-coo-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 8112,
+        "word_count": 1154,
+        "record_count": 0,
+        "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a"
+      },
+      "word_count": 1154
+    },
+    {
+      "completed_at": "2026-07-29T15:32:16+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:contrarian-evidence.jsonl",
+      "path": "stage1/contrarian-evidence.jsonl",
+      "producer": "contrarian",
+      "record_count": 11,
+      "required": true,
+      "role": "artifact",
+      "sha256": "a6ccf760747b4cf13310a0a1f71b170c33c3c93958be2569ffc8ff5c62714b30",
+      "size_bytes": 13823,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/contrarian-evidence.jsonl",
+        "record_count": 11,
+        "sha256": "a6ccf760747b4cf13310a0a1f71b170c33c3c93958be2569ffc8ff5c62714b30",
+        "size_bytes": 13823,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/contrarian",
+      "path": "stage1/contrarian-brief.md",
+      "producer": "contrarian",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7",
+      "size_bytes": 19773,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/contrarian-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 19773,
+        "word_count": 2766,
+        "record_count": 0,
+        "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7"
+      },
+      "word_count": 2766
+    },
+    {
+      "completed_at": "2026-07-29T15:39:42+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:regulatory-political-analyst-evidence.jsonl",
+      "path": "stage1/regulatory-political-analyst-evidence.jsonl",
+      "producer": "regulatory-political-analyst",
+      "record_count": 19,
+      "required": true,
+      "role": "artifact",
+      "sha256": "3e1f294d3515435c0a5c8c1dedce17d19cc4d6773a0e1a4ac8734ef99a5e3e30",
+      "size_bytes": 23483,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/regulatory-political-analyst-evidence.jsonl",
+        "record_count": 19,
+        "sha256": "3e1f294d3515435c0a5c8c1dedce17d19cc4d6773a0e1a4ac8734ef99a5e3e30",
+        "size_bytes": 23483,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/regulatory-political-analyst",
+      "path": "stage1/regulatory-political-analyst-brief.md",
+      "producer": "regulatory-political-analyst",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251",
+      "size_bytes": 27541,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/regulatory-political-analyst-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 27541,
+        "word_count": 3817,
+        "record_count": 0,
+        "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251"
+      },
+      "word_count": 3817
+    },
+    {
+      "completed_at": "2026-07-29T15:40:58+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:virtual-chris-evidence.jsonl",
+      "path": "stage1/virtual-chris-evidence.jsonl",
+      "producer": "virtual-chris",
+      "record_count": 18,
+      "required": true,
+      "role": "artifact",
+      "sha256": "47d83a6d33bc97ba5716e0c7fab174d9698de1c1ad3c4eca956c77fc7466bc6f",
+      "size_bytes": 19525,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/virtual-chris-evidence.jsonl",
+        "record_count": 18,
+        "sha256": "47d83a6d33bc97ba5716e0c7fab174d9698de1c1ad3c4eca956c77fc7466bc6f",
+        "size_bytes": 19525,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/virtual-chris",
+      "path": "stage1/virtual-chris-brief.md",
+      "producer": "virtual-chris",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1",
+      "size_bytes": 21382,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/virtual-chris-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 21382,
+        "word_count": 3115,
+        "record_count": 0,
+        "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1"
+      },
+      "word_count": 3115
+    },
+    {
+      "completed_at": "2026-07-29T15:41:31+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:chief-engineer-evidence.jsonl",
+      "path": "stage1/chief-engineer-evidence.jsonl",
+      "producer": "chief-engineer",
+      "record_count": 11,
+      "required": true,
+      "role": "artifact",
+      "sha256": "577b0a1bb4a3d623e251b9eb5d8dff5b49c891863aa339e1e306b7e70b9247d8",
+      "size_bytes": 16392,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/chief-engineer-evidence.jsonl",
+        "record_count": 11,
+        "sha256": "577b0a1bb4a3d623e251b9eb5d8dff5b49c891863aa339e1e306b7e70b9247d8",
+        "size_bytes": 16392,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/chief-engineer",
+      "path": "stage1/chief-engineer-brief.md",
+      "producer": "chief-engineer",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82",
+      "size_bytes": 7537,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/chief-engineer-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 7537,
+        "word_count": 1061,
+        "record_count": 0,
+        "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82"
+      },
+      "word_count": 1061
+    },
+    {
+      "completed_at": "2026-07-29T16:14:41+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "stage1:quantitative-analyst-evidence.jsonl",
+      "path": "stage1/quantitative-analyst-evidence.jsonl",
+      "producer": "quantitative-analyst",
+      "record_count": 16,
+      "required": true,
+      "role": "artifact",
+      "sha256": "4049cacbcf1bdad74dba8f484a18d29190cd3136495a7765c053cadfff57aded",
+      "size_bytes": 20520,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "jsonl",
+        "path": "outputs/stage1/quantitative-analyst-evidence.jsonl",
+        "record_count": 16,
+        "sha256": "4049cacbcf1bdad74dba8f484a18d29190cd3136495a7765c053cadfff57aded",
+        "size_bytes": 20520,
+        "valid": true,
+        "warnings": [],
+        "word_count": 0
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 100,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "02ae5e5960632858923f13449197db2926f32380060960af40b4e1bfe87c12e3"
+      },
+      "id": "argument/research/quantitative-analyst",
+      "path": "stage1/quantitative-analyst-brief.md",
+      "producer": "quantitative-analyst",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b",
+      "size_bytes": 13547,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/quantitative-analyst-brief.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 13547,
+        "word_count": 2002,
+        "record_count": 0,
+        "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b"
+      },
+      "word_count": 2002
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/*-brief.md",
+            "files": [
+              {
+                "path": "stage1/airport-coo-brief.md",
+                "kind": "file",
+                "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a",
+                "size_bytes": 8112
+              },
+              {
+                "path": "stage1/chief-engineer-brief.md",
+                "kind": "file",
+                "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82",
+                "size_bytes": 7537
+              },
+              {
+                "path": "stage1/contrarian-brief.md",
+                "kind": "file",
+                "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7",
+                "size_bytes": 19773
+              },
+              {
+                "path": "stage1/quantitative-analyst-brief.md",
+                "kind": "file",
+                "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b",
+                "size_bytes": 13547
+              },
+              {
+                "path": "stage1/regulatory-political-analyst-brief.md",
+                "kind": "file",
+                "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251",
+                "size_bytes": 27541
+              },
+              {
+                "path": "stage1/virtual-chris-brief.md",
+                "kind": "file",
+                "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1",
+                "size_bytes": 21382
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/*-evidence.jsonl",
+            "files": [
+              {
+                "path": "stage1/airport-coo-evidence.jsonl",
+                "kind": "file",
+                "sha256": "9c083f569135e60d062a57e024853170e207f0c46b3791dfe84f02da4010df49",
+                "size_bytes": 19507
+              },
+              {
+                "path": "stage1/chief-engineer-evidence.jsonl",
+                "kind": "file",
+                "sha256": "577b0a1bb4a3d623e251b9eb5d8dff5b49c891863aa339e1e306b7e70b9247d8",
+                "size_bytes": 16392
+              },
+              {
+                "path": "stage1/contrarian-evidence.jsonl",
+                "kind": "file",
+                "sha256": "a6ccf760747b4cf13310a0a1f71b170c33c3c93958be2569ffc8ff5c62714b30",
+                "size_bytes": 13823
+              },
+              {
+                "path": "stage1/quantitative-analyst-evidence.jsonl",
+                "kind": "file",
+                "sha256": "4049cacbcf1bdad74dba8f484a18d29190cd3136495a7765c053cadfff57aded",
+                "size_bytes": 20520
+              },
+              {
+                "path": "stage1/regulatory-political-analyst-evidence.jsonl",
+                "kind": "file",
+                "sha256": "3e1f294d3515435c0a5c8c1dedce17d19cc4d6773a0e1a4ac8734ef99a5e3e30",
+                "size_bytes": 23483
+              },
+              {
+                "path": "stage1/virtual-chris-evidence.jsonl",
+                "kind": "file",
+                "sha256": "47d83a6d33bc97ba5716e0c7fab174d9698de1c1ad3c4eca956c77fc7466bc6f",
+                "size_bytes": 19525
+              }
+            ]
+          }
+        ],
+        "sha256": "8baccab0bb212182217590293f2ea745a5657d9562e596fd46d3475a3d825ab0"
+      },
+      "id": "argument/evidence-ledger",
+      "path": "evidence-ledger.jsonl",
+      "producer": "orchestrator",
+      "record_count": 91,
+      "required": true,
+      "role": "artifact",
+      "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+      "size_bytes": 141940,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/evidence-ledger.jsonl",
+        "valid": true,
+        "kind": "jsonl",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 141940,
+        "word_count": 0,
+        "record_count": 91,
+        "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1"
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 60,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/*-brief.md",
+            "files": [
+              {
+                "path": "stage1/airport-coo-brief.md",
+                "kind": "file",
+                "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a",
+                "size_bytes": 8112
+              },
+              {
+                "path": "stage1/chief-engineer-brief.md",
+                "kind": "file",
+                "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82",
+                "size_bytes": 7537
+              },
+              {
+                "path": "stage1/contrarian-brief.md",
+                "kind": "file",
+                "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7",
+                "size_bytes": 19773
+              },
+              {
+                "path": "stage1/quantitative-analyst-brief.md",
+                "kind": "file",
+                "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b",
+                "size_bytes": 13547
+              },
+              {
+                "path": "stage1/regulatory-political-analyst-brief.md",
+                "kind": "file",
+                "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251",
+                "size_bytes": 27541
+              },
+              {
+                "path": "stage1/virtual-chris-brief.md",
+                "kind": "file",
+                "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1",
+                "size_bytes": 21382
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          }
+        ],
+        "sha256": "5762cea2839cab04b8f53f225506dce5df15022e9916b467c37656d1f8994091"
+      },
+      "id": "stage1:evidence-map.md",
+      "path": "stage1/evidence-map.md",
+      "producer": "strategist",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+      "size_bytes": 6206,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage1/evidence-map.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 6206,
+        "word_count": 919,
+        "record_count": 0,
+        "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e"
+      },
+      "word_count": 919
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 250,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/*-brief.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "stage1/airport-coo-brief.md",
+                "sha256": "7bae87d51c9d7667586ec4df749ac093d57bb2857aba2cd05bddedc63ad9fe5a",
+                "size_bytes": 8112
+              },
+              {
+                "kind": "file",
+                "path": "stage1/chief-engineer-brief.md",
+                "sha256": "ab244a5e207de51fa7f0499124ded4574323459a9799badbd0a5d555f5636d82",
+                "size_bytes": 7537
+              },
+              {
+                "kind": "file",
+                "path": "stage1/contrarian-brief.md",
+                "sha256": "22d0ea9d293837708aa1732bf52955b672326dbb54b013a3b53b81375ed467b7",
+                "size_bytes": 19773
+              },
+              {
+                "kind": "file",
+                "path": "stage1/quantitative-analyst-brief.md",
+                "sha256": "54f0516a614d7ec7d833ec0d75bbf2568de617b0153459d369dcab41d398448b",
+                "size_bytes": 13547
+              },
+              {
+                "kind": "file",
+                "path": "stage1/regulatory-political-analyst-brief.md",
+                "sha256": "2706812474a7c813f2db0daac624b9259665bc8565478a2d6aee11cc872e6251",
+                "size_bytes": 27541
+              },
+              {
+                "kind": "file",
+                "path": "stage1/virtual-chris-brief.md",
+                "sha256": "37c239b1afce6a756b07577e65bafb9c8b27403b0fb2a9cf7d56694ec8f68ed1",
+                "size_bytes": 21382
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "kind": "file",
+                "path": "evidence-ledger.jsonl",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "5762cea2839cab04b8f53f225506dce5df15022e9916b467c37656d1f8994091"
+      },
+      "id": "argument/strategist-draft",
+      "path": "stage2/strategist-draft.md",
+      "producer": "strategist",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653",
+      "size_bytes": 6268,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage2/strategist-draft.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 6268,
+        "word_count": 902,
+        "record_count": 0,
+        "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653"
+      },
+      "word_count": 902
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 250,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/evidence-map.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "stage1/evidence-map.md",
+                "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+                "size_bytes": 6206
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "kind": "file",
+                "path": "evidence-ledger.jsonl",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "stage2/strategist-draft.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "stage2/strategist-draft.md",
+                "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653",
+                "size_bytes": 6268
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "07ba690ce407c3603fd395fb61f09c02de462b36cb57a6b6a568efc473fc1b8b"
+      },
+      "id": "argument/final-draft",
+      "path": "stage3/final-draft.md",
+      "producer": "fact-checker",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+      "size_bytes": 5892,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+        "valid": true,
+        "kind": "markdown",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 5892,
+        "word_count": 823,
+        "record_count": 0,
+        "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4"
+      },
+      "word_count": 823
+    },
+    {
+      "completed_at": "2026-07-29T17:24:57+00:00",
+      "contract": {
+        "kind": "markdown",
+        "min_records": 0,
+        "min_words": 40,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "kind": "run_identity",
+                "path": "run-manifest.json",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "context/argument-request.md",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/evidence-map.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "stage1/evidence-map.md",
+                "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+                "size_bytes": 6206
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "kind": "file",
+                "path": "evidence-ledger.jsonl",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "stage2/strategist-draft.md",
+            "files": [
+              {
+                "kind": "file",
+                "path": "stage2/strategist-draft.md",
+                "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653",
+                "size_bytes": 6268
+              }
+            ]
+          }
+        ],
+        "schema_version": "1.0",
+        "sha256": "07ba690ce407c3603fd395fb61f09c02de462b36cb57a6b6a568efc473fc1b8b"
+      },
+      "id": "stage3:fact-check-report.md",
+      "path": "stage3/fact-check-report.md",
+      "producer": "fact-checker",
+      "record_count": 0,
+      "required": true,
+      "role": "artifact",
+      "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+      "size_bytes": 19104,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "errors": [],
+        "kind": "markdown",
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/fact-check-report.md",
+        "record_count": 0,
+        "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+        "size_bytes": 19104,
+        "valid": true,
+        "warnings": [],
+        "word_count": 2511
+      },
+      "word_count": 2511
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "jsonl",
+        "min_records": 1,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/evidence-map.md",
+            "files": [
+              {
+                "path": "stage1/evidence-map.md",
+                "kind": "file",
+                "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+                "size_bytes": 6206
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "stage2/strategist-draft.md",
+            "files": [
+              {
+                "path": "stage2/strategist-draft.md",
+                "kind": "file",
+                "sha256": "8efa678e7c3dc403d44fb0077de29b15d6183dd2a8e1c2e2ce494d72d9ed1653",
+                "size_bytes": 6268
+              }
+            ]
+          }
+        ],
+        "sha256": "07ba690ce407c3603fd395fb61f09c02de462b36cb57a6b6a568efc473fc1b8b"
+      },
+      "id": "claim-lineage.jsonl",
+      "path": "claim-lineage.jsonl",
+      "producer": "fact-checker",
+      "record_count": 14,
+      "required": true,
+      "role": "artifact",
+      "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+      "size_bytes": 15816,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/claim-lineage.jsonl",
+        "valid": true,
+        "kind": "jsonl",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 15816,
+        "word_count": 0,
+        "record_count": 14,
+        "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868"
+      },
+      "word_count": 0
+    },
+    {
+      "completed_at": "2026-07-29T17:27:46+00:00",
+      "contract": {
+        "kind": "json",
+        "min_records": 0,
+        "min_words": 0,
+        "optional": false,
+        "required_any": [],
+        "required_keys": []
+      },
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/final-draft.md",
+            "files": [
+              {
+                "path": "stage3/final-draft.md",
+                "kind": "file",
+                "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+                "size_bytes": 5892
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "claim-lineage.jsonl",
+            "files": [
+              {
+                "path": "claim-lineage.jsonl",
+                "kind": "file",
+                "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+                "size_bytes": 15816
+              }
+            ]
+          }
+        ],
+        "sha256": "3dc57de467f5521c684e693116aac523f2a0d47d8782d3c8f26b1c47b56d11a4"
+      },
+      "id": "argument/quality-gate",
+      "path": "quality-gate.json",
+      "producer": "orchestrator",
+      "record_count": 1,
+      "required": true,
+      "role": "artifact",
+      "sha256": "d00f326b3cb2164d081dffa4f2d424929faec98fe197371287a43767aaac3013",
+      "size_bytes": 803,
+      "stage": "unknown",
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/quality-gate.json",
+        "valid": true,
+        "kind": "json",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 803,
+        "word_count": 0,
+        "record_count": 1,
+        "sha256": "d00f326b3cb2164d081dffa4f2d424929faec98fe197371287a43767aaac3013"
+      },
+      "word_count": 0
+    },
+    {
+      "id": "argument/word-memo",
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx",
+      "stage": "unknown",
+      "producer": "orchestrator",
+      "role": "word_memo",
+      "required": true,
+      "contract": {
+        "kind": "docx",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx",
+        "valid": true,
+        "kind": "docx",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 41238,
+        "word_count": 0,
+        "record_count": 0,
+        "sha256": "afc08b2c76dd729aaefb415bbc099b4829cd4ba54737923312ff8b2ab638444e"
+      },
+      "size_bytes": 41238,
+      "word_count": 0,
+      "record_count": 0,
+      "sha256": "afc08b2c76dd729aaefb415bbc099b4829cd4ba54737923312ff8b2ab638444e",
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/final-draft.md",
+            "files": [
+              {
+                "path": "stage3/final-draft.md",
+                "kind": "file",
+                "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+                "size_bytes": 5892
+              }
+            ]
+          },
+          {
+            "declared_input": "quality-gate.json",
+            "files": [
+              {
+                "path": "quality-gate.json",
+                "kind": "file",
+                "sha256": "d00f326b3cb2164d081dffa4f2d424929faec98fe197371287a43767aaac3013",
+                "size_bytes": 803
+              }
+            ]
+          },
+          {
+            "declared_input": "claim-lineage.jsonl",
+            "files": [
+              {
+                "path": "claim-lineage.jsonl",
+                "kind": "file",
+                "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+                "size_bytes": 15816
+              }
+            ]
+          }
+        ],
+        "sha256": "6c21bbe4f32fc7b2a26535d538ce9f2170f273cb082a5334840d7639ead870df"
+      },
+      "completed_at": "2026-07-29T17:27:47+00:00"
+    },
+    {
+      "id": "stage4/word-visual-inspection",
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-memo-word-visual-inspection.json",
+      "stage": "unknown",
+      "producer": "art-director",
+      "role": "artifact",
+      "required": true,
+      "contract": {
+        "kind": "json",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo-word-visual-inspection.json",
+        "valid": true,
+        "kind": "json",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 2258,
+        "word_count": 0,
+        "record_count": 1,
+        "sha256": "971c7efa04abd459b8034ec81ce732e8b1de230719a74b86941a2c02f66771e2"
+      },
+      "size_bytes": 2258,
+      "word_count": 0,
+      "record_count": 1,
+      "sha256": "971c7efa04abd459b8034ec81ce732e8b1de230719a74b86941a2c02f66771e2",
+      "completed_at": "2026-07-29T17:28:22+00:00"
+    },
+    {
+      "id": "argument/visual-brief",
+      "path": "stage4/visual-brief.json",
+      "stage": "unknown",
+      "producer": "art-director",
+      "role": "artifact",
+      "required": true,
+      "contract": {
+        "kind": "json",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/visual-brief.json",
+        "valid": true,
+        "kind": "json",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 18091,
+        "word_count": 0,
+        "record_count": 1,
+        "sha256": "2c3f6c65d0ce691b89a597c3e5a9cd558c8af1ccdcae33bbaba1a5a8601aaf34"
+      },
+      "size_bytes": 18091,
+      "word_count": 0,
+      "record_count": 1,
+      "sha256": "2c3f6c65d0ce691b89a597c3e5a9cd558c8af1ccdcae33bbaba1a5a8601aaf34",
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage1/evidence-map.md",
+            "files": [
+              {
+                "path": "stage1/evidence-map.md",
+                "kind": "file",
+                "sha256": "fee4223420144d777fef778074c6b5a6341ad2019c8d0bc78e6db713ca07af7e",
+                "size_bytes": 6206
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "claim-lineage.jsonl",
+            "files": [
+              {
+                "path": "claim-lineage.jsonl",
+                "kind": "file",
+                "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+                "size_bytes": 15816
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/final-draft.md",
+            "files": [
+              {
+                "path": "stage3/final-draft.md",
+                "kind": "file",
+                "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+                "size_bytes": 5892
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/fact-check-report.md",
+            "files": [
+              {
+                "path": "stage3/fact-check-report.md",
+                "kind": "file",
+                "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+                "size_bytes": 19104
+              }
+            ]
+          }
+        ],
+        "sha256": "e5096b6cd05d240ae5eaed9c96244e6a55567b36fa7704a4d7681ec564288da8"
+      },
+      "completed_at": "2026-07-29T17:30:18+00:00"
+    },
+    {
+      "id": "stage4:argument-data-center-concerns-on-aircraft-approach-visual-inspection.json",
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach-visual-inspection.json",
+      "stage": "unknown",
+      "producer": "presentation-designer",
+      "role": "artifact",
+      "required": true,
+      "contract": {
+        "kind": "json",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-visual-inspection.json",
+        "valid": true,
+        "kind": "json",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 3621,
+        "word_count": 0,
+        "record_count": 1,
+        "sha256": "d5ff06977b230556c76cf6e9fc44723886bcf45cac7322ac3b9a539de4a6e9f4"
+      },
+      "size_bytes": 3621,
+      "word_count": 0,
+      "record_count": 1,
+      "sha256": "d5ff06977b230556c76cf6e9fc44723886bcf45cac7322ac3b9a539de4a6e9f4",
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/final-draft.md",
+            "files": [
+              {
+                "path": "stage3/final-draft.md",
+                "kind": "file",
+                "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+                "size_bytes": 5892
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/fact-check-report.md",
+            "files": [
+              {
+                "path": "stage3/fact-check-report.md",
+                "kind": "file",
+                "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+                "size_bytes": 19104
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "claim-lineage.jsonl",
+            "files": [
+              {
+                "path": "claim-lineage.jsonl",
+                "kind": "file",
+                "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+                "size_bytes": 15816
+              }
+            ]
+          },
+          {
+            "declared_input": "stage4/visual-brief.json",
+            "files": [
+              {
+                "path": "stage4/visual-brief.json",
+                "kind": "file",
+                "sha256": "2c3f6c65d0ce691b89a597c3e5a9cd558c8af1ccdcae33bbaba1a5a8601aaf34",
+                "size_bytes": 18091
+              }
+            ]
+          }
+        ],
+        "sha256": "f36c52ffcf55a93b3ea73c6d1d04ab7bc6bec15b37e1865707fd94c876353509"
+      },
+      "completed_at": "2026-07-29T17:40:45+00:00"
+    },
+    {
+      "id": "argument/presentation",
+      "path": "stage4/argument-data-center-concerns-on-aircraft-approach.pptx",
+      "stage": "unknown",
+      "producer": "presentation-designer",
+      "role": "artifact",
+      "required": true,
+      "contract": {
+        "kind": "pptx",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach.pptx",
+        "valid": true,
+        "kind": "pptx",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 48412,
+        "word_count": 0,
+        "record_count": 0,
+        "sha256": "4ba9579fcd93b4e7b41f0676686c4bfaaf0aa9e3aae7b9a5ace5303ec88025ba"
+      },
+      "size_bytes": 48412,
+      "word_count": 0,
+      "record_count": 0,
+      "sha256": "4ba9579fcd93b4e7b41f0676686c4bfaaf0aa9e3aae7b9a5ace5303ec88025ba",
+      "dependencies": {
+        "schema_version": "1.0",
+        "complete": true,
+        "inputs": [
+          {
+            "declared_input": "run-manifest.json",
+            "files": [
+              {
+                "path": "run-manifest.json",
+                "kind": "run_identity",
+                "sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+                "size_bytes": null
+              }
+            ]
+          },
+          {
+            "declared_input": "context/argument-request.md",
+            "files": [
+              {
+                "path": "context/argument-request.md",
+                "kind": "file",
+                "sha256": "3106843891d5e923326973f1790e6efcb9bb39fe5ce78c14f5d75c92de97ef9b",
+                "size_bytes": 4571
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/final-draft.md",
+            "files": [
+              {
+                "path": "stage3/final-draft.md",
+                "kind": "file",
+                "sha256": "08ac9873e8f829cd5adf3ae9c41b2578291f4da171d02db23a4c607916e20ae4",
+                "size_bytes": 5892
+              }
+            ]
+          },
+          {
+            "declared_input": "stage3/fact-check-report.md",
+            "files": [
+              {
+                "path": "stage3/fact-check-report.md",
+                "kind": "file",
+                "sha256": "87f22bbadbaadede9ed7745ced3898d407443c8c84a9b2e0b912d38a7c1ea773",
+                "size_bytes": 19104
+              }
+            ]
+          },
+          {
+            "declared_input": "evidence-ledger.jsonl",
+            "files": [
+              {
+                "path": "evidence-ledger.jsonl",
+                "kind": "file",
+                "sha256": "924ff177e3f7c4a73a73c4a1c8a361e46b85ddc63ae82655ee84f7a78ce70ca1",
+                "size_bytes": 141940
+              }
+            ]
+          },
+          {
+            "declared_input": "claim-lineage.jsonl",
+            "files": [
+              {
+                "path": "claim-lineage.jsonl",
+                "kind": "file",
+                "sha256": "f9a964c00e5c26bb07ec8ced556db91f1d9144e31566cc5e2f4ec34b6ded8868",
+                "size_bytes": 15816
+              }
+            ]
+          },
+          {
+            "declared_input": "stage4/visual-brief.json",
+            "files": [
+              {
+                "path": "stage4/visual-brief.json",
+                "kind": "file",
+                "sha256": "2c3f6c65d0ce691b89a597c3e5a9cd558c8af1ccdcae33bbaba1a5a8601aaf34",
+                "size_bytes": 18091
+              }
+            ]
+          }
+        ],
+        "sha256": "f36c52ffcf55a93b3ea73c6d1d04ab7bc6bec15b37e1865707fd94c876353509"
+      },
+      "completed_at": "2026-07-29T17:40:45+00:00"
+    },
+    {
+      "id": "argument/word-publishing-quality",
+      "path": "publishing-quality.json",
+      "stage": "unknown",
+      "producer": "orchestrator",
+      "role": "artifact",
+      "required": true,
+      "contract": {
+        "kind": "json",
+        "min_words": 0,
+        "min_records": 0,
+        "required_keys": [],
+        "required_any": [],
+        "optional": false
+      },
+      "status": "complete",
+      "validation": {
+        "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/publishing-quality.json",
+        "valid": true,
+        "kind": "json",
+        "errors": [],
+        "warnings": [],
+        "size_bytes": 1715,
+        "word_count": 0,
+        "record_count": 1,
+        "sha256": "c1009429d1e6d4db1363df09dc1634a8779358c740981dac7c6e5f607c03a0df"
+      },
+      "size_bytes": 1715,
+      "word_count": 0,
+      "record_count": 1,
+      "sha256": "c1009429d1e6d4db1363df09dc1634a8779358c740981dac7c6e5f607c03a0df",
+      "completed_at": "2026-07-29T17:40:47+00:00"
+    }
+  ],
+  "created_at": "2026-07-29T15:23:12+00:00",
+  "dependency_identity_rebound": true,
+  "mode": "strengthen",
+  "resume_migrations": [
+    {
+      "at": "2026-07-29T16:26:12+00:00",
+      "changed_execution_files": [
+        "cli/__main__.py",
+        "cli/menu.py",
+        "cli/orchestrator.py",
+        "cli/strengthen.py"
+      ],
+      "from": "strengthen-v6",
+      "reason": "turn-limit and authentication recovery",
+      "to": "strengthen-v7"
+    },
+    {
+      "at": "2026-07-29T16:29:11+00:00",
+      "changed_execution_files": [
+        "cli/config.py",
+        "cli/strengthen.py",
+        "council.toml"
+      ],
+      "from": "strengthen-v7",
+      "reason": "unsupported Opus identifier replaced by rolling alias",
+      "to": "strengthen-v8"
+    },
+    {
+      "at": "2026-07-29T16:57:05+00:00",
+      "changed_execution_files": [
+        "cli/orchestrator.py",
+        "cli/strengthen.py"
+      ],
+      "from": "strengthen-v8",
+      "reason": "turn-limit stream cleanup recovery",
+      "to": "strengthen-v9"
+    },
+    {
+      "at": "2026-07-29T17:27:46+00:00",
+      "changed_execution_files": [
+        "cli/docx_builder.py",
+        "cli/strengthen.py"
+      ],
+      "from": "strengthen-v9",
+      "reason": "one-page memo source-layout recovery",
+      "to": "strengthen-v10"
+    }
+  ],
+  "run": {
+    "resume_identity_sha256": "011fbee29c42c7185dfb9066b9620fec457d6fcc38cc7e3167278a2e3eeb1678",
+    "slug": "data-center-concerns-on-aircraft-approach",
+    "title": "Data Center Concerns on Aircraft Approach"
+  },
+  "schema_version": "2.0",
+  "updated_at": "2026-07-29T17:40:47+00:00"
+}

@@ -22,6 +22,7 @@ import re
 import secrets
 import zipfile
 from pathlib import Path
+from typing import Any
 from urllib.parse import quote, urlsplit
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
@@ -52,12 +53,21 @@ ARGUMENT_UPLOAD_EXTENSIONS = {
 ARGUMENT_UPLOAD_MAX_FILE_BYTES = 40 * 1024 * 1024
 ARGUMENT_UPLOAD_MAX_TOTAL_BYTES = 100 * 1024 * 1024
 ARGUMENT_UPLOAD_MAX_FILES = 20
+SOURCE_UPLOAD_PURPOSES = {"report", "scope", "argument"}
 
 app = FastAPI(title="Transform Airports AI Council")
 
 # Module-level single-run state.
 _active_sink: WebSink | None = None
 _active_owner: str | None = None
+# Live WebSocket connections per client id. The browser's client id lives in
+# sessionStorage, so a crashed or closed tab never comes back under the same
+# identity. Without liveness tracking the run's owner would stay a dead tab
+# forever and nobody could approve its checkpoints — the run would stall with
+# no way to recover but killing the server. Counting sockets lets control pass
+# to a live tab once the owner is genuinely gone, while a still-connected owner
+# keeps exclusive control and additional tabs remain observers.
+_live_clients: dict[str, int] = {}
 _SESSION_TOKEN = secrets.token_urlsafe(32)
 _SESSION_HEADER = "x-council-session"
 _CLIENT_HEADER = "x-council-client"
@@ -171,6 +181,32 @@ def _websocket_client(socket: WebSocket) -> str | None:
     ):
         return None
     return client_id
+
+
+def _owner_is_present() -> bool:
+    """True only while the run's controlling tab still holds a live socket."""
+
+    return bool(_active_owner) and _live_clients.get(str(_active_owner), 0) > 0
+
+
+def _run_is_live() -> bool:
+    return _active_task is not None and not _active_task.done()
+
+
+def _control_status(client_id: str) -> dict[str, Any]:
+    """Tell a tab whether it can approve checkpoints, and why."""
+
+    controls = _active_owner == client_id
+    return {
+        "type": "control_status",
+        "controls": controls,
+        "run_active": _run_is_live(),
+        "message": (
+            ""
+            if controls
+            else "Another open tab is controlling this run. Close it to take over."
+        ),
+    }
 
 
 def _coerce_budget(value: object) -> float | None:
@@ -291,15 +327,24 @@ async def api_meta(request: Request) -> JSONResponse:
     })
 
 
-def _argument_upload_dir(client_id: str, repo_root: Path | None = None) -> Path:
+def _argument_upload_dir(
+    client_id: str,
+    repo_root: Path | None = None,
+    purpose: str = "argument",
+) -> Path:
     if not _valid_client_id(client_id):
-        raise ValueError("Invalid argument-upload client ID.")
-    root = (repo_root or REPO_ROOT) / "sources" / ".argument-uploads"
+        raise ValueError("Invalid source-upload client ID.")
+    if purpose not in SOURCE_UPLOAD_PURPOSES:
+        raise ValueError("Invalid source-upload purpose.")
+    root = (repo_root or REPO_ROOT) / "sources" / ".browser-uploads"
     if root.is_symlink():
-        raise ValueError("Argument upload root may not be a symlink.")
-    directory = root / client_id
+        raise ValueError("Source upload root may not be a symlink.")
+    client_directory = root / client_id
+    if client_directory.is_symlink():
+        raise ValueError("Source upload client directory may not be a symlink.")
+    directory = client_directory / purpose
     if directory.is_symlink():
-        raise ValueError("Argument upload directory may not be a symlink.")
+        raise ValueError("Source upload directory may not be a symlink.")
     return directory
 
 
@@ -327,13 +372,14 @@ def _resolve_argument_uploads(
     client_id: str,
     tokens: object,
     repo_root: Path | None = None,
+    purpose: str = "argument",
 ) -> list[Path]:
     if not isinstance(tokens, list) or any(not isinstance(item, str) for item in tokens):
         raise ValueError("Uploaded source tokens must be a list.")
-    directory = _argument_upload_dir(client_id, repo_root)
+    directory = _argument_upload_dir(client_id, repo_root, purpose)
     if not directory.is_dir():
         if tokens:
-            raise ValueError("Uploaded argument material is no longer staged.")
+            raise ValueError("Uploaded source material is no longer staged.")
         return []
     resolved_root = directory.resolve()
     paths: list[Path] = []
@@ -346,15 +392,20 @@ def _resolve_argument_uploads(
             resolved = candidate.resolve(strict=True)
             resolved.relative_to(resolved_root)
         except (OSError, ValueError) as exc:
-            raise ValueError(f"Uploaded argument material is missing: {name}") from exc
+            raise ValueError(f"Uploaded source material is missing: {name}") from exc
         if not resolved.is_file():
-            raise ValueError(f"Uploaded argument material is not a file: {name}")
+            raise ValueError(f"Uploaded source material is not a file: {name}")
         paths.append(candidate)
     return paths
 
 
+@app.post("/api/source")
 @app.post("/api/argument-source")
-async def upload_argument_source(request: Request, name: str = "") -> JSONResponse:
+async def upload_argument_source(
+    request: Request,
+    name: str = "",
+    purpose: str = "argument",
+) -> JSONResponse:
     """Stage one browser-selected source without granting arbitrary file access."""
 
     if not _http_request_is_authenticated(request):
@@ -362,7 +413,7 @@ async def upload_argument_source(request: Request, name: str = "") -> JSONRespon
     try:
         safe_name = _safe_argument_upload_name(name)
         client_id = str(request.headers.get(_CLIENT_HEADER) or "")
-        directory = _argument_upload_dir(client_id)
+        directory = _argument_upload_dir(client_id, purpose=purpose)
         directory.mkdir(parents=True, exist_ok=True)
         existing = [path for path in directory.iterdir() if path.is_file()]
         if len(existing) >= ARGUMENT_UPLOAD_MAX_FILES:
@@ -401,13 +452,18 @@ async def upload_argument_source(request: Request, name: str = "") -> JSONRespon
         return JSONResponse({"error": str(exc)}, status_code=400)
 
 
+@app.delete("/api/source")
 @app.delete("/api/argument-source")
-async def delete_argument_source(request: Request, token: str = "") -> JSONResponse:
+async def delete_argument_source(
+    request: Request,
+    token: str = "",
+    purpose: str = "argument",
+) -> JSONResponse:
     if not _http_request_is_authenticated(request):
         return JSONResponse({"error": "unauthorized"}, status_code=403)
     try:
         client_id = str(request.headers.get(_CLIENT_HEADER) or "")
-        path = _resolve_argument_uploads(client_id, [token])[0]
+        path = _resolve_argument_uploads(client_id, [token], purpose=purpose)[0]
         path.unlink()
         return JSONResponse({"removed": token})
     except (OSError, ValueError, IndexError) as exc:
@@ -433,9 +489,17 @@ async def _drive_new(spec: RunSpec, sink: WebSink, auto_approve: bool,
 
 async def _drive_scope(payload: dict, sink: WebSink) -> None:
     from cli.scope import run_scope_pipeline
+    client_id = str(payload.get("client_id") or "")
+    source_files = _resolve_argument_uploads(
+        client_id,
+        payload.get("source_tokens") or [],
+        REPO_ROOT,
+        purpose="scope",
+    )
     result = await run_scope_pipeline(
         title=payload.get("title") or "Scope engagement",
         notes=payload.get("notes", ""),
+        source_files=source_files,
         repo_root=REPO_ROOT,
         auto_approve=bool(payload.get("auto_approve")),
         budget_usd=payload.get("budget"),
@@ -473,7 +537,7 @@ async def _drive_resume(slug: str, sink: WebSink, auto_approve: bool,
         from cli.scope import run_scope_pipeline
         result = await run_scope_pipeline(
             title=marker.get("title") or slug, repo_root=REPO_ROOT,
-            auto_approve=auto_approve, budget_usd=budget_usd,
+            source_files=(), auto_approve=auto_approve, budget_usd=budget_usd,
         )
         if not result.completed:
             await sink.emit("run_stopped", {"total": result.tally.total})
@@ -609,11 +673,16 @@ async def _drive_run(mode: str, payload: dict, sink: WebSink) -> None:
         else:  # new
             spec = _build_spec(payload.get("spec", {}))
             spec.slug = ensure_unique_slug(spec.slug)
-            # Attach any staged source files.
-            from cli.sources import discover_dropzone, attach_sources
-            dropped = discover_dropzone()
-            if dropped and payload.get("spec", {}).get("use_sources", True):
-                attached = attach_sources(spec.slug, dropped, REPO_ROOT / "outputs")
+            # Attach only the files selected for this browser workflow.
+            from cli.sources import attach_sources
+            source_files = _resolve_argument_uploads(
+                str(payload.get("client_id") or ""),
+                payload.get("spec", {}).get("source_tokens") or [],
+                REPO_ROOT,
+                purpose="report",
+            )
+            if source_files:
+                attached = attach_sources(spec.slug, source_files, REPO_ROOT / "outputs")
                 spec.source_paths = [
                     s.readable.relative_to(REPO_ROOT).as_posix() for s in attached
                 ]
@@ -671,6 +740,7 @@ async def ws(socket: WebSocket) -> None:
         await socket.close(code=1008)
         return
     await socket.accept()
+    _live_clients[connection_client] = _live_clients.get(connection_client, 0) + 1
     pump: asyncio.Task | None = None
     try:
         while True:
@@ -707,30 +777,41 @@ async def ws(socket: WebSocket) -> None:
                 )
                 if pump is not None:
                     pump.cancel()
+                await socket.send_json(_control_status(connection_client))
                 pump = asyncio.create_task(_pump(sink, socket))
 
             elif mtype == "attach":
-                if (
-                    _active_task is None
-                    or _active_task.done()
-                    or _active_sink is None
-                ):
+                if not _run_is_live() or _active_sink is None:
                     await socket.send_json({
                         "type": "run_error",
                         "message": "No active run is available to attach.",
                     })
                     continue
+                # A crashed or closed tab must not hold control forever. If the
+                # owner has no live socket, hand control to this tab so the run
+                # can be approved and finished rather than stalling at its next
+                # checkpoint. A still-connected owner keeps exclusive control.
+                if not _owner_is_present():
+                    _active_owner = connection_client
+                await socket.send_json(_control_status(connection_client))
+                cursor = msg.get("after")
+                cursor = int(cursor) if isinstance(cursor, int) and cursor > 0 else 0
                 if pump is not None:
                     pump.cancel()
-                pump = asyncio.create_task(_pump(_active_sink, socket))
+                pump = asyncio.create_task(_pump(_active_sink, socket, cursor))
 
             elif mtype == "checkpoint":
                 if _active_owner != connection_client:
-                    await socket.send_json({
-                        "type": "control_error",
-                        "message": "This tab is observing the run and cannot approve it.",
-                    })
-                    continue
+                    if _owner_is_present():
+                        await socket.send_json({
+                            "type": "control_error",
+                            "message": "This tab is observing the run and cannot approve it.",
+                        })
+                        continue
+                    # The controlling tab is gone; this live tab takes over
+                    # rather than leaving the run stalled at its checkpoint.
+                    _active_owner = connection_client
+                    await socket.send_json(_control_status(connection_client))
                 if (
                     _active_task is None
                     or _active_task.done()
@@ -749,11 +830,14 @@ async def ws(socket: WebSocket) -> None:
 
             elif mtype == "cancel":
                 if _active_owner != connection_client:
-                    await socket.send_json({
-                        "type": "control_error",
-                        "message": "This tab is observing the run and cannot cancel it.",
-                    })
-                    continue
+                    if _owner_is_present():
+                        await socket.send_json({
+                            "type": "control_error",
+                            "message": "This tab is observing the run and cannot cancel it.",
+                        })
+                        continue
+                    _active_owner = connection_client
+                    await socket.send_json(_control_status(connection_client))
                 if _active_task is not None and not _active_task.done():
                     _active_task.cancel()
                 else:
@@ -765,13 +849,22 @@ async def ws(socket: WebSocket) -> None:
     except WebSocketDisconnect:
         pass
     finally:
+        remaining = _live_clients.get(connection_client, 0) - 1
+        if remaining > 0:
+            _live_clients[connection_client] = remaining
+        else:
+            _live_clients.pop(connection_client, None)
         if pump is not None:
             pump.cancel()
 
 
-async def _pump(sink: WebSink, socket: WebSocket) -> None:
-    """Replay and follow the sequenced event log without duplicate delivery."""
-    cursor = 0
+async def _pump(sink: WebSink, socket: WebSocket, cursor: int = 0) -> None:
+    """Replay and follow the sequenced event log without duplicate delivery.
+
+    A re-attaching browser passes the last sequence it rendered, so a reconnect
+    costs only the events it actually missed. A fresh attach passes 0 and gets
+    the full run replayed.
+    """
     while True:
         events = await sink.wait_after(cursor)
         if not events and sink.closed:
@@ -790,6 +883,7 @@ async def _pump(sink: WebSink, socket: WebSocket) -> None:
 
 _DOWNLOAD_LABELS = {
     "argument": "Strengthened argument",
+    "word_memo": "One-page Word memo",
     "word_report": "Word report",
     "executive_summary": "Executive summary",
     "presentation": "Presentation",
@@ -1001,8 +1095,9 @@ def _verified_argument_release(
         return None
     try:
         payload = json.loads(pointer_path.read_text(encoding="utf-8"))
+        schema_version = str(payload.get("schema_version") or "")
         if (
-            payload.get("schema_version") != "1.0"
+            schema_version not in {"1.0", "2.0"}
             or payload.get("status") != "current"
             or payload.get("mode") != "strengthen"
             or payload.get("slug") != public_slug
@@ -1018,13 +1113,14 @@ def _verified_argument_release(
             expected = str(record.get("sha256") or "")
             path = _safe_scope_distribution_path(record.get("path"), root)
             if (
-                role not in {"argument", "presentation"}
+                role not in {"argument", "word_memo", "presentation"}
                 or role in roles
                 or path is None
                 or not re.fullmatch(r"[0-9a-f]{64}", expected)
                 or not secrets.compare_digest(_sha256(path), expected)
                 or path.stat().st_size != record.get("size_bytes")
                 or (role == "argument" and path.suffix.lower() != ".md")
+                or (role == "word_memo" and path.suffix.lower() != ".docx")
                 or (role == "presentation" and path.suffix.lower() != ".pptx")
             ):
                 return None
@@ -1038,7 +1134,9 @@ def _verified_argument_release(
                     "url": f"/download/{quote(relative, safe='/')}",
                 }
             )
-        if "argument" not in roles:
+        if "argument" not in roles or (
+            schema_version == "2.0" and "word_memo" not in roles
+        ):
             return None
         argument_record = next(item for item in artifacts if item["role"] == "argument")
         argument_path = root / argument_record["path"]
@@ -1048,6 +1146,14 @@ def _verified_argument_release(
             "title": str(payload.get("title") or public_slug.replace("-", " ").title()),
             "date": str(payload.get("date") or ""),
             "argument_path": argument_path,
+            "memo_path": (
+                root
+                / next(item for item in artifacts if item["role"] == "word_memo")[
+                    "path"
+                ]
+                if "word_memo" in roles
+                else None
+            ),
             "artifacts": artifacts,
         }
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
@@ -1368,13 +1474,11 @@ def _argument_home_entries() -> list[dict[str, object]]:
                 "slug": release["slug"],
                 "title": release["title"],
                 "date": release["date"],
-                "format": "strengthened argument",
+                "format": "one-page argument memo",
                 "mode": "strengthen",
                 "downloads": [
                     {
-                        "label": (
-                            "Argument" if item["role"] == "argument" else "Deck"
-                        ),
+                        "label": _DOWNLOAD_LABELS[item["role"]],
                         "url": item["url"],
                     }
                     for item in release["artifacts"]

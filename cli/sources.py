@@ -188,6 +188,10 @@ def discover_dropzone(dropzone: Path = DROPZONE) -> list[Path]:
         # operator drop zone. Never offer an already-attached source again.
         if relative.parts and relative.parts[0] == "runs":
             continue
+        # Browser uploads are selected explicitly by opaque token. Never let a
+        # staged file leak into the legacy global drop-zone workflow.
+        if any(part.startswith(".") for part in relative.parts):
+            continue
         if path.name.lower() in IGNORE_NAMES or path.name.startswith("."):
             continue
         # Preserve the caller's lexical root in the returned path; attachment

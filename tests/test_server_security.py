@@ -59,6 +59,7 @@ class ServerSecurityTests(unittest.TestCase):
         server._active_task = None
         server._active_sink = None
         server._active_owner = None
+        server._live_clients.clear()
 
     def tearDown(self) -> None:
         (
@@ -66,6 +67,7 @@ class ServerSecurityTests(unittest.TestCase):
             server._active_sink,
             server._active_owner,
         ) = self.previous
+        server._live_clients.clear()
         self.client.close()
 
     def _ws_path(self, *, token: str = server._SESSION_TOKEN,
@@ -387,6 +389,10 @@ class ServerSecurityTests(unittest.TestCase):
         server._active_task = task
         server._active_sink = _FakeSink()
         server._active_owner = CLIENT_ID
+        # The owner has a socket open. A run whose owner has gone away is a
+        # different case — control passes there, or a crashed browser would
+        # strand the run forever (see tests/test_reattach.py).
+        server._live_clients[CLIENT_ID] = 1
         observer = "observer_client_123456"
         path = self._ws_path(client_id=observer)
         with self.client.websocket_connect(path, headers=WS_HEADERS) as socket:
@@ -399,6 +405,28 @@ class ServerSecurityTests(unittest.TestCase):
         self.assertEqual(response["type"], "control_error")
         self.assertIn("observing", response["message"])
         self.assertFalse(task.cancelled)
+
+    def test_abandoned_run_can_be_cancelled_by_a_returning_tab(self) -> None:
+        task = _FakeTask()
+        server._active_task = task
+        server._active_sink = _FakeSink()
+        server._active_owner = "crashed_client_123456"
+        returning = "returning_client_123456"
+        with self.client.websocket_connect(
+            self._ws_path(client_id=returning), headers=WS_HEADERS
+        ) as socket:
+            socket.send_json({
+                "type": "cancel",
+                "session_token": server._SESSION_TOKEN,
+                "client_id": returning,
+            })
+            # Taking over announces the new control state first; the malformed
+            # frame then gives a response boundary after the cancel is handled.
+            self.assertEqual(socket.receive_json()["type"], "control_status")
+            socket.send_text("{")
+            self.assertEqual(socket.receive_json()["type"], "control_error")
+        self.assertTrue(task.cancelled)
+        self.assertEqual(server._active_owner, returning)
 
     def test_owner_can_cancel_its_run(self) -> None:
         task = _FakeTask()
@@ -464,6 +492,49 @@ class ServerSecurityTests(unittest.TestCase):
             "budgeted-deck", sink, 42.5
         )
         sink.close.assert_awaited_once()
+
+    def test_new_report_attaches_only_its_browser_selected_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "outputs").mkdir()
+            upload_dir = server._argument_upload_dir(
+                CLIENT_ID, root, purpose="report"
+            )
+            upload_dir.mkdir(parents=True)
+            (upload_dir / "selected.md").write_text(
+                "selected in the report form", encoding="utf-8"
+            )
+            unselected = root / "sources" / "unselected.md"
+            unselected.write_text("left in the terminal dropzone", encoding="utf-8")
+            sink = SimpleNamespace(close=AsyncMock())
+            drive_new = AsyncMock()
+
+            with (
+                patch.object(server, "REPO_ROOT", root),
+                patch.object(server, "_drive_new", drive_new),
+            ):
+                asyncio.run(server._drive_run(
+                    "new",
+                    {
+                        "client_id": CLIENT_ID,
+                        "budget": 0,
+                        "spec": {
+                            "title": "Browser source isolation test",
+                            "thesis": "Only explicitly selected files belong to this report.",
+                            "source_tokens": ["selected.md"],
+                        },
+                    },
+                    sink,
+                ))
+
+            spec = drive_new.await_args.args[0]
+            self.assertEqual(
+                spec.source_paths,
+                ["sources/runs/browser-source-isolation-test/selected.md"],
+            )
+            self.assertTrue(unselected.is_file())
+            self.assertTrue((root / spec.source_paths[0]).is_file())
+            sink.close.assert_awaited_once()
 
     def test_current_downloads_are_manifest_driven_and_hash_verified(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

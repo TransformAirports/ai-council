@@ -743,7 +743,15 @@ def stage_release_artifacts(
             )
 
         qa_path = release_dir / "qa" / f"{source.name}.qa.json"
-        render_dir = release_dir / "qa" / "render" / source.stem
+        # Scope renders by extension: the Word report and the deck share one
+        # stem (<slug>.docx / <slug>.pptx), and a stem-only directory lets the
+        # second render clobber the first — the recorded hash then fails
+        # verification at the end of promotion. Stage 4 QA already suffixes
+        # its render directories; the release path must too.
+        render_dir = (
+            release_dir / "qa" / "render"
+            / f"{source.stem}-{source.suffix.lstrip('.')}"
+        )
         release_receipt: Path | None = None
         release_inspection: Path | None = None
         if source.suffix.lower() == ".docx":

@@ -284,7 +284,16 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
         blob = f"{proc.stdout}\n{proc.stderr}"
         if "PONG" in blob:
             _auth_probe_cache = (True, "authenticated (verified just now)")
-        elif "401" in blob or "authenticat" in blob.lower():
+        elif any(
+            marker in blob.casefold()
+            for marker in (
+                "401",
+                "authenticat",
+                "not logged in",
+                "please run /login",
+                "please run `claude login`",
+            )
+        ):
             _auth_probe_cache = (
                 False,
                 "⚠ authentication failed (401) — run `claude login`",
@@ -577,7 +586,12 @@ def new_run_flow() -> None:
         post_run_menu(spec, result)
 
 
-def resume_flow(info: dict | None = None) -> None:
+def resume_flow(
+    info: dict | None = None,
+    *,
+    auto_approve: bool = False,
+    budget_usd: float | None = None,
+) -> None:
     from cli.orchestrator import run_pipeline
     from cli.runfile import RUNS_DIR, parse_run_file
 
@@ -594,13 +608,65 @@ def resume_flow(info: dict | None = None) -> None:
         ).ask()
         if slug is None:
             return
+
+    # Strengthen Argument runs are created from a persisted request, not a
+    # prompts/runs/*.md file. Route them back through their own pipeline before
+    # the generic report parser tries to resolve a run file that cannot exist.
+    if info.get("mode") == "strengthen":
+        from cli.strengthen import load_strengthen_request, run_strengthen_pipeline
+
+        auth_ok, auth_msg = check_claude_auth(force=True)
+        if not auth_ok:
+            console.print(Panel(auth_msg, border_style="red", title="Authentication required"))
+            return
+        allowed = {agent.name for agent in research_agents(load_all_agents())}
+        request_path = OUTPUTS_DIR / str(
+            info.get("request") or "context/argument-request.json"
+        )
+        request = load_strengthen_request(request_path, allowed)
+        ceiling = budget_usd
+        if ceiling is None:
+            ceiling = get_config().default_budget_usd or None
+        console.print(
+            f"[cyan]Resuming '{request.title}'[/cyan] [dim]— validated research "
+            f"is preserved; only missing work runs.[/dim]"
+        )
+        result = asyncio.run(run_strengthen_pipeline(
+            request=request,
+            source_files=(),
+            repo_root=REPO_ROOT,
+            budget_usd=ceiling,
+            resume=True,
+        ))
+        console.print(
+            f"[bold green]Done. Total cost this session: "
+            f"${result.tally.total:.2f}[/bold green]"
+        )
+        if result.completed:
+            console.print(f"[green]Memo:[/green] {result.memo_path}")
+            if result.deck_path is not None:
+                console.print(f"[green]PowerPoint:[/green] {result.deck_path}")
+        return
+
     spec = parse_run_file(slug)
     run_file = RUNS_DIR / f"{slug}.md"
     console.print(
         f"[cyan]Resuming '{spec.title}'[/cyan] [dim]— completed steps are skipped, "
         f"only missing work re-runs.[/dim]"
     )
-    launch = preflight(spec)
+    if auto_approve:
+        auth_ok, auth_msg = check_claude_auth(force=True)
+        if not auth_ok:
+            console.print(Panel(auth_msg, border_style="red", title="Authentication required"))
+            return
+        launch = {
+            "auto_approve": True,
+            "budget_usd": budget_usd
+            if budget_usd is not None
+            else (get_config().default_budget_usd or None),
+        }
+    else:
+        launch = preflight(spec)
     if launch is None:
         return
     result = asyncio.run(run_pipeline(

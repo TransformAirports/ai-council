@@ -1,0 +1,203 @@
+{
+  "schema_version": "2.0",
+  "communication_job": "Present and strengthen Jennifer Kandel's argument that MWAA should not build the proposed data center inside the RWY 1L approach and RWY 19R departure surfaces at IAD, replacing personal opinion with verified FAA regulatory precedent so executives can act on it.",
+  "audience": "Airport executives and sophisticated aviation readers — MWAA executive leadership, planning, real estate, and legal.",
+  "decision": "Whether MWAA advances construction of the proposed data center at its currently proposed location inside the RWY 1L approach and RWY 19R departure surfaces at Dulles International.",
+  "decision_owner": "Decision-critical unknown: the run prompt names no accountable executive. The memo is addressed to MWAA Executive Leadership; the accountable owner must be assigned before the halt-and-redirect recommendation can be executed.",
+  "approval_path": [
+    "Formal coordination with the FAA Airport District Office before any further project advancement (the run prompt states the proposal has not been coordinated with the FAA ADO)",
+    "FAA Form 7460-1 filing and the resulting aeronautical study under 14 CFR Part 77, requiring a Determination of No Hazard",
+    "Any ALP amendment for this parcel re-enters the master-planning process per ALP SOP 2.00 — not a project-level review",
+    "Grant Assurance exposure routed to MWAA General Counsel. Unresolved authority: internal MWAA board or committee sequence for real-estate transactions is not established by the run prompt or evidence."
+  ],
+  "first_90_day_action": "Halt project advancement pending formal FAA Airport District Office coordination, and file FAA Form 7460-1 to trigger the aeronautical study covering height, exterior lighting, plume dispersion, and NAVAID compatibility.",
+  "success_measures": [
+    "Run prompt supplies no explicit success measure; the operative standard from the verified draft: no construction commitment inside the RWY 1L/19R approach and departure surfaces without an FAA Determination of No Hazard covering height, lighting, plume dispersion, and NAVAID compatibility.",
+    "FAA Form 7460-1 filed and aeronautical study initiated before any further lease or design commitment.",
+    "Commercial Real Estate identifies alternative parcels within the Airport Master Plan's designated non-aeronautical zones, using the 2018 Western Lands envelope as the working precedent.",
+    "Stop condition: any FAA finding of hazard, ILS interference, or Grant Assurance violation ends consideration of the currently proposed site."
+  ],
+  "deck_mode": "argument_brief",
+  "visual_thesis": "One cross-section of the RWY 19R/1L approach corridor shows why this is a physics-and-federal-law problem, not a real-estate preference: a data center's thermal plumes, open-water basin, and metallic mass all sit inside the protected surfaces of a Cat II/III ILS runway, and the FAA — not MWAA — holds the pen on every one of those hazards.",
+  "signature_visual": {
+    "slide_number": 2,
+    "concept": "Annotated side-view cross-section of the RWY 19R/1L approach and departure corridor: aircraft on the Cat II/III glide path, ALSF-2 approach lights at the 19R end, and the proposed data center below with three labeled interference vectors — (1) thermal plume turbulence rising 'over 1,000 feet above the top of the stack or cooling tower' per AIM § 7-6-16, (2) open-water stormwater basin attracting wildlife into the corridor against AC 150/5200-33C's no-standing-water design standard, (3) metallic mass and UPS/generator emissions against the ILS signal, with FAA Order 6750.16E's warning that clearing the critical area does not guarantee non-interference.",
+    "visual_type": "annotated_corridor_cross_section",
+    "visual_spec": "Landscape section drawing, runway at left with ALSF-2 light array, 3-degree glide path as a single descending line, data center block under the corridor. Three callouts with verbatim regulatory anchors: AIM § 7-6-16 plume height, AC 150/5200-33C standing-water design standard, FAA Order 6750.16E ILS quote. Schematic, not to scale; label it so. No decorative imagery.",
+    "evidence_ids": [
+      "quantitative-analyst::ev-9d3a1f470632",
+      "regulatory-political-analyst::ev-e1dbcff0c3ce",
+      "virtual-chris::ev-b8cc3fba63f1",
+      "quantitative-analyst::ev-ecc4287de4b5",
+      "quantitative-analyst::ev-2db96f29f8fd",
+      "airport-coo::ev-02664ad8c067"
+    ],
+    "source_note": "FAA AIM § 7-6-16 (Change 3, Sept. 5, 2024); FAA AC 150/5200-33C; FAA Order 6750.16E (Apr. 10, 2014).",
+    "asset_source": "designer_built_from_spec"
+  },
+  "brand_profile": {
+    "voice": "Direct, technical, unhedged. An airspace planner's argument rendered for executives.",
+    "palette": "Dark navy ground, white and amber annotations; a single alert red reserved for the three interference vectors and the do-not-proceed claim.",
+    "typography": "One sans-serif family; headlines set as full sentences, not labels.",
+    "imagery_rule": "Schematic and diagrammatic only. Real IAD imagery only if it adds place or scale. No stock photography, clip art, or icon grids."
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "narrative_job": "Claim and stakes — state the recommendation and why the ground under it matters.",
+      "headline": "Do not build a data center inside the approach surfaces of a Cat II/III ILS runway.",
+      "evidence_ids": [
+        "quantitative-analyst::ev-ea97865736c8",
+        "regulatory-political-analyst::ev-26df0a99cb78"
+      ],
+      "visual_type": "annotated_site_diagram",
+      "visual_spec": "Plan-view schematic of the RWY 01L/19R end: runway centerline, RWY 1L approach and RWY 19R departure surface fans, ALSF-2 array, proposed data center footprint marked inside the fans. One caption: 9,400-ft runway, Cat II/III ILS, ALSF-2 — the highest-criticality approach lighting in the FAA inventory. Schematic, not to scale.",
+      "source_note": "FAA runway and instrument approach data, KIAD RWY 01L/19R (ALSF-2, Cat II/III ILS), via FlightAware approach plate.",
+      "density_budget": "Max 40 visible words: headline, three site labels, one caption.",
+      "speaker_note": "Open with the claim, not background. The site sits inside the RWY 1L approach and RWY 19R departure surfaces of IAD's Cat II/III ILS runway — the most instrument-critical corridor on the airfield. This is strategic capacity land; the recommendation is do not proceed at this location, not do not proceed with the developer."
+    },
+    {
+      "slide_number": 2,
+      "narrative_job": "Mechanism — show physically why the site fails, in one exhibit (signature visual).",
+      "headline": "A data center puts three interference vectors under one glide path.",
+      "evidence_ids": [
+        "quantitative-analyst::ev-9d3a1f470632",
+        "regulatory-political-analyst::ev-e1dbcff0c3ce",
+        "virtual-chris::ev-b8cc3fba63f1",
+        "quantitative-analyst::ev-ecc4287de4b5",
+        "quantitative-analyst::ev-2db96f29f8fd",
+        "airport-coo::ev-02664ad8c067"
+      ],
+      "visual_type": "annotated_corridor_cross_section",
+      "visual_spec": "Signature visual per top-level spec: side-view corridor cross-section with three labeled vectors — thermal plume turbulence to 'over 1,000 feet above the top of the stack or cooling tower' (AIM § 7-6-16); open-water basin versus AC 150/5200-33C's no-above-ground-standing-water design standard; metallic mass and emissions versus the ILS, with FAA Order 6750.16E: 'Placing an object outside the critical area does not guarantee non-interference with the ILS signal in space.'",
+      "source_note": "FAA AIM § 7-6-16 (Change 3, Sept. 5, 2024); FAA AC 150/5200-33C; FAA Order 6750.16E (Apr. 10, 2014).",
+      "density_budget": "Max 45 visible words: headline, three vector labels with regulatory anchors, one drawn quote.",
+      "speaker_note": "This is the whole mechanism in one picture. The hazards are physical, not procedural: turbulence a pilot cannot see, wildlife the corridor cannot tolerate, and signal interference no lease term can waive. FAA Technical Operations certifies the ILS and is not a party to any lease."
+    },
+    {
+      "slide_number": 3,
+      "narrative_job": "Proof — show the FAA has already ruled on this hazard class and holds independent enforcement hooks.",
+      "headline": "The FAA has already called this hazard class incompatible — and it holds the enforcement pen.",
+      "evidence_ids": [
+        "regulatory-political-analyst::ev-12066293b317",
+        "regulatory-political-analyst::ev-30aaf83ebd04",
+        "regulatory-political-analyst::ev-21423b6551b0",
+        "virtual-chris::ev-914a1d2558e3",
+        "airport-coo::ev-d32bdaf5307f",
+        "airport-coo::ev-d4921906be7e",
+        "airport-coo::ev-4a1230a983d0",
+        "quantitative-analyst::ev-69de31874686",
+        "regulatory-political-analyst::ev-8875fc133c63"
+      ],
+      "visual_type": "authority_stack_diagram",
+      "visual_spec": "Two-column exhibit. Left, 'Precedent': FAA 2015 Technical Guidance Memorandum — thermal plumes 'incompatible with airport operations'; CEC Docket 15-AFC-01 (Puente) — FAA found cooling-tower plumes a significant hazard to Long Beach departures. Right, 'Enforcement': Section 743's three preserved veto grounds; Grant Assurances 19, 20, 29 attaching independently; 14 CFR Part 16 remedies up to 3x illegally diverted revenue. Each entry one line.",
+      "source_note": "FAA Technical Guidance Memorandum, Sept. 24, 2015; CEC Docket 15-AFC-01; FAA Reauthorization Act of 2024 § 743; FAA Airport Sponsor Assurances (Apr. 2025); 14 CFR Part 16; 49 U.S.C. § 46301(a)(3).",
+      "density_budget": "Max 45 visible words: headline plus two five-line columns of short entries.",
+      "speaker_note": "This is precedent, not prediction. The FAA classified thermal plumes as incompatible with airport operations in 2015 and applied that finding against a power plant near Long Beach Airport. Section 743 preserves FAA jurisdiction on exactly the safety and federal-investment grounds this project implicates, and Assurances 19, 20, and 29 each attach independently."
+    },
+    {
+      "slide_number": 4,
+      "narrative_job": "Strongest objection, answered honestly — MWAA's own precedent argues for a different parcel, not this one.",
+      "headline": "MWAA's own data-center precedent argues for a different parcel, not this one.",
+      "evidence_ids": [
+        "contrarian::ev-2dec2f7dcb19",
+        "contrarian::ev-edb4a4fd6c24",
+        "regulatory-political-analyst::ev-21423b6551b0",
+        "airport-coo::ev-2ad0adeec299"
+      ],
+      "visual_type": "before_after_comparison",
+      "visual_spec": "Side-by-side panel. Left, '2018 Western Lands': 424 acres to Digital Realty, sited outside approach and departure surfaces, ALP change subject to NEPA with an Environmental Assessment in preparation. Right, 'Proposed site': inside the RWY 1L approach and 19R departure surfaces, no FAA ADO coordination, not on the approved ALP. Bottom bar: Section 743 preserves FAA review on aircraft safety, ground safety, and prior federal investment — assume review; do not lean on the 45-day window.",
+      "source_note": "MWAA press release, 'Sale of 424 Acres of Western Lands at Dulles International,' 2018; FAA Reauthorization Act of 2024 § 743; FAA ALP Preliminary Instructions Memorandum, Oct. 3, 2024.",
+      "density_budget": "Max 45 visible words: headline, two four-line panels, one bottom bar.",
+      "speaker_note": "Take the objection at full strength: data centers can work at IAD — MWAA proved it in 2018. But the Western Lands deal sat outside the protected surfaces and went through FAA process. The precedent validates the use and condemns the site. No documented incident in Loudoun County's roughly 26M sq ft of data centers, but none of them sit inside an ILS approach corridor; absence of an accident is not permission."
+    },
+    {
+      "slide_number": 5,
+      "narrative_job": "Ask — the four moves, sequenced, with the governing regulatory event named.",
+      "headline": "Halt, file the 7460-1, and move the deal — the aeronautical study governs, not the lease.",
+      "evidence_ids": [
+        "contrarian::ev-fc77401c0919",
+        "regulatory-political-analyst::ev-1984a4377d5a",
+        "regulatory-political-analyst::ev-7d26604dc07e",
+        "airport-coo::ev-5b22b785b4a6",
+        "regulatory-political-analyst::ev-73b494d6c0a1"
+      ],
+      "visual_type": "sequenced_action_flow",
+      "visual_spec": "Four numbered steps, left to right, each with an owner tag: (1) Halt advancement pending FAA ADO coordination — Planning; (2) File Form 7460-1; require a Determination of No Hazard covering height, lighting, plume dispersion, NAVAID compatibility — Planning; (3) Redirect the deal to master-plan non-aeronautical zones; Western Lands is the working envelope — Commercial Real Estate; (4) Route Grant Assurance exposure to General Counsel; any ALP amendment re-enters the master-plan process — Legal.",
+      "source_note": "FAA OE/AAA process, 14 CFR Part 77 and Form 7460-1; FAA ALP SOP 2.00; FAA Airport Sponsor Assurances (Apr. 2025).",
+      "density_budget": "Max 45 visible words: headline plus four steps of roughly eight words each with owner tags.",
+      "speaker_note": "Close on the decision anchor: the governing event is the Form 7460-1 filing and the aeronautical study that follows — every commitment made before that study returns is made against an undefined regulatory outcome. This redirects the deal, not the developer. The ask is a halt-and-resite, not a kill."
+    }
+  ],
+  "report_visuals": [],
+  "source_appendix": [
+    {
+      "footnote": "1",
+      "source": "FAA runway and instrument approach data, KIAD RWY 01L/19R (ALSF-2, Cat II/III ILS). FlightAware, https://www.flightaware.com/resources/airport/KIAD/IAP/ILS+RWY+01L+%28CAT+II+-+III%29."
+    },
+    {
+      "footnote": "2",
+      "source": "FAA Reauthorization Act of 2024, Section 743, as summarized in FAA Preliminary Instructions Memorandum on ALP Approval, October 3, 2024, https://www.faa.gov/airports/planning_capacity/alp-approval-preliminary-instructions; AAAE Regulatory Alert, October 2024, https://alerts.aaae.org/latest/regulatory_100524."
+    },
+    {
+      "footnote": "3",
+      "source": "Federal Aviation Administration, Aeronautical Information Manual § 7-6-16 (current through Change 3, September 5, 2024), https://faraim.org/faa/aim/chapter-7/section-7-6-16.html."
+    },
+    {
+      "footnote": "4",
+      "source": "FAA Technical Guidance Assessment Tool for Thermal Exhaust Plume Impact, September 24, 2015, https://www.faa.gov/sites/faa.gov/files/airports/environmental/land_use/Technical-Guidance-Assessment-Tool-Thermal-Exhaust-Plume-Impact.pdf."
+    },
+    {
+      "footnote": "5",
+      "source": "California Energy Commission, Docket 15-AFC-01 (Puente Power Project), FAA aeronautical study findings on cooling-tower plume hazard to departing aircraft at Long Beach Airport, https://efiling.energy.ca.gov/GetDocument.aspx?tn=215584."
+    },
+    {
+      "footnote": "6",
+      "source": "FAA Advisory Circular 150/5200-33C, Hazardous Wildlife Attractants On or Near Airports, https://www.faa.gov/airports/resources/advisory_circulars/index.cfm/go/document.information/documentID/1037215."
+    },
+    {
+      "footnote": "7",
+      "source": "FAA Order 6750.16E, Siting Criteria for Instrument Landing Systems (April 10, 2014), https://www.faa.gov/documentLibrary/media/Order/FINAL_SIGNED_Order_6750_16E_ILS_Siting_Criteria_06-09-2014_for_Web_posting%5B1%5D.pdf."
+    },
+    {
+      "footnote": "8",
+      "source": "FAA Airport Sponsor Assurances (April 2025 revision), Assurances 19, 20, and 29, https://www.faa.gov/airports/aip/grant_assurances."
+    },
+    {
+      "footnote": "9",
+      "source": "14 CFR Part 16 (Rules of Practice for Federally-Assisted Airport Enforcement), https://www.ecfr.gov/current/title-14/chapter-I/subchapter-B/part-16; civil penalty ceiling under 49 U.S.C. § 46301(a)(3)."
+    },
+    {
+      "footnote": "10",
+      "source": "Metropolitan Washington Airports Authority, 'Airports Authority Announces Sale of 424 Acres of Western Lands at Dulles International,' 2018, https://www.mwaa.com/news/airports-authority-announces-sale-424-acres-western-lands-dulles-international."
+    },
+    {
+      "footnote": "11",
+      "source": "FAA Obstruction Evaluation / Airport Airspace Analysis process, 14 CFR Part 77 and FAA Form 7460-1, https://oeaaa.faa.gov/."
+    }
+  ],
+  "accessibility_checks": [
+    "Minimum 4.5:1 contrast for all annotation text against the dark-navy ground; alert red never carries meaning alone — every red element also carries a text label.",
+    "Corridor cross-section and site diagram readable in grayscale: interference vectors distinguished by numbered labels, not color only.",
+    "Source notes set no smaller than 10 pt equivalent and never over imagery.",
+    "All schematics labeled 'not to scale' to prevent misreading annotated distances.",
+    "Alt text for each exhibit describes the argument the visual makes, not just its contents."
+  ],
+  "asset_requests": [
+    {
+      "asset": "Signature corridor cross-section (slide 2)",
+      "type": "designer_diagram",
+      "notes": "Built entirely from spec; verbatim regulatory quotes supplied above. No measured distances may be drawn to scale — the 2,500-ft site distance was removed in fact-check and must not appear."
+    },
+    {
+      "asset": "Plan-view site schematic (slide 1)",
+      "type": "designer_diagram",
+      "notes": "Approach/departure surface fans are schematic. Do not draw the RPZ as a labeled dimension; the fact-check removed all RPZ distance claims."
+    },
+    {
+      "asset": "Optional IAD aerial of the 01L/19R end",
+      "type": "photograph",
+      "notes": "Only if a rights-cleared, current aerial is available to ground slide 1 in place and scale; the deck ships without it. No stock photography."
+    }
+  ]
+}

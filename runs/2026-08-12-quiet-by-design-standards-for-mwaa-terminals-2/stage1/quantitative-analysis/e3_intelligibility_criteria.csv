@@ -1,0 +1,9 @@
+source,metric,threshold_value,threshold_units,scope,is_code_binding
+NFPA 72 (2022) Ch. 24,average STI per ADS,0.50,unitless,voice evacuation and mass notification,yes
+NFPA 72 (2022) Ch. 24,STI at 90% of measurement points,0.45,unitless,voice evacuation and mass notification,yes
+IEC 60268-16 Annex G,STI target for voice-address,0.50,unitless,public address non-emergency,consensus
+ACRP Report 175,STI target range,0.46-0.53,unitless,airport terminal PA design,consensus (research)
+ACRP Report 175,SNR announcement-to-ambient,10,dB(A),pier-style departure lounge holdrooms,consensus (research)
+ANSI/ASA S12.60,background sound in learning space,35,dBA (~NC 27),benchmark for sensory-quiet zones only,not applicable to main terminal
+MWAA-recommended,sensory-quiet zone ambient,40,dBA (~NC 30-35),analyst-recommended low-stimulation zones,analyst construction
+MWAA-recommended,commissioning re-verification cadence,5,years,per ADS post-opening,analyst construction

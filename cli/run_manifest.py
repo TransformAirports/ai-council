@@ -37,6 +37,45 @@ EXECUTION_CONTRACT_PATTERNS: tuple[str, ...] = (
     "cli/*.py",
 )
 
+# Modules that carry a run to the operator but do not generate its content.
+#
+# The contract exists to stop a resume from stitching together artifacts that
+# no two versions of the code would ever produce together. Transport and UI
+# code cannot cause that: a WebSocket reconnect fix, a terminal menu tweak, or
+# a change to the audit reader has no path to the text of a brief or the bytes
+# of a .docx. Hashing them as blocking meant every edit to this app bricked
+# resume for whatever was mid-flight — the tripwire fired on its own authors.
+#
+# These are still fingerprinted and still recorded in the manifest, so the
+# receipt stays complete and an investigator can see exactly what moved. They
+# just don't refuse the resume.
+#
+# The list is a DENYLIST on purpose. A new module added to cli/ is blocking
+# until someone deliberately declares it inert, so the failure mode of
+# forgetting is a loud false refusal, never a silently corrupt resume.
+#
+# server.py builds a spec for NEW runs (_build_spec), which does shape output —
+# but a resume reads its spec from the manifest, where it is hashed separately.
+APP_SHELL_PATHS: frozenset[str] = frozenset(
+    {
+        "cli/__main__.py",     # argv parsing
+        "cli/audit.py",        # post-hoc retrospective reader
+        "cli/events.py",       # event sink and transport
+        "cli/interactive.py",  # terminal prompts
+        "cli/menu.py",         # terminal UI
+        "cli/resume_repair.py",  # the repair tool itself
+        "cli/server.py",       # HTTP/WebSocket transport and dispatch
+    }
+)
+
+
+def generation_contract_records(
+    records: Iterable[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """The subset of the contract whose bytes can change a run's output."""
+
+    return [r for r in records if str(r.get("path", "")) not in APP_SHELL_PATHS]
+
 
 class ResumeContractMismatch(RuntimeError):
     """Raised when paid artifacts no longer match the executable run contract."""
@@ -60,6 +99,10 @@ def _contract_dict(contract: ArtifactContract) -> dict[str, Any]:
         "min_records": contract.min_records,
         "required_keys": list(contract.required_keys),
         "required_any": [list(group) for group in contract.required_any],
+        "requires_with": [
+            [trigger, list(dependents)]
+            for trigger, dependents in contract.requires_with
+        ],
         "optional": contract.optional,
     }
 
@@ -315,7 +358,8 @@ def _expected_artifacts(spec: Any) -> list[dict[str, Any]]:
                             "source_type",
                             "confidence",
                         ),
-                        required_any=(("source_url", "source_path"),),
+                        required_any=(("source_url", "source_path", "source_citation"),),
+                    requires_with=(("source_citation", ("page_or_section",)),),
                         optional=name == "deep-research",
                     ),
                 ),
@@ -362,7 +406,9 @@ def _expected_artifacts(spec: Any) -> list[dict[str, Any]]:
                         "is_primary",
                         "confidence",
                     ),
-                    required_any=(("source_url", "source_path"),),
+                    required_any=(("source_url", "source_path", "source_citation"),),
+                    # The ledger normalizes page_or_section into `locator`.
+                    requires_with=(("source_citation", ("locator",)),),
                 ),
             ),
             _artifact(
@@ -990,8 +1036,17 @@ def create_run_manifest(
         },
         "source_material": source_material,
         "source_library": source_library,
-        "execution_contract": execution_contract,
-        "selected_research_agents": selected_agents,
+        # Only generation code binds the identity. App-shell modules are still
+        # recorded in the manifest for the receipt; see APP_SHELL_PATHS.
+        "execution_contract": generation_contract_records(execution_contract),
+        # Identity is order-insensitive for the roster. WHICH agents are seated
+        # is the contract; the order the operator happened to click them is not.
+        # The web form records selection order while the run prompt normalizes
+        # to registry order, so an order-sensitive hash refuses legitimate
+        # resumes. Execution order is unchanged — this sorts the hashed copy only.
+        "selected_research_agents": sorted(
+            selected_agents, key=lambda item: str(item.get("name", ""))
+        ),
         "process_agents": process_agents,
         "pipeline": [
             {
@@ -1317,7 +1372,12 @@ def assert_manifest_complete(manifest_path: Path) -> dict[str, Any]:
         except ResumeContractMismatch as exc:
             failures.append(f"execution contract: {exc}")
         else:
-            if current_execution_contract != recorded_execution_contract:
+            # Compare generation code only. A recorded contract may predate the
+            # app-shell split and still carry transport modules, so filter both
+            # sides rather than assuming the stored list is already narrow.
+            if generation_contract_records(
+                current_execution_contract
+            ) != generation_contract_records(recorded_execution_contract):
                 failures.append(
                     "execution contract: code, prompts, or design rules changed "
                     "after the run began"
@@ -1353,6 +1413,12 @@ def assert_manifest_complete(manifest_path: Path) -> dict[str, Any]:
             required_any=tuple(
                 tuple(group)
                 for group in (raw_contract.get("required_any") or ())
+            ),
+            requires_with=tuple(
+                (str(trigger), tuple(dependents))
+                for trigger, dependents in (
+                    raw_contract.get("requires_with") or ()
+                )
             ),
             optional=bool(raw_contract.get("optional", False)),
         )

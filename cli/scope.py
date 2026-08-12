@@ -1,8 +1,8 @@
 """Scope-fulfillment mode — turn a client scope of work into its deliverables.
 
 The single-report pipeline answers a question. This pipeline fulfills an
-engagement: drop a scope document (RFP, SOW, emailed scope) into sources/,
-and the Council plans the deliverables, researches the regulatory and
+engagement: supply a scope document (RFP, SOW, or emailed scope), and the
+Council plans the deliverables, researches the regulatory and
 professional grounding once, then builds every required artifact — Word
 documents and PowerPoint decks — with an acceptance-review QA pass at the end.
 
@@ -953,6 +953,7 @@ async def run_scope_pipeline(
     *,
     title: str,
     notes: str | None = None,
+    source_files: Iterable[Path] | None = None,
     repo_root: Path = REPO_ROOT,
     auto_approve: bool = False,
     budget_usd: float | None = None,
@@ -982,21 +983,27 @@ async def run_scope_pipeline(
         except (OSError, json.JSONDecodeError):
             notes = ""
 
-    # Attach scope documents from the drop zone (or reuse ones already
-    # attached to this engagement on a previous, interrupted attempt).
-    dropped = discover_dropzone(repo_root / "sources")
-    if dropped:
-        attach_sources(slug, dropped, repo_root / "outputs")
+    # Browser runs pass an explicit, isolated selection. Terminal runs retain
+    # the source-folder workflow when no explicit selection is provided.
+    supplied = (
+        discover_dropzone(repo_root / "sources")
+        if source_files is None
+        else [Path(path) for path in source_files]
+    )
+    if supplied:
+        attach_sources(slug, supplied, repo_root / "outputs")
     source_inventory = _scope_source_library(repo_root, slug)
     source_paths = [
         path.relative_to(repo_root).as_posix()
         for path in _scope_readable_sources(repo_root, slug)
     ]
     if not source_paths:
-        raise RuntimeError(
-            "No scope documents found. Drop the scope (PDF, Word, or text) into "
-            "sources/ and relaunch."
-        )
+        if source_files is None:
+            raise RuntimeError(
+                "No scope documents found. Drop the scope (PDF, Word, or text) "
+                "into sources/ and relaunch."
+            )
+        raise RuntimeError("No scope documents found. Add at least one document and relaunch.")
     state_path = _prepare_scope_state(
         base=base, slug=slug, title=title, operator_notes=notes
     )

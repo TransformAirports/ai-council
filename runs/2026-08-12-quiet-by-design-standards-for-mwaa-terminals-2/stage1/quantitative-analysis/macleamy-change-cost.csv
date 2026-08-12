@@ -1,0 +1,7 @@
+stage,multiple_low,multiple_high,base_capital_usd,result_low_usd,result_high_usd
+schematic_design,1,1,9570000,9570000,9570000
+design_development,2,3,9570000,19140000,28710000
+construction_documents,4,6,9570000,38280000,57420000
+bidding_gmp,5,8,9570000,47850000,76560000
+construction,10,20,9570000,95700000,191400000
+post_occupancy_retrofit,20,100,9570000,191400000,957000000

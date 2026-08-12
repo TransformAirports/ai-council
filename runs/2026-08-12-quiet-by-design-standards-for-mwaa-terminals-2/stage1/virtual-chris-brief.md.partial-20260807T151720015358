@@ -1,0 +1,328 @@
+# Virtual-Chris Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Author lens:** Chris — connections, adjacencies, and the alliances the risk-first
+agents will miss.
+**Date:** 2026-08-07
+
+---
+
+## Opening frame
+
+The other briefs in this run will do their job: they will inventory the
+acoustic specifications, contest the intelligibility thresholds, price the
+commissioning, and stress-test the airline exposure. That is necessary work
+and I am not here to duplicate it. My job is to argue that MWAA's quiet-by-
+design decision is, at its core, a *network* decision — a piece of policy
+whose value comes from what it *connects to* rather than from what it *is*.
+
+The thesis lands inside an unusually rich lattice: a new 15-year Use & Lease,
+a $9 B CCP that will grow to something on the order of $20–22.5 B at IAD, a
+regional peer (BWI) that just joined the Sunflower program, an FAA grant
+program whose scoring rubric explicitly rewards accessibility, an ACRP
+research base that already contains most of the technical answers, and a
+White House that made Dulles a joint political announcement six weeks ago.
+Almost every piece of this lattice is under-exploited. The strategic
+question is not "should MWAA adopt a standard?" It is "what else does this
+standard unlock, and how much of it can be unlocked inside 24 months?"
+
+That is the frame the rest of this brief holds.
+
+---
+
+## 1. The lattice — non-obvious connections this thesis activates
+
+- **Design & Construction ↔ HOK international-concourse team ↔ FAA ATP
+  scoring.** The 1.735-million-sq-ft international expansion at IAD is being
+  designed by HOK right now, and its follow-on Federal Inspection Services
+  facility is roughly 176,000 sq ft [1]. The design manual is the leverage
+  point: an acoustic/PA standard inserted before that program reaches ~30%
+  design becomes program cost. Inserted after, it is a change order. That
+  single insertion also converts "accessibility" from a value statement into
+  a scoring credit under the FAA Airport Terminal Program, which lists
+  "expand access for persons with disabilities" as a stated selection
+  criterion [2]. One document; two payoffs.
+
+- **BWI ↔ regional traveler ↔ MWAA's Maryland-appointed board members.** BWI
+  Thurgood Marshall joined the Hidden Disabilities Sunflower Program in May
+  2025 [3]. In a three-airport regional market where the same traveler
+  chooses among BWI, DCA, and IAD, the quiet-by-design standard has an
+  obvious diplomatic partner. Adding Sunflower at MWAA now, and framing it
+  as *regional coherence with a Maryland peer*, is a low-cost win that plays
+  directly to the three Maryland-appointed board seats without asking them
+  to spend political capital.
+
+- **Emergency Management ↔ Public Safety ↔ NFPA 72 intelligibility floor.**
+  NFPA 72 requires a measured Speech Transmission Index of at least 0.45 in
+  90 percent of measurement locations per acoustically distinguishable
+  space, with an average of at least 0.50 [4]. That is the *floor*, and
+  most airport hold-rooms, gate lounges, and baggage halls do not verify
+  compliance building-wide. Quiet-by-design done right maps every ADS,
+  measures STI at commissioning, and gives the Emergency Manager and the
+  Director of Public Safety a defensible evidence base after the January
+  2025 midair collision made post-incident communication a live board-level
+  question.
+
+- **Concessions and clubs ↔ dwell and spend ↔ United Club at Concourse E.**
+  Concourse E opens in September 2026 with 46,000 sq ft of concessions and
+  a 40,000-sq-ft United Club [5][6]. Concessionaires and premium-club
+  operators are natural allies of a quiet standard because a legible sonic
+  environment lengthens dwell and lifts non-aeronautical revenue. This is
+  the constituency the standard needs, and nobody has asked them.
+
+- **Airline Use & Lease MII ↔ program cost vs. scope ↔ 2030 CPE trajectory.**
+  Airline CPE is forecast to move from $12.77 to $20.71 by 2030 under the
+  CCP [7]. Any standard added mid-project as new scope becomes an MII
+  argument. A standard added at the design-manual level, applied at project
+  inception, is materially harder to classify as MII-triggering because it
+  is baseline program cost rather than incremental scope. The vehicle
+  matters more than the content.
+
+- **Historic preservation (Saarinen Main Terminal) ↔ acoustics ↔ adaptive
+  reuse.** The Saarinen terminal is a designated icon and one of the most
+  reverberant public halls in North American aviation. A quiet-by-design
+  standard opens the door to acoustic remediation the historic-preservation
+  community can actually endorse: soft goods, floor systems, absorptive
+  furnishings, distributed low-density loudspeakers. Without a standard,
+  every intervention is treated as an aesthetic infringement.
+
+- **DCA slot economics ↔ Section 502 long-hauls ↔ missed-boarding cost.**
+  Section 502 of the 2024 FAA Reauthorization added ten daily beyond-
+  perimeter exemptions at DCA; a missed boarding on a slot-exempt SEA, SFO,
+  LAS, SAT, or SAN flight is not a seat problem, it is a slot problem. The
+  quiet-terminal standard's most important operational metric at DCA is
+  therefore *missed-boarding rate*, not *decibels*. Nobody outside airline
+  operations frames it this way, and that is the frame that will unlock
+  their support.
+
+- **White House ↔ Dulles narrative ↔ political currency at zero federal
+  cost.** The July 2026 Dulles announcement was joint MWAA / United /
+  USDOT / White House. "Quiet, dignified, orderly" is a message the current
+  administration can carry, and it costs no federal dollars. That is a rare
+  configuration; it should be used.
+
+---
+
+## 2. Three cross-disciplinary pattern matches
+
+### Pattern 1 — HCAHPS "Quiet at Night" and CMS Value-Based Purchasing (2007–present)
+
+Before 2007, U.S. hospitals treated overnight noise as an operational nuisance
+the way most airports today treat terminal soundscape. That changed when the
+HCAHPS survey embedded "Quiet at Night" as a scored patient-experience
+measure and CMS tied roughly 25% of the Value-Based Purchasing Total
+Performance Score to HCAHPS results [8]. The behavioral response was
+striking: hospitals reorganized overnight nursing rounds, adopted vibrating
+pagers, replaced squeaky wheels on floor cleaners, and specified acoustic
+finishes into renovations they would not have specified otherwise. The
+finding: *what you measure is what you renovate.*
+
+**Mapping to MWAA.** A quiet-by-design standard without a scoreboard is a
+design manual entry. A quiet-by-design standard with a scored MWAA-internal
+metric — STI at commissioning, dB(A) LEQ by zone, announcement frequency,
+missed-boarding rate, exclusion-complaint rate — becomes an operating
+discipline. HCAHPS is the proof that measurement changes behavior more
+reliably than requirements do. MWAA can copy the mechanism directly.
+
+### Pattern 2 — The Berkeley curb-cut, September 28, 1971
+
+In 1971 the Berkeley "Rolling Quads," led by Ed Roberts, poured concrete and
+took jackhammers to city curbs at night to force the city to build
+wheelchair ramps [9]. The city relented and made curb cuts standard in
+commercial districts. What happened next is the point: curb cuts, designed
+for one small user group, turned out to be beneficial for parents with
+strollers, delivery workers with hand trucks, cyclists, skateboarders,
+and — the population that dominates airport terminals — travelers with
+wheeled luggage.
+
+**Mapping to MWAA.** Design the sonic environment for the traveler who is
+hard-of-hearing, autistic, cognitively fatigued, non-English-speaking, or
+smartphone-less, and the airport becomes measurably better for the
+frequent business traveler who represents most of DCA's federal-adjacent
+demand. The design-for-the-tail-defines-the-median principle is
+disproportionately powerful in airports precisely because 5% of passengers
+in "sensory distress" produce a far larger share of missed connections,
+gate-agent interruptions, and negative-experience surveys than their share
+of headcount predicts. The curb-cut lens also reframes accessibility from
+"cost center" to "median-experience upgrade" — which is how it gets funded.
+
+### Pattern 3 — SFO's Quiet Airport Program (2018–2020)
+
+SFO implemented gate-only boarding calls in 2020, reports a 40% reduction in
+boarding-area announcements, and claims roughly 90 minutes of noise removed
+per day in the International Terminal [10]. It is the nearest domestic peer
+this thesis has. It is also a cautionary tale: SFO drew visible complaints
+from travelers who don't use airline apps and don't hear terminal-wide calls
+in the way they used to.
+
+**Mapping to MWAA.** The lesson is not "quieter is bad." The lesson is that a
+quiet standard is only as strong as its *redundant channels*. Where SFO
+under-invested was in signaling the alternatives — the app push, the visual
+gate call, the seat-back FIDS in the concourse, the Sunflower lanyard, the
+human at the podium. MWAA can arrive at the same operational outcome (40%
+fewer announcements) *and* the accessibility outcome (measurable exclusion
+rate falling) by writing the redundant-channel requirements *first* and the
+announcement-reduction targets *second*. Sequence is strategy.
+
+---
+
+## 3. The opportunity register — ranked, actionable within 24 months
+
+1. **Insert acoustic/PA/redundant-channel criteria into the MWAA Design
+   Manual before the HOK international expansion reaches 30% design.**
+   *First step:* commission a scoping memo from D&C's design standards team
+   identifying which volumes of the manual (IAD Vol. 1 and Vol. 2, DCA
+   parallels) require amendment and what change-control process governs.
+   *Window:* 6–12 months.
+
+2. **Join the Hidden Disabilities Sunflower Program, alongside BWI.**
+   *First step:* a single MOU with the Sunflower program and a lanyard
+   inventory. Costs are trivial; program-launch precedent already exists at
+   BNA, BWI, MCI, PNS, SLC and others [3][11]. *Window:* 0–6 months.
+
+3. **Use Concourse E as an instrumented pilot.** Baseline STI, dB(A) LEQ,
+   announcement frequency, employee sound-exposure, and passenger-experience
+   metrics at Day 1, again at Day 90, and again at Day 365. *First step:*
+   negotiate the measurement scope with Turner/PGAL before substantial
+   completion and fold it into commissioning. *Window:* 6–18 months.
+
+4. **Position quiet-by-design and accessibility as ATP scoring credits in
+   FY27 and FY28 applications.** The ATP program has $1 B annual notional
+   funding through FY26 under IIJA and continues in the FY26 NOFO [2][12].
+   *First step:* liaise with the CFO's federal-funding team to score at
+   least one CCP project against ATP criteria and quantify the
+   accessibility credit. *Window:* 12–18 months.
+
+5. **Third-party acoustic commissioning agreement with a research entity.**
+   ACRP Research Report 175 was authored by Wilson, Ihrig & Associates and
+   remains the industry's most cited PA-intelligibility reference [13].
+   *First step:* an RFI to identify qualified third-party commissioning
+   authorities and confirm procurement pathway. *Window:* 6–12 months.
+
+6. **Employee sound-exposure baseline.** Publicly signalled workers'-comp
+   and OSHA exposure liability grows quietly for airport-employed gate,
+   ramp, custodial, and concessions staff. *First step:* dosimetry pilot in
+   the two loudest concourse zones at IAD and DCA. *Window:* 6–12 months.
+
+7. **A board-facing narrative: "MWAA sets the U.S. airport standard for
+   dignified sound."** *First step:* a one-page framing memo to the
+   President & CEO's office ahead of the next board planning cycle.
+   *Window:* 0–6 months. This is the cheapest opportunity on the list and
+   the most likely to compound.
+
+---
+
+## 4. Collaboration paths — the two hardest oppositions
+
+### Opposition 1 — Signatory airlines (United at IAD, American at DCA)
+
+*Their reasonable objection:* "This will cost us missed boardings, complicate
+IROP calls, and might trigger MII."
+
+*What they actually need:* United needs Concourse E and the follow-on
+international expansion to feel premium. Their new 40,000-sq-ft club, their
+concessions program, and their international transfer product all improve
+in an intelligible sonic environment. American at DCA has the more
+sensitive missed-boarding math (slot economics) and therefore the strongest
+reason to *want* a boarding-communication standard that is measurably
+better than the current PA-only default.
+
+*Trade to offer:* Joint pilot at United's Concourse E gates with a shared
+metric (missed-boarding rate). If it moves in United's favor, the
+airline-facing case writes itself. Structure the standard as design-manual
+baseline (not MII scope) and give the airlines a formal comment window,
+not a veto.
+
+*First convening:* MWAA D&C + Airline Affairs + United station leadership +
+American station leadership at DCA, held before the incremental Dulles
+scope's MII package is finalized. Agenda: one metric (missed-boarding
+rate), one instrumented pilot (Concourse E), one commitment (the standard
+is design-manual, not MII scope).
+
+### Opposition 2 — Legacy PA vendors and integrators
+
+*Their reasonable objection:* Performance-based specifications erode the
+seller's incumbency advantage in loudspeaker density and channel count.
+
+*What they actually need:* Predictable pipeline. A performance-based
+standard is not a threat if the pipeline expands, and this pipeline
+expands materially — Concourse E, the HOK international expansion, DCA
+gate refresh, and the AeroTrain extension all become PA/audio programs
+inside the same 24-month window.
+
+*Trade to offer:* Convert the specification from "product density" to
+"measured intelligibility at commissioning." Same vendors, larger pipeline,
+different competitive metric. The good vendors win. The order-taking
+vendors lose.
+
+*First convening:* An industry day with a draft performance specification,
+convened by MWAA D&C and Procurement, six months before the design-manual
+change is issued. The reframing beats the surprise.
+
+---
+
+## 5. Pull-ready observations
+
+1. "The quiet-airport question is not silence versus announcements. It is
+   intelligibility versus noise. Only one of those has an ANSI-recognized
+   metric, and MWAA does not currently require it building-wide."
+
+2. "The window closes when the HOK international concourse crosses 30%
+   design. Before that, this is a design guideline. After, it is a change
+   order."
+
+3. "SFO cut boarding announcements by 40% and saved roughly 90 minutes of
+   daily noise. The complaints it drew came almost entirely from travelers
+   the redundant channels forgot. That is a design failure, not a policy
+   failure — and it is the one MWAA has the opportunity to avoid."
+
+4. "The airline economics inverted the moment slot-exempt long-hauls started
+   boarding at DCA. A missed boarding at DCA is not a seat problem
+   anymore; it is a slot problem. That is the frame that will bring the
+   airlines to the table."
+
+5. "The curb cut was built for wheelchair users and turned out to be for
+   everyone with wheeled luggage. The Sunflower lanyard, the visual gate
+   call, the app push and the human at the podium are the twenty-first-
+   century curb cut of the airport terminal. Design the standard for the
+   traveler at the edge, and the median passenger gets the upgrade."
+
+---
+
+## Evidence gaps I want to flag
+
+- Whether the current MWAA Design Manual already contains any acoustic
+  performance targets (NC/RC, T60/RT30, STI) at the airport-specific
+  volumes level. The public record does not resolve this.
+- Whether either airport has ever piloted a reduced-announcement or PA-
+  zoning practice, and what if anything was measured.
+- Current MII language in the 2025 Use & Lease as it applies to design
+  standards changes versus program scope changes.
+- Current employee sound-exposure monitoring practice at gate, ramp, and
+  concessions staff levels.
+
+These gaps do not weaken the argument for a standard. They shape the *first
+year* of implementation and belong in the deliverable's "open questions"
+register.
+
+---
+
+## Sources cited in this brief
+
+1. ENR, "New Dulles Airport Concourse Reaches Construction Milestone."
+2. FAA, Airport Terminal Program FY 2025 Notice of Funding Opportunity.
+3. Maryland DOT / BWI press release, May 2025.
+4. NFPA 72 (2010 ed.) Chapter 24 and Annex D.
+5. FFXnow, "New Dulles Airport concourse on track to arrive in 2026."
+6. ENR, Concourse E facts sheet, cited above.
+7. MWAA Series 2025A Airport System Revenue Bonds Official Statement.
+8. CMS HCAHPS technical documentation and Value-Based Purchasing summaries.
+9. Wikipedia, "Curb cut effect"; Berkeley disability-rights history.
+10. SFO Quiet Airport Program public reporting, 2020–2024 press coverage.
+11. Hidden Disabilities Sunflower Program participating-airport lists.
+12. FAA, "Airport Terminals" program page (IIJA).
+13. ACRP Research Report 175, "Improving Intelligibility of Airport
+    Terminal Public Address Systems," 2017.
+
+Full evidence trail with URLs, page/section, and confidence in
+`virtual-chris-evidence.jsonl`.

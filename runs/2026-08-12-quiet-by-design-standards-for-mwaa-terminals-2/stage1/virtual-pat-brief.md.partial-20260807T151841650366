@@ -1,0 +1,148 @@
+# Virtual Pat — Brief
+
+**Run:** quiet-by-design-standards-for-mwaa-terminals-2
+**Lens:** Solution-oriented; asset-recombination; cheap-and-shipping beats comprehensive-and-late.
+**One-line thesis:** MWAA does not need a nine-figure program to become measurably quieter. The bulk of the win is a governance change and about $8–15 million of surgical work at IAD and DCA, most of it inside existing budgets and inside the design-manual authority the Authority already holds. The remaining question is whether MWAA will spend three years studying the problem or ninety days piloting the fix.
+
+---
+
+## 1. The asset inventory read — what's already on the property that matters here
+
+MWAA does not start from zero. Four of the six things a serious quiet-by-design standard needs are already in the building.
+
+- **The Airports Authority Design Manual (seven volumes).** MWAA already owns the vehicle a quiet standard would ride in. Acoustics performance criteria, PA zoning rules, FIDS density minimums, and tenant broadcast constraints do not require new legal authority — they require a numbered revision to volumes that already govern signing, tenant construction, and MEP. This is the single biggest under-used asset on the property.
+- **The FIDS network, DSE displays, and the mobile app.** IAD and DCA already operate airport-wide flight information display systems plus a growing digital signage estate, plus an MWAA mobile app and the airline apps that carry irregular-ops messaging. The redundant visual/digital channel a quiet standard requires is 80% built. What is missing is the *policy* that says "if it is broadcast on the PA, it must first appear here."
+- **The 2025 Use & Lease and the Concourse E opening.** MWAA just signed a 15-year residual agreement and is 30–60 days from opening a brand-new 14-gate United concourse at IAD. Concourse E is a purpose-built A/B testbed sitting inside the current CCP. Any quiet-by-design standard that is not stress-tested there before Concourse C/D design intent packages harden has missed a free pilot.
+- **The Saarinen Main Terminal itself.** IAD's icon is a coffered concrete shell with famously long reverberation. That is a problem *and* an asset: the terminal already tells passengers to expect a cathedral. Concessionaires, gate zones, and the CBP FIS have all had 60+ years to build workarounds. Any quiet standard has to distinguish "hallowed volume, do not touch" from "concessions cluster, absorb aggressively."
+- **The employees who already know where the noise is.** Gate agents at DCA Concourse C, custodial staff in Concourse A, the CBP officers at IAD FIS, the Metropolitan Washington Airports Authority Police Department dispatchers, and the MWAA Fire and Rescue crews all live inside the acoustic environment daily. Their internal noise map is more accurate than any consultant's first-pass STIPA sweep, and it costs nothing to harvest.
+- **The board's proven willingness to embed passenger-experience requirements in tenant construction.** MWAA already dictates sign face materials, gate hold-room fit-out standards, and food-court finish palettes through Volumes 2 and 3 of the Design Manual. Adding NC/RT/STI targets to the same volumes is a category the Authority already exercises — it is not a new form of regulation on tenants.
+
+---
+
+## 2. Five unconventional solutions, most to least achievable
+
+### Solution 1 — Rewrite the announcement, not the terminal (governance-first)
+
+**Problem attacked:** The single biggest lever on perceived noise is the number and length of announcements, not the acoustic finish. Helsinki, Schiphol, and SFO cut perceived noise dramatically without touching the ceiling grid; SFO reports ~90 minutes/day of announcements removed from the International Terminal after a 2018 policy change.
+
+**Mechanism:** MWAA issues a numbered Order and Instruction — one for IAD, one for DCA — that classifies every PA use into four tiers: (1) life-safety, always broadcast, terminal-wide; (2) irregular-operations, broadcast in affected zones only; (3) flight-specific, gate zone only, and never for anything the passenger's boarding pass already tells them; (4) commercial and courtesy, prohibited. The Order becomes an exhibit to the airline and tenant handbooks under the 2025 Use & Lease.
+
+**Assets recombined:** Existing MWAA rulemaking authority. Existing airline handbook mechanism. Existing FIDS and app channels absorb the paging that Tier 3 and Tier 4 removes.
+
+**Cost order-of-magnitude:** Low five figures — legal drafting, board resolution, airline consultation. No capital.
+
+**Implementation path:** Draft in 30 days. Airline briefing under the Use & Lease at the next scheduled operations meeting. Board consent-calendar item. Enforcement through the existing tenant compliance mechanism.
+
+**Who resists and why:** Some airline station managers who use PA as a substitute for staffing at the gate. Concessionaires who lose the "special today" spot. Both are surmountable if the standard grandfathers safety and IROP calls and gives a 90-day compliance window.
+
+**Failure mode:** The Order gets written but never enforced because nobody at MWAA has "PA compliance" in their scope. Fix by naming a specific role (Director of Operations at each airport) as the accountable officer and by putting a monthly announcement-count dashboard in front of them.
+
+---
+
+### Solution 2 — Turn Concourse E into a live A/B test before it opens
+
+**Problem attacked:** MWAA is about to open 435,000 square feet of new United gate space at IAD. Every acoustic and PA specification for Concourse C/D — a program that could reach $20B+ — will be argued about with reference to Concourse E's performance for the next decade. If MWAA opens E without a designed acoustic and PA measurement baseline, it will spend the C/D design phase re-litigating settled questions.
+
+**Mechanism:** Before commissioning acceptance, run a two-week STIPA + ambient sound + announcement-count baseline in all 14 hold rooms. Then split the concourse: seven gates run under the legacy IAD announcement script; seven run under the proposed quiet-by-design Order (Solution 1). Measure passenger missed-boardings, on-time push, gate agent perceived workload, and ambient level at the same six points daily for 90 days.
+
+**Assets recombined:** The concourse itself, the AeroTrain data (which tells you exactly when the passenger arrived at the gate), the FIDS gate-change log (already timestamped), the ACARS out-off-on-in feed the airport already ingests. Add one $30,000 rental of six Class 1 sound-level meters and one acoustic consultant retainer, and the pilot is instrumented.
+
+**Cost order-of-magnitude:** $150K–$300K — acoustic consultant, meter rental, dashboard build, MWAA analyst time. No capital.
+
+**Implementation path:** Concourse E is opening now. The measurement plan has to be signed off in the next 60 days or the free baseline is lost. This is a "do it by Thursday" item if the Council wants a real number to argue with in 2027.
+
+**Who resists and why:** United station leadership will worry about missed-boarding risk on the quiet-side gates during the test. Address by (a) running the quiet script only on flights ≥60 minutes to departure, (b) auto-escalating to legacy script if any flight is inside T-15 minutes without boarding-complete, (c) sharing the missed-boarding data with United daily.
+
+**Failure mode:** The test proves quiet is fine but nobody at MWAA moves the finding into the Concourse C/D design brief. Fix by making the C/D program manager the *reader* of the pilot report, not just its recipient.
+
+---
+
+### Solution 3 — Directional loudspeakers plus painted "listening zones" in the loudest concourses
+
+**Problem attacked:** DCA Terminal 2 (Pelli National Hall and the four attached concourses) is the archetype of a hold room where every gate's announcements bleed into every other gate. This is exactly the problem parametric/directional loudspeaker arrays solved for TSA checkpoints — a well-documented deployment at multiple US airports using the Brown Innovations SB-47 SonicBeam and comparable products.
+
+**Mechanism:** In the six loudest hold rooms at DCA (a walk-around survey nominates them; the internal noise map from asset #5 above confirms) and the two loudest at IAD (Concourse B international arrivals; Concourse D gate cluster), replace the existing ceiling-mounted omni PA loudspeakers with a paired directional array. Paint a "listening zone" floor decal in front of the gate podium so passengers self-select into the beam when they want the announcement.
+
+**Assets recombined:** The existing PA distribution (amplifiers, cabling, DSP). The existing gate podium. Wayfinding paint budget the airport spends every year anyway. What is new is 30–50 directional loudspeakers per hold room cluster and a DSP re-tune.
+
+**Cost order-of-magnitude:** Roughly $400K–$800K for eight hold rooms including engineering, procurement, install, and commissioning. Fits comfortably inside the DCA CCP terminal-repairs line without a new capital authorization.
+
+**Implementation path:** Retrofit during off-peak overnight windows in existing terminals. No airline concurrence trigger under any conventional MII threshold because it is a like-for-like replacement of PA hardware.
+
+**Who resists and why:** MWAA Fire Marshal will (correctly) ask how directional coverage satisfies NFPA 72 voice evacuation intelligibility. Answer: keep the existing omni distribution live and interlocked for fire alarm; the directional array carries operational/boarding tier only. Two systems, one enclosure, common commissioning.
+
+**Failure mode:** The narrow beam width means a passenger sitting six feet off axis hears nothing. Mitigated by installing paired arrays and by pairing every directional call with an FIDS visual pulse (already in place).
+
+---
+
+### Solution 4 — Take back the televisions
+
+**Problem attacked:** A meaningful share of terminal noise is not the PA. It is 60–80 cable-news televisions in bars, food courts, gate holds, and lounges, most of them slightly out of sync with each other. Federal accessibility rules already require closed captioning on airport public-area televisions receiving federal funding at airports with ≥10,000 flights annually — a rule MWAA is already subject to. The rule permits mute; nothing requires audio.
+
+**Mechanism:** Amend the DCA and IAD tenant handbooks (concessions, lounges) to prohibit audible television audio in public-facing areas except in explicit "sports bar" zones designated by tenant lease. Require captions on all displays. Extend the same standard to MWAA-owned displays in hold rooms and common-use corridors.
+
+**Assets recombined:** The tenant lease amendment mechanism the Authority already uses annually. The existing displays. The federal captioning rule that already binds the airport.
+
+**Cost order-of-magnitude:** Low five figures. Signage, tenant notice, an inspection pass.
+
+**Implementation path:** 60-day tenant notice; the next scheduled tenant handbook update carries it. Enforcement via the same lease-compliance officer who inspects for grease-trap and hours-of-operation compliance.
+
+**Who resists and why:** Concessions operators who believe TV audio drives dwell. The evidence on that is weaker than they claim, and hotels — a closer analog — have removed lobby TV audio without a revenue hit.
+
+**Failure mode:** Enforcement erodes. Mitigate by including a "silent operation" line in the monthly concession inspection scorecard.
+
+---
+
+### Solution 5 — Buy MWAA the ability to measure itself before buying anything else
+
+**Problem attacked:** The Council can produce the most rigorous quiet-by-design standard in North American aviation and it will not compile into action, because MWAA today has no continuous, terminal-wide acoustic measurement capability. Every claim about "quieter" is anecdote. Every capital decision is subject to consultant relitigation.
+
+**Mechanism:** Deploy 60–100 permanent Class 1 or Class 2 sound-level meters at fixed positions across both airports — one per hold room, three per concourse spine, three per baggage claim, three per FIS at IAD — reporting one-minute Leq to the existing MWAA Operations Center dashboard. Cost per meter has fallen to the low four figures for airport-grade units. Total meter procurement: roughly $600K–$1.2M. Integration into the existing Operations Center: another $300K–$500K. Ongoing calibration and maintenance: existing facilities staff, one afternoon per meter per year.
+
+**Assets recombined:** The Operations Center that already exists. The IT fiber backbone that already reaches every concourse. The BIM model that already knows where the ceiling grid is.
+
+**Cost order-of-magnitude:** $1.0M–$1.7M one-time; ~$150K/year operating. This is the *entire* infrastructure the quiet-by-design standard needs to be enforceable, and it is 1% of the announced Dulles transformation cost.
+
+**Implementation path:** RFP inside 90 days. Meters online inside 12 months. First calendar year of data feeds the Concourse C/D design intent.
+
+**Who resists and why:** Nobody who understands what it does. Some finance staff will note it is an OpEx-ish spend hiding as CapEx; the answer is that it is federal-eligible under most terminal-improvement categories and can be embedded in the E commissioning line.
+
+**Failure mode:** Data collected, never looked at. Fix by making the dashboard the Chief Operating Officer's morning stand-up screen alongside on-time performance.
+
+---
+
+## 3. Precedents — operations that already run something like this
+
+- **San Francisco International (SFO)** — implemented a "quiet airport" policy in 2018 targeting overlapping PA, tenant music, and non-essential announcements. SFO reports a >40% reduction in overall onsite noise and ~90 minutes/day of announcements removed from the International Terminal. Publicly reported passenger response is largely positive. [Source: https://viewfromthewing.com/san-francisco-airport-removed-90-minutes-of-daily-noise-travelers-say-it-changed-everything/]
+- **Helsinki Airport (Finavia)** — discontinued terminal-wide flight and passenger paging; announcements now made at the departure gate and for emergencies only. Longest-running large-hub example of tier-based announcement policy. [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over]
+- **Amsterdam Schiphol** — has run a "silent airport" policy since ~2011; announcements largely confined to essential information; measured noise reduction on the airside (aircraft-driven, not terminal) and passenger satisfaction at a 10-year high in 2025 (3.84/5.0). Combined evidence that quiet policies coexist with high satisfaction at a top-6 European hub. [Source: https://news.schiphol.com/schiphol-in-2025-quieter-aircraft-more-satisfied-travellers-and-solid-financial-results/]
+- **TSA checkpoint deployments (multiple US airports)** — Brown Innovations SB-47 SonicBeam directional loudspeakers used to deliver checkpoint instructions in a beam roughly four feet wide, without spillover to adjacent areas. Directly transferable engineering pattern for gate hold rooms. [Source: https://www.browninnovations.com/blog/2025/8/15/how-tsa-improves-airport-checkpoint-communication-with-brown-innovations-directional-speakers]
+- **Pittsburgh International (Presley's Place, 2019) and Hartsfield-Jackson (Delta Multi-Sensory Room, 2016)** — dedicated sensory rooms are now table-stakes at large US hubs; the operating and capital cost is modest (single-room, single-tenant footprint) and is a proven complement to a quiet-by-design standard rather than a substitute for it. [Source: https://www.washingtonpost.com/travel/2019/07/29/pittsburghs-airport-is-latest-create-sensory-friendly-space-travelers-with-autism/]
+- **Inspira Health Network (Vineland, NJ) — hospital analog** — overhead pages cut from ~150/night to ~3/night; HCAHPS "quietness at night" score up 26% year over year. This is the most useful non-airport precedent: it proves that governance-first PA reform, without capital work, drives a large measurable improvement in customer satisfaction. Airports over-index on capital solutions when the hospital sector has already shown that policy is the lever. [Source: https://www.businesswire.com/news/home/20151117005677/en/]
+
+---
+
+## 4. The "do it by Thursday" tier — three pilots for under $100K each in 90 days
+
+1. **Concourse E baseline sweep (pilot for Solution 2).** Before United's opening date, rent six Class 1 sound-level meters and pay an acoustic consultant $60K–$80K to establish an STIPA, RT60, and one-minute-Leq baseline at 12 positions on the concourse. Deliverable: a one-page dashboard the COO reads daily for 60 days after opening. This is a $100K spend that anchors every future acoustic argument at IAD with a real number.
+2. **DCA Terminal 2 announcement-count audit and reduction pilot (pilot for Solution 1).** For 30 days, log every announcement in Concourse C by category, source, and duration. Publish the count internally. Then adopt a Tier-3-only policy in Concourse C for 30 days and re-measure missed-boardings, gate agent overtime, and on-time push. Cost: one MWAA operations analyst plus one $15K acoustic consultant sanity check. Deliverable: an evidence base that either kills the "airlines can't operate without terminal-wide PA" objection or names its true cost.
+3. **Silent-television standing order at three MWAA-owned hold rooms and one lounge (pilot for Solution 4).** Post signage, mute audio, enable captions. Measure passenger complaints and concessionaire revenue against matched control zones for 30 days. Cost: under $10K. Deliverable: hard evidence for the tenant-handbook amendment.
+
+Each of the three ships inside the current fiscal year, uses no new authority, and generates evidence a Board can act on. They are the cheapest way to make sure the eventual quiet-by-design standard is not a 200-page document argued about for three years in the design-review process.
+
+---
+
+## 5. The honest kill list — clever ideas rejected
+
+- **Terminal-wide active noise cancellation.** Physics does not cooperate at the volumes and frequencies involved. Every airport that has tried it has quietly abandoned it. Do not repeat.
+- **Ripping out the existing PA and going FIDS-and-app-only.** Fails NFPA 72 voice evacuation and ACAA compliance. A quiet standard has to *preserve* the emergency channel, not eliminate it.
+- **Wholesale acoustic retrofit of the Saarinen Main Terminal.** The published cost benchmark is roughly $2.8M for one airport check-in hall retrofit (3,200 m² baffles + 800 m² wall panels) with an eight-week partial closure. Scaling that to the full Main Terminal would cost tens of millions, would degrade the Saarinen visual, and would require an FAA/SHPO consultation. Not worth it — treat the Saarinen shell as a design constraint and put the acoustic dollars in the concourses.
+- **Requiring every passenger to use the MWAA app for gate information.** Digital-exclusion problem; also collapses the moment cellular or Wi-Fi degrades during IROPs. The app is a *redundant* channel, never the primary one.
+- **A single MWAA-wide announcement script rewritten by a consultant.** Ignores that IAD's international transfer flows and DCA's short-dwell business flows need different content and cadence. A one-size script is why the current environment is bad.
+- **Full-terminal acoustic digital twin build.** Attractive on paper, but the design-decision return relative to a $1M continuous-measurement network (Solution 5) is poor, and no vendor has a live airport-scale acoustic twin in operation that a reader could go visit today. Revisit in five years.
+
+---
+
+**Bottom line for the Strategist:** The version of this argument that lands hardest with a skeptical board is the one that says the first $10–15M of quiet-by-design at MWAA is a governance rewrite, a measurement network, a Concourse E baseline, and eight hold rooms of directional audio — and that it ships inside the current CCP, without airline MII drama, and before the Concourse C/D design intent packages harden. Everything else in the eventual standard rests on evidence those four moves generate.
+
+**Word count:** ~2,050.

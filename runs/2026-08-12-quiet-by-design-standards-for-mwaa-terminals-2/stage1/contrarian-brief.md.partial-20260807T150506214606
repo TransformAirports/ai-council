@@ -1,0 +1,285 @@
+# Contrarian Brief — Against the MWAA Quiet-by-Design Standard
+
+Run: `quiet-by-design-standards-for-mwaa-terminals-2`
+Prepared: 2026-08-07
+Role: adversarial second opinion. This brief argues the strongest honest case
+against the thesis so the Strategist has to answer it, not tiptoe around it.
+
+## Position
+
+MWAA should not adopt a two-airport quiet-by-design standard. The thesis
+concedes the important half of the argument in advance — that "quiet" cannot
+mean fewer announcements and must preserve safety, accessibility, and
+resilience — and then asks the Council to write a common standard anyway. Once
+those concessions are honored, the standard collapses into a restatement of
+constraints MWAA already meets: NFPA 72 for voice evacuation intelligibility,
+14 CFR Part 382 for accessible information, ACRP-grade acoustic design during
+project delivery, and the airline scripting the signatory carriers already
+control under lease. A new MWAA-wide document does not add a requirement that
+is missing; it adds a governance surface, an audit obligation, and a design-
+review veto point that MWAA can already exercise, project by project, without
+one.
+
+The advocate should be forced to answer: what does a quiet-by-design standard
+require that STI ≥ 0.50 under NFPA 72, plus ACRP Report 175 as reference,
+plus ADA/ACAA compliance, plus a competent PA/AV commissioning spec in the
+design manual, does not already require? If the answer is "an ambient dBA
+target and a reverberation cap," the standard is a technical footnote inside
+Design Manual Volume 2, not a board-level initiative. If the answer is a
+governance apparatus — announcement categories, frequency caps, tenant script
+control, quiet-hour policy, exception process — then the thesis is a fight
+with the 2025 Use & Lease, and it should be argued as one.
+
+## 1. The strongest version of the counterargument (7 bullets)
+
+- **The constraint stack already exists and it pulls the opposite direction.**
+  NFPA 72 requires an average Speech Transmission Index of at least 0.50 and
+  a minimum of 0.45 at 90% of measurement locations inside every acoustically
+  distinguishable space [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/].
+  "Quiet" specifications and PA intelligibility live on the same
+  absorption/reverberation dial. A standard that pushes ambient level and
+  reverberation down without simultaneously buying loudspeaker density,
+  DSP zoning, and finish reconciliation is a standard that fails Fire Marshal
+  review. A standard that funds all of that is a standard that costs whatever
+  the design would have cost anyway. Either way, "quiet-by-design" adds no
+  net requirement.
+
+- **Every named "silent airport" has kept the announcements that matter.**
+  London City's silent-terminal policy, in place since 2008, expressly
+  retains announcements for "gate changes at short notice, during disruption
+  and when there is a flight information display failure"
+  [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over].
+  Helsinki, silent since 2015, retains "departure gate and emergency"
+  announcements and had to bolt banners under its FIDS telling passengers
+  that they now have to track time themselves [Source: same]. Chennai
+  triggered a disability-community backlash serious enough that airport
+  authority officials publicly conceded "no separate provisions for the
+  visually-challenged are available"
+  [Source: https://www.deccanchronicle.com/nation/current-affairs/070517/how-will-visually-impaired-flyers-manage-in-silent-terminals.html].
+  The advocate is asking MWAA to inherit a policy that no operator has been
+  able to run at the strength it was originally marketed.
+
+- **Federal disability law is not neutral on this.** 14 CFR 382.51 requires
+  MWAA to ensure "terminal facilities providing access to air transportation
+  are readily accessible to and usable by individuals with disabilities" and
+  requires captioning "at all times on all televisions and other audio-visual
+  displays that are capable of displaying captions"
+  [Source: https://www.law.cornell.edu/cfr/text/14/382.51]. The DOT-required
+  channels for flight-critical information — safety, delays, cancellations,
+  schedule changes, boarding, connections, gate assignments, paging,
+  aircraft changes, emergencies — must be delivered to disabled passengers,
+  which in practice means audible and visual [Source: https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382].
+  Any MWAA standard whose payoff depends on shifting information to
+  smartphones will be interpreted as pushing risk onto blind, deaf-blind,
+  cognitively disabled, and non-English-speaking travelers, and it will be
+  litigated by advocacy organizations that have already taken this fight to
+  U.S. carriers [Source: https://simpleflying.com/how-airlines-airports-are-abandoning-blind-travelers/].
+
+- **MWAA does not own the microphone in the concourses.** Airport use-and-
+  lease agreements customarily give signatory airlines "the right to approve
+  or disapprove proposed airport capital development projects"
+  [Source: https://airportscouncil.org/wp-content/uploads/2020/03/CHAPTER-7-THE-AIRPORT-TENANT-RELATIONSHIP.pdf].
+  Under MWAA's residual 2025 Use & Lease, majority-in-interest concurrence
+  applies to capital that lands in the rate base. Any quiet-by-design
+  standard that changes gate-hold PA design, mandates a new announcement
+  governance regime, caps announcement frequency, or reassigns scripting
+  authority is a change to airline operating practice — American at DCA and
+  United at IAD run those podiums today, and single-agent boarding is
+  already an active labor-safety fight
+  [Source: https://cwa-union.org/news/releases/gate-and-ramp-agents-american-airlines-subsidiary-report-hazardous-conditions].
+  MWAA can require ambient-level and STI targets in the design manual.
+  MWAA cannot, unilaterally, tell a gate agent to make fewer calls.
+
+- **DCA cannot afford a silent-boarding experiment.** DCA is slot-controlled
+  under the FAA High Density Rule and the statutory perimeter, and in 2025
+  the DOT awarded 10 new beyond-perimeter exemptions across five carriers
+  under Section 502 of the 2024 FAA Reauthorization
+  [Source: `outputs/context/airport-context.md`, §4]. A missed boarding at
+  DCA is not a missed boarding at Helsinki — the slot does not wait, the
+  aircraft does not re-cue, and the airport is still absorbing the
+  operational fragility exposed by the January 2025 midair collision and the
+  fall 2025 seven-week federal shutdown, both of which the context packet
+  identifies as drivers of DCA's 5.3% traffic decline
+  [Source: `outputs/context/airport-context.md`, §6]. Under those
+  conditions, a common IAD/DCA standard is the wrong instrument. DCA needs
+  more announcement density, better scripting, and better intelligibility —
+  not a quiet ceiling.
+
+- **The Saarinen Main Terminal is architecturally unquiet, and that is
+  policy.** The IAD Main Terminal is a National Register interior whose
+  formal preservation is stated policy under the current modernization
+  program [Source: `outputs/context/airport-context.md`, §5]. DOCOMOMO DC
+  publicly opposes any revitalization approach that would "compromise the
+  essential form, structure, materials, or spatial qualities of Saarinen's
+  design" [Source: https://www.archpaper.com/2026/07/president-trump-department-of-transportation-update-dulles-airport/].
+  You cannot install broadband absorbers on the coffered concrete shell
+  without a preservation fight. A common IAD/DCA acoustic standard therefore
+  cannot apply to the most public and most photographed room in the system,
+  and the exception is not a footnote — it is the terminal that appears in
+  every image of Dulles ever printed. A standard whose exceptions are
+  bigger than its rule is a standard that will be honored in the breach.
+
+- **The cheaper alternative already exists and already works.** ACRP
+  Research Report 175 provides project-level design guidelines to improve
+  PA intelligibility "for all types and sizes of airport terminal
+  environments," including finishes, background noise, PA density,
+  commissioning, and STIPA verification
+  [Source: https://crp.trb.org/acrpwebresource2/improving-intelligibility-of-airport-terminal-public-address-systems/].
+  ACRP 175 explicitly recommends commissioning that includes before-and-
+  after RT60 tests, impulsive-response measurements, and STI evaluations in
+  occupied and unoccupied states, with a corrective-action trigger when
+  measurements deviate more than 10% from modeled predictions
+  [Source: https://nap.nationalacademies.org/read/24839/chapter/11]. MWAA
+  can enforce that today by naming ACRP 175 as the reference standard in
+  consultant scopes and requiring STIPA commissioning at substantial
+  completion. That is a paragraph in each project's specification, not a
+  new authority-wide policy instrument.
+
+## 2. Specific scenarios where the thesis produces the wrong outcome
+
+**Scenario A — The DCA irrops cascade.** DCA operates on a single main
+runway with slot controls and a heavy business/federal traveler mix. A
+storm cell shuts the airfield for 90 minutes. Gate changes, aircraft swaps,
+and reboards begin cascading through Terminal 2. Under a quiet-by-design
+regime that has already spent political capital reducing announcement
+frequency and normalizing app-first notification, gate agents fall back to
+non-standard, ad-hoc PA use — the shortcuts are worse than the discipline
+they replaced. Passengers who deferred to their phones during the calm hours
+are the ones most disoriented in the surge. The standard produced the
+opposite of resilience, and the airport wears it in complaint volume, missed-
+connection compensation, and DOT consumer complaint filings.
+
+**Scenario B — The ACAA complaint that MWAA can't win.** A blind traveler
+without a smartphone misses a boarding at DCA Terminal 2 because the
+carrier's app-based push notification did not reach a device the traveler
+does not carry, and the gate call complied with the MWAA quiet standard's
+frequency cap. The traveler files a DOT complaint under Part 382. The
+carrier points at the airport standard. Deccan Chronicle already documented
+the "no separate provisions for the visually-challenged" problem in Chennai;
+Simple Flying has already documented the pattern of U.S. carriers
+"abandoning blind travelers." MWAA is now a named party in an ACAA fight
+that its own design manual created. The board will not thank the Council
+for producing that headline.
+
+**Scenario C — The airline MII veto.** The 2025 Use & Lease is a two-airport
+residual with a 140% coverage target and an $8.6 B rate base pressure on
+CPE (rising from $12.77 to a projected $20.71 by 2030 per the 2025A official
+statement, per the context packet). United and American read a quiet-by-
+design capital line item, add the AV/acoustic delta to their forecast
+airline OCC, and decline concurrence for anything above the ACRP-175 baseline.
+The standard survives as an aspirational document with no funding path. It
+would have been more honest, and more effective, to negotiate PA intelligibility
+performance into the technology standards inside consultant scopes for the
+CCP work already funded.
+
+**Scenario D — The Saarinen carve-out that eats the standard.** MWAA
+publishes a mandatory ambient-noise cap and RT60 target for renovated
+terminal space. The Saarinen Main Terminal is exempted because absorption
+would alter a National Register interior. Concourse E, already substantially
+designed, is grandfathered. Terminal 1 at DCA (1941 Art Deco) is exempted
+for parallel preservation reasons. The "common" standard applies to two
+concourses at IAD and part of Terminal 2 at DCA — a footprint smaller than
+the current MWAA design-manual revision cycle already touches on a rolling
+basis.
+
+**Scenario E — The commissioning bill.** MWAA embeds an STI acceptance test
+in every renovation over some size threshold. One project fails. The cited
+remediation cost from a documented airport terminal case: $2.8 million,
+eight weeks of disruption, measured STI 0.32–0.42 against a modeled 0.38
+[Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. Now
+multiply across a $9 B CCP and a $20–22.5 B Dulles transformation. The
+standard's downside is not that it fails to specify a target — it is that
+it locks a target in without a change-control mechanism that can absorb the
+inevitable measurement misses without stopping the project.
+
+## 3. Direct quotes and data points a strategist has to concede or answer
+
+1. **NFPA 72, mass-notification intelligibility.** "The intelligibility of an
+   emergency communication system (ECS) is considered acceptable if at least
+   90 percent of the measurement locations within each acoustically
+   distinguishable space (ADS) have a measured STI of not less than 0.45,
+   and an average STI of not less than 0.50"
+   [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/].
+   Any "quiet" specification MWAA adopts must clear this threshold in every
+   ADS. The intelligibility requirement is not a soft aspiration; it is a
+   safety code that constrains absorption and PA design in the same room.
+
+2. **14 CFR 382.51 on terminal accessibility.** "You must ensure that
+   terminal facilities providing access to air transportation are readily
+   accessible to and usable by individuals with disabilities, including
+   individuals who use wheelchairs" [Source: https://www.law.cornell.edu/cfr/text/14/382.51].
+   Combined with the Part 382 requirement that flight-critical information
+   be provided to passengers with disabilities
+   [Source: https://www.ecfr.gov/current/title-14/chapter-II/subchapter-D/part-382],
+   any quiet standard that shifts even a fraction of flight-critical
+   information off the PA and onto a screen or an app inherits federal
+   liability that MWAA does not carry today.
+
+3. **The Chennai concession.** "Officials at airports say no separate
+   provisions for the visually-challenged are available"
+   [Source: https://www.deccanchronicle.com/nation/current-affairs/070517/how-will-visually-impaired-flyers-manage-in-silent-terminals.html].
+   This is the most-cited operator quote from a real silent-airport rollout,
+   and it is a confession. MWAA cannot cite Chennai as precedent and
+   simultaneously claim its own standard will not produce the same
+   accessibility deficit.
+
+4. **The Helsinki concession.** Helsinki Airport is silent, but "at the
+   departure gate and when there is an emergency, announcements are still
+   broadcast," and the airport had to add banners under its Flight
+   Information Displays "informing passengers there will be fewer
+   announcements and alerting them to the fact that they need to keep track
+   of time" [Source: https://airport.nridigital.com/air_mar18/shhhh_is_the_day_of_the_airport_announcer_over].
+   The exemplar model retains the two announcement categories — gate and
+   emergency — that account for essentially every operational risk a
+   quiet-by-design standard would try to mitigate. What is left is
+   background music, general paging, and marketing spots, which MWAA does
+   not need a board-level standard to control.
+
+5. **The airline capital veto.** ACI's own tenant-relationship reference
+   states: use-and-lease agreements "identify airlines' rights and
+   privileges, frequently including the right to approve or disapprove
+   proposed airport capital development projects"
+   [Source: https://airportscouncil.org/wp-content/uploads/2020/03/CHAPTER-7-THE-AIRPORT-TENANT-RELATIONSHIP.pdf].
+   Any quiet standard that changes gate PA density, mandates additional
+   AV/acoustic scope on airline-preferential space, or reassigns
+   announcement scripting is a capital and operating change airlines can
+   contest under the 2025 agreement. The Strategist has to answer how the
+   standard survives MII.
+
+## 4. The concession the advocate should make
+
+The thesis is defensible if it is rescoped from a "standard" to a
+**reference-and-commissioning spec** inside the MWAA Design Manual: adopt
+ACRP Research Report 175 as the airport-terminal acoustic reference; require
+STIPA commissioning at substantial completion for new and renovated
+passenger-processing spaces above a defined size threshold; require NFPA 72
+compliance to be demonstrated in the occupied state, not simulated; require
+FIDS density and captioning to meet or exceed 14 CFR 382.51 in every gate
+hold and processing zone; and stay silent on announcement policy, which
+belongs to the airlines under the Use & Lease. That is a change MWAA can
+make inside the design manual, without a board resolution, without an MII
+fight, and without inheriting an ACAA complaint. It is also, notably, a
+change the Strategist could recommend without ever using the word "quiet."
+
+If the argument requires the word "quiet" to survive, the argument is a
+brand exercise, and the thesis's own "What this is NOT" section already
+disallows brand exercises.
+
+## Evidence gaps I could not close
+
+- Whether the current MWAA Design Manual actually specifies NC/RC, RT60,
+  STI, or PA density values inside Volumes 2, 3, or their DCA parallels.
+  The public record does not disclose the interior of the design manual.
+- Whether MWAA has piloted reduced-announcement practice at any concourse
+  or hold-room. No public record found.
+- Whether the 2025 Use & Lease's MII language reaches design-manual
+  changes or passenger-experience capital. The agreement's specific MII
+  categories are not public. Both gaps should be raised as open questions
+  in the final deliverable, not filled by assumption.
+
+## What I did not read
+
+Per the run contract, I did not read any other Stage 1 brief in
+`outputs/stage1/`. The Strategist will see whether this argument
+independently converges with, contradicts, or sharpens the operations,
+technology, CEO, COO, and public-safety reads.

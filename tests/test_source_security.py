@@ -12,6 +12,20 @@ from cli.sources import (
 
 
 class SourceBoundaryTests(unittest.TestCase):
+    def test_browser_staging_is_not_part_of_the_global_dropzone(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            dropzone = root / "sources"
+            staged = dropzone / ".browser-uploads" / "client" / "report"
+            staged.mkdir(parents=True)
+            (staged / "private.md").write_text(
+                "selected only for one browser run", encoding="utf-8"
+            )
+            visible = dropzone / "terminal-source.md"
+            visible.write_text("legacy terminal source", encoding="utf-8")
+
+            self.assertEqual(discover_dropzone(dropzone), [visible])
+
     def test_dropzone_discovery_and_attachment_reject_symlinks(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

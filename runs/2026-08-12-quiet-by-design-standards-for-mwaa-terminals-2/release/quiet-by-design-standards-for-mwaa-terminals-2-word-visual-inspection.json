@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "inspection_type": "word_pages",
+  "artifact": {
+    "path": "quiet-by-design-standards-for-mwaa-terminals-2.docx",
+    "sha256": "5c4371c404fa1c7bde628e0161fc64cba0e83669abf37946ded561a8bcb47063",
+    "size_bytes": 206230
+  },
+  "pdf": {
+    "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+    "sha256": "4814bfd60819743dd3a702517f7aebf4b28a9f5f0c2fd8e4eb8998133430b19a",
+    "size_bytes": 210149
+  },
+  "page_count": 7,
+  "rendered_pages": [
+    {
+      "page_number": 1,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+      "sha256": "6537f80ed82b660f9c2fabd02a33a17f6c538ab56e3c9b752b475335aa173598",
+      "size_bytes": 139582
+    },
+    {
+      "page_number": 2,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+      "sha256": "1a2504ddc0243d94b18cf707236a6a6fa5f015e36798cc6ad4c26add8782177f",
+      "size_bytes": 411365
+    },
+    {
+      "page_number": 3,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+      "sha256": "480dd3e5ef72479f8842ca8ea5bc793a1405f6d8913de0cbfd5bb0e6a259b3dc",
+      "size_bytes": 490294
+    },
+    {
+      "page_number": 4,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+      "sha256": "bb7bef0c89413066ea883af6d4aa4b260da5f3552ef5a83010d7a35948b1e0c5",
+      "size_bytes": 487586
+    },
+    {
+      "page_number": 5,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+      "sha256": "2c374704f78138ec1a54667b5e06bd4266440171edcd7a99e4345eae77fc2ec1",
+      "size_bytes": 457659
+    },
+    {
+      "page_number": 6,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+      "sha256": "a18f1217ae0a0487ab381619502fd98a7cfd4f446859585a876f9815fc3c0221",
+      "size_bytes": 496592
+    },
+    {
+      "page_number": 7,
+      "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-7.png",
+      "sha256": "f8571b24cfbdbfec1546821092deb527a044ce0f0376a0c2c4b2bd6c87acd11c",
+      "size_bytes": 213982
+    }
+  ],
+  "montage": {
+    "path": "qa/quiet-by-design-standards-for-mwaa-terminals-2/montage.png",
+    "sha256": "4aafd3c16dc3d6ded076e93e767ed4179078e618713fda2126be1d1dba254020",
+    "size_bytes": 910752
+  },
+  "inspection": {
+    "inspector": "art-director",
+    "full_size_each_page_inspected": true,
+    "montage_inspected": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Verified all 7 rendered page hashes and the montage hash against the receipt before inspection; inspected the exact hash-bound bytes.",
+      "Page 1 cover: STRATOPS/MWAA logo lockup renders sharp, title hierarchy clean, AI-provenance callout box intact, footer present. No clipping.",
+      "Pages 2-4 body: continuous prose with consistent 'TRANSFORM AIRPORTS / AI RESEARCH COUNCIL' header and 'CONFIDENTIAL WORKING PAPER' page footer; margins even; no clipped lines, no orphaned headings at page bottoms.",
+      "Pages 5-7 Notes section: endnote text dense but legible at full size; citations wrap cleanly; no truncated URLs mid-glyph; section heading 'Notes' starts cleanly on page 5.",
+      "Page 7 ends roughly one-third down with remaining whitespace — normal final-page behavior, not a stranded or blank page; footer present.",
+      "Montage: pacing even across 7 pages, no accidental blank pages, page hierarchy (cover, body, notes) reads correctly in sequence.",
+      "Document contains no tables or figures, so no split-table or broken-figure risk; nothing rendered as a disguised production plan."
+    ],
+    "unresolved_findings": []
+  }
+}

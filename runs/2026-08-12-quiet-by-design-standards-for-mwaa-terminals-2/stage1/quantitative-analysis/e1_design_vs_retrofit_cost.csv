@@ -1,0 +1,5 @@
+scenario,scope_sqft,unit_cost_low_usd_per_sqft,unit_cost_high_usd_per_sqft,total_low_usd,total_high_usd,source_label
+new_build_acoustic_ceiling,435000,5,15,2175000,6525000,SOURCE (2026 commercial benchmark)
+retrofit_acoustic_treatment,435000,18,45,7830000,19575000,SOURCE (2026 commercial benchmark)
+retrofit_premium_delta,435000,3,40,1305000,17400000,COMPUTED
+retrofit_premium_50pct_scope,217500,3,40,652500,8700000,COMPUTED (holdrooms + circulation only)

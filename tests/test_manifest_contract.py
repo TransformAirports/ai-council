@@ -8,7 +8,9 @@ from types import SimpleNamespace
 
 from cli.artifacts import ArtifactContract, validate_artifact
 from cli.run_manifest import (
+    APP_SHELL_PATHS,
     ResumeContractMismatch,
+    generation_contract_records,
     create_run_manifest,
     update_artifact,
 )
@@ -256,3 +258,52 @@ class ManifestContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExecutionContractScopeTests(unittest.TestCase):
+    """The resume tripwire must fire on generation code, not on the app shell.
+
+    Hashing every cli/*.py meant a WebSocket reconnect fix or a terminal menu
+    tweak invalidated whatever run was mid-flight — the contract refused
+    resumes over code that cannot touch a single byte of a deliverable.
+    """
+
+    @staticmethod
+    def _records(*paths: str) -> list[dict[str, object]]:
+        return [{"path": p, "sha256": "a" * 64, "size_bytes": 1} for p in paths]
+
+    def test_app_shell_modules_are_excluded_from_the_binding_contract(self) -> None:
+        kept = generation_contract_records(
+            self._records("cli/orchestrator.py", "cli/server.py", "cli/menu.py")
+        )
+        self.assertEqual([r["path"] for r in kept], ["cli/orchestrator.py"])
+
+    def test_generation_modules_stay_in_the_binding_contract(self) -> None:
+        generation = (
+            "cli/orchestrator.py",
+            "cli/agents.py",
+            "cli/docx_builder.py",
+            "cli/publish.py",
+            "cli/quality_gate.py",
+            "cli/run_manifest.py",
+            "prompts/orchestration.md",
+            "CLAUDE.md",
+        )
+        kept = {r["path"] for r in generation_contract_records(self._records(*generation))}
+        self.assertEqual(kept, set(generation))
+
+    def test_new_cli_modules_are_blocking_until_declared_inert(self) -> None:
+        # A denylist, so forgetting to classify a new module yields a loud
+        # false refusal rather than a silently corrupt resume.
+        kept = generation_contract_records(self._records("cli/brand_new_stage.py"))
+        self.assertEqual(len(kept), 1)
+
+    def test_every_declared_shell_path_actually_exists(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        for relative in sorted(APP_SHELL_PATHS):
+            with self.subTest(path=relative):
+                self.assertTrue(
+                    (root / relative).is_file(),
+                    f"{relative} is declared inert but is not in the repo; a stale "
+                    "entry silently narrows the contract",
+                )

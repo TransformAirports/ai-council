@@ -1,0 +1,33 @@
+{
+  "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx",
+  "kind": "argument_memo_bundle",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 1,
+  "issues": [
+    {
+      "code": "tiny_text",
+      "severity": "warning",
+      "message": "Document contains 22 run(s) below 8 pt.",
+      "location": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx"
+    }
+  ],
+  "metadata": {
+    "output_format": "one_page_memo",
+    "page_count": 1,
+    "visual_inspection_receipt": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo-word-visual-inspection.json",
+    "word_visual_inspections": [
+      {
+        "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo.docx",
+        "receipt": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/argument-data-center-concerns-on-aircraft-approach-memo-word-visual-inspection.json",
+        "pages": 1,
+        "inspector": "art-director",
+        "receipt_sha256": "971c7efa04abd459b8034ec81ce732e8b1de230719a74b86941a2c02f66771e2"
+      }
+    ]
+  },
+  "rendered_files": [
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo.pdf",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/argument-data-center-concerns-on-aircraft-approach-memo/argument-data-center-concerns-on-aircraft-approach-memo-1.png"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4",
+  "kind": "publishing_bundle",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": [],
+  "metadata": {
+    "artifacts": [
+      {
+        "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2.docx",
+        "kind": "docx",
+        "ok": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": [],
+        "metadata": {
+          "paragraphs": 67,
+          "tables": 0,
+          "headings": 4,
+          "words": 3292,
+          "page_number_field": true
+        },
+        "rendered_files": [
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-7.png"
+        ]
+      },
+      {
+        "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx",
+        "kind": "docx",
+        "ok": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "issues": [],
+        "metadata": {
+          "paragraphs": 15,
+          "tables": 3,
+          "headings": 1,
+          "words": 871,
+          "page_number_field": true
+        },
+        "rendered_files": [
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.pdf",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-1.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-2.png",
+          "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-3.png"
+        ]
+      }
+    ],
+    "output_format": "article",
+    "visual_brief": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/visual-brief.json",
+    "render_attempted": true,
+    "word_visual_inspection_receipts": [
+      "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-word-visual-inspection.json",
+      "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-word-visual-inspection.json"
+    ],
+    "word_visual_inspections": [
+      {
+        "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2.docx",
+        "receipt": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-word-visual-inspection.json",
+        "pages": 7,
+        "inspector": "art-director",
+        "receipt_sha256": "53ada572700c5722f8463cefbc86820a6ff9957fc28105635d8e8b9c10b40f40"
+      },
+      {
+        "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.docx",
+        "receipt": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-word-visual-inspection.json",
+        "pages": 3,
+        "inspector": "art-director",
+        "receipt_sha256": "9328e52838a2d7d2d56596b7630a6eacddb2a22de6ca603b312b39f8f1a4dba0"
+      }
+    ]
+  },
+  "rendered_files": [
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2/quiet-by-design-standards-for-mwaa-terminals-2-7.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary.pdf",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-1.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-2.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary/quiet-by-design-standards-for-mwaa-terminals-2-executive-summary-3.png"
+  ]
+}

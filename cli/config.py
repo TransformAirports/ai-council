@@ -14,19 +14,25 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = REPO_ROOT / "council.toml"
 
-# Research and synthesis run on Opus 4.8. The editorial tier — the agents
+# Research and synthesis use Anthropic's rolling Opus alias. It selects the
+# newest Opus available to the account and will pick up Opus 5.0 when Anthropic
+# exposes that model through Claude Code. The editorial tier — the agents
 # that work AFTER the research briefs land (Red Team critique, Editor,
 # Humanizer, presentation) — runs on Fable 5 for stronger critique and
 # editorial performance. The Fact-checker uses a fresh Sonnet context so the
 # final source check is not performed by the Opus writer or the Fable polisher.
 DEFAULT_MODELS: dict[str, str] = {
-    "context": "claude-opus-4-8",
-    "research": "claude-opus-4-8",
-    "curation": "claude-opus-4-8",
+    "context": "opus",
+    "research": "opus",
+    # Strengthen an argument is a bounded memo workflow. Sonnet handles its
+    # focused research wave faster; Opus remains the single argument writer.
+    "argument_research": "claude-sonnet-4-6",
+    "curation": "opus",
     "creative": "claude-fable-5",
-    "synthesis": "claude-opus-4-8",
+    "synthesis": "opus",
+    "argument_synthesis": "opus",
     "critique": "claude-fable-5",
-    "executive_review": "claude-opus-4-8",
+    "executive_review": "opus",
     "editor": "claude-fable-5",
     "humanizer": "claude-fable-5",
     "factcheck": "claude-sonnet-4-6",
@@ -40,7 +46,7 @@ DEFAULT_MODELS: dict[str, str] = {
     "openai_deep_research": "o3-deep-research",
 }
 
-MODEL_CHOICES = ["claude-opus-4-8", "claude-fable-5", "claude-sonnet-4-6"]
+MODEL_CHOICES = ["opus", "claude-fable-5", "claude-sonnet-4-6"]
 
 # The OpenAI-hosted Deep Research role takes different models than the
 # Claude-hosted roles.
@@ -57,6 +63,9 @@ def choices_for_role(role: str) -> list[str]:
 # claude-fable-5 was blocked here from 2026-06-10 to 2026-06-24; it is
 # available again and back in the defaults above.
 BLOCKED_MODELS: dict[str, str] = {
+    # This literal model ID is not currently exposed by Claude Code. The Opus
+    # alias is the supported forward-compatible route to the latest Opus.
+    "claude-opus-5-0": "opus",
     # `gpt-5.5-pro-deep-research` was a placeholder ID that never existed in the
     # OpenAI catalog. Real Deep Research models are `o3-deep-research` (heavy)
     # and `o4-mini-deep-research` (light). Auto-rewrite the placeholder.
@@ -72,7 +81,7 @@ class Config:
     default_format: str = "report"
 
     def model(self, role: str) -> str:
-        return self.models.get(role, DEFAULT_MODELS.get(role, "claude-opus-4-8"))
+        return self.models.get(role, DEFAULT_MODELS.get(role, "opus"))
 
 
 _cached: Config | None = None

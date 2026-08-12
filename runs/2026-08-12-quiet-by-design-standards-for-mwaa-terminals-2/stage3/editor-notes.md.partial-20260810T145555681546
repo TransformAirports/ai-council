@@ -1,0 +1,31 @@
+# Editor notes — quiet-by-design-standards-for-mwaa-terminals-2
+
+**Input:** `outputs/stage2/strategist-draft-v3.md` (per orchestrator; no newer file substituted)
+**Output:** `outputs/stage3/edited-draft.md`
+**Word counts:** article body 2,949 → 1,995 (−32%); executive summary 689 → 439. Both now inside the run prompt's deterministic range (1,500–2,000 article; ~400 summary). The Strategist flagged the overrun in handoff note 8; closing it required cutting past my usual 25% ceiling, so every cut came from restatement and compression — no argument, tier, stop condition, funding source, 90-day action, or metric was dropped.
+
+## Major changes
+
+1. **Dropped the Strategist's internal handoff-notes section.** Not reader-facing. Its open items are carried forward below and as inline `[FC: …]` / `[FC/GC: …]` tags.
+2. **Compressed the executive summary** to eight points at roughly half length; no claim removed.
+3. **Cut restatements, kept the better half** — e.g., merged the "One standard. Two calibrations." paragraph into the calibration sentence; collapsed "quiet framing read against memory" (stated twice) to once per location; cut Board seat arithmetic (7/4/3/3) from body prose (retained in footnote 31).
+4. **Moved two evidence details from prose to their existing footnotes**: the $98/block-minute delay figure (footnote 26 retains it in full) and Denver's 16-month/$1M-a-day detail (footnote 30). Both case anchors remain cited in the body.
+5. **Preserved voice deliberately**: the Gate 35 opening scene and its closing callback, "MWAA owns the room. It does not own the sound.", the two-word beats, and the concrete dates/figures all survive.
+6. **Footnotes untouched** — all 34 verbatim from v3; every marker still resolves.
+7. Buzzword sweep: none of the banned list present in v3 or introduced. Active voice throughout except where the actor is genuinely irrelevant.
+
+## Fact-checker flags (inline-tagged in the draft)
+
+- **[FC: verify against primary PDF]** — ACRP 175 STI 0.50 target band and ≥10 dB(A) SNR floor; not machine-read from the primary PDF (footnote 4).
+- **[FC: final-rule status]** — DOT ACAA/PRM Part 382 rulemaking status before publication (footnote 9).
+- **[FC: §9.05.8 rests on consultant analysis, not public text]** — $1M/pair and $2 CPE covenant; also the $2.36 current gap (footnote 12). Verify CPE figures against the 2025A OS on EMMA (footnote 16).
+- **[FC: trade-press estimate]** — American's ~53% DCA departure share (footnote 19).
+- **[FC/GC: broadcast-rights clause]** — whether the executed 2025 U&L codifies airline gate-PA rights (footnote 1). GC diligence, not a public-source fetch.
+- **[FC/GC: written delegation unconfirmed]** — Fire Marshal's AHJ/STIPA enforcement delegation under 49 U.S.C. §49104 (footnote 5). GC confirmation item.
+- **[FC/GC: MII carve-out unverified]** — safety/accessibility carve-out in the executed 2025 U&L; recommendation is conditioned on the GC memo (footnote 32).
+
+Unverified-but-retained (per Strategist handoff, not separately tagged): Terminal 2 renovations as first DCA vehicle (footnote 27); concession-lease weighted-average term expressed as a horizon; Board vote geometry rather than seat-by-seat.
+
+## Hedges I could not resolve
+
+"Roughly 29 million" (IAD 2025) and "approximately 24.9 million" (DCA) are the most precise figures in the evidence base; left as-is for the Fact-checker to tighten against MWAA CY2025 reporting if exact totals are published.

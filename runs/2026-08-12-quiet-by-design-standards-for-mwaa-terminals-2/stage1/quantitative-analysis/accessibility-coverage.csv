@@ -1,0 +1,6 @@
+scenario,p_visual,p_audible,p_mobile,p_staffed,combined_coverage,target,meets_target
+baseline_3_channels,0.95,0.85,0.60,0.00,0.997000,0.999,false
+add_staff_channel,0.95,0.85,0.60,0.30,0.997900,0.999,false
+raise_visual_and_audible,0.98,0.90,0.60,0.30,0.999440,0.999,true
+strong_visual_weak_mobile,0.98,0.90,0.30,0.30,0.999020,0.999,true
+weak_visual_strong_audible,0.85,0.95,0.60,0.30,0.997900,0.999,false

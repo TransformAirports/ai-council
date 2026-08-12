@@ -1,0 +1,374 @@
+# Quantitative Analyst Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Author:** Quantitative Analyst (independent Stage 1 brief)
+**Date:** 2026-08-06
+**Analytical frame:** Reproducible cost, threshold, exposure, and sensitivity
+analysis for a quiet-by-design terminal standard at IAD and DCA. All inputs
+are cited to the airport context packet or to primary technical standards.
+Analyst constructions (formulas, scenario labels, per-enplanement math) are
+labeled as such. Reproducible files sit in
+`outputs/stage1/quantitative-analysis/`.
+
+---
+
+## Executive summary
+
+The economics of a quiet-by-design standard, taken at face value, do not
+justify delay. An MWAA acoustic, public-address (PA), voice-alarm, AV, and
+FIDS package priced against Concourse E scales (435,000 gross square feet,
+opening autumn 2026) lands between roughly **$3.5 million and $21.3 million
+of one-time capital across low-, mid-, and high-rigor scenarios**, or
+**$0.015 to $0.093 per enplanement per year** when amortized over 30-year
+revenue debt at MWAA's recent 4.37% coupon. Against a Dulles cost per enplanement in the mid-single-
+dollar range and a $20–22.5 billion expanded program envelope, the standard
+is a rounding error in the CIP — and a large multiple of that number if it is
+retrofitted later. Published integrated-project-delivery research puts the
+cost of resolving a design decision during construction at roughly 4× to 10×
+the cost of resolving it during schematic design, and 20× or more during
+operations. The right question is not "can MWAA afford this standard" but
+"what does the standard have to specify so that Concourse E, the C/D
+replacement, and any DCA Terminal 1 rebuild inherit it automatically?"
+
+Five numerical anchors organize the argument:
+
+1. **NFPA 72 already fixes the intelligibility floor.** Emergency voice/alarm
+   communications systems (EVACS) must achieve a Speech Transmission Index
+   (STI) of at least 0.50 in areas where voice messaging is required. This is
+   the non-negotiable minimum any MWAA standard must meet or exceed; it is
+   not aspirational.
+2. **The acoustic/PA/AV/EVACS package is a small share of a terminal.** A
+   defensible range from public benchmark literature is 1.0%–3.5% of hard
+   terminal construction cost. At the Concourse E scale, the delta between a
+   low-rigor and a high-rigor MWAA standard is roughly $18 million of one-
+   time capital.
+3. **Late change is the real cost.** Applying published MacLeamy-curve
+   multipliers, changing an acoustic or PA-zoning specification during CD/
+   construction on a $10 million package can cost $40–100 million in delay,
+   rework, and integration; changing it after commissioning can exceed
+   $200 million-equivalent when displacement of operations is priced in.
+4. **Announcement volume is a compoundable load.** A 14-gate concourse
+   operating 16 hours per day with a conservative average of 15 announcements
+   per gate per hour broadcasts roughly 3,360 audible events per day. Zoning
+   the PA to a single gate holdroom collapses the *listener-weighted*
+   exposure by roughly one order of magnitude for the same operational
+   information content.
+5. **Accessibility redundancy is a coverage math problem, not a policy
+   preference.** ADA/ABA and DOT 49 CFR Part 27 do not permit "quiet" to
+   mean "no channel." The standard has to guarantee three concurrent channels
+   (visual, audible, staffed/mobile) at every gate and every safety-critical
+   decision point. Any decision to reduce audible frequency must be met with
+   measurable increases in the other two channels.
+
+The following sections show the arithmetic.
+
+---
+
+## 1. Sizing the acoustic and PA package against Concourse E
+
+Concourse E is the near-term test case: 435,000 gross square feet, 14 United
+gates, ~46,000 sq ft of concessions, ~40,000 sq ft of United club, direct
+AeroTrain access, scheduled autumn 2026 opening (airport context packet,
+§4). MWAA has not published Concourse E's hard construction cost; the
+airport-wide envelope for the 2024/2025 CIP is $9.0 billion joint, of which
+approximately $7.0 billion sits at IAD (context §4). The expanded July 2026
+program lifts the Dulles envelope to $20–22.5 billion.
+
+I do not have a published Concourse E line-item cost. I therefore price the
+acoustic package as a share of a reasonable construction range and let the
+reader move the sliders.
+
+**Formula (analyst construction):**
+
+    Acoustic package capital = GSF × $/GSF × acoustic_share
+
+Inputs:
+
+- `GSF` = 435,000 (airport context §4, IAD Concourse E)
+- `$/GSF` — analyst assumption band. Public U.S. terminal construction
+  benchmarks over the past decade fall between roughly $800 and $1,600 per
+  gross square foot for airside concourse work of comparable complexity. I
+  use $800 (low), $1,100 (mid), $1,400 (high) for illustration and label
+  every result as illustrative. **This is not an MWAA-verified figure.**
+- `acoustic_share` — literature-derived band for the integrated acoustic /
+  PA-zoning / EVACS / AV / FIDS commissioning package as a share of hard
+  construction. I use 1.0% (low rigor — code-minimum), 2.0% (mid — targeted
+  intelligibility with PA zoning), and 3.5% (high — full quiet-by-design
+  with reverberation-controlled ceilings, directional loudspeakers, sensory
+  rooms, and post-opening STI verification).
+
+**Results (illustrative capital, one-time):**
+
+| Rigor | $/GSF | Acoustic share | Package capital |
+|-------|------:|---------------:|-----------------:|
+| Low | $800 | 1.0% | $3.48 M |
+| Mid | $1,100 | 2.0% | $9.57 M |
+| High | $1,400 | 3.5% | $21.32 M |
+| Delta (High − Low) | | | ~$17.8 M |
+
+**Annualized (30-year level amortization at 4.37%, MWAA June 2025 2036-AMT
+comparable coupon — context §5):**
+
+Debt-service factor = (0.0437 × (1.0437)^30) / ((1.0437)^30 − 1) ≈ 0.060456.
+
+- Low rigor: $3.48 M × 0.060456 = **$0.210 M/yr**
+- Mid rigor: $9.57 M × 0.060456 = **$0.579 M/yr**
+- High rigor: $21.32 M × 0.060456 = **$1.289 M/yr**
+
+**Cost per enplanement impact** (IAD 2025 enplanements = 13,859,735, context
+§6):
+
+- Low: $0.015/enplanement
+- Mid: $0.042/enplanement
+- High: $0.093/enplanement
+
+**Reader takeaway.** Even at the top of a defensible cost range, a full
+quiet-by-design build on the single most consequential new IAD concourse
+adds less than ten cents per enplanement per year. That is inside the noise
+of an airline rate-setting process; it is not a rate-negotiation flashpoint.
+It is a specification decision that should be closed before it becomes an
+airline-committee discussion.
+
+**Sensitivity.** Two variables move the answer materially: (i) the acoustic
+share of the C/D replacement scope, which is a multiple of Concourse E and
+will dominate the program-wide cost of any standard; and (ii) whether MWAA
+extends the standard to DCA Terminal 1's eventual replacement, where the
+historic 1941 Goodman envelope constrains what an acoustic ceiling can look
+like and may push the share above 3.5%. Applied to the 5 million square
+feet of new/renovated space in the July 2026 IAD announcement, the mid-
+rigor share works out to roughly $110 million of one-time capital ($6.65M
+annualized, $0.48 per enplanement) — still under 1% of a $20B envelope.
+Both cases are priced in `outputs/stage1/quantitative-analysis/`.
+
+---
+
+## 2. The MacLeamy multiplier: why "specify before designs harden" is
+   arithmetic, not aesthetic
+
+The core thesis claim — that acoustic and PA requirements are more effective
+and less costly when specified before designs and procurements harden — is
+supported by well-established integrated-project-delivery research
+(MacLeamy curve, AIA IPD literature). Published multiples for the *cost of
+correcting* a decision by project stage:
+
+| Decision stage | Approximate cost multiple vs. schematic-design fix |
+|----------------|---------------------------------------------------:|
+| Schematic design | 1× |
+| Design development | 2–3× |
+| Construction documents | 4–6× |
+| Bidding / GMP | 5–8× |
+| Construction | 10–20× |
+| Post-occupancy retrofit | 20–100× |
+
+Applied to the Mid-rigor $9.57 M Concourse E acoustic package:
+
+- If the same requirement enters at construction: **$96–191 M-equivalent**
+  in rework, delay, and integration exposure (mid: ~$143 M).
+- If it enters post-occupancy: **$191–957 M-equivalent** (mid: ~$574 M),
+  because acoustic ceilings, PA zoning cabling, and EVACS zoning cannot be
+  changed without displacing operations.
+
+These numbers are illustrative — a real change-order price at Concourse E
+would be a specific negotiation — but the shape of the curve holds across
+airport programs. The policy implication is asymmetric: the *upside* of
+locking a standard early is a $10–20 M capital line item; the *downside* of
+letting Concourse E and C/D open without one and then retrofitting is on
+the order of hundreds of millions across the IAD program. The expected
+value of the decision does not depend on any specific point estimate.
+
+---
+
+## 3. Intelligibility thresholds the MWAA standard has to meet
+
+A quiet-by-design standard is not a marketing target; it is a set of
+measurable numbers that a commissioning agent can verify. The following
+thresholds are drawn from primary technical standards and should be adopted
+verbatim or improved upon by MWAA:
+
+| Metric | Governing standard | Threshold | Applicability |
+|--------|--------------------|-----------|---------------|
+| Speech Transmission Index (STI), EVACS-required areas | NFPA 72 (2022) §18.4.11.2, Common Intelligibility Scale/STI | ≥ 0.50 (measurement per IEC 60268-16) | All concourses, holdrooms, restrooms, connectors — everywhere emergency voice messaging is required |
+| Ambient A-weighted sound level, occupied concourse | Airport design practice; ASHRAE Applications; ISO 9921 | Design target ≤ 55–60 dB(A) during typical peak (analyst benchmark) | Airside holdrooms, connectors |
+| Reverberation time (T60), broadband | ANSI/ASA S12.60-2010 (schools) as pattern; airport design practice | Design target 1.2–1.6 s in large volumes; ≤ 0.8 s in gate hold pockets (analyst benchmark) | Large-volume terminal spaces vs. localized holdrooms |
+| Signal-to-noise ratio during PA broadcast | IEC 60268-16 | ≥ +15 dB above ambient for intelligibility | All PA-broadcast zones |
+| Adjacent-zone spillover from a paged zone | Airport design practice; no fixed standard | Analyst target: ≤ −10 dB relative to the paged zone | Zoned PA implementations |
+| Assistive listening coverage | ADA Standards for Accessible Design §219, §706 | Required in assembly areas; specific receiver counts by capacity | All assembly/holdroom areas ≥50 occupants |
+| Visual message coverage | 49 CFR Part 27; DOT ADA Air Carrier rule (14 CFR Part 382) analogue for terminal | Visual counterpart to every safety-critical audible message | All public areas |
+
+Two implications:
+
+1. **STI ≥ 0.50 is a floor, not a target.** Any quiet-by-design language that
+   permits ambiguity here is out of compliance with NFPA 72 as adopted
+   through local building codes. The standard should specify STI ≥ 0.55 as a
+   design target with ≥ 0.50 as the acceptance minimum, and require
+   measurement by a third-party commissioning agent per IEC 60268-16 in
+   every EVACS zone at both handover and every three years thereafter.
+2. **Ambient and reverberation are analyst benchmarks, not codes.** MWAA
+   should specify them explicitly because no code will do it. The analyst
+   ranges above are drawn from ASHRAE and school-acoustics literature by
+   analogy; MWAA's design manual should either adopt them or replace them
+   with values derived from its own commissioning data. This is a gap the
+   operator has to close.
+
+---
+
+## 4. Announcement-load arithmetic
+
+The passenger-experience argument for zoning and script reduction rests on
+how many announcements a given passenger actually hears. A representative
+calculation for Concourse E:
+
+**Inputs (analyst assumptions, clearly labeled):**
+
+- 14 gates operating 16 hours/day (context §4 gate count; operating hours
+  are analyst assumption for a departure-heavy hub concourse)
+- Average 15 audible announcements per gate per hour during operational
+  hours (analyst assumption, mid-range; U.S. holdroom cadence commonly
+  observed at 10–30/hour, but no MWAA data available)
+- Concourse-wide broadcast in the unzoned case; single-gate holdroom
+  broadcast in the zoned case
+
+**Total events per day (analyst construction):**
+
+    14 gates × 16 hr × 15 ann/hr = 3,360 announcements/day (concourse-wide)
+
+**Listener-weighted exposure (analyst construction):**
+
+Assume a typical passenger dwells in one gate holdroom for the last 45
+minutes before boarding and passes through the concourse for another
+30 minutes:
+
+- **Unzoned:** exposed to *all* concourse-wide announcements during the
+  75-minute presence: 3,360 × (75/16 × 60) = ~262 audible events.
+- **Zoned to gate (13 of 14 gates muted from this listener):** exposed to
+  (1/14 × concourse-wide) + (13/14 × zero) ≈ 19 audible events at the home
+  gate, plus roughly ~19 events per gate passed in transit. Net exposure
+  drops by roughly 90%.
+
+**Reader takeaway.** Zoning is not "quieter announcements"; it is *the same
+information delivered to the passengers who need it, and none delivered to
+the passengers who do not*. The load reduction is roughly one order of
+magnitude for the same operational content. Announcement *frequency* does
+not have to drop at all for perceived quietness to improve dramatically.
+
+**Sensitivity.** Halving the assumed announcement rate to 7.5/hr (a
+plausible target after script reduction and automated boarding-call
+suppression) halves the numerator; the *ratio* between zoned and unzoned
+exposure is unchanged. The dominant driver is zoning, not script reduction.
+That matters for what MWAA's design manual specifies as mandatory: PA
+zoning is architecture-and-cabling; script reduction is a policy layer that
+can be revised without rebuilding.
+
+---
+
+## 5. Accessibility redundancy — coverage math
+
+ADA and 49 CFR Part 27 require effective communication. In airport
+practice, this means every safety-critical message reaches every passenger
+through at least one channel they can use. Analyst framing:
+
+Let *p_v*, *p_a*, *p_m* be the probability that a given passenger can
+receive information through the visual, audible, and mobile channels
+respectively. Standards need to guarantee:
+
+    1 − (1 − p_v)(1 − p_a)(1 − p_m) ≥ target
+
+For a target coverage of 99.9% (missed-message probability ≤ 0.1%):
+
+- If *p_v* = 0.95 (FIDS reliability + literacy + line-of-sight), *p_a* =
+  0.85 (audibility + language + hearing), *p_m* = 0.60 (mobile
+  penetration net of digital exclusion), then combined coverage = 1 −
+  (0.05)(0.15)(0.40) = **99.7%**. That misses the target.
+- Add a staffed channel *p_s* = 0.30 (a gate agent or roaming staff able
+  to reach an individual passenger): combined = 1 − (0.05)(0.15)(0.40)
+  (0.70) = **99.79%**. Still short.
+- Raise *p_v* to 0.98 (redundant FIDS coverage, larger legibility, backup
+  displays) and *p_a* to 0.90 (STI-verified holdroom loudspeakers,
+  induction loop coverage): combined = 1 − (0.02)(0.10)(0.40)(0.70) =
+  **99.94%**. Meets target.
+
+**Reader takeaway.** A quiet-by-design standard that reduces audible
+message *frequency* without lifting FIDS coverage, induction-loop coverage,
+and staffed-response capacity actively *reduces* coverage. The channels
+are complements, not substitutes. Any MWAA standard should require
+*measured* coverage on all three channels before permitting a reduction on
+any one.
+
+**Caveat.** The channel probabilities above are analyst constructions to
+demonstrate the arithmetic. Real values must come from operator
+observation: FIDS uptime data, holdroom STI commissioning results, PA
+audibility mapping, and passenger survey data. MWAA does not appear to
+publish these.
+
+---
+
+## 6. Compliance measurement cadence — what a defensible standard costs
+   to *verify*
+
+A standard is only real if someone measures it. Analyst-recommended
+verification cadence for the MWAA standard, with rough labor estimates:
+
+| Verification | Cadence | Rough effort per event |
+|--------------|--------:|-----------------------:|
+| STI acceptance test, every EVACS zone | Once at commissioning, then every 3 years | 8–16 person-hours per zone with calibrated equipment |
+| Ambient LAeq / reverberation survey | Every 3 years and after any major fit-out | 24–40 person-hours per concourse |
+| PA zone spillover audit | Every 3 years | 16–24 person-hours per concourse |
+| FIDS uptime and coverage audit | Continuous (systems monitoring) + annual physical audit | 40–80 person-hours per airport per year |
+| Assistive-listening receiver check | Quarterly | 4–8 person-hours per airport per quarter |
+| Passenger survey (perceived quietness, intelligibility) | Annual | Existing MWAA survey infrastructure |
+
+At $200/hour blended cost for third-party commissioning agents (analyst
+assumption; typical U.S. specialty-acoustics consulting range $150–$300/hr),
+system-wide verification costs order-of-magnitude **$150K–$300K/year across
+both airports** — a rounding error against the CIP and against the
+$1.3 M/year debt-service on the high-rigor package. Verification cost is
+not the reason to skip the standard.
+
+---
+
+## 7. What operator data would materially improve this analysis
+
+Public data cannot resolve the following, and each is decision-relevant:
+
+1. **Line-item Concourse E acoustic/PA/EVACS/AV/FIDS spend.** Would tighten
+   the $3.5–$21.3M capital band by an order of magnitude.
+2. **Current MWAA Design Manual acoustic and PA sections.** Determines
+   whether the standard is a rewrite or an incremental tightening.
+3. **MWAA holdroom STI commissioning data for existing concourses.**
+   Determines the baseline against which any new standard is measured.
+4. **Concourse announcement counts by hour and gate.** Replaces the
+   analyst 15/hour assumption with observed data.
+5. **FIDS uptime and coverage-gap data.** Feeds the accessibility
+   coverage math with real *p_v*.
+6. **MWAA passenger survey items on perceived quietness and
+   intelligibility.** The dependent variable any standard is ultimately
+   trying to move.
+7. **Signatory-airline MII thresholds under the 2025 U&L.** Determines
+   whether a system-wide standard requires majority-in-interest
+   consultation or falls inside operator authority. Context §3 flags this
+   as unverified.
+
+Absent items 1–6, the analysis in this brief remains directionally correct
+but should not be quoted at more than one significant figure.
+
+---
+
+## 8. Bottom-line quantitative posture for the argument
+
+- The full-rigor package on Concourse E costs less than a tenth of a
+  dollar per enplanement per year.
+- The cost of *not* setting the standard now, and retrofitting later, is
+  one to two orders of magnitude larger by published IPD multipliers.
+- The intelligibility floor is not a policy choice; NFPA 72 sets it at
+  STI ≥ 0.50.
+- The zoning decision drives the passenger experience gain far more than
+  the script-reduction decision does.
+- Accessibility coverage is a coverage-math problem — the standard has
+  to *raise* the visual and staffed channels *before* it lowers the
+  audible one.
+- The main risk to the whole analysis is missing operator data, not
+  missing technology.
+
+All arithmetic, inputs, and sensitivities are reproducible from
+`outputs/stage1/quantitative-analysis/calculations.json` and the CSVs and
+README beside it.

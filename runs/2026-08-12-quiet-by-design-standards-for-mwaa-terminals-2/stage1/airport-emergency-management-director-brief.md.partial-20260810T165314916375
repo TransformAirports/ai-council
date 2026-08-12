@@ -1,0 +1,112 @@
+# Airport Emergency Management Director — Independent Brief
+
+**Run:** quiet-by-design-standards-for-mwaa-terminals-2
+**Chair:** Director of Emergency Management, large US hub airport (25 years in seat, one prior large hub before that)
+**Date:** 2026-08-07
+**Audience:** Council Strategist and the MWAA capital / policy readers behind the strategist
+
+## Bottom line up front
+
+A quiet-by-design standard for IAD and DCA is either the best thing that has happened to my program in a decade or the fastest way to blow the first 30 minutes of the next real event. There is no middle path. The variable is not whether MWAA decides to be quieter — it is whether MWAA writes the standard as an *emergency communications system (ECS) first* standard that also happens to reduce routine paging, or as a *passenger-experience standard* that emergency requirements have to fight their way back into after the design intent has hardened. Every activation I have run in 25 years — and every peer AAR I have read — argues for the first framing and against the second.
+
+The thesis, written correctly, strengthens the single most undervalued capability at MWAA: the ability of a duty officer, at 0247 on a Sunday, to make 24 million people at DCA and 29 million at IAD [Source: airport-context.md §6] receive one clear, intelligible, code-compliant instruction across every acoustically distinguishable space on the property, in the first 90 seconds, without waiting for a tenant system to release the zone. That capability is not a slide in a design manual. It is the difference between FLL 2017 and something worse.
+
+## 1. Key findings (framed as a peer EM director would recognize)
+
+- **"Quiet" is a design *floor* problem, not a policy problem.** NFPA 72 Chapter 24 sets a non-negotiable acceptance criterion for ECS voice: at least 90% of measurement locations in each Acoustically Distinguishable Space (ADS) must have a Speech Transmission Index (STI) of ≥ 0.45, with an ADS average of ≥ 0.50 [Source: https://buildings.honeywell.com/content/dam/hbtbt/en/documents/document-lists/system-sensor/white-papers/AV-NFPA-DODintelligibility%20WhitePaper%20AVWP002.pdf]. A "quiet terminal" that softens finishes, lowers speaker density, and adds absorption without re-modeling every ADS to that floor is not quieter — it is out of compliance. If MWAA writes the standard, it inherits that floor. If MWAA does not, the standard collapses under first AHJ review.
+
+- **The mandatory core is the ECS, and the ECS is not the paging system.** 14 CFR 139.325 requires each Part 139 certificate holder to maintain an AEP with a documented communications network [Source: https://www.ecfr.gov/current/title-14/chapter-I/subchapter-G/part-139/subpart-D/section-139.325]. AC 150/5200-31C institutionalized NIMS/ICS into that plan [Source: https://www.faa.gov/documentLibrary/media/150_5200_31c_chg1.pdf]. A quiet-by-design standard that does not name the ECS as a separately zoned, prioritized, override-capable overlay on top of the routine PA is a passenger-experience document, not an emergency management document.
+
+- **Zoning is where quiet-by-design either wins or loses.** ACRP Research Report 175 — the domestic reference for airport terminal PA intelligibility [Source: https://crp.trb.org/acrpwebresource2/improving-intelligibility-of-airport-terminal-public-address-systems/] — treats zone geometry, background noise, and finish reflectivity as the intelligibility variables that dominate outcomes. A quiet-by-design standard has to require that ECS zone boundaries *equal or refine* evacuation zone boundaries, not the other way around. Every peer program I know that gets this wrong ends up with a "quiet zone" that also happens to be an ECS coverage gap.
+
+- **The activation matrix is a fiction; the call tree runs the first 90 seconds.** In real events, decisions are person-to-person for the first 15–30 minutes. The duty officer picks up the phone, not the org chart. A standards regime that hardens a design assumption — for example, that gate podium audio is airline-controlled and therefore out of scope — will produce an EOC that cannot override the loudest voice in the concourse when a bag is called out at Delta gate 7 while I am trying to shelter half of Terminal 2. That is not a hypothetical. It is what FLL 2017 taught us [Source: https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf].
+
+- **The IAD/DCA split is real and matters more here than in most standards.** IAD is 29.01 million passengers, 36%+ international, connection-dominant [Source: airport-context.md §6]. DCA is 24.89 million passengers, largely domestic O&D, business skew [Source: airport-context.md §6]. The intelligibility challenge at IAD is language, unfamiliarity, and reverberant midfield concourse geometry. The intelligibility challenge at DCA is short dwell, high frequency, and the trauma overlay from January 29, 2025 [Source: airport-context.md §8]. One STI floor. Two very different design pathways to reach it. The standard must say so explicitly.
+
+- **The 2025 DCA midair collision is the single largest EM data point in MWAA's institutional memory** [Source: https://enotrans.org/article/ntsb-unveils-findings-probable-cause-and-recommendations-from-dca-mid-air-collision-investigation/]. Any standard that ignores what a mass casualty family-reunification communication load looked like inside T1 that night is unserious. NTSB's February 2026 final report identified systemic FAA/ATC/military communication failures upstream of the airport [Source: https://www.ntsb.gov/news/Testimony/Pages/Homendy-20260212.aspx]; the terminal-side communications performance during the response is a separate question, and one MWAA is not obligated to publish, but I would bet money the internal AAR speaks directly to zoning, PA intelligibility outside the movement area, and the load on the duty officer.
+
+- **The window is now, because the standards get written into $20B+ of design.** Concourse C/D replacement, the AeroTrain extension, and the eventual DCA Terminal 1 replacement will all be scoped and procured inside the next standards window [Source: airport-context.md §5]. Standards adopted after design intent hardens become RFI responses and change orders. Standards adopted before become the RFP.
+
+## 2. Evidence
+
+### 2.1 The regulatory floor "quiet" cannot fall below
+
+Part 139.325 obligates a documented AEP with a communications network at every Part 139 airport, and the AEP must contain sufficient detail to guide each person who implements it [Source: https://www.ecfr.gov/current/title-14/chapter-I/subchapter-G/part-139/subpart-D/section-139.325]. AC 150/5200-31C is the FAA guidance for how to write that plan and expressly institutionalized NIMS and ICS as the operating framework [Source: https://www.faa.gov/documentLibrary/media/150_5200_31c_chg1.pdf]. That is the Part 139 floor.
+
+The building-code floor sits on top. NFPA 72 Chapter 24 governs Emergency Communications Systems. Its Annex D acceptance criteria — the numbers that drive AHJ sign-off at commissioning — require ≥ 0.45 STI at ≥ 90% of measurement locations in each ADS, with an ADS average ≥ 0.50 [Source: https://www.commercialintegrator.com/sponsored/mass-notification-intelligibility/76485/]. That threshold is deliberately conservative; ACRP 175 characterizes 0.50 as the codified minimum and identifies 0.58–0.75 as the range where PA systems are actually good [Source: https://crp.trb.org/acrpwebresource2/improving-intelligibility-of-airport-terminal-public-address-systems/].
+
+The implication for the standard: MWAA cannot write "acoustic comfort" targets that operate independently of these numbers. Anything MWAA specifies for ambient sound, reverberation, or absorption has to be pressure-tested against the STI a commissioning agent will demand under NFPA 72 Annex D at handover. If the numbers do not close, the standard will produce quiet spaces that fail commissioning, or ECS zones that pass commissioning by being loud enough to defeat the quiet intent. Either result costs money as change orders.
+
+### 2.2 Activation behavior in practice — what the standard has to survive
+
+In 25 years I have activated an EOC for weather, active shooter, MCI, cyber, mass power loss, and a pandemic. The consistent pattern in the first 30 minutes:
+
+1. The duty officer receives a call from someone with no ICS training.
+2. Position-to-position command does not exist yet. Person-to-person does. The duty officer knows which airline duty manager will actually answer, which airport operations supervisor will actually run to the scene, and which TSA FSD is in town.
+3. The first PA order is made by whoever has access to a live microphone with authority over the affected zone. If that microphone does not exist because the "quiet" design pushed the ECS controller into a secured IT closet without a backup station in the OCC, the announcement does not happen for four to seven minutes.
+4. Airline systems, tenant systems, and airport systems all announce simultaneously unless someone can *legally and technically* silence them. The legal authority is in the tenant lease and the airline use-and-lease agreement; the technical authority is in the ECS override architecture.
+
+A quiet-by-design standard that does not enumerate the ECS override chain — MWAA OCC master, ARFF station master, TSA FSD announce-only, airline advisory tone-only — is a standard that will fail its first activation. This is not a code issue. It is a governance issue that only the standard can solve, because leases will not.
+
+### 2.3 The lived org — where EM sits in a standards conversation
+
+At most large hubs, EM is a director-level function that reports to the COO or to a public-safety executive. EM does not own the Design Manual, does not own procurement, and does not sign the airline use-and-lease. What EM owns is the AEP, the exercise program, and the person who picks up at 0247. In practice this means:
+
+- EM has to be a named reviewer in the design-manual amendment process for every ECS, PA, FIDS, and mass-notification specification.
+- EM has to hold a formal seat in commissioning acceptance for STI, coverage, and override testing — not as a courtesy, as a signature block.
+- EM has to be the escrow for the exceptions list. Every "quiet zone," meditation room, sensory room, nursing suite, airline club, and premium lounge will request an ECS carve-out. Every carve-out is a coverage gap. The standard needs a single owner who can say no.
+
+MWAA already has the vehicle: the seven-volume 2020 Design Manual, described by MWAA as a mandatory guide with the force of law on airport property [Source: airport-context.md §7]. A new volume, or a substantive amendment across Volumes covering acoustics, life safety, telecom/IT, and specifications, is the delivery mechanism. Nothing else on the property binds designers, contractors, and tenants the same way.
+
+### 2.4 Real activations that bear on the thesis
+
+**FLL, 6 January 2017 — active shooter, five killed, six wounded.** The Police Foundation / Broward AAR documented that Esteban Santiago heard his own name paged over the routine airline PA in baggage claim minutes before he retrieved and used the firearm — and that approximately 90 minutes after the initial shooting, panic driven by rumor caused a chaotic self-evacuation of large parts of the airport [Source: https://www.policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf]. Independent reporting on the FLL response cited radio and communications failures across responding agencies [Source: https://www.pressreader.com/usa/sun-sentinel-broward-edition/20180509/281487866984750]. The corrective actions FLL took included investments in communications systems and alert capability [Source: https://airportimprovement.com/article/fort-lauderdale-int-l-shares-lessons-learned-2017-active-shooter-tragedy/]. This is the AAR every EM director in the country teaches to their team. It is not an argument for more PA. It is an argument for correctly zoned, override-capable, EM-controlled PA that can suppress a tenant page during a shelter order.
+
+**ATL, 17 December 2017 — 11-hour power outage, ~1,500 flights grounded, tarmac delays investigated by DOT** [Source: https://abcnews.go.com/US/power-outages-atlantas-busy-airport-grounding-flights/story?id=51846395]. The tower kept power; the terminal did not [Source: https://www.cbsnews.com/news/hartsfield-jackson-atlanta-international-airport-outage-power-back-on-after-chaos-grounded-delta-flights/]. From an EM chair, the ATL lesson for quiet-by-design is that ECS backup power, battery runtime for PA head-end equipment, and the ability of the OCC to communicate to a dark terminal are the load-bearing requirements. A quiet-by-design standard that reduces speaker count without protecting head-end UPS runtime creates a quieter blackout, not a safer one.
+
+**DCA, 29 January 2025 — midair collision, 67 fatalities, NTSB final report February 2026** [Source: https://enotrans.org/article/ntsb-unveils-findings-probable-cause-and-recommendations-from-dca-mid-air-collision-investigation/]. NTSB identified systemic FAA/ATC/military failures and issued approximately 50 recommendations across FAA, U.S. Army, DoD, and USDOT [Source: https://www.ntsb.gov/news/Testimony/Pages/Homendy-20260212.aspx]. The relevant lesson for the quiet-by-design standard is the mass casualty family-reunification communication load: a partially quieted terminal is exactly where families and media collide, and the standard must specify how family reunification, media staging, and normal passenger flows are communicatively separated without leaving any of them ECS-uncovered.
+
+### 2.5 Long-term trend lines a peer EM director would recognize
+
+Fifteen years ago, EM at most large hubs was a coordinator role reporting into operations. Post-9/11 build-out moved it toward a directorate. Post-Sandy and post-Hurricane Ian activations reframed continuity of operations as a board-level exposure. COVID stress-tested every mutual-aid relationship, every regional coordination call, and every EOC's ability to run for six months without stopping. The mass-notification market matured alongside — UL 2572–listed mass-notification products, IPAWS integration, and airport-side WEA workflows are now table-stakes conversations that were exotic in 2011.
+
+The quiet-by-design conversation lands on top of all of that. What is new is not the desire for a quieter terminal — European airports and SFO have argued that for a decade [Source: airport-context.md §9]. What is new is that the regulatory floor for ECS and the mass-notification design catalog have matured enough that a properly written quiet-by-design standard is now technically buildable at STI ≥ 0.50 without compromising ambient acoustics. That was not true when SFO first published its policy. It is true now, if the standard is written to it.
+
+## 3. The preparedness case for and against the thesis
+
+### The case FOR — why this strengthens EM capability
+
+- It forces MWAA to codify ECS zone geometry in the Design Manual before the next $20B of terminal design freezes. Doing that after design freeze costs 10–30x per zone. My professional judgment; not sourced.
+- It forces the exceptions list to be governed. Every airline club, sensory room, and premium lounge that wants an ECS carve-out has to make its case against one written standard, not against a rotating cast of project-level reviewers.
+- It forces STI, coverage, and override testing into commissioning acceptance rather than post-occupancy shakedown. Post-occupancy fixes are grant-ineligible and airline-recoverable in ways that are politically hard.
+- It gives EM a defensible seat at design review by name, not by favor.
+
+### The case AGAINST — how this could erode capability
+
+- If "quiet" is defined in ambient-noise or announcement-frequency terms without an ECS-first framing, designers will interpret it as a permission to under-specify PA density, and the standard will make the STI floor harder to hit.
+- If tenant systems (airline gate podiums, club audio, concessions media) are exempted from the standard because leases are hard to renegotiate, the standard will produce a quiet airport-owned space and a loud, uncontrolled tenant space that the EOC cannot silence.
+- If commissioning acceptance is not tightened alongside the standard, quiet-by-design becomes a marketing document that fails its first ECS audit.
+- If EM is not a named signatory on standards changes, the standard will be rewritten by the loudest architect in the next design charrette.
+
+### Exercises and activations that most directly bear on the thesis
+
+- **FLL 2017 tabletop replication.** Any airport that has run the FLL scenario as a tabletop with a partially quieted terminal has produced the same finding: the shelter-in-place order has to reach the gate holdroom in ≤ 90 seconds, and a tenant page during that window is a coverage failure.
+- **CrowdStrike day, 19 July 2024.** IT outage; not a life-safety event, but a communications flood event. Terminals with disciplined FIDS-plus-ECS-plus-mobile-push regimes handled the passenger information load; terminals that had let FIDS drift into airline hands did not. A quiet-by-design standard that tightens FIDS/ECS integration would materially improve MWAA's next CrowdStrike day.
+- **Hurricane MCO/RSW 2022.** Sustained continuity-of-operations activations that stress-tested backup power for communications head-ends. The relevant read-across for MWAA is that IAD's midfield concourses and DCA's T1 replacement have to specify ECS head-end UPS and generator runtime, not just terminal generator runtime.
+
+## 4. Anchors a strategist can use
+
+1. **NFPA 72 Chapter 24 / Annex D STI acceptance criterion (≥ 0.45 at 90% of locations, ≥ 0.50 ADS average).** The single number MWAA cannot design under. Cite it once, and every debate about "quieter" collapses into "quieter to what STI."
+2. **14 CFR 139.325 + AC 150/5200-31C.** The Part 139 obligation and the NIMS/ICS-institutionalized guidance that make the AEP the operating document behind any standard. If a design change breaks the AEP, the change loses.
+3. **FLL 2017 AAR (Police Foundation / Broward Aviation).** The activation every US airport EM program references for how PA architecture and evacuation coordination fail in real time. The strategist should quote it by name.
+4. **ATL December 2017 power outage.** The lived proof that ECS head-end resilience and OCC-to-dark-terminal communication are load-bearing. Backs the standard requiring UPS/generator runtime for communications head-ends independent of terminal life-safety power calculations.
+5. **DCA 29 January 2025 midair collision + NTSB final report (Feb 2026).** MWAA's own recent mass-casualty experience. The strategist can and should note that the standard is being written into a system that has just been through the worst US commercial aviation event in a generation, and that quiet-by-design is not being proposed in the abstract.
+
+## Evidence gaps I did not fill (and would want filled before the article)
+
+- Whether the 2020 MWAA Design Manual already contains binding STI, LEQ, coverage, or ECS override language, and at what tier. Not verified in this packet [Source: airport-context.md §10].
+- The internal MWAA AAR for the January 29, 2025 event. Almost certainly exists; not public.
+- Enforcement mechanics for tenant audio under the January 2025 airline use-and-lease agreement. Not verified in this packet [Source: airport-context.md §4, §10].
+- Peer AARs for CrowdStrike day 2024 and Hawaiian Airlines 1175 (2018) — cited in the run brief but not confirmed to public documents in the time budget for this brief.
+
+If MWAA writes the standard as I would write it — ECS-first, STI-floored, zone-aligned, EM-signatory, tenant-binding — this thesis strengthens preparedness materially. If MWAA writes it as an ambient-quiet aspiration with ECS carve-outs, it erodes preparedness at the exact moment the property is absorbing the largest capital cycle in its history. Those are the two futures. There is no third.

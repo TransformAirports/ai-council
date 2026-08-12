@@ -1,0 +1,115 @@
+# Technology Scout Brief — Quiet-by-Design Standards for MWAA Terminals
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Agent:** technology-scout
+**Independent lens:** Written without reading peer Stage 1 briefs, per contract. The question this brief answers: which technologies actually deliver "quiet by design," what is available off the shelf in 2026, what still requires custom work, and where do vendor claims outrun independent evidence.
+
+---
+
+## 1. What "quiet by design" is, technologically
+
+Strip the marketing off and a quiet-airport program is four separable technology bets:
+
+1. **Acoustic performance of the room** — reverberation time (RT60), absorption, geometry, and background noise floor. This is architecture and finishes, but it is specified with numeric acceptance criteria (RT60, ambient LAeq, STI). If the room is loud, no downstream system fixes it.
+2. **Public address zoning, steering, and automation** — how few loudspeakers can be energized for a given call, how tightly the beam is confined to the intended audience, and how many announcements can be eliminated because a machine schedules them instead of a gate agent hitting a hot mic.
+3. **Visual and mobile information channels** — FIDS density and placement, gate-area displays, mobile push, kiosk audio, and captioned announcements. In a quiet airport these carry the freight the PA used to carry.
+4. **Accessibility redundancy** — hearing loops, real-time captioning, visual paging, staffed assistance, and low-stimulation rooms. These exist because the moment you turn down the PA, you have created new failure modes for hard-of-hearing, low-vision, cognitively different, non-English-speaking, and infrequent travelers.
+
+Anything that does not fit one of those four buckets is either operations policy (who is allowed to press "make announcement"), design governance (how the spec gets into the contract), or branding.
+
+The categories that get called "operational intelligence" in adjacent vendor pitches — A-CDM, TTOT/TSAT, biometric flow, digital twins, predictive turn — sit outside this brief. They matter for airport operations, but they do not make a gate lounge quieter. Do not let a vendor pull "quiet by design" into that pitch deck.
+
+## 2. Key findings
+
+1. **The measurable prize is specific, and it is not silence.** The dominant reference standard is ACRP Research Report 175, which recommends a **minimum Speech Transmission Index of 0.45 and a signal-to-noise ratio of 10–15 dB(A)** for gate-area public address. [Source: https://www.wilsonihrig.com/wp-content/uploads/2017/12/ACRP-Report-No.-175_Wilson-Ihrig.pdf] That is the number a design manual can enforce. "Calm passenger experience" is not.
+2. **SFO is the only North American case with a publicly reported before/after PA count.** Per an industry trade write-up, individual pages fell from **492 to 261 per day** and cumulative announcement duration fell from **145 to 58 minutes** during the pilot with United, then rolled airport-wide between **December 2019 and March 2020**. [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/] The widely-quoted "over 90 minutes per day" and "40 percent reduction" figures are SFO's own; no independent audit of the methodology has been published.
+3. **Dubai DXB claims a larger cut** — announcements from **more than 2,000 daily to fewer than 700**, capped at two per flight and reserved for emergencies. [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/] This is an operator press release, not an audited measurement.
+4. **The European "silent" airports are policy, not technology.** London City "makes announcements only for bad weather delays or genuine emergencies" [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]; Barcelona El Prat "does not make PA system announcements about boarding gates or changes made to existing gates" and directs passengers to the screens [Source: https://www.aena.es/en/josep-tarradellas-barcelona-el-prat/airport-services/categories-and-terminals/departures-area.html]; Schiphol declares itself a "silent airport" and pushes information to FIDS, web, and app [Source: https://news.schiphol.com/silence-at-amsterdam-airport-schiphol/]. None of them cite a numeric target the same way ACRP 175 does. What they have in common is a stated governance rule about when the PA is allowed to fire.
+5. **The technology stack for a silent airport is mature and mostly commodity.** Automated multilingual PA (AviaVox, deployed at Heathrow, Schiphol, Delhi, Doha; 35+ languages) [Source: https://aviavox.com/for-airports/], beam-steerable column arrays (Renkus-Heinz Iconyx, deployed at LAX among "thousands of projects worldwide") [Source: https://renkus-heinz.com/products/iconyx-gen5/], parametric ultrasonic loudspeakers (Holosonics Audio Spotlight) [Source: https://www.holosonics.com/], enterprise FIDS platforms (SITA and Amadeus, each with hundreds of deployments) [Source: https://www.sita.aero/solutions/sita-at-airports/sita-operations-at-airports/sita-passenger-information/sita-information-display-system/], hearing loops (Contacta, Ampetronic, Univox), and STIPA field-measurement kits (Bedrock, NTi Audio, XL2) are all off-the-shelf in 2026. **What is not off the shelf is the acceptance criteria and the enforcement mechanics.** Those are contract language and design-manual amendments.
+6. **Accessibility redundancy is where quiet-airport programs quietly succeed or fail.** MSP now runs hearing loops through Terminal 1 departures, arrivals, baggage claim, international arrivals, common-use gates E1–E4, and parts of Concourse G, with Terminal 2 gates H11–H14 complete and H1–H10 in construction. [Source: https://www.mspairport.com/airport/accessibility/hearing-loop-technology] Port Authority of NY & NJ has moved from "encouraged" to a **mandate** for hearing loops at gates and information counters in new or significantly improved terminals. [Source: https://runwaygirlnetwork.com/2021/07/hearing-loops-landing-at-more-us-airports/] That is precisely the kind of standards precedent MWAA is being asked to consider.
+7. **Sensory rooms are proliferating, but the deployment quality is bimodal.** PIT's 1,500 SF sensory space with a mock jetway and decommissioned aircraft cabin [Source: https://www.parentingspecialneeds.org/article/pittsburgh-intl-airport-unveils-the-largest-most-comprehensive-airport-sensory-space-in-the-world/] is at one end; airports that put a beanbag and a lava lamp in a former storage room at the other. MSP plans two sensory rooms delivered as part of separate terminal expansion projects by 2028. [Source: https://www.mspairport.com/airport/deaf-and-hard-hearing] The design-manual question is whether a room counts if it is retrofit-quality, and how it is commissioned.
+8. **The most defensible commissioning technology is a specification, not a device.** IEC 60268-16:2020 defines the STI measurement method, and STIPA is the standard field protocol using a talkbox and a calibrated meter. [Source: https://webstore.iec.ch/en/publication/26771] Any competent acoustical consultant can execute it. MWAA does not need to buy the meter; MWAA needs to write the acceptance test into the specification and refuse substantial completion until the STI report clears.
+
+## 3. Evidence
+
+### Acoustic and PA design guidance
+
+- **ACRP Research Report 175 — Improving Intelligibility of Airport Terminal Public Address Systems** (TRB, 2017, Wilson Ihrig lead) recommends a **minimum STI of 0.45** for public address broadcasts in pier-style departure lounges, an SNR of **10 dB(A)** minimum, and a design target SNR of **10–15 dB**. [Source: https://www.wilsonihrig.com/wp-content/uploads/2017/12/ACRP-Report-No.-175_Wilson-Ihrig.pdf] This is the domestic peer-reviewed baseline; treat any lower threshold as a documented exception.
+- **IEC 60268-16:2020** defines the STI model and the STIPA field-measurement protocol required to verify PA acceptance at commissioning. [Source: https://webstore.iec.ch/en/publication/26771] The measurement chain is a talkbox connected to the PA input plus a STIPA-capable sound level meter at listener locations.
+- **NFPA 72 (Chapter 24)** requires voice intelligibility in mass notification systems consistent with an STI of **0.45 or higher**, and visible notification for hard-of-hearing occupants; some emergency-communications guidance cites 0.70 as an "excellent" target rather than a floor. [Source: https://www.suppressionsystems.com/voice-intelligibility-in-mass-notification-systems/] The interaction with quiet-by-design is direct: emergency messaging must remain intelligible regardless of how much you have zoned or attenuated everyday paging.
+
+### Peer-airport implementations
+
+- **SFO Quiet Airport Policy:** individual paging cut from **492 to 261 occurrences** daily, cumulative duration from **145 to 58 minutes**, and self-reported airport-wide onsite noise reduction of **more than 40 percent** across a **December 2019 to March 2020** rollout after a United-anchored pilot. [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/] The 40 percent figure is self-reported and lacks a published measurement methodology.
+- **Dubai International (DXB):** announcements cut from **more than 2,000 per day to under 700**, limited to a maximum of **two announcements per flight** and emergencies only. [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/] Numbers are Dubai Airports' own.
+- **London City Airport:** silent policy publicly documented; "announcements are made only for bad weather delays or genuine emergencies." [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]
+- **Amsterdam Schiphol:** self-described silent airport with information delivered on FIDS, web, and app; dedicated assistance program for deaf and blind travelers, including preflight assistance from arrival to boarding and vice versa. [Source: https://www.schiphol.nl/en/assistance/flying-for-the-deaf-and-blind/]
+- **Barcelona El Prat (AENA):** PA suppression applied specifically to boarding and last-call messages in the Sky Center commercial area of T1 and the pre-boarding common area of T2, with emergency and contingency messaging preserved. [Source: https://www.aena.es/en/josep-tarradellas-barcelona-el-prat/airport-services/categories-and-terminals/departures-area.html]
+- **Copenhagen (CPH):** silent-airport policy paired with specifically designated sound-dampened quiet zones near Gates A10 and C15 and a silent lounge near Gate A4. (Cited to public airport guides; researcher was unable to obtain a primary CPH policy document within budget — treat as evidence gap for design precedent.)
+- **Helsinki Vantaa (Finavia):** documented "Silent Airport" project run jointly by Finavia and airlines; gate-area and emergency announcements were explicitly preserved. [Source: https://morepremium.com/helsinki-vantaa-to-be-made-a-quiet-airport/]
+
+### Vendor and product landscape
+
+- **Automated multilingual PA:** AviaVox describes itself as the platform behind Heathrow, Schiphol, Delhi, and Doha, generating announcements in 35–40+ languages. [Source: https://aviavox.com/for-airports/] AviaVox's own white-paper page contains promotional prose and lacks per-airport quantitative results a third party could audit. [Source: https://aviavox.com/resource/achieving-a-silent-airport/] Treat as market-leader by deployment count, but not as an independent source of savings claims.
+- **Beam-steerable arrays:** Renkus-Heinz Iconyx column arrays (deployed at LAX) provide up to eight individually steerable vertical beams from a single column, controlled in DSP, and are the workhorse solution for reverberant terminal halls. [Source: https://renkus-heinz.com/products/iconyx-gen5/] Competing steerable products are made by Community (Biamp), Bose ShowMatch/Panaray, Bosch, TOA, and JBL Intellivox.
+- **Parametric / ultrasonic directional audio:** Holosonics Audio Spotlight beams speech in a narrow ultrasonic column and is widely deployed in museums, with airport, retail, and library installations claimed. [Source: https://www.holosonics.com/applications/museumsandgalleries] The technology's constraints — narrow beam, degraded speech quality outside the target zone, sensitivity to reflective surfaces — mean it is a tool for exhibit-style targeted zones, not a general concourse solution.
+- **Enterprise FIDS:** SITA claims **99.9 percent system availability across 100+ deployments** for its Information Display System [Source: https://www.sita.aero/solutions/sita-at-airports/sita-operations-at-airports/sita-passenger-information/sita-information-display-system/]; Amadeus, Indra, and TAV Technologies operate at comparable scale. FIDS is essentially a mature commodity market; differentiation is in integration to AODB and RMS, not screen technology.
+- **Hearing loops at airports:** MSP has installed loops across Terminal 1 departures, arrivals, baggage claim, international arrivals, common-use gates E1–E4, and Concourse G, with Terminal 2 gates H11–H14 complete and H1–H10 under construction. [Source: https://www.mspairport.com/airport/accessibility/hearing-loop-technology] Port Authority of NY & NJ has moved to a mandate at gates and information counters in new or significantly improved terminals. [Source: https://runwaygirlnetwork.com/2021/07/hearing-loops-landing-at-more-us-airports/] Gerald R. Ford International (Grand Rapids) equipped every gate at both concourses. [Source: https://runwaygirlnetwork.com/2021/07/hearing-loops-landing-at-more-us-airports/]
+- **Sensory / quiet rooms:** PIT operates a **1,500 SF** sensory space with a decommissioned American Airlines cabin and mock jetway, a soundproof suite, and dedicated adult and family rooms. [Source: https://www.parentingspecialneeds.org/article/pittsburgh-intl-airport-unveils-the-largest-most-comprehensive-airport-sensory-space-in-the-world/] ATL opened a multisensory room on the F Concourse in 2016 through a Delta-and-The Arc partnership. [Source: https://www.today.com/parents/airport-s-sensory-room-aims-help-people-autism-t159449] MSP has committed to two sensory rooms delivered via two separate terminal expansion projects by 2028. [Source: https://www.mspairport.com/airport/deaf-and-hard-hearing] IAD's public accessibility page mentions "quiet spaces" available on request via information desks, without dedicated sensory-room specification. [Source: https://iadairport.com/disabilities-services]
+
+### Where numbers came from — a candid read
+
+The most quoted numbers in the quiet-airport press canon (SFO's 40 percent, Dubai's 2,000-to-700, and the 90-minutes-per-day figure) originate with the airport operator or its communications team. None have been externally audited that this researcher could locate within budget. The ACRP 175 numbers, by contrast, are peer-reviewed and TRB-published; they are the strongest defensible thresholds in the file. Vendor claims (AviaVox, Renkus-Heinz, Holosonics) describe capability and reference deployments accurately but do not carry independent third-party outcome data. Use them for product feasibility, not for outcome projection.
+
+## 4. Maturity assessment — what is real, what is hype
+
+**Real and off-the-shelf in 2026:**
+
+- Steerable column arrays for reverberant halls (Renkus-Heinz, Community, Bose, Bosch, TOA, JBL). Commodity procurement.
+- STIPA-based commissioning per IEC 60268-16:2020. Any qualified acoustical consultant.
+- Automated multilingual PA with zoning to gate, hold-room, or concourse. AviaVox is dominant; Bosch, TOA, and integrator-built stacks compete.
+- Enterprise FIDS platforms with airline-agnostic feeds, mobile deep-links, and accessibility overlays. SITA, Amadeus, Indra, TAV.
+- Hearing loops at gates and info counters. Contacta, Ampetronic, Univox.
+- Real-time captioning of PA announcements to gate-area screens. Already deployed at MSP; commodity ASR plus display integration.
+- Sensory-room specification templates. ACRP-adjacent guidance and a growing number of documented US deployments.
+
+**Real but not commodity — meaningful custom work required:**
+
+- Integration between the PA scheduler, the AODB, and the FIDS — so that a gate change fires the right zone message in the right languages at the right time without a human keying it in. This is where the "silent airport" promise actually breaks down at scale.
+- Mobile push to the passenger. Airline apps are the default carrier; airport apps have low install rates and short session times. Assuming a passenger is holding a smartphone with push enabled and the correct airline app installed is aggressive. This is the accessibility argument stated in operational terms.
+- Tenant-side compliance. Concessions, airline clubs, and airline gate podium equipment are not on the airport's PA. The rules that make LCY, Schiphol, and DXB feel calm are lease and permit language for tenant systems.
+- Post-occupancy verification at 30/90/365 days. STIPA measurement at substantial completion is straightforward; enforcement of ongoing intelligibility as tenants remodel, fixtures change, and background music creeps back is not.
+
+**Hype or overclaimed:**
+
+- "Silent" as a noun. Every one of the airports called silent has emergency, security, and gate-area exceptions. The right operating word is "quiet"; the right design word is intelligibility.
+- Parametric ultrasonic loudspeakers as a general concourse solution. Effective for targeted exhibit-style zones, not a substitute for good acoustic design or steerable arrays over a wide gate hold-room.
+- Digital-twin marketing that promises quiet-by-design as a subsystem. Nothing in the peer set required a digital twin to deliver quiet.
+- Ambient-noise-canceling ceiling systems for open concourses. Physics does not oblige.
+
+## 5. Data points and quotes a strategist can use verbatim
+
+- **Numeric threshold:** "ACRP Research Report 175 recommends a minimum Speech Transmission Index of 0.45 and a signal-to-noise ratio of 10 dB(A) for public address broadcasts in pier-style departure lounges." [Source: https://www.wilsonihrig.com/wp-content/uploads/2017/12/ACRP-Report-No.-175_Wilson-Ihrig.pdf]
+- **Best documented US precedent:** "SFO's Quiet Airport policy cut individual paging from 492 to 261 daily occurrences and cumulative duration from 145 to 58 minutes, rolled out airport-wide between December 2019 and March 2020." [Source: https://www.airport-technology.com/features/san-francisco-quiet-airport/]
+- **Largest reported cut:** "Dubai International reduced daily announcements from more than 2,000 to fewer than 700, with a two-per-flight cap and an emergencies-only rule." [Source: https://media.dubaiairports.ae/dubai-international-gives-passengers-the-silent-treatment/]
+- **Accessibility precedent for a Design Manual amendment:** "The Port Authority of New York and New Jersey now mandates the installation of hearing loops at departure gates and information counters in all new or significantly improved terminals." [Source: https://runwaygirlnetwork.com/2021/07/hearing-loops-landing-at-more-us-airports/]
+- **Commissioning discipline:** "IEC 60268-16:2020 defines the STI model and the STIPA field-measurement protocol; the acceptance test requires a talkbox at the PA input and a STIPA-capable meter at listener locations." [Source: https://webstore.iec.ch/en/publication/26771]
+
+## 6. Professional judgment — what this technology scout would flag for the Strategist
+
+These reads are my own; they are not in the evidence file because they are not sourced to a single publication.
+
+- **The MWAA-shaped answer is a Design Manual amendment plus a specifications volume, not a policy statement.** The Design Manual is the vehicle that binds consultants, contractors, and tenants (§7 of the airport context packet). A quiet-by-design standard that lives outside it is unenforceable at commissioning.
+- **Two thresholds do most of the work in a real standard.** RT60 and STI. Everything else — announcement frequency, PA zoning, FIDS density — follows if those two are set and tested. Every peer airport in the file that reports numbers uses STI as the accepted currency.
+- **The commissioning gate is where quiet gets teeth.** Refuse substantial completion until an independent STIPA report clears the acceptance criteria at a stratified sample of gate, concourse, and check-in locations, and require a re-test at 12 months post-occupancy. Vendors do not choose to be measured; owners do.
+- **IAD and DCA cannot share a single prescription and should share a single acceptance test.** IAD's international, connection-dominant traffic mix and DCA's slot-controlled O&D business mix imply different announcement policies, tenant-audio rules, and mobile-adoption assumptions, but the STI, RT60, SNR, and hearing-loop coverage thresholds should be common — because those are physics, not customer segments.
+- **Do not overweight the peer-airport press canon.** Schiphol, LCY, DXB, and SFO are useful precedent for policy language and public commitment. They are weak evidence for measured outcomes. The evidence you would cite to a bond-rating agency is ACRP 175 and IEC 60268-16, not a press release from a peer operator.
+- **The biggest sleeper risk is tenant audio.** Every one of the "silent" peer airports has to police concessionaire music, airline club sound systems, and gate-agent hot mics. A quiet-by-design standard that does not run into airline and concession leases will drift within 24 months. Any binding standard MWAA adopts should reach the airline gate podium equipment specification, the concession lease, and the airline club design review — not just the base-building acoustic package.
+
+## 7. Evidence gaps flagged for the Strategist
+
+- Primary Copenhagen and Helsinki policy documents were not obtained within budget; both are cited from secondary sources.
+- No independent third-party audit of SFO's 40 percent onsite-noise-reduction claim was located.
+- MWAA's existing 2020 Design Manual was not opened; whether it already carries STI, RT60, or hearing-loop requirements at a binding tier is not established here (flagged in the airport context packet).
+- AviaVox and comparable vendors were not asked for per-airport measured outcomes; their published materials do not carry them.
+- Airline missed-boarding rates before and after quiet-airport rollouts were not located in a citable form.

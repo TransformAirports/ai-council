@@ -1,0 +1,364 @@
+# Narrative Options — Quiet-by-Design Standards for MWAA Terminals
+
+**Run:** `quiet-by-design-standards-for-mwaa-terminals-2`
+**Author:** creative-director
+**Date:** 2026-08-07
+**Inputs:** run prompt; `outputs/run-manifest.json` (14 selected research agents,
+all represented in the curated ledger); `outputs/stage1/evidence-map.md`;
+`outputs/evidence-ledger.jsonl` (256 records).
+
+The evidence base is strong and it points at a predictable article: "specify
+early, cite NFPA 72, show the retrofit premium." That article would be true and
+forgettable. The three options below use the same ledger to reach the same
+tiered-standard recommendation from three different doors. None invents a fact.
+All three respect the do-not-claim list, especially: no operational-outcome
+claims for silent-airport peers, no assertion that the MWAA Design Manual lacks
+acoustic criteria, no direct-transfer claims from LCY/HEL/AMS.
+
+---
+
+## Option 1 — Board-ready: "Specify it before the concrete does"
+
+**Thesis (one sentence).** MWAA should adopt a Terminal Acoustic and
+Information Performance Standard as a Design Manual amendment now, because the
+largest terminal-construction pipeline in the authority's history is about to
+harden its designs, and the same requirements cost 0.06–0.20% of the IAD
+program written early versus a 2–4× retrofit premium bought back late.
+
+**Communication job.** By the end, the MWAA Board and capital-planning leaders
+should authorize a design-manual amendment on the current CCP procurement
+clock, because the standard is cheap now, expensive later, and impossible to
+retrofit into a certified life-safety system once designs freeze.
+
+**Opening scene.** Concourse E, late 2026: 435,000 square feet, 14 United
+gates, 46,000 square feet of concessions — the first delivered piece of the
+Dulles modernization, and the last major terminal space MWAA will open without
+having decided what its hold rooms should sound like. Behind it: a $9.0 B CCP
+and an announced $20–22.5 B transformation touching more than 5 million square
+feet.
+
+**Argument sequence (7 beats).**
+
+1. *The pipeline is the opportunity.* The July 2026 IAD announcement plus the
+   $9 B CCP create the longest run of unhardened terminal design MWAA will
+   ever govern at once.
+   — `infrastructure-economist::ev-ea35cdc1f28c`,
+   `operations-analyst::ev-c5bc4ad4021f`,
+   `infrastructure-economist::ev-c76972ceca45`
+2. *The floors already exist in code.* NFPA 72 STI ≥ 0.50 average / ≥ 0.45 at
+   90% of points; Part 382 accessible flight-critical information; ADA Title II
+   "as effective" communication. These are not aspirations; they are law.
+   — `operations-analyst::ev-0b02c79dde7f`,
+   `regulatory-political-analyst::ev-63adc52d8642`,
+   `contrarian::ev-d8c021903d7c`, `regulatory-political-analyst::ev-ada35160`
+3. *Answer the Contrarian head-on.* If codes already require this, why a
+   standard? Because the requirement lives in integration — acoustics, PA
+   zoning, FIDS, tenant systems, and commissioning are specified by different
+   parties on different contracts, and nobody currently owns the seam.
+   — Contrarian brief vs. COO/CEO/economist cluster (evidence-map §3 tension)
+4. *What integration failure costs.* Berlin Brandenburg: a PA-adjacent
+   life-safety integration that never certified against a frozen design,
+   ~€2 B → ~€7.3 B and an eight-year drag. Denver's baggage system: same
+   structure, different subsystem.
+   — `infrastructure-economist::ev-fb4c8ac3e4c2`,
+   `infrastructure-economist::ev-b09e4cfcff40`,
+   `infrastructure-economist::ev-540cace0221c`
+5. *What early specification costs.* $5–15/sf new versus $18–45/sf retrofit;
+   applied to Concourse E, $1.3 M–$17.4 M avoided rework; MWAA-wide stack
+   $12 M–$40 M one-time, 0.16–0.54% of projected 2030 CPE.
+   — Quantitative exhibits E1, E2, E6; 1:10:100 direction (not magnitude) per
+   `infrastructure-economist` caveats
+6. *The affordability envelope makes timing binding.* CPE $12.77 → $20.71 by
+   2030; ~$5.5 B new debt 2025–2028; debt per O&D enplanement peaking near
+   $400. There is headroom for an early spec, not for a late one.
+   — `infrastructure-economist::ev-711bbeadb6f5`,
+   `airport-ceo::ev-3fd3e1b4aa7b`
+7. *The decision.* A tiered standard — mandatory intelligibility and
+   redundancy floor, recommended practices, context-dependent options with a
+   DCA variance — entering the Design Manual, consultant scopes, tenant
+   volumes, and commissioning per IEC 60268-16 STIPA in occupied conditions.
+   — Evidence-map §10 handoff; `airport-coo::ev-34d980653e2f`
+
+**Strongest objection and where it enters.** The Contrarian's: existing codes
+plus competent commissioning already require everything the standard would
+require; a new document is governance overhead. It enters at beat 3, early and
+by name, and the whole middle of the argument is the answer.
+
+**Analogy.** None required. The BER and DEN cases do the comparative work as
+literal precedents; adding a cross-domain analogy would dilute a deliberately
+conservative frame.
+
+**Signature visual.** A single timing chart: specification cost per square
+foot at design ($5–15) versus retrofit ($18–45), with Concourse E's 435,000 sq
+ft and the announced 5 M+ sq ft pipeline plotted as the stakes, and the E6
+stack shown as a 0.06–0.20% sliver of the IAD program.
+
+**Airport decision this leads toward.** Board direction to amend the Airports
+Authority Design Manual with a tiered acoustic and information performance
+standard, applied to all CCP and transformation-program design contracts from
+the next procurement forward.
+
+**Risk of this frame.** Predictability. It is the article the audience expects
+from the title, and the run prompt's audience "has read McKinsey decks and is
+tired of them." Its safety is also its ceiling: it under-uses the ledger's two
+most surprising findings (DCA's higher floor; MWAA not owning the microphone).
+
+---
+
+## Option 2 — Counterintuitive: "A quiet terminal is a safety system"
+
+**Thesis (one sentence).** The case for a quiet-by-design standard is not
+passenger comfort but signal integrity: every "silent" peer airport is really
+running an exception-governance regime, and the discipline that removes
+low-value announcements is the same discipline that guarantees the one
+announcement that must land — evacuation, security, IROPS — actually lands.
+
+**Communication job.** By the end, airport executives should stop evaluating
+"quiet" as an amenity and start evaluating it as the governance layer of their
+emergency-communication and boarding-integrity systems, because the ledger
+shows the peers who went quiet did it by governing exceptions, not by removing
+capability.
+
+**Opening scene.** Not an airport at first — a hospital. Boston Medical Center
+was drowning in roughly one million clinical alarms a week; it cut them to
+about 400,000 by eliminating low-priority categories, and response to the
+remaining alarms improved. Johns Hopkins cut ICU pulse-oximetry alarms 63%
+with one threshold change. Then the pivot: an IAD hold room during an
+irregular-operations evening, where the message that matters is competing with
+every message that doesn't.
+
+**Argument sequence (6 beats).**
+
+1. *The alarm-fatigue mechanism, named honestly as an analogy.* Hospital
+   numbers don't transfer; the mechanism — indiscriminate signaling degrades
+   response to critical signals — does.
+   — `virtual-christian::alarm-fatigue-bmc-halved`,
+   `virtual-christian::alarm-fatigue-jhh-pulseox-63pct` (mechanism only, per
+   evidence-map §6 warning)
+2. *"Silent" airports are exception regimes, not silence.* LCY (written policy
+   since 2008, gate-change/disruption/FIDS-failure exceptions), Helsinki
+   (2015, gate and emergency announcements retained), Schiphol ("virtually no
+   announcements" plus a documented accessibility program). No peer eliminated
+   PA; all governed it.
+   — `infrastructure-economist::ev-9765e5989f94`,
+   `technology-scout::ev-759552a3c145`,
+   `infrastructure-economist::ev-7d488022d478`,
+   `technology-scout::ev-b45432565a8b`
+3. *When the critical signal fails, people die or the airport stops.* Fort
+   Lauderdale, January 6, 2017: a mass-notification and interoperability
+   failure across zones, five dead, PERF/BCAD after-action as the reference.
+   Atlanta, December 17, 2017: PA and FIDS down with commercial power,
+   megaphones and paper. CrowdStrike, July 2024: the digital stack fails
+   simultaneously with airline systems. Presented as governance-and-resilience
+   evidence — not as a claim that quiet policy caused or would have prevented
+   them.
+   — `airport-emergency-management-director::ev-408657043c0c`,
+   `director-of-public-safety::ev-875d9787eb6b`,
+   `airport-emergency-management-director::ev-ab7a6888ab96`,
+   `airport-emergency-management-director::ev-crowdstrike`
+4. *The floor is measurable, and it is code.* NFPA 72 STI 0.50/0.45, verified
+   by STIPA in occupied conditions; ACRP 175 target STI 0.50, SNR ≥ 10 dB(A),
+   RT60 > 1 s as the risk driver. "Quiet" done right is how you reach these
+   numbers; noise is what keeps you below them.
+   — `operations-analyst::ev-0b02c79dde7f`,
+   `quantitative-analyst::ev-d1b6bd6f446b`,
+   `quantitative-analyst::ev-d26464a4731e`
+5. *The inversion: DCA needs a higher floor than IAD.* A missed boarding at a
+   67-slot-per-hour, federally capped airport is an unrecoverable event, and
+   MWAA's $1 M-per-beyond-perimeter-pair revenue stream is conditioned on a $2
+   CPE advantage. The smaller, calmer airport is the one that can least afford
+   a missed call. Accessibility cuts the same way: Chennai shows what happens
+   when "silent" precedes redundancy; Part 382 is the floor MWAA designs to.
+   — `regulatory-political-analyst::ev-crs_in12504`,
+   `airline-commercial-strategist::ev-b0e0e35d59d5`,
+   `airline-commercial-strategist::ev-7605ade542cb`,
+   `contrarian::ev-cfc311dc731a`, `contrarian::ev-d8c021903d7c`
+6. *The decision, renamed.* Adopt it as the Terminal Acoustic and Information
+   Performance Standard — never "quiet" in a public MWAA document, for exactly
+   the reason Schiphol and Helsinki brand silence externally but govern
+   intelligibility internally. Tiered: mandatory floor, recommended practice,
+   context-dependent options; DCA variance clause; PA-push authority and
+   IROPS/emergency carve-outs as the load-bearing governance element.
+   — Evidence-map §2.7, §3 (CEO naming argument; EM/DPS/COO convergence)
+
+**Strongest objection and where it enters.** No peer operator has published
+measured operational outcomes for a silent-airport policy — so the safety
+framing cannot claim quiet *causes* better emergency response. It enters at
+beat 3, stated before the reader can raise it: FLL and ATL prove notification
+governance is load-bearing; they do not prove quiet policy improves it. The
+argument is design conservatism, not measured outcome.
+
+**Analogy.** Hospital alarm fatigue (beat 1). It genuinely clarifies: it is
+the only frame in the ledger that explains *why* "make fewer announcements" as
+a mere policy has failed without a tiered protocol, which no airport peer
+comparison explains.
+
+**Signature visual.** A two-panel "signal vs. noise" chart: left, announcement
+categories in a typical U.S. hold room (boarding, paging, security-theater
+repetition, tenant audio); right, the short exception list every silent peer
+retains (gate change, disruption, emergency) — with the NFPA 72 STI floor
+drawn as a horizontal line both panels must clear.
+
+**Airport decision this leads toward.** The same design-manual amendment as
+Option 1, but sponsored through the safety and emergency-management lens:
+mandatory intelligibility floor, redundant-channel obligation, and PA
+governance with pre-authorized override, adopted as a life-safety and
+operational-integrity measure.
+
+**Risk of this frame.** Taste and politics. Using FLL casualties adjacent to
+an acoustics argument invites the charge of borrowed gravity, and the January
+2025 DCA midair is in living memory — any safety-flavored framing at MWAA will
+be read against it. The draft must keep beat 3 strictly on governance
+mechanics and let the reader draw the connection.
+
+---
+
+## Option 3 — Operational: "MWAA doesn't own the microphone"
+
+**Thesis (one sentence).** The acoustic environment of an MWAA terminal on
+opening day is set less by the base building than by what the authority
+permits on top of it — airline gate handhelds, tenant TVs, concessionaire AV —
+so a quiet-by-design standard succeeds or fails in the tenant design volumes
+and operating agreements, and MWAA should write it where the microphones
+actually live.
+
+**Communication job.** By the end, MWAA executives and capital planners should
+understand that a base-building acoustic spec alone is decorative, because the
+2025 Use & Lease grants airlines broadcast rights inside their leased envelope
+and tenant fitouts add the loudest layers — so the standard must reach design
+manuals, tenant volumes, commissioning, and airline coordination together.
+
+**Opening scene.** A weekday morning bank at DCA's Terminal 2 — the 1997 Pelli
+National Hall, hard surfaces and long reverberation, feeding concourses where
+American turns slot-capped departures. The loudest instrument in the hold room
+is not MWAA's PA. It is a gate agent's handheld on speaker, layered over
+captioned-but-audible TVs and concession audio, in a room where a missed
+boarding is a federally unrecoverable slot. MWAA owns the room. It does not
+own the sound.
+
+**Argument sequence (7 beats).**
+
+1. *The moment.* DCA at 67 slots per hour; a missed boarding costs the airline
+   $2,300–$16,000 and the slot cannot be re-flown; MWAA's beyond-perimeter
+   revenue ($1 M per new flight pair) is conditioned on holding a $2 CPE
+   advantage. The quiet question at DCA is a dollarized operations question.
+   — `regulatory-political-analyst::ev-crs_in12504`,
+   `airline-commercial-strategist::ev-7605ade542cb`,
+   `airline-commercial-strategist::ev-b0e0e35d59d5`
+2. *Who owns the sound.* The 2025 Use & Lease gives airlines broadcast rights
+   inside the leased envelope; tenant retail, AV, and TVs are governed by the
+   tenant volumes of the seven-volume Design Manual, not the base terminal
+   spec. The standard's real fight surface is there.
+   — Evidence-map §2.4, §4.3 (COO finding 1, Virtual Christian dot (b),
+   do-not-claim #9); `infrastructure-economist::ev-c76972ceca45`
+3. *What the peers actually governed.* LCY, Helsinki, and Schiphol didn't
+   silence buildings; they wrote exception rules and paired them with
+   accessibility architecture and apps. Copenhagen zoned quiet by gate area —
+   the closest prototype for a tiered, space-by-space MWAA standard. SFO — the
+   only documented U.S. large-hub program — cut boarding-area announcements
+   ~40% and also generated documented complaints: governance, not magic.
+   — `technology-scout::ev-759552a3c145`,
+   `operations-analyst::ev-8f6e672a5757`,
+   `technology-scout::ev-b45432565a8b`,
+   `operations-analyst::ev-162009feafa5` (medium confidence, flag it),
+   `technology-scout::ev-3dd99398c512`, `technology-scout::ev-05d34428bc0a`
+4. *The floors the standard inherits.* NFPA 72 STI 0.50/0.45 verified in
+   occupied conditions; ACRP 175 SNR ≥ 10 dB(A) in pier hold rooms; Part 382
+   and ADA Title II redundancy. Chennai is what skipping the redundancy
+   architecture looks like.
+   — `operations-analyst::ev-0b02c79dde7f`,
+   `quantitative-analyst::ev-d1b6bd6f446b`, `contrarian::ev-d8c021903d7c`,
+   `contrarian::ev-cfc311dc731a`
+5. *Two airports, two floors.* DCA: short curb-to-gate, business-heavy,
+   single-runway fragility, slot economics — a high mandatory announcement
+   floor. IAD: 10.5 M international passengers, long transfer journeys,
+   language diversity — density and redundancy of visual/digital channels
+   matter more than announcement count. One standard, two calibrations.
+   — Context packet §6; `airport-ceo` / `airport-coo` clusters;
+   evidence-map §2.1
+6. *Where it gets written.* Design Manual base volumes for the shell; tenant
+   volumes for fitout audio and TVs; consultant scopes and commissioning specs
+   for STIPA verification; airline coordination for gate-PA discipline and
+   IROPS carve-outs. The MII question — whether this is a board memo or an
+   airline negotiation — is named as the open variable it is.
+   — Evidence-map §3 (Airline Strategist vs. CEO tension), §5.2;
+   `quantitative-analyst::ev-075c6aa7bd82`
+7. *The near-term proof surface.* Concourse E opens late 2026 with 46,000 sq
+   ft of concessions and a United club — the first space where tenant-volume
+   acoustic requirements could be verified at commissioning before the 5 M sq
+   ft pipeline behind it hardens. Cost context: E6's $12 M–$40 M stack,
+   0.16–0.54% of projected 2030 CPE.
+   — `virtual-chris::ev-50798056fcd9`, `airport-coo::ev-ce9017197c00`;
+   quantitative exhibits E1, E6
+8. *(Close)* The tiered decision: mandatory floor (intelligibility, redundant
+   channels, PA-push governance), recommended practice, context-dependent
+   options with explicit DCA/IAD calibrations and tenant-volume enforcement.
+   — Evidence-map §10
+
+**Strongest objection and where it enters.** "MWAA doesn't own the microphone,
+so the standard is decorative" — the strongest anti-thesis item is also this
+option's premise, flipped. It enters in the opening scene and beat 2, and the
+rest of the argument is the answer: you don't abandon the standard because you
+lack unilateral control; you write it into the instruments of control you do
+hold (tenant volumes, commissioning, coordination) and name the MII gap
+honestly. The secondary objection — no peer operational-outcome data — enters
+at beat 3.
+
+**Analogy.** A light one, only if the Strategist wants it: a building code
+governs the shell, but a condominium's rules govern what residents bolt onto
+it — and the noise complaints come from the bolt-ons. Optional; the hold-room
+scene may carry the point unaided.
+
+**Signature visual.** An annotated cross-section of one real hold-room
+moment: every sound source in the room (airport PA zone, gate handheld, tenant
+TV, concession audio, HVAC, crowd) labeled with its owner and its governing
+document (Design Manual volume, Use & Lease, tenant lease, none) — making
+visible that the loudest sources sit under the weakest governance.
+
+**Airport decision this leads toward.** Adopt the tiered standard with its
+enforcement deliberately distributed: base-volume acoustic criteria,
+tenant-volume audio and display requirements, commissioning verification at
+Concourse E forward, and a defined airline-coordination track for gate-PA
+governance — with the Use & Lease MII question flagged for internal diligence
+before board action.
+
+**Risk of this frame.** Scope compression. Anchoring in one hold room and the
+tenant/contract layer risks reading as an operations memo rather than a
+strategy article, and it gives the capital-timing argument (BER, Denver, the
+retrofit premium) less room. The Strategist must keep beat 7 substantial so
+the board-level stakes stay visible.
+
+---
+
+## Scored recommendation
+
+Scores are 1–5.
+
+| Criterion | 1. Board-ready | 2. Counterintuitive | 3. Operational |
+|---|---|---|---|
+| Truthfulness to the evidence | 5 | 4 | 5 |
+| Surprise | 2 | 5 | 4 |
+| Airport specificity | 4 | 3 | 5 |
+| Decision power | 5 | 4 | 5 |
+| Visual potential | 4 | 4 | 5 |
+| **Total** | **20** | **20** | **24** |
+
+**Selected: Option 3 — "MWAA doesn't own the microphone."**
+
+It is the only frame built from the ledger's most airport-specific,
+non-obvious findings: airline broadcast rights inside the leased envelope,
+tenant volumes as the real fight surface, and DCA's slot economics setting a
+higher — not lower — announcement floor. It opens inside the anti-thesis
+(evidence-map §4.3) and converts it into the argument, which is the most
+honest possible answer to the Contrarian. Every load-bearing claim is
+primary-source or explicitly flagged; nothing rests on the hospital analogy or
+on peer marketing. It serves the stated audience — skeptical executives tired
+of consultant decks — with a scene from their own buildings and contracts
+rather than a framework. And it still delivers the full tiered decision the
+run prompt requires, including the capital-timing economics, through beat 7.
+
+Options 1 and 2 should not be discarded: the Strategist should borrow Option
+1's retrofit-premium exhibit for beat 7 and Option 2's "exception regime"
+reading of the peers for beat 3, and should adopt Option 2's naming discipline
+("Terminal Acoustic and Information Performance Standard") in the final
+recommendation. The angle changes; the evidence does not.

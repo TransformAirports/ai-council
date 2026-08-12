@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-07-29T16:57:22+00:00",
+  "final_draft": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+  "passed": false,
+  "error_count": 17,
+  "warning_count": 0,
+  "artifact_validation": {
+    "path": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage3/final-draft.md",
+    "valid": true,
+    "kind": "markdown",
+    "errors": [],
+    "warnings": [],
+    "size_bytes": 6399,
+    "word_count": 919,
+    "record_count": 0,
+    "sha256": "a730edf82c6fdecd4ff6f3b62a058b73145e60dbab6de34674f74b5cc8354e60"
+  },
+  "reader_word_count": 601,
+  "word_count_bounds": {
+    "minimum": 350,
+    "maximum": 550
+  },
+  "readability_profile": "executive_memo",
+  "evidence_records": 91,
+  "claim_lineage_records": 16,
+  "issues": [
+    {
+      "severity": "error",
+      "code": "numeric_claims_without_footnotes",
+      "message": "numerical claims lack a footnote in the same sentence or table row",
+      "count": 4
+    },
+    {
+      "severity": "error",
+      "code": "memo_paragraph_too_long",
+      "message": "the executive memo contains prose paragraphs longer than 90 words",
+      "count": 3
+    },
+    {
+      "severity": "error",
+      "code": "word_count_out_of_range",
+      "message": "the final argument has 601 reader-facing words; the run contract requires 350\u2013550",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_lineage_schema",
+      "message": "C3 is missing: draft_sha256",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "stale_claim_lineage",
+      "message": "C3 is not bound to the current final-draft bytes",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "C3 does not appear in the sentence or table row cited by [^2]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "C3's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_lineage_schema",
+      "message": "C7b is missing: draft_sha256",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "stale_claim_lineage",
+      "message": "C7b is not bound to the current final-draft bytes",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_footnote_not_in_draft",
+      "message": "C7b does not name a footnote marker used in the final draft",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "C7b's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "C16's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_lineage_schema",
+      "message": "C19 is missing: draft_sha256",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "stale_claim_lineage",
+      "message": "C19 is not bound to the current final-draft bytes",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "lineage_claim_footnote_mismatch",
+      "message": "C19 does not appear in the sentence or table row cited by [^2]",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_not_supported_by_evidence_record",
+      "message": "C19's cited evidence records do not collectively support the reader-facing assertion",
+      "count": 1
+    },
+    {
+      "severity": "error",
+      "code": "claim_without_evidence",
+      "message": "C20 is retained but has no evidence IDs",
+      "count": 1
+    }
+  ]
+}

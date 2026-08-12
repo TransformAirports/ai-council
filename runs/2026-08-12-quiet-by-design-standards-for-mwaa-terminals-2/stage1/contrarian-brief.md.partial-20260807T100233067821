@@ -1,0 +1,112 @@
+# Contrarian Brief — Against a Quiet-by-Design Standard for MWAA Terminals
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Author:** Contrarian
+**Date:** 2026-08-07
+**Purpose:** Argue the strongest reasonable case against the run's central thesis. Not a strawman; the position the Council must survive if the standard is worth publishing.
+
+---
+
+## Executive line
+
+MWAA is being asked to adopt a common quiet-by-design standard for new and substantially renovated terminal space at IAD and DCA, at the exact moment its most important operational fact is a mass-fatality accident at DCA in which controllers were, per the NTSB, "overwhelmed" by traffic and situational-awareness collapsed. In that political and safety environment, the operator that reduces the salience of audible information in its terminals — even under the sophisticated framing of "intelligible localized audio and redundant visual channels" — is the operator that gets asked, in the next Congressional hearing, whether it prioritized ambient quietness over passenger and employee ability to hear a warning. The thesis is not wrong because "quiet is bad." It is wrong because it (a) misidentifies where the intelligibility problem actually lives (in NFPA 72 EVACS design, which is already binding), (b) understates the cost and governance burden of the specification-and-commissioning regime it requires, (c) misreads MWAA's contractual authority over carriers under the 2025 Use and Lease Agreement, and (d) inherits a European operating model that has produced documented passenger harm, consumer-court complaints, and, at several named peers, quiet reversals. If MWAA wants better acoustics, it should fix EVACS intelligibility to code, tighten reverberation-time targets in a design-manual amendment, and stop there. The rest of the "quiet by design" apparatus is scope creep.
+
+---
+
+## 1. The strongest version of the counterargument (six bullets)
+
+1. **The thesis is temporally wrong.** DCA is inside a heightened-safety political envelope following the 29 January 2025 midair collision that killed 67 people. The NTSB's 50 recommendations and the Board's finding that controllers were "overwhelmed" and suffered "reduced situational awareness" make this the wrong decade to codify any operator policy that will be read as reducing audible information at DCA. Timing, in a political operating environment, is a governance variable, not a soft one.
+
+2. **The intelligibility problem is already solved by binding code.** NFPA 72 requires that emergency voice/alarm communications systems (EVACS) meet an average Speech Transmission Index of 0.50, with 90 percent of measurement locations in each acoustically distinguishable space at STI ≥ 0.45. Airport terminals in the U.S. are governed by NFPA 72 through local building-code adoption. If MWAA wants intelligibility, it should enforce the code it already owes. A parallel "quiet by design" regime layered on top of NFPA 72 creates a compliance stack with no additional safety value and new litigation surface.
+
+3. **MWAA cannot enforce PA discipline on carriers.** The 15-year Use and Lease Agreement effective 1 January 2025 runs through 2039. Airline-controlled boarding announcements at leased gates are the loudest recurring PA source in any concourse. The moment to build carrier-facing announcement governance into a lease was the 2024 negotiation. That door closed on 31 December 2024. A quiet standard adopted in 2026 will bind MWAA staff and A/E consultants; it will not bind United at IAD or American at DCA except through amendment or new gate-lease supplements the airlines have no reason to sign.
+
+4. **"Silent airport" is a branding concept with a mixed operational record.** London City's silent-airport policy coexists with documented passenger complaints about missed flights and inadequate operational communication. The European Consumer Centre Austria publishes formal guidance warning travelers that at silent airports "the passenger is not informed that the gate had changed and missed his or her flight" is a common claim category, and that "the airport is not obliged to make announcements … in order to guarantee that every single passenger receives the information relevant to him." That is a documented externality shifted from the operator to the passenger, not a passenger-experience win.
+
+5. **The digital-redundancy story fails the actual passenger distribution.** The run prompt correctly names accessibility, digital exclusion, and infrequent travelers as risks. It then proposes to solve them with visual FIDS, mobile notifications, muted TVs, and staffed communication — the same "redundant channels" that airports currently rely on. Those channels are not neutral: they systematically disadvantage older adults, non-English speakers, people with low vision, people with cognitive processing differences, and any passenger whose phone battery has died. IAD's international passenger share was 10.5 million in CY 2025 — roughly one in three passengers is international, and a material fraction do not have U.S. carrier apps installed or T-Mobile roaming turned on.
+
+6. **The opportunity cost is nine figures of program attention.** MWAA has committed to a $20–22.5B Dulles program over a decade and holds ~$4.9B in outstanding revenue debt. Concourse E opens in autumn 2026. The mobile lounges are being retired. Every hour of MWAA Engineering, VP-Airports, and Design Review attention spent litigating STI thresholds, PA zoning, TV-mute policies, and tenant-technology standards is an hour not spent on the gate-throughput, curb-to-gate journey, and airside redesign decisions that actually move the operator's traffic and rate-base math. A quiet-by-design standard is a decorative program in the middle of a structural one.
+
+---
+
+## 2. Evidence
+
+### 2.1 The regulatory floor already exists — NFPA 72
+
+The intelligibility problem the thesis actually cares about is a code-driven, technical problem. NFPA 72 (2010 edition and forward) codified quantitative STI requirements for emergency voice/alarm communications systems: acceptable if at least 90 percent of measurement locations within each acoustically distinguishable space have STI ≥ 0.45 and the ADS average is STI ≥ 0.50 [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/]. This is not a "should"; through local building-code adoption it is enforced during commissioning. An MWAA design manual that restates NFPA 72 is redundant; one that goes beyond it invites a compliance stack. The measurement methodology (STI vs. STIPA) is defined in IEC 60268-16 and produces reproducible field values, but STIPA measurement across a large-format terminal is non-trivial: a documented terminal case reports **"USD $2.8 million in remediation, eight weeks of disruption, and immeasurable passenger frustration"** when acoustic STI predictions were overridden by architectural intent [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. That is the cost of getting the acoustic-architectural coordination wrong once. The remedy is not a new standard; it is discipline against acoustic-consultant overrides — which requires no new document.
+
+### 2.2 The 29 January 2025 DCA collision changed the political frame
+
+The NTSB completed its investigation and issued 50 safety recommendations, finding that the accident resulted from "the placement of a helicopter route in close proximity to a runway approach path without procedural mitigations, combined with failures by multiple organizations to identify and address known risks," and that on the night in question controllers were "overwhelmed" and suffered "reduced situational awareness" [Source: https://enotrans.org/article/ntsb-unveils-findings-probable-cause-and-recommendations-from-dca-mid-air-collision-investigation/]. The Board's urgent recommendations targeted runways 15/33 and helicopter Route 4. Congressional attention to DCA operational safety is now sustained. Any MWAA-branded document that reads as reducing audible information in a DCA terminal — even one that carefully distinguishes "quiet" from "silent" — will be quoted back at MWAA in the next incident.
+
+### 2.3 Silent-airport peers have documented failure modes
+
+The European Consumer Centre Austria — a state-funded consumer-protection body, not a trade advocate — publishes formal advisory guidance for travelers navigating silent airports: **"the passenger was not informed that the gate had changed and missed his or her flight, so the most common claim. Most airports actually only display such changes on monitors and/or send notifications to the passenger's smartphones,"** and **"the airport is not obliged to make announcements via speakers in order to guarantee that every single passenger receives the information relevant to him"** [Source: https://europakonsument.at/en/page/tips-silent-airports]. London City Airport's own silent policy page confirms announcements are made only in emergencies [Source: https://www.londoncityairport.com/at-the-airport/need-to-know/airport-policies/silent-policy]; independent review aggregators document sustained operational complaints about missed flights, inadequate delay updates, and screens failing to reflect real-time delays [Source: https://ca.trustpilot.com/review/londoncityairport.com]. This is not a "European best practice" the U.S. should transfer; it is a design choice with a known and adverse externality distribution.
+
+### 2.4 ADA and DOT already require visual counterparts — the marginal accessibility gain is small
+
+The DOT ADA rule for airports and the ABA Accessibility Standards require assistive-listening systems in assembly areas and visual counterparts to audible information. Passengers who identify as needing visual or hearing assistance must receive **"prompt access to the same trip information as other passengers at the gate, ticket area, customer service desk, and on the aircraft"** [Source: https://www.transportation.gov/airconsumer/disabilitybillofrights]. A visual-first environment does not, by itself, satisfy the DOT requirement; the accessibility argument in favor of quiet-by-design is a restatement of law that already binds. Meanwhile the population being harmed by an audible-first policy — deaf, hard-of-hearing, cognitively different, low-vision — is not the population being helped by a quieter concourse. The quiet-preferring population overlaps heavily with autism-spectrum, sensory-processing, and dementia-affected travelers, whose documented intervention of choice is not concourse-wide quiet but the **dedicated sensory room** already deployed at Phoenix, Seattle, Pittsburgh, Atlanta, and Shannon [Source: https://www.portseattle.org/blog/quiet-oasis-stimulating-environment; https://acl.gov/TransportationCenter/promising-practices/airport-sensory-rooms]. That is a room, not a standard.
+
+### 2.5 Airline PA control is contractual, and the contract is fresh
+
+The 2025 U&L took effect 1 January 2025 and runs through calendar 2039, adopted alongside a $9.0B joint capital plan (~$7.0B IAD, ~$2.39B DCA) [context packet §3]. Airline-controlled gate announcements at leased premises are the loudest recurring PA source in any concourse. Vendor-side reporting on automated boarding-announcement systems (AviaVox, Simpleway) makes plain that carriers, not operators, drive gate-side call cadence, script, and volume, and that **"some airports don't allow automated gate announcements because their PA systems are outdated and incompatible, and fire marshals may disallow proprietary public address systems to preserve their ability to override them for emergency announcements"** [Source: https://viewfromthewing.com/american-airlines-has-updated-its-boarding-announcements/; https://simpleway.global/airports-us]. Any MWAA standard that requires carriers to change gate-agent behavior is a change to the 2025 U&L. The MII and signatory-list terms of that agreement have not been verified in the context packet [context packet §12], but a hybrid U&L is not amendable at operator convenience.
+
+### 2.6 The "quiet" claim at Schiphol is confounded
+
+Schiphol's noise reduction is driven overwhelmingly by aircraft-fleet quieting and airport-charge differentiation, not by terminal PA policy: aircraft averaged 2.09 dB quieter in 2025 vs. 2018 [Source: https://news.schiphol.com/schiphol-in-2025-quieter-aircraft-more-satisfied-travellers-and-solid-financial-results/]. Community noise complaints against Schiphol still increased 7 percent year over year in the 2023 reporting period [Source: https://www.dutchnews.nl/2024/04/noise-complaints-against-schiphol-increased-by-7-last-year/]. The often-cited passenger-experience improvement is not attributable to concourse announcement policy. Citing Schiphol as evidence for quiet-by-design terminal standards is a category error: it is evidence for fleet-quieting via airport-charge differentiation, an instrument MWAA does not use and which the U.S. rates-and-charges framework and airline U&Ls do not support.
+
+### 2.7 Standardizing IAD and DCA is a category error
+
+The two airports are not the same operational animal. IAD is a widebody, international, connecting hub with a Saarinen main terminal (1962, National Historic Landmark), Pelli midfield C/D targeted for replacement, and a 435,000 sq ft greenfield Concourse E opening autumn 2026 [context packet §§4, 9]. DCA is a slot-controlled, perimeter-restricted, origin-and-destination airport whose Terminal 1 dates to 1941 (Goodman, National Register) and Terminal 2 to 1997 (Pelli National Hall, vaulted volumes that make reverberation control inherently harder) [context packet §9]. Historic-review overlays constrain any acoustic intervention inside the IAD main terminal envelope and DCA Terminal 1. A "common MWAA standard" that treats both airports the same either (a) sets the bar low enough to fit both, in which case it is unenforceable at Concourse E's greenfield opportunity, or (b) sets it high enough to matter at IAD, in which case it is unbuildable at DCA without disfiguring Pelli's National Hall.
+
+---
+
+## 3. Specific scenarios where the thesis is wrong
+
+### Scenario A — DCA Terminal 1 refresh, 2028
+
+MWAA adopts the quiet-by-design standard. A subsequent T1 refresh RFP requires ambient dB, RT60, and STI targets consistent with the standard. Bidders return costed alternatives showing that the 1941 Goodman envelope cannot achieve target reverberation without dropped acoustic ceilings that Section 106 review will not approve. The project is delayed 14 months while MWAA either seeks a Programmatic Agreement variance or grants a project-specific exception. The standard's "context-dependent options" tier absorbs the exception, and the standard becomes advisory. The cost of the delay is borne by rates and charges.
+
+### Scenario B — Post-incident DCA hearing, 2029
+
+An irregular-operations event at DCA — a weather diversion cascade, a security incident, a de-icing overrun — leaves several thousand passengers stranded overnight. Post-event reporting includes passenger accounts that gate changes were displayed on FIDS but not audibly announced, that passengers with dead phones missed rebooking windows, and that non-English-speaking international transfer passengers could not locate their assigned rebooking desks. The 2026 MWAA quiet-by-design standard is quoted in local coverage as "the airport authority's policy of minimizing audible announcements." MWAA's response cannot cite Schiphol.
+
+### Scenario C — Concourse E opens, 2026
+
+The Concourse E gate program is already procured and built to design intent that predates any quiet standard adopted in 2026. Retrofit to a subsequent MWAA standard requires PA rework at a facility not yet six months old. United, the anchor tenant with a separate long-term lease and its own gate-agent scripts and Auracast-style gate-audio pilot, declines to modify its announcement practice. The standard covers MWAA-owned finishes and PA infrastructure; the actual audible experience at E does not change.
+
+### Scenario D — The standard covers the wrong problem
+
+Post-opening acoustic measurement at IAD Concourses A and B reveals that the dominant acoustic problem is not concourse PA volume but reverberation from hard-surfaced tile floors and glass curtain walls, plus baggage-belt noise at the FIS. The quiet standard has driven MWAA to invest in PA-zoning hardware and directional loudspeakers. The 3-decibel improvement passengers perceive is delivered instead by a $1.4M FIS baggage-belt liner and a soft-surface flooring change at two concessions food courts — interventions that would have happened without any standard, if MWAA Engineering had run a $60,000 post-occupancy acoustic survey first.
+
+---
+
+## 4. Five direct quotations or data points a strategist must address
+
+1. **NFPA 72 already sets the intelligibility floor.** "The voice intelligibility of an emergency communication system is considered acceptable if at least 90 percent of the measurement locations within each acoustically distinguishable space (ADS) have a measured STI of not less than 0.45 (0.65 CIS) and an average STI of not less than 0.50 (0.70 CIS)." [Source: https://www.commercialintegrator.com/security/mass_notification/mass-notification-intelligibility/] The strategist must explain why an MWAA standard adds safety above NFPA 72, and whether it adds legal exposure.
+
+2. **The DCA political envelope is real and current.** The NTSB found the January 29, 2025 collision "resulted primarily from the placement of a helicopter route in close proximity to a runway approach path without procedural mitigations, combined with failures by multiple organizations to identify and address known risks," and issued 50 safety recommendations [Source: https://enotrans.org/article/ntsb-unveils-findings-probable-cause-and-recommendations-from-dca-mid-air-collision-investigation/]. The strategist must explain how a quiet-by-design standard survives a post-incident hearing in which MWAA is asked to defend audible-information reductions at DCA.
+
+3. **Silent airports produce documented passenger harm.** European Consumer Centre Austria, official advisory: **"the airport is not obliged to make announcements via speakers in order to guarantee that every single passenger receives the information relevant to him. This means that if you are late at the gate and miss your flight or are denied boarding, you can't blame the airport for not knowing your gate or if you waited to be called out"** [Source: https://europakonsument.at/en/page/tips-silent-airports]. The strategist must explain what MWAA's answer is to the passenger who misses a flight because the airport chose not to page.
+
+4. **Getting the acoustic-architectural coordination wrong is expensive.** Documented terminal case: **"USD $2.8 million in remediation, eight weeks of disruption, and immeasurable passenger frustration. The acoustic consultant's prediction of STI 0.38 was documented but overruled by architectural vision"** [Source: https://acousplan.com/blog/iec-60268-16-sti-measurement]. The strategist must show that MWAA's standard would have prevented this failure, and at what cost to the program schedule.
+
+5. **The 15-year U&L closed the airline lever.** The 2025 U&L took effect 1 January 2025 and runs through 2039, alongside a $9.0B joint capital plan [context packet §3]. Airline gate announcements are the loudest recurring PA source. The strategist must show a credible path by which airline gate-agent behavior changes without the U&L amendment airlines have no incentive to sign.
+
+---
+
+## 5. The concession the thesis should make
+
+The strongest defensible retreat is to narrow the standard to two things MWAA actually owns and can enforce inside its own capital program:
+
+- **A design-manual amendment on room acoustics and EVACS intelligibility.** Explicit RT60 (reverberation time) targets by space type, an explicit STIPA measurement protocol at commissioning, and an explicit prohibition on architectural overrides of acoustic-consultant STI predictions without written CEO delegation. This is enforceable through the A/E contract, does not touch tenants or airlines, and has code alignment (NFPA 72) that gives it legal ground.
+
+- **A sensory-room and quiet-space requirement for terminal programs above a defined size threshold.** This is the intervention with the best documented outcome for the affected population, is cheap, does not require concourse-wide PA policy, and is already a peer practice at Phoenix, Seattle, Pittsburgh, Atlanta, and Shannon.
+
+Everything else — announcement-frequency governance, TV-mute policy, PA zoning philosophy, "quiet" as a passenger-experience metric, tenant-technology standardization — should be dropped. It cannot be enforced against airlines under the 2025 U&L, it exposes MWAA to post-incident political risk at DCA, it duplicates code, and it delivers a passenger-experience improvement that is not attributable to the intervention.
+
+If the Council is going to publish, publish that narrower thing. A "quiet by design" standard that survives its first NTSB hearing at DCA is not a quiet standard. It is an intelligibility-and-sensory-space standard. Call it what it is.
+
+---
+
+*~2,050 words.*

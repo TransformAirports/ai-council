@@ -1,0 +1,101 @@
+# Airport COO Brief — Quiet-by-Design Standards at IAD and DCA
+
+**From:** Chief Operating Officer
+**To:** Strategist (Council v2, Stage 1)
+**Re:** Quiet-by-design as an operations problem, not a branding problem
+**Date:** 7 August 2026
+
+---
+
+## Framing
+
+Every strategy deck about "quiet airports" I have seen was written by someone who has never worked a 5:45 AM Monday push, watched a mainline aircraft go mechanical at a common-use gate with three downline pushes stacked behind it, or run the desk during an unplanned runway closure. From the operator's chair, an announcement is a last-line control against a missed connection, a gate-hold breach, an ADA obligation, or an NFPA-72-governed emergency. It is often the audible symptom of a communication chain that has already failed upstream at the CUPPS workstation, the FIDS feed, the airline paging integration, or the ramp OPSCOMM.
+
+I am not opposed to a quiet-by-design standard. I will fight for one if it is written to reduce noise we already know we can reduce **without** shifting risk onto passengers who cannot receive information any other way, and onto ops center staff whose escalation ladder ends with the paging mic. This brief tells the strategist where the thesis survives operational contact and where it doesn't.
+
+## 1. Key findings
+
+1. **What the airport actually controls is narrower than the deck assumes.** MWAA controls the acoustic envelope of common-use space, the head-end of the general PA, the FIDS spec, and (through the design manual and tenant handbook) what airlines and concessionaires may install inside their premises. MWAA does **not** control airline hold-room paging content, TSA checkpoint announcements, CBP FIS announcements, or airline gate-podium overrides. A standard that fails to name those boundaries will be relitigated at every design review [Source: https://www.faa.gov/airports/resources/advisory_circulars/index.cfm/go/document.current/documentnumber/150_5360-13].
+2. **Emergency voice intelligibility is a floor, not a design preference.** NFPA 72 Chapter 24 requires speech intelligibility in emergency communications spaces sufficient to deliver evacuation instructions — commonly measured by Speech Transmission Index (STI) or the derivative Common Intelligibility Scale (CIS). A quiet standard that reduces sound pressure or extends reverberation without engineering to maintain STI at emergency-relevant zones is out of compliance the day it opens [Source: https://www.nfpa.org/product/nfpa-72-code/p0072code].
+3. **The IROPS 90 minutes decide whether the standard is a policy or a slogan.** In a major weather cell, a runway closure, or a system outage, the tools an operator reaches for in order are: (a) FIDS/GIDS mass update, (b) airline app push, (c) airport app push, (d) staffed information counters, (e) gate podium PA, (f) zone PA, (g) all-terminal PA. A quiet standard has to specify that (a)-(d) are performing at design intent **before** it constrains (e)-(g). ACRP Report 65 explicitly identifies communications failure as a repeat cause of IROPS breakdown [Source: https://nap.nationalacademies.org/catalog/16903/guidebook-for-airport-irregular-operations-irops-contingency-planning].
+4. **Deferred maintenance in FIDS, PA amplifiers, and jet-bridge PA is the operator's silent problem.** ACRP synthesis work shows terminal AV/PA systems routinely outlive their designed 10-15 year lifecycle, are patched rather than replaced, and are the first thing to fail in an event [Source: https://nap.nationalacademies.org/catalog/22192/common-use-facilities-and-equipment-at-airports]. A quiet spec that assumes underlying PA is at design intent is writing on paper the operator does not have.
+5. **Design decisions taken at 60% documents cost operations forever.** A beautiful ceiling that reverberates, a curtain wall that turns hold rooms into hard surfaces, a jet bridge with an unaddressable PA head — a quiet-by-design standard written **before** schematic design prevents these. Written after 90% DDs, it becomes a change-order document.
+6. **DCA and IAD are two different operational problems.** DCA is near physical envelope with a passenger profile skewed to frequent-flier, high-mobile-app Beltway commuters. IAD is a growing international hub — 10.5M international passengers in 2025, many first-time-through and limited-English. A sound-pressure ceiling right for DCA gate 35 is wrong for IAD Concourse A's international connector at 22:00.
+7. **The operator's authority in an event is smaller than the badge implies.** The Airport Duty Manager can close a concourse, reroute pax, and open the EOC. They cannot compel an airline gate agent to make an announcement, override an airline paging integration, or push content to an airline app. Any governance section that says "the ADM will..." must be pressure-tested against the airline use agreement and the 2025-2039 premises lease [Source: https://www.mwaa.com/about/investor-relations].
+8. **Measurable is the entire argument.** If MWAA cannot commission and audit STI, background noise (NC/RC), reverberation time (T30), adjacent-zone spillover (dBA at boundary), and announcement frequency per gate-hour, the standard is decoration. The good news: the measurement discipline exists (IEC 60268-16 for STI; ANSI/ASA S12.2 for NC/RC; ISO 3382 for reverberation). The bad news: it must be written into commissioning specs, and MWAA's current design manual provisions on this are not publicly known — a stage-zero gap flagged in the context packet.
+
+## 2. Evidence
+
+### 2.1 What the standards actually require, and where they conflict
+
+The operator's baseline for public-space voice systems is not aesthetic. NFPA 72 (2022), Chapter 24, requires emergency communications systems to achieve intelligibility such that instructions are "distinguishable and understandable." The default engineering target across US airports is STI ≥ 0.50 (CIS ≥ 0.70) in acoustically distinguishable spaces, per Annex D of NFPA 72 and the airport-focused guidance in ACRP work on terminal AV [Source: https://www.nfpa.org/product/nfpa-72-code/p0072code]. Reducing loudspeaker density or moving to directional arrays without re-modeling STI at each zone boundary is not a quiet decision — it is a code decision, and it needs a fire-protection engineer's stamp.
+
+The FAA's terminal-facility guidance (AC 150/5360-13B) treats PA and information systems as terminal infrastructure to be planned with the same discipline as baggage or holdrooms; it does not, however, prescribe an ambient-noise ceiling [Source: https://www.faa.gov/airports/resources/advisory_circulars/index.cfm/go/document.current/documentnumber/150_5360-13]. That is the gap the MWAA standard would fill — appropriately, if it uses recognized measurement bases.
+
+The measurement grammar the standard should adopt is well established: STI per IEC 60268-16 [Source citation: IEC 60268-16:2020, "Sound system equipment — Part 16: Objective rating of speech intelligibility by speech transmission index"]; interior noise criteria per ANSI/ASA S12.2 [Source citation: ANSI/ASA S12.2-2019, "Criteria for Evaluating Room Noise"]; and reverberation and speech clarity per ISO 3382 series [Source citation: ISO 3382-3:2012, "Acoustics — Measurement of room acoustic parameters — Part 3: Open plan offices"]. There is no need to invent a new specification vocabulary.
+
+### 2.2 What the operator actually controls — and doesn't
+
+The lines of responsibility at a US hub of MWAA's size, from the COO's chair:
+
+- **Airfield ops:** MWAA airport operations, coordinated with FAA ATC (tower and TRACON) and airline ramp control at IAD's dominant-carrier apron. FAA controls surface movement instructions; MWAA controls closures, NOTAM issuance, and pavement condition. This has no bearing on quiet-by-design except that the boundary conditioning matters: what the airport can *promise* the standard will deliver stops at the terminal envelope.
+- **Terminal ops:** MWAA-owned, including FIDS, general PA head-end, common-use gates (where deployed), curbside, and public circulation. This is the operational core of a quiet standard.
+- **Airline premises:** Hold-room paging, gate podium overrides, airline app content, airline club PA. MWAA can specify integration requirements and hardware standards through the tenant design handbook; content control is contractual.
+- **Federal partners:** TSA checkpoint announcements (TSA-mandated content, TSA-owned amplifiers in many installations); CBP FIS space announcements. MWAA can specify the acoustic envelope of those rooms and negotiate loudspeaker layouts, not the content.
+- **Concessionaires:** Music, TVs, and paging within leased premises. Bounded by the tenant design handbook; the enforcement mechanism is the lease and periodic tenant compliance audits.
+
+Any quiet-by-design standard that fails to distinguish these five domains will fail its first change-order fight [Source: https://airportscouncil.org/].
+
+### 2.3 IROPS as the truth serum
+
+The paper IROPS plan and the executed IROPS plan diverge on communications first. Three well-documented events frame this:
+
+- **Atlanta (ATL) power outage, 17 December 2017.** An underground fire in a Georgia Power substation and its backup feed took the terminal complex dark for approximately 11 hours; roughly 1,150 flights were canceled and passengers were stranded without FIDS, escalators, jet-bridge PA, or normal wayfinding. Post-event analysis emphasized failure of redundant communications channels and reliance on the general PA once information systems went dark [Source: https://www.ntsb.gov/investigations/AccidentReports/Reports/HAR1802.pdf] [Source: https://www.gpo.gov/fdsys/pkg/CHRG-115hhrg28881/pdf/CHRG-115hhrg28881.pdf]. For a quiet-by-design thesis, ATL is the counter-example: when digital and visual channels drop, the audible channel is what remains.
+- **Southwest holiday meltdown, 21-29 December 2022.** ~16,700 flight cancellations; DOT's consent order documented that Southwest's crew-scheduling and communications systems could not process the disruption; passenger information failures were among the DOT's stated bases for the $140M civil penalty [Source: https://www.transportation.gov/briefing-room/dot-fines-southwest-airlines-140-million-2022-holiday-meltdown-failing-consumers]. Airports absorb these events at the concourse level.
+- **CrowdStrike outage, 19 July 2024.** A faulty content update to CrowdStrike Falcon disabled millions of Windows endpoints worldwide, including airline check-in and dispatch systems at Delta, United, American, and others; airports resorted to manual check-in and hand-written boarding passes, with the general PA doing much of the passenger-management work [Source: https://www.crowdstrike.com/falcon-content-update-remediation-and-guidance-hub/] [Source: https://www.transportation.gov/briefing-room/us-department-transportation-launches-investigation-delta-air-lines-following]. Every visual and digital channel a quiet standard would rely on failed simultaneously; the airport PA and staffed counters were the mitigation.
+
+The pattern is consistent: the redundant channels that a quiet-by-design standard promises are often correlated failures. Losing one means losing many. ACRP Report 65 makes exactly this point in less colorful language [Source: https://nap.nationalacademies.org/catalog/16903/guidebook-for-airport-irregular-operations-irops-contingency-planning].
+
+### 2.4 The capital handoff, from the operator's side
+
+Recurring categories of operational pain that come from design decisions the operator did not push back on:
+
+- **Ceiling geometry that reverberates.** Grand vaulted ceilings, exposed structure, and hard finishes look extraordinary in renderings and destroy STI in commissioning. Once the ceiling is in, mitigation is a change order, a bulkhead, or a lot of felt.
+- **Under-specified acoustic materials in curtain-wall hold rooms.** Every glass hold room I have inherited was noisier than modeled. The absorption budget was thin at 60% DDs and got value-engineered at 90%.
+- **PA head-ends that were not designed to zone below the concourse level.** Adding zoning post-occupancy requires new amplifier racks, new cable pulls to loudspeaker taps, and often new fire alarm coordination. It is not a software fix.
+- **Jet-bridge PA that was specified by the bridge manufacturer, not the airport AV standard.** Operators inherit heterogeneous jet-bridge PA hardware that will not integrate cleanly with a common airport PA governance layer.
+- **FIDS displays sized for the render, not the sightline.** ACRP research on wayfinding consistently finds that display sizing, mounting height, and glance-angle are the dominant variables in whether passengers use digital information rather than approach a counter [Source: https://nap.nationalacademies.org/catalog/14589/wayfinding-and-signing-guidelines-for-airport-terminals-and-landside].
+
+Concourse E at IAD, opening September 2026, is the first live pressure test for whatever standard MWAA adopts. If the acoustic and PA-zoning spec was not written into that program at the design manual level, it is a post-occupancy commissioning exercise — much cheaper than a retrofit, but not free.
+
+### 2.5 Throughput as the operator sees it
+
+Latent capacity in an existing terminal footprint is usually communications-limited, not gate-limited. On a peak day, dwell time at a common-use gate is a function of: how quickly the gate flip is announced; whether pre-boarding groups line up in the right sequence; how fast the paging can call missing passengers; and whether the FIDS accurately reflects the gate assignment change. A quiet standard that makes those channels *more* reliable — through zoning, intelligibility, and integration — is a throughput multiplier. A quiet standard that just makes those channels *quieter* is a throughput drag.
+
+## 3. The operational case for and against the thesis
+
+**For, from the COO chair:**
+
+- The single biggest determinant of terminal AV performance is what was written into the program brief. Writing it into the MWAA design manual before the $20B+ IAD program hits schematic design is the cheapest hour MWAA will ever spend on passenger experience [Source: https://www.mwaa.com/].
+- The measurement discipline exists. STI, NC/RC, T30, and speech clarity are stable, commissionable specifications. This is not a soft standard.
+- A tiered standard with mandatory floors (emergency intelligibility, ADA multimodal redundancy, tenant integration hooks) and context-dependent options (ambient targets by space type, announcement governance) is exactly the structure the operator wants to enforce.
+- Getting the standard into the tenant design handbook is how MWAA controls the concessionaire and airline club noise floor without picking a fight per lease renewal.
+
+**Against, from the same chair:**
+
+- A standard that reduces PA capability without engineering the mitigation channels transfers risk to the operator. On the day of an event, the CEO's speech about quiet terminals does not help the ADM who has 400 missed-connection passengers in the CBP hall.
+- "Fewer announcements" is not a specification and cannot be commissioned. If the standard reads that way, it will be enforced inconsistently and abandoned within a program cycle.
+- International peer branding (Schiphol, Copenhagen, Helsinki) does not transfer without close reading of their emergency-communications codes, their airline-paging governance, and their passenger demographics — most of which are different from IAD and structurally incomparable to DCA [Source: https://www.schiphol.nl/en/].
+- If MWAA writes a common IAD/DCA standard that ignores DCA's historic terminal envelope and its post-January 2025 operational stress, the standard will be honored in Concourse E and ignored at DCA gate 35.
+
+## 4. Concrete examples
+
+1. **Concourse E, IAD (opening September 2026).** First test bed. If the standard is not in the design manual by the time HOK issues drawings for Tier 2 and Tier 3 concourse expansions, MWAA is retrofitting instead of designing.
+2. **DCA Terminal 2 (Pelli) hold rooms.** Glass, hard finishes, high ceilings, tight column grid; reverberation is already outside residential-comfort norms. Any quiet standard applied here without a targeted absorption program is aspirational.
+3. **ATL 17 Dec 2017 blackout.** The lesson MWAA should carry into its standard: redundancy has to be genuinely independent. If FIDS, digital signage, and the airline app all ride the same terminal power and network backbone, the quiet standard collapses at the moment it is most needed [Source: https://www.ntsb.gov/investigations/AccidentReports/Reports/HAR1802.pdf].
+4. **CrowdStrike 19 July 2024.** The lesson: airline-side systems and airport-side systems fail together more often than the deck assumes. The mitigation channel the passenger ultimately relies on is a human at a counter with a printed board [Source: https://www.transportation.gov/briefing-room/us-department-transportation-launches-investigation-delta-air-lines-following].
+5. **The 2025 DCA/IAD asymmetry.** DCA lost 5.3% of passengers in 2025 and remains under operational stress after the 29 January collision; IAD set an all-time record at ~29M with 10.5M international. A single-number ambient-sound target for both airports is wrong on its face.
+
+## 5. What I would tell the Strategist
+
+Write the standard as an engineering document with commissionable metrics. Anchor emergency intelligibility as a hard floor. Distinguish MWAA-controlled envelope from airline and federal-partner content. Require independent redundancy across visual, digital, staffed, and audible channels. Tier by space type, not by airport. Put it into the design manual and tenant handbook before the IAD program hits schematic. And do not let anyone call the result "quiet." Call it "intelligible." I can defend "intelligible" at 5:45 AM on a Monday in July. I cannot defend "quiet" the first time an ADM reaches for the mic and finds the amplifier was value-engineered out.

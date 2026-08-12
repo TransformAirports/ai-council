@@ -1,0 +1,6 @@
+scenario,incremental_capex_usd,annual_debt_service_usd,combined_enplanements_millions,cpe_impact_usd_per_enplanement,pct_of_2030_projected_cpe
+low_case,12000000,900000,26.95,0.033,0.16
+high_case,40000000,3000000,26.95,0.111,0.54
+doubled_capex_low,24000000,1800000,26.95,0.067,0.32
+doubled_capex_high,80000000,6000000,26.95,0.223,1.08
+new_construction_only,included_in_program_financing,approx_zero,26.95,0.000,0.00

@@ -1,0 +1,30 @@
+{
+  "artifact": "quiet-by-design-standards-for-mwaa-terminals-2.docx",
+  "kind": "docx",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": [],
+  "metadata": {
+    "paragraphs": 67,
+    "tables": 0,
+    "headings": 4,
+    "words": 3292,
+    "page_number_field": true,
+    "word_visual_inspection": {
+      "pages": 7,
+      "inspector": "art-director",
+      "receipt_sha256": "53ada572700c5722f8463cefbc86820a6ff9957fc28105635d8e8b9c10b40f40"
+    }
+  },
+  "rendered_files": [
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2.pdf",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-1.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-2.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-3.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-4.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-5.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-6.png",
+    "qa/render/quiet-by-design-standards-for-mwaa-terminals-2-docx/quiet-by-design-standards-for-mwaa-terminals-2-7.png"
+  ]
+}

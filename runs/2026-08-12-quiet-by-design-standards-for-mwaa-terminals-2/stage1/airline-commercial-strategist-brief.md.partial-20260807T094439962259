@@ -1,0 +1,142 @@
+# Airline Commercial Strategist — Independent Brief
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Author lens:** 20 years airline commercial and network planning; 10 years airport-side. Sat in the rooms where hub-add and dehub decisions were made. Watched CVG, PIT, STL, MEM, CLE come off the network board.
+**Central question I bring:** what will the carriers do in response? Any MWAA standard that does not model carrier behavior — signatory-carrier consent under the 2025 U&L, gate-operations impact at hub scale, and the CPE math a network planner actually runs — is incomplete on arrival.
+
+---
+
+## 1. Key Findings
+
+1. **United at IAD is not a captive tenant.** United took ~72% of IAD enplanements in 2024 and executed a new long-term Dulles lease as part of the 2025 U&L cycle [Source: MWAA 2024 traffic statistics; MWAA press release, Aug 2024]. But United operates a second, larger East Coast hub 220 miles away at EWR (~46 million passengers 2024) [Source: United 2024 10-K]. Any standard that shifts marginal cost onto United-funded projects gets re-underwritten against EWR growth alternatives before it gets signed.
+2. **American at DCA is captive by slot, not by loyalty.** American holds ~50% of DCA slots, its Washington hub, and picked up 2 of the 10 new beyond-perimeter exemptions in December 2024 [Source: DOT Order 2024-12-x, beyond-perimeter slot exemption award]. The slot regime protects American's DCA position more than any airport strategy could — but it also means American has no reason to concede on operational discretion. They will fight terminal standards that touch gate ops.
+3. **MII is the veto that matters.** MWAA's 2025 U&L is a hybrid agreement with a $9.0B capital envelope pre-agreed by signatories. Standards adopted *after* the 2025 U&L that raise per-project cost above delegated thresholds trigger Majority-In-Interest review [Source: standard U.S. residual/hybrid U&L convention; specific MWAA MII thresholds not verified — flagged in airport context packet]. A "quiet" standard is cheap; a "quiet + acoustic-treated + STI-verified + BIM-modeled" standard bundled into every renovation is not, and that is where MII enters the room.
+4. **CPE at IAD is already high and going higher.** MWAA IAD CPE was $28.34 in FY 2023 per operator disclosure [Source: MWAA CAFR / Airport rates and charges filing]. The expanded $20–22.5B Dulles program announced July 2026 layers more debt service onto a base that already sits above the U.S. large-hub median of roughly $15–20 [Source: FAA CATS/rates database; ACI-NA benchmarking]. Every incremental design mandate lands on top of that trajectory.
+5. **The dehub warning signs are pattern, not prophecy.** CVG, PIT, STL, MEM, and CLE all featured (a) a single hub carrier with an alternative hub in the same region, (b) CPE trajectory into the mid-to-high teens or above, (c) a large just-completed capital program the carrier had signed off on but no longer needed after a merger. IAD hits (a) and partly (c) — Concourse E opens autumn 2026 and the $22B expansion is the next round. The critical differentiator is that DCA-area O&D demand and IAD's international gateway role remove the "there is no reason to be here" logic that killed the five dehubbed hubs.
+6. **The quiet-by-design cost debate is the wrong debate at United's scale.** United spends roughly $250–350M annually at IAD in rates and charges [Source: back-of-envelope from MWAA airline-payments disclosures]. A $2–5M acoustic mandate per new concourse is invisible to that carrier's P&L. What is *not* invisible is a standard that (a) adds 30 seconds to boarding calls, (b) slows IROPS reaccommodation, or (c) forces gate agents to work around announcement restrictions. The threat vector is operational drag, not first-cost.
+7. **Boarding intelligibility is a Part 139 and DOT-CR consumer-rule issue before it is an airline preference.** DOT's tarmac-delay and disability rules require effective communication in irregular operations [Source: 14 CFR Part 259; 14 CFR Part 382]. Any standard that reduces intelligibility — even briefly — is legally exposed. Airlines will invoke this to defeat aggressive "no PA" prescriptions and will be legally correct to do so.
+8. **The MWAA leverage window is the 2025 U&L capital envelope, not the standard itself.** Standards adopted inside the $9.0B envelope are financeable and MII-covered. Standards proposed as add-ons after execution have to be re-negotiated. Timing determines whether the standard lands or dies.
+
+---
+
+## 2. Evidence — What Airlines Actually Care About in Terminal Standards
+
+### 2.1 The four-major oligopoly and MWAA's exposure to it
+
+Post-consolidation U.S. airline structure is a four-major oligopoly (American, Delta, United, Southwest) with an ULCC fringe (Spirit, Frontier, Allegiant, plus the pending Spirit reorganization) [Source: DOT Form 41; carrier 10-Ks 2024]. MWAA sits at the concentrated end of that structure: United is dominant at IAD; American is dominant at DCA. Neither airport carries meaningful Southwest presence and DCA has zero ULCC service. This concentration is a double-edged sword — it removes the "diversification" argument for airport-favorable terms, and it means any standard becomes a bilateral negotiation with one carrier per airport in practice, whatever the U&L signatory list looks like on paper.
+
+The 2008–2016 merger wave (Delta/Northwest 2008; United/Continental 2010; Southwest/AirTran 2011; American/US Airways 2013; Alaska/Virgin 2016) [Source: DOJ competitive filings and DOT orders for each] shifted leverage sharply toward carriers. Airports with a single dominant merged carrier lost the "let's play carriers against each other" tactic that had worked in the 1990s. MWAA's 2025 U&L reflects that world: 15-year term, pre-agreed capital envelope, hybrid rate-setting — an agreement carriers underwrite because the certainty helps them, not because MWAA had the whip hand.
+
+### 2.2 Hub economics, banked operations, and the boarding-call cadence
+
+A hub is not a marketing label; it is a banked operation that funnels connecting traffic into narrow arrival-departure windows to maximize connection combinations. United's IAD banking structure runs roughly 6–7 daily banks with 45–60 minute connection windows [Source: OAG schedules; author professional judgment]. Inside a bank, dozens of gates board simultaneously across concourses. Announcement discipline is not aesthetic — it is throughput. A missed boarding call at bank peak forces a rebook that cascades through the connecting itinerary. Missed-boarding rates and DOT on-time performance are the metrics network planners care about because they directly hit MCT (minimum connect time) marketing.
+
+A "quiet" concourse that measurably slows boarding by even 10–20 seconds per gate at bank peak has real cost. Multiply across ~40 gates in Concourses C/D/E during a peak United bank and the number is not trivial. This is the operational metric MWAA must engage before proposing announcement caps, not after.
+
+### 2.3 What separates a real hub from a large focus city — and why IAD is a real hub
+
+United carried ~72% of IAD enplanements in 2024 [Source: MWAA CY2024 statistics]. International accounts for ~10.5M of IAD's 29M total passengers [Source: MWAA CY2025 traffic]. Star Alliance connections (Lufthansa, ANA, Turkish, others) hub or transit through IAD. This is a *real* hub — connecting complex, international gateway, single carrier dominance — not a focus city. Compare to Cleveland pre-2014 (Continental/United), where the O&D market was mid-sized and no international gateway function existed. That's why CLE was expendable and IAD is not.
+
+### 2.4 Cost-per-enplanement — the number carriers actually track
+
+CPE is the diagnostic. Rough current ranges at large U.S. hubs (FY 2023 filings, ACI-NA benchmarking):
+
+- LAX ~$25–30 [Source: LAWA CAFR FY2023]
+- JFK ~$35–40 pre-Terminal 6/1 completion [Source: PANYNJ statistical reports]
+- ORD ~$28–32 post-OHare 21 [Source: CDA rates and charges]
+- IAD ~$28.34 FY2023 [Source: MWAA airport rates and charges]
+- ATL <$5–8 (Delta-dominated, residual, extraordinary throughput) [Source: HJAIA CAFR]
+- MDW ~$12–15 [Source: CDA]
+- MSP ~$12–16 [Source: MAC CAFR]
+
+Where carriers begin to divert growth is not a single number; it is a *relative* threshold within the carrier's own network. United's IAD CPE compared to United's EWR CPE (roughly $30+) is the actual benchmark. As long as IAD remains within ~10–20% of the network median, United absorbs incremental cost. Above that band, the network planner starts modeling capacity redirects. The July 2026 $22B expansion, if funded predominantly through revenue debt paid via rates, will push IAD toward the top quartile — and that is the ceiling above which MII objections become real.
+
+### 2.5 Use and lease agreement mechanics — where the leverage actually lives
+
+Under a residual agreement, the airline pays whatever it takes to make the airport whole after non-airline revenue. Under a compensatory agreement, the airline pays only for direct cost recovery and the airport keeps upside. MWAA's 2025 U&L is a **hybrid** that pre-agreed a $9.0B capital envelope with airline consent inside it and left MWAA with more discretion on non-airline revenue than a pure residual would [Source: MWAA press release Aug 2024; MWAA U&L executive summary].
+
+Two mechanisms matter for a design standard:
+
+- **MII on capital additions:** Standard practice is that projects above a delegated threshold require signatory-airline consent. If a quiet-by-design mandate adds material cost to future projects, that cost falls under MII scrutiny project-by-project.
+- **Change-order and rate reopening:** Standards adopted mid-agreement that materially raise operating cost can trigger rate re-computation. Airlines will not sign off on a standard that lacks a defined cost envelope.
+
+The tactical implication: quiet-by-design lands more cleanly if it is codified in the MWAA Design Manual *inside* the 2025 U&L capital envelope, with per-project cost bands airlines can price into their MII posture. Retrofitting it as an add-on after the U&L was signed is a harder political sell.
+
+### 2.6 Route economics: what makes a route survive or die
+
+Network planners cut, upgauge, or hold based on a route P&L that includes station cost (ground handling, gate rent, terminal charges), fuel, crew, aircraft ownership, and marginal revenue net of dilution. Terminal-experience effects show up in the model only indirectly — via missed boardings, DOT on-time, and customer-satisfaction driving revenue premium (or discount). A quiet-terminal experience does *not* register as a revenue driver in the network planner's spreadsheet unless the carrier's brand team has assigned it a value, which none currently do at a level that would move a route decision.
+
+This is important: the airport should not sell a quiet standard to airlines as "this will help you commercially." It won't, at the granularity carriers plan. It should be sold as (a) accessibility and disability-rule compliance, (b) an alignment with the airport's Master Plan trajectory to 90M passengers at IAD, and (c) an insurance policy against consumer-rule exposure in IROPS.
+
+---
+
+## 3. Case Studies — Carrier Responses to Airport Decisions
+
+### 3.1 CVG (Delta out of Cincinnati) — the airport that built for a hub that shrank
+
+Delta dehubbed CVG in stages from 2005 onward, accelerated after the Northwest merger closed in 2008 [Source: Delta 10-Ks FY2005–FY2012]. CVG had just financed and opened Concourse A and completed extensive midfield build-out, which pushed CPE past $20 as traffic evaporated [Source: KCVG airport financial disclosures]. Delta's public statements cited "network optimization" and "hub rationalization." The route economics said something more specific: post-merger, DTW handled Delta's Great Lakes connecting bank more efficiently, and CVG's O&D market (~2.1M metro) could not support hub operations without connecting traffic. **The airport had done nothing wrong. The airport had done exactly what Delta asked for. The airport had the wrong carrier.**
+
+Lesson for MWAA: an airport with substantial capital investment in service of one carrier is exposed to that carrier's post-merger network decisions. IAD is protected by DC's O&D scale and international gateway function, but the mechanism is the same. The 2025 U&L's pre-agreed capital envelope is the airport-side hedge — if United had walked away from the envelope before signing, the $9.0B would not have been financeable.
+
+### 3.2 PIT (US Airways out of Pittsburgh) — the airport that built the terminal the carrier specified
+
+US Airways dehubbed Pittsburgh in 2004, ~12 years after the airport opened a midfield terminal designed to US Airways specifications with a fully banked hub [Source: US Airways bankruptcy filings 2002/2004; Allegheny County Airport Authority disclosures]. CPE spiked from ~$3 during hub operations to >$18 within two years of dehubbing as debt service stayed constant against a smaller traffic base [Source: ACAA financial reports post-2004]. The airport's public position was that PIT would attract low-cost replacement service; the route economics said the O&D market (~2.3M) could not fill the terminal.
+
+Lesson for MWAA: terminal designs that only work at hub scale become stranded assets at focus-city scale. Quiet-by-design standards written for a 90M-passenger IAD must remain sensible at 40M — and the standard should be defensible at both scale points.
+
+### 3.3 STL, MEM, CLE — the recurring pattern
+
+- **STL (American, post-TWA):** American acquired TWA in 2001 and reduced STL hub operations sharply by 2003 [Source: American Airlines 10-K FY2003]. Lambert had just completed the W-1W expansion program.
+- **MEM (Delta, post-Northwest):** Delta dehubbed MEM in 2013 after Northwest merger integration [Source: Delta 10-K FY2013]. MEM had just completed concourse improvements.
+- **CLE (United, post-Continental):** United dehubbed CLE in 2014 [Source: United 10-K FY2014]. Cleveland had recently completed Concourse D.
+
+The pattern is stubbornly consistent: hub-carrier merger + regional O&D too small + recent airport capital investment = dehub. IAD is protected by DC O&D scale. But *the mechanism by which the airports were exposed was consent-based capital agreements the airline later did not need*. This is why MII matters and why the 2025 U&L envelope matters.
+
+### 3.4 The counter-example — DEN
+
+Denver International's CPE has run in the mid-teens for most of its life and DEN has retained two dominant carriers (United, Southwest) with a growing Frontier presence [Source: DEN CAFRs 2015–2023]. The 2018 Great Hall renovation went sideways on delivery but the underlying carrier-airport relationship survived because DEN's O&D market is large, growing, and geographically indispensable to both carriers' networks. **This is the model MWAA should aim for: an airport too structurally important to any one carrier's network to be walked away from.** IAD's international gateway function and DCA's slot regime are the MWAA versions of DEN's geography.
+
+---
+
+## 4. Direct Data Points and Quotes a Strategist Can Use Verbatim
+
+1. **"United carried approximately 72% of IAD enplanements in 2024 and executed a new long-term lease at Dulles as part of the 2025 U&L cycle."** [Source: MWAA 2024 traffic statistics; MWAA press release announcing 2025 U&L, August 2024]
+
+2. **"MWAA's 2025 Airport Use Agreement runs through calendar 2039 and pre-agreed a $9.0 billion joint capital plan — approximately $7.0 billion at IAD and $2.39 billion at DCA — funded through rates and charges."** [Source: MWAA press release Aug 2024; MWAA 2025 U&L executive summary]
+
+3. **"IAD CPE was $28.34 in FY 2023, in the top quartile of U.S. large hubs. The July 2026 $20–22.5B Dulles expansion, layered on top of ~$4.9B in outstanding revenue debt as of mid-2025, will push CPE higher over the next decade."** [Source: MWAA CAFR / rates and charges filings; MWAA bond disclosures]
+
+4. **"American Airlines holds approximately 50% of DCA slots and picked up two of the ten new beyond-perimeter exemptions authorized by the FAA Reauthorization Act of 2024."** [Source: 49 U.S.C. § 41714; Pub. L. 118-63; DOT slot-exemption award order, December 2024]
+
+5. **Pattern statement (author, drawing on dehub case studies): "Every U.S. dehubbing of the last two decades — CVG, PIT, STL, MEM, CLE — involved an airport that had just completed a major capital program in service of one carrier's stated needs. The airports did what the carriers asked. The carriers walked when the route economics said to. This is what carrier response looks like when the counter-party is dominant and the leverage is one-sided. IAD's protection is not U&L language — it is DC's O&D scale and international gateway function."**
+
+6. **"14 CFR Part 259 requires effective communication with passengers during tarmac delays; 14 CFR Part 382 requires effective communication for passengers with disabilities. A quiet-by-design standard that meaningfully reduces intelligibility in IROPS is legally exposed under existing DOT consumer rules."** [Source: 14 CFR Parts 259 and 382]
+
+7. **"NFPA 72 sets STI ≥ 0.50 for required emergency voice communication areas; any 'quiet' standard runs *in addition to* NFPA 72 and does not modify it."** [Source: NFPA 72 (2022 edition), Chapter 24; airport context packet §8]
+
+---
+
+## 5. The Airline-Response Test for the Council's Recommendation
+
+Any recommendation this run produces should be run through the following four-question test before adoption:
+
+1. **Does the standard require MII consent as new-scope capital under the 2025 U&L?** If yes, model the signatory-carrier position first, not the design team's preference.
+2. **Does the standard measurably affect gate turn time, missed-boarding rate, or IROPS reaccommodation?** If yes, the operational cost falls on the carrier and will be met with contract objection.
+3. **Does the standard survive at 40M passengers *and* 90M passengers at IAD?** If not, it is a hub-scale standard exposed to the same stranded-asset risk that hit PIT, CLE, and CVG.
+4. **Does the standard rely on carrier voluntary compliance in leased premises?** If yes, it is aspirational, not a standard. Only U&L-embedded or tenant-agreement-embedded requirements are enforceable.
+
+If a proposed requirement fails two of the four, it is a design manual aspiration, not an enforceable operating standard. The Council should say so plainly.
+
+---
+
+## 6. Evidence Gaps I Would Flag Before Stage 2
+
+- Specific MII thresholds and project-approval categories in the executed 2025 U&L. Airport context packet §12 flags this. Without it, no cost claim about MII exposure is precise.
+- United's actual gate-count and share at each IAD concourse (A/B, C/D, E) and gate-count trajectory under the expansion.
+- American's gate footprint at DCA and the operational cost per second of boarding delay at DCA gate constraints.
+- Whether MWAA's Design Manual currently contains any acoustic, STI, or PA zoning requirements at all. If it does not, the baseline is fully permissive and the addition is a real change to airline contract exposure.
+- The funding structure of the July 2026 $22B expansion. If it is predominantly rate-recovered, CPE goes up sharply. If it includes federal grant or state contribution, less so. This shapes the MII posture on every subsequent standard.
+
+---
+
+*Brief author lens closes: the airport's fate at MWAA is set less by anything MWAA writes into a design manual than by United's next EWR-vs-IAD growth allocation and American's next DCA slot-utilization decision. A quiet-by-design standard is worth pursuing, but only inside the 2025 U&L envelope, only with measured operational impact, and only with the airlines briefed early enough that MII posture is priced in before the standard becomes public. Otherwise it becomes another well-intentioned airport gesture that dies at the signatory-airline meeting.*

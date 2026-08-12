@@ -1,0 +1,104 @@
+# Airport Context Packet — MWAA (IAD and DCA)
+
+**Run:** Quiet-by-Design Standards for MWAA Terminals
+**Date assembled:** 2026-08-07
+**Purpose:** Shared factual baseline for the research swarm before independent analysis begins. Every fact below is drawn from operator, federal, rating-agency, or major-trade-press sources listed in `context-sources.jsonl`. Where a source could not be verified inside this pass, the gap is named rather than filled by inference.
+
+---
+
+## 0. Decision framing (as declared in the run prompt and manifest)
+
+- **Named operator:** Metropolitan Washington Airports Authority (MWAA), operating Washington Dulles International (IAD) and Ronald Reagan Washington National (DCA).
+- **Decision required:** Not declared in `outputs/run-manifest.json`. The run prompt asks for a tiered standard — mandatory / recommended / context-dependent — governing acoustics, PA zoning, FIDS and digital communication, TVs, quiet spaces, tenant systems, commissioning, and post-opening verification for new and substantially renovated terminal space at IAD and DCA.
+- **Decision owner:** Not declared. Any adopted MWAA standard would typically flow through the Chief Engineer / Vice President of Engineering, the Vice President of Airports (or airport-specific manager at IAD and DCA), and the Design Review process, with board-level notice on rate-of-charge or U&L implications. The specific executive owner should be confirmed by research agents against MWAA’s current org chart.
+- **Time horizon:** Not declared. The functional horizon set by the physical program is 10+ years: Concourse E opens autumn 2026; the expanded ~$20–22.5B Dulles program spans roughly a decade; DCA Terminal 1 replacement is inside the 2025 U&L capital envelope but not the near-term construction package.
+- **Approval path:** Not declared. Design standards of this type historically enter through the MWAA Design Manual, program-brief revisions for named projects, and contract terms for airline and tenant work — all under the President/CEO’s delegated authority. Board approval is required only where the change materially affects rates, charges, U&L obligations, or capital plan totals.
+- **Success measure:** Not declared. The prompt names candidate measurable dimensions (ambient sound, reverberation, signal-to-noise ratio, Speech Transmission Index, adjacent-zone spillover, announcement frequency and duration, intelligibility, accessibility, passenger experience, and employee exposure) that the standard itself should quantify.
+- **Operator-attached sources:** None. `source_paths`, `source_material`, and `source_library` in the manifest are empty; only the standard execution-contract files (`AGENTS.md`, `CLAUDE.md`, orchestration files, code, brand assets) are declared. **No operator memo, dataset, or internal document accompanies this run.**
+
+## 1. Operator identity and legal frame
+
+- **Operator:** Metropolitan Washington Airports Authority (MWAA) — an independent, interstate public-body corporate created by the Virginia General Assembly and the District of Columbia Council under the Metropolitan Washington Airports Act of 1986 (49 U.S.C. §§ 49101–49112).
+- **Facilities:** DCA and IAD, plus the Dulles Toll Road segment of the Dulles Corridor. IAD and DCA are federal property leased from the U.S. DOT under a long-term lease (originally 50 years, extended to 80). MWAA operates them but does not own the land.
+- **Regulatory posture:** Both airports are Part 139-certificated hubs. DCA is a Level 3 slot-controlled airport under IATA WSG and is additionally governed by the 1,250-statute-mile perimeter rule (49 U.S.C. § 41714). IAD has no slot or perimeter constraints.
+
+## 2. Board and governance
+
+- **Board size:** 17 members. Appointing bodies: Governor of Virginia (7, confirmed by the Virginia General Assembly), Mayor of the District of Columbia (4, confirmed by the D.C. Council), President of the United States (3, with Senate advice and consent), Governor of Maryland (3). Six-year terms; one reappointment permitted.
+- **2026 officers:** Chair Mark Uncapher; Vice Chair Alex Vogel; Secretary Felice C. Smith (re-elected).
+- **Delegated authority:** The board sets rates and charges, approves the capital construction program, adopts the airline Use and Lease Agreement, issues revenue debt, and signs concession and construction contracts above delegated thresholds. Day-to-day authority sits with the President/CEO.
+- **CEO / senior staff:** Confirmed name and tenure of the current President/CEO and the executive owner of design standards were not independently verified inside this pass. Research agents should consult mwaa.com/about-authority/senior-staff before attributing decisions to a specific executive.
+
+## 3. Airline Use and Lease Agreement (U&L)
+
+- **Current U&L:** A new 15-year Airport Use Agreement and Premises Lease took effect **January 1, 2025**, replacing the prior residual-style agreement. It runs through calendar 2039.
+- **Capital linkage:** The 2025 U&L was adopted alongside a $9.0 billion joint capital plan — approximately **$7.0 billion at IAD** and **$2.39 billion at DCA** — that the airlines agreed to fund through rates and charges.
+- **Majority-in-interest (MII) provisions:** Existence is standard under U.S. residual/hybrid airline agreement convention, but the specific MII thresholds, project-approval categories, and airline signatory list in the 2025 U&L were not directly verified in this pass. **Do not infer specific MII terms from industry convention.** Consult the executed U&L on MWAA’s Financial and Statistics page.
+- **Signatory carriers:** United Airlines holds the largest position at IAD (its Washington hub) and executed a separate long-term lease with MWAA at Dulles in the 2024–2025 cycle. American Airlines holds the largest position at DCA (its Washington hub). Precise gate and MII share by carrier at each airport was not verified in this pass.
+
+## 4. Capital program — active and announced
+
+- **2024/2025 baseline CIP:** ~$9.0 billion combined ($7.0B IAD + $2.39B DCA) tied to the 2025 U&L.
+- **July 2026 expansion announcement:** Announced jointly by the White House, U.S. DOT Secretary Sean P. Duffy, United Airlines, and MWAA — a plan to expand the Dulles program to **$20–22.5 billion** over roughly ten years. The plan retires the mobile lounges, replaces Concourses C and D, extends the AeroTrain, and creates or renovates more than 5 million square feet at IAD. Funding structure was not disclosed at announcement; trade press (Bond Buyer, FFXnow) has flagged the funding-source question as open.
+- **Concourse E (IAD):** ~435,000 sq ft, 14 United gates, direct AeroTrain access, ~46,000 sq ft of concessions, ~40,000 sq ft United club. Construction began 2024; scheduled opening autumn 2026. This is the first substantial new terminal space at IAD in decades and the most immediate real-world test of any quiet-by-design decisions MWAA makes.
+- **DCA Terminal 2 refresh:** ~$63.9 million package targeted for 2025 completion, focused on restrooms and passenger amenities inside the existing Cesar Pelli-designed National Hall/Terminal 2 building.
+- **Terminal 1 (DCA):** Eventual replacement of the Terminal 1 main concourse is inside the $2.39B DCA program envelope but not the near-term construction package.
+
+## 5. Financial position
+
+- **Outstanding airport-system revenue debt:** ~$4.9 billion across 19 series as of mid-2025 disclosures.
+- **Bond ratings (airport-system revenue bonds):** Moody’s Aa3 / S&P AA- / Fitch AA-, all stable outlook as of 2026.
+- **Recent issuance:** MWAA came to market in June 2025; a 2036 AMT maturity from that transaction yielded ~4.37%. Additional sizable issuance is expected to fund the expanded Dulles program.
+- **Dulles Toll Road:** Financed separately from the airport system (Dulles Corridor Enterprise) with its own indenture and ratings; it is the primary funding source for MWAA’s share of Silver Line construction and is not commingled with airport revenues.
+
+## 6. Traffic and operating conditions (CY 2025)
+
+- **IAD:** ~29.0 million total passengers (all-time record); 13,859,735 enplanements, up 6.6% year over year — the largest percentage jump among the 50 largest U.S. airports in 2025. International passengers: ~10.5 million.
+- **DCA:** ~24.9 million total passengers, down 5.3% from 26.3 million in 2024. Trade coverage names three contributing factors: the January 29, 2025 midair collision between a PSA/American CRJ700 and a U.S. Army UH-60, which triggered temporary flight restrictions and a helicopter-route review; a seven-week fall 2025 federal shutdown; and softening federal-related travel demand.
+- **Combined system:** ~54 million passengers — a system record despite the DCA decline.
+- **Master plan trajectory (IAD):** MWAA’s 2025 Master Plan update envisions growth toward ~90 million annual passengers over the long horizon.
+
+## 7. DCA-specific regulatory context
+
+- **Perimeter and slots:** DCA remains slot-controlled and governed by the 1,250-mile perimeter rule. The FAA Reauthorization Act of 2024 (Pub. L. 118-63, enacted May 16, 2024) authorized **10 additional beyond-perimeter slot exemptions**. In December 2024, DOT awarded two exemptions each to Alaska, American, Delta, Southwest, and United for nonstop service to SAN, SAT, SEA, LAS, and SFO respectively, with service required to commence by March 17, 2025.
+- **Post-collision environment:** Local officials, MWAA staff, and airline safety leaders have publicly framed the January 2025 midair collision as a factor in DCA operational and safety decisions going forward. Any recommendation that touches DCA public-address governance sits inside a heightened-safety political environment.
+
+## 8. Regulatory frame most relevant to a quiet-by-design standard
+
+- **14 CFR Part 139 (Certification of Airports):** § 139.325 requires each certificated airport to maintain an Airport Emergency Plan that includes “a communications network” capable of prompt notification. Part 139 does **not** prescribe specific PA sound-pressure levels, Speech Transmission Index (STI) thresholds, or paging-frequency rules for terminals; those requirements enter through building codes and other authorities. FAA Advisory Circular 150/5200-31C (Airport Emergency Plan) is the governing AC.
+- **NFPA 72 (National Fire Alarm and Signaling Code):** The primary technical authority for emergency voice/alarm communications systems (EVACS) intelligibility (STI ≥ 0.50 in required areas), audibility, and survivability in U.S. terminals via adoption through local building codes.
+- **ADA / ABA Accessibility Standards for buildings, and DOT ADA rule for airports (49 CFR Part 27):** Require effective communication, including visual counterparts to audible information, assistive listening in assembly areas, and accessible wayfinding.
+- **TSA:** Publishes required security announcements (e.g., unattended-bag reminders) whose frequency, wording, and language coverage have historically been operator-implemented; recent TSA guidance has allowed reductions and localization. Current TSA guidance on announcement cadence was not verified in this pass.
+- **CBP:** Governs FIS-hall communication and signage at IAD; CBP’s posted requirements apply inside the sterile international arrivals process.
+- **Local jurisdiction:** IAD is subject to Fairfax and Loudoun County building enforcement (via MWAA’s own adopted building code); DCA is subject to Arlington County. MWAA’s Design Manual sits above these as the operator standard — its current version was not retrieved in this pass and should be pulled from MWAA’s engineering portal before the standard is drafted.
+
+## 9. Architectural and terminal-design constraints
+
+- **IAD main terminal:** Eero Saarinen (1962), a National Historic Landmark. Any acoustic or PA change inside the main terminal envelope is subject to historic preservation review (Section 106 where federal action is present) in addition to MWAA’s own design controls.
+- **IAD midfield concourses:** Concourses A/B, C/D (Cesar Pelli midfield), and the forthcoming Concourse E. C/D are targeted for replacement in the expanded program. Concourse E is the first opportunity to build to a new standard on greenfield airside space.
+- **DCA Terminal 1 (Historic Terminal):** Original 1941 terminal by Charles M. Goodman, listed on the National Register — retrofit constrained.
+- **DCA Terminal 2 (National Hall):** Cesar Pelli, opened 1997. High-volume vaulted spaces make reverberation control and PA intelligibility inherently harder than in low-ceilinged contemporary terminals.
+
+## 10. Peer benchmarks the run explicitly names
+
+The run prompt asks the swarm to examine Amsterdam Schiphol, Copenhagen (CPH), Helsinki-Vantaa (HEL), London City (LCY), and Dubai (DXB) as “silent airport” references. Context builder did not conduct primary research on those airports in this pass; that is Stage 1 research-agent scope. Two operator-side facts should travel with any peer comparison:
+
+1. All five peers are single-operator airports that control tenants and airlines under a European-style airport-of-use framework or a state-owned model. MWAA is a public-body corporate with a signatory-carrier U&L. Enforcement of any announcement policy against carriers and tenants therefore runs through contract, not through unilateral operator rule.
+2. None of the named peers operate under the U.S. FAA Part 139 / TSA layered regime. Regulatory transfer is not automatic.
+
+## 11. Operator-supplied source material
+
+- **Attached sources in run manifest:** None. The manifest’s `source_paths`, `source_material`, and `source_library` fields are all empty; only the standard execution-contract files (`AGENTS.md`, `CLAUDE.md`, orchestration files, code, brand assets) are declared. **No operator-provided document, memo, or dataset accompanies this run.**
+- **Implication:** The research swarm cannot rely on internal MWAA acoustic studies, current MWAA Design Manual acoustic sections, or unpublished MWAA policy. Any claim that reaches into MWAA internal documents must be attributed only if a public source exists; otherwise flag as assumption.
+
+## 12. Named gaps the swarm should not fill by inference
+
+1. Specific MII thresholds, project-approval categories, and signatory-airline list under the 2025 U&L.
+2. Current MWAA Design Manual sections on acoustics, PA zoning, EVACS, FIDS, and tenant technology standards.
+3. Precise gate and MII share by carrier at each airport.
+4. Current TSA guidance on announcement frequency, wording, and multilingual coverage in the U.S.
+5. Funding structure and rate-and-charge impact of the July 2026 $20–22.5B Dulles expansion (publicly unresolved as of the assembly date of this packet).
+6. Confirmed name and tenure of MWAA’s current President/CEO and the executive owner of design standards.
+7. Executed acoustic performance of existing IAD and DCA terminal spaces (measured ambient level, reverberation time, STI). No public measurement is on record.
+
+Each of these is a legitimate call for primary-source retrieval by research agents; none should be inferred.

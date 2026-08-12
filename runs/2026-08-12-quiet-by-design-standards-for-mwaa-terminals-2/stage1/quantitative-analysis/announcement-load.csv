@@ -1,0 +1,4 @@
+scenario,gates,operating_hours,ann_per_gate_per_hour,events_per_day,dwell_plus_transit_min,exposure_unzoned_events,exposure_zoned_home_gate_events,reduction_pct
+low_rate_unzoned,14,16,10,2240,75,175.0,12.5,92.9
+mid_rate_unzoned,14,16,15,3360,75,262.5,18.75,92.9
+high_rate_unzoned,14,16,30,6720,75,525.0,37.5,92.9

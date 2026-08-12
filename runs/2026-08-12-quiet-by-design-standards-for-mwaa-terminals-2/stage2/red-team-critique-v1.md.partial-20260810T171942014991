@@ -1,0 +1,177 @@
+# Red Team Critique v1 — Evidence Prosecution Brief
+
+**Target:** `outputs/stage2/strategist-draft-v1.md` ("The Fire Code Already Wrote MWAA's Quiet-Airport Standard")
+**Prosecutor:** evidence-prosecutor
+**Date:** 2026-08-10
+**Inputs:** run prompt (`quiet-by-design-standards-for-mwaa-terminals-2.md`), run manifest (14 selected research agents, all briefs complete), all 14 Stage 1 briefs, `outputs/stage1/evidence-map.md`, `outputs/evidence-ledger.jsonl` (262 records, namespaced IDs `<agent>::E-nnnn`), and `outputs/stage1/quantitative-analysis/calculations.json`.
+
+**Overall verdict before the particulars:** this is a disciplined draft. It respects most of the curator's do-not-claim list, flags the SFO headline correctly, firewalls the hospital numbers, and refuses the missed-boarding inference the ledger cannot carry. The failures are concentrated in three places: the two disaster narratives (Fort Lauderdale and Atlanta), where the prose repeatedly outruns the ledger; the regulatory bridge sentence that makes NFPA 72 binding on MWAA; and the cost arithmetic, which is not reproducible from the quantitative analyst's own workbook. Every one of these is fixable. None is optional, because each sits under a load-bearing section.
+
+---
+
+## Findings
+
+### F-1. Atlanta flight count contradicts the draft's own ledger
+
+- **Location:** §"Atlanta, December 17, 2017" — "roughly 1,100 flights were cancelled." Footnote [^13].
+- **Charge:** Citation mismatch.
+- **Evidence:** `airport-emergency-management-director::E-0205` (high confidence): the outage "grounded roughly **1,500** flights." No ledger record contains 1,100. The record also says "grounded," not "cancelled" — different denominators.
+- **Why it matters:** The ATL vignette carries the entire independent-power mandate in the Mandatory tier. A number that contradicts the cited evidence invites the reader to re-audit every other number in the article.
+- **Remedy:** Replace with the ledger figure ("grounded roughly 1,500 flights" per E-0205) or independently source 1,100 cancellations. Do not split the difference.
+
+### F-2. The Atlanta paragraph's causal hinge is unsupported
+
+- **Location:** Same section — "At 12:56 p.m. on a Sunday, an underground fire in a Georgia Power substation… **PA and FIDS went with it.** Announcements were made by megaphone, rebook lists were handed out on paper…"
+- **Charge:** Unsupported; invented construction.
+- **Evidence:** The only ATL records are E-0205 and `…::E-0206` (medium). Between them they support: ~11-hour outage, ~1,500 flights grounded, FAA tower retained power while the terminal did not, DOT tarmac-delay investigation. They do **not** contain: the 12:56 p.m. start time, the substation-fire cause, the loss of PA and FIDS, the megaphones, or the paper rebook lists. The evidence map (§1 honorable mentions) asserted "PA and FIDS lost with commercial power; forced megaphone-and-paper communication" — that is curator drift, not a ledger record; the Strategist inherited it without checking.
+- **Why it matters:** "PA and FIDS went with it" is the causal hinge — it is the only fact that converts a power-outage story into an *emergency-communications* story, which is what the Mandatory-tier UPS/generator requirement rests on. Right now the draft's most prescriptive requirement is anchored to an uncited sentence.
+- **Remedy:** Source the PA/FIDS loss and the megaphone detail from primary reporting or the ATL after-action record (both plausibly verifiable), or rewrite the paragraph around what E-0205/E-0206 actually carry (terminal lost power for ~11 hours while the tower did not; passengers were without normal airport systems). Cut the 12:56 time stamp and the substation-fire attribution unless sourced — they are texture, and unsourced texture is a liability.
+
+### F-3. The Fort Lauderdale after-action review is attributed to the wrong organization
+
+- **Location:** §"Fort Lauderdale, January 6, 2017" — "The Police Executive Research Forum's after-action review, prepared with Broward County Aviation Department…" Footnote [^9].
+- **Charge:** Citation mismatch.
+- **Evidence:** `director-of-public-safety::E-0193` (high confidence) — the AAR URL is `policinginstitute.org/wp-content/uploads/2017/09/Ft.-Lauderdale-Hollywood-International-Airport-AAR.pdf`. That is the **National Policing Institute** (formerly the Police Foundation), not the Police Executive Research Forum. PERF is a different organization. The "prepared with Broward County Aviation Department" co-authorship appears in no ledger record. The evidence map's "PERF/BCAD" attribution is the same error upstream.
+- **Why it matters:** This is the article's opening authority, in its most emotionally exposed section. A sophisticated reader who knows the FLL literature will catch it in one read, and the fact-checker's veto will catch it later at higher cost.
+- **Remedy:** Replace attribution with the Police Foundation / National Policing Institute critical-incident review (the document at the E-0193 URL) and drop the BCAD co-authorship claim unless verified against the report's cover page.
+
+### F-4. The FLL narrative adds scene-setting the record does not contain
+
+- **Location:** Same section — "TSA officers were still walking the terminal…"; "at approximately minute 91"; "Passengers who had received no authoritative message about anything for the previous hour ran"; the AAR "described a **cascading failure of mass notification** and radio interoperability."
+- **Charge:** Invented construction; overstatement.
+- **Evidence:** E-0193 supports: five killed, six wounded, ~90 minutes, false reports of additional gunfire, panic across all four terminals, 50+ additional hospitalizations. `airport-emergency-management-director::E-0203` (medium confidence, newspaper) supports "radio and communications failures **across responding agencies**" — a responder-side interoperability finding reported by a journalist, not the AAR's own characterization of passenger mass notification. "Minute 91" is false precision manufactured from "approximately 90 minutes." The TSA-officers detail and the "no authoritative message for the previous hour" claim appear nowhere.
+- **Why it matters:** FLL is the article's thesis-in-miniature — the claim that the hour-two injuries were a *terminal-communications* failure. If the AAR's actual findings are about inter-agency radio rather than passenger notification, the draft's inference ("caused by the absence of an intelligible, authoritative voice reaching a crowd") is the author's causal reading presented as the report's. It may well be right; the AAR is public and fetchable. But as written it is prosecution of the evidence, not citation of it.
+- **Remedy:** Either (a) verify against the AAR PDF itself and quote its actual findings language, or (b) mark the passenger-notification reading as the article's inference and keep only the ledger-backed facts. Restore "approximately 90 minutes."
+
+### F-5. "Virginia and the District adopt NFPA 72 by reference" is unsupported — and half-irrelevant
+
+- **Location:** §"The peer canon has no numbers" — "Virginia and the District adopt NFPA 72 by reference. A fire marshal already signs to it on every substantially renovated terminal MWAA opens."
+- **Charge:** Unsupported; source-quality failure.
+- **Evidence:** Zero ledger records address state or district building-code adoption of NFPA 72, the applicable code edition on MWAA property, or the authority-having-jurisdiction arrangement at IAD/DCA. Searched: "Virginia" (returns only board-composition and police-jurisdiction records, e.g., E-0144, E-0191), "adopt," "fire code," "statewide" — nothing on point. Separately: both airports sit on MWAA property in Virginia; the District's code adoption is immaterial to either terminal, which suggests the sentence was composed rather than checked.
+- **Why it matters:** This sentence is the bridge that turns NFPA 72 from a model code into a binding obligation MWAA "already signs to." It is the load-bearing move of the entire fire-code framing — the article's title depends on it. It is probably *true* in substance (the Virginia USBC incorporates NFPA 72 via the IBC/IFC reference chain, and MWAA has its own fire-code enforcement arrangement), which makes leaving it unsourced inexcusable.
+- **Remedy:** Source it — Virginia Uniform Statewide Building Code adoption chain plus MWAA's AHJ arrangement — or qualify to "NFPA 72 is the national voice-alarm intelligibility standard incorporated into the model codes Virginia adopts" and drop the DC clause and the fire-marshal-signature claim.
+
+### F-6. The $12M–$40M program figure is not reproducible from its own workbook
+
+- **Location:** Executive summary and §"Timing, arithmetic" — "a full MWAA-wide quiet-by-design stack… sizes to $12M–$40M one-time." Footnote [^8].
+- **Charge:** Recalculate / defend.
+- **Evidence:** `calculations.json`, Exhibit E6. The low input is annotated "sum of E1 low + E5 low": E1's new-build acoustic low is $2.175M and E5's redundancy low is $4.084M — that sums to **$6.3M**, not $12M (using the retrofit-premium low instead gives $5.4M). The high input is "E1 high + E5 high **+ program-wide contingency**" with the contingency never stated: $6.5M + $6.1M = $12.6M, or $17.4M + $6.1M = $23.5M — neither reaches $40M without an unquantified plug. Meanwhile the draft's own description of the stack includes "PA head-end and zoning to the STI floor" and "commissioning-agent scope" — components priced **nowhere** in any exhibit.
+- **Why it matters:** The $12M–$40M number is the affordability spine of the recommendation. Every downstream ratio (0.06%–0.20% of program, $0.03–$0.11 per enplanement, 0.16%–0.54% of CPE) inherits it. A board analyst who opens the workbook will find the arithmetic does not close.
+- **Remedy:** Have the Quantitative Analyst rebuild E6 with each component priced (including PA head-end and commissioning) and the contingency stated, or present the honest version: "the priced components sum to $6M–$24M; PA head-end and commissioning scope are unpriced; $40M is a conservative envelope." The second is defensible today.
+
+### F-7. The per-enplanement and CPE ratios hide three assumptions and mix denominators
+
+- **Location:** Executive summary and §"Timing, arithmetic" — "$0.03–$0.11 per enplanement, or 0.16 to 0.54 percent of **MWAA's** projected 2030 CPE."
+- **Charge:** Denominator error; hidden assumption.
+- **Evidence:** Exhibit E6: (a) the per-enplanement figure is not the one-time cost divided by enplanements — it is **annualized debt service** at an assumed 7.5% factor (labeled ASSUMPTION: "30-year AMT revenue bond at ~4.4% plus reserve"), which the draft never discloses; (b) the enplanement base is "passengers ÷ 2," flagged in E6's own caveat as needing replacement with ACFR figures; (c) the numerator is a two-airport stack (139 IAD + 59 DCA gates), the enplanement denominator is combined IAD+DCA (26.95M), but the "% of program" denominator is the IAD-only announced program, and the $20.71 CPE denominator is **IAD signatory CPE** — DCA's is $8.41 (`infrastructure-economist::E-0003`). Calling $20.71 "MWAA's projected 2030 CPE" is wrong on its face.
+- **Why it matters:** These are exactly the seams an airline rate-hearing analyst pulls. The affordability argument survives the corrections easily — which is the reason to make them.
+- **Remedy:** Recalculate with consistent scope (either IAD-only stack against IAD program and IAD CPE, or two-airport stack against combined denominators), state the debt-service annualization in the footnote, and change "MWAA's projected 2030 CPE" to "IAD's projected 2030 signatory CPE."
+
+### F-8. The "$6.8M midpoint" is not the midpoint of the range it accompanies
+
+- **Location:** §"Timing, arithmetic" — "avoided rework is $1.3M–$17.4M, midpoint $6.8M."
+- **Charge:** Recalculate.
+- **Evidence:** The midpoint of $1.305M–$17.4M is **$9.35M**. The workbook's `midpoint_retrofit_premium_USD: 6,810,000` (≈$15.66/sf × 435,000 sf) is not derivable from any stated combination of its own inputs (midpoint premium per sf is $21.50; midpoints-of-ranges also give $9.35M). The error originates in the quant workbook; the draft repeated it unexamined.
+- **Why it matters:** Small number, large signal: the one exhibit the draft calls "the least contested piece" contains an arithmetic value that fails a one-line check.
+- **Remedy:** Recalculate or delete the midpoint. The range alone does the work.
+
+### F-9. The avoided-rework range applies the premium to 100% of Concourse E and skips the workbook's own haircut
+
+- **Location:** Same paragraph — "Applied to Concourse E's roughly 435,000 square feet, avoided rework is $1.3M–$17.4M."
+- **Charge:** Overstated; cherry-picking.
+- **Evidence:** Exhibit E1's sensitivity block: if the standard touches only holdrooms and circulation (~50% of area — the realistic scope), the range halves to **$0.65M–$8.7M**. E1's caveats also state the unit costs are generic 2026 commercial benchmarks that exclude secure-side badging/escort/after-hours premiums. The draft quotes the full-area range and neither qualification.
+- **Why it matters:** The draft's honesty about the SFO headline earns credibility it then spends here. An airline reviewer will find the 50% scenario in the CSV.
+- **Remedy:** Qualify: cite the 50%-of-area scenario as the base case or present both, and note the benchmarks are non-airport unit costs.
+
+### F-10. The 30–40% "audible surface" estimate: single-source, and the corroboration claim misfires
+
+- **Location:** §"Concourse E, fall 2026" — "the MWAA head-end covers roughly 30 to 40 percent of the audible surface"; footnote [^17]: "four independent working briefs in this run reached the same qualitative conclusion." Plus: "moves the dB meter three or four decibels, not thirty."
+- **Charge:** Unsupported quantification; overstated corroboration.
+- **Evidence:** No ledger record carries the 30–40% figure — it exists only in the COO brief (line 15), unlabeled as to derivation. The only other brief using "30–40%" is virtual-pat (line 43), and it attaches the number to the **inverse** quantity — tenants as 30–40% of ambient sound, implying the head-end side is 60–70%. So of the two numeric statements in the run, one contradicts the one the draft uses. The qualitative convergence (tenant audio sits outside MWAA's head-end) is real across four briefs; the *number* has one source and one contradiction. The "three or four decibels, not thirty" sentence is invented acoustic quantification with no measurement behind it — and thirty decibels is not a plausible outcome of any intervention, so the rhetorical contrast is also technically careless.
+- **Why it matters:** The draft flags the 30–40% as an operating estimate — good — but the footnote's "four independent briefs" claim manufactures corroboration that dissolves on inspection, and the ledger itself (which the fact-checker will work from) contains neither number.
+- **Remedy:** Keep the flag, correct the footnote to "one operating estimate in the COO brief; the qualitative conclusion — that most tenant audio sits outside the head-end — is corroborated across four briefs, though one brief's estimate implies a higher head-end share." Cut or soften the 3-dB/30-dB sentence to a non-numeric formulation.
+
+### F-11. DCA Terminal 1 replacement: imminence overstated, and attached to the wrong dollar figure
+
+- **Location:** Executive summary — "about to procure roughly 5 million square feet… **plus a full replacement of the DCA Terminal 1 main concourse, on capital worth more than $20 billion**"; §"Timing" — "Concourse C/D and DCA Terminal 1 are inside that window today."
+- **Charge:** Overstated; denominator conflation; source-quality failure.
+- **Evidence:** No ledger record establishes a DCA Terminal 1 replacement project. The context packet (explicitly non-primary per evidence map §6) describes an "**eventual** replacement of the Terminal 1 main concourse" as a "**longer-horizon**" item inside the DCA ~$2.39B use-and-lease program, and lists its status — design-phase, procurement-phase, or funded programming only — as an open question (packet §85). The only T1 ledger record, `quantitative-analyst::E-0091`, describes the 1941 building as a historically significant asset constraining retrofit. Separately, the ">$20 billion" is the IAD-only July 2026 announcement (E-0153); the sentence structure sweeps DCA T1 inside it.
+- **Why it matters:** "Inside that window today" is a schedule claim doing timing-urgency work. If DCA T1 is funded programming a decade out, the urgency case rests on Concourse C/D alone — still strong, but different.
+- **Remedy:** Qualify: "the use-and-lease capital plan contemplates an eventual replacement of the DCA Terminal 1 main concourse, on a schedule MWAA has not published." Detach it from the $20B figure. Keep C/D as the urgency anchor.
+
+### F-12. "Nobody has yet written it down" asserts an absence the ledger says is unproven
+
+- **Location:** §"The peer canon" — "The quiet-airport movement and the fire code have been converging on the same terminal from opposite directions for a decade. **Nobody has yet written it down.**" Also the Contrarian answer ("No single existing instrument delivers that"), which never concedes the point.
+- **Charge:** Hidden assumption; missing counterevidence.
+- **Evidence:** Evidence map do-not-claim #3: "'The MWAA Design Manual currently lacks acoustic performance criteria' — the public record is silent, not proven absent." Gap #1 (§5): whether the 2020 Design Manual already contains binding STI, LEQ, RT60, PA-zoning, or hearing-loop requirements is the run's first-ranked unfilled diligence item, named by six briefs. The draft's entire marginal-value argument assumes the answer is no.
+- **Why it matters:** This is the one omission that can embarrass the recommendation in the room. If the Office of Engineering opens Volume 4 and finds an existing acoustic chapter, the article's premise inverts from "write the standard" to "enforce and extend the standard." One conceding sentence inoculates the argument at zero cost — and actually strengthens it, since the remedy (bind, commission, re-verify, reach tenants) survives either answer.
+- **Remedy:** Add the concession: the public record does not establish what the 2020 manual already contains; the first deliverable of the drafting authorization is that diligence read; the recommendation is robust to either finding.
+
+### F-13. The "5 million square feet" figure is sourced to a blog, footnoted to a federal press release
+
+- **Location:** Executive summary and footnote [^1], which attributes the "$20B+ / ~5 million ft²" figures to the USDOT/MWAA July 29, 2026 releases.
+- **Charge:** Citation mismatch.
+- **Evidence:** The only ledger record carrying "more than 5 million square feet" is `infrastructure-economist::E-0005` — **viewfromthewing.com**, journalism, medium confidence. The $20B+ figure is separately supported at high confidence (`airport-ceo::E-0153`). Whether the square-footage appears in the primary releases is unverified in the ledger.
+- **Why it matters:** The run prompt explicitly bars leaning on unverified claims; the fact-checker will trace this footnote. If the number is in the primary release, the fix is one fetch; if not, the article is citing an aviation blog for its opening scale claim.
+- **Remedy:** Verify the figure against the USDOT/MWAA release text at fact-check, or re-attribute to trade press explicitly ("reported at more than 5 million square feet").
+
+### F-14. Two legal conclusions stated with more confidence than the record supports
+
+- **Location:** (a) §"The peer canon" — Schiphol's 48-hour pre-notification "would fail a Part 27 challenge on the U.S. side of the Atlantic before lunch"; (b) §"Atlanta" — "'Reduce PA, add screens' is not a lawful design."
+- **Charge:** Overstated.
+- **Evidence:** The regulatory records (E-0132, E-0133, `…::E-0135`, ADAAG E-0099/E-0187) support the *requirements* — visual paging as a grant condition, equal-information obligations on carriers, paired audible/visual alarms. No record contains an adjudication, DOT enforcement action, or guidance letter on pre-notification models or on visual-substitution designs. Both sentences are the analyst's legal inference dressed as settled law.
+- **Why it matters:** The inferences are probably sound, and the "before lunch" line is good prose. But an audience that includes counsel will register the difference between "382.53 requires equal access to information" (cited fact) and "this design is unlawful" (uncited conclusion).
+- **Remedy:** Qualify: "sits squarely against the effective-communication requirements of Part 27" / "is not a design that satisfies the accessibility floor as written." Same punch, defensible sourcing.
+
+### F-15. Counterevidence named but not answered; counterevidence omitted entirely
+
+- **Location:** §"The Contrarian objection, answered."
+- **Charge:** Missing counterevidence.
+- **Evidence:** (a) The paragraph lists "The Board has not asked for this" among the objections, then answers only the integration and ossification points — the opportunity-cost objection (evidence map §4.6, from the Airport CEO brief) is raised and left standing. (b) The DOT ACAA/PRM rulemaking direction (map §4.5: the federal accessible-information baseline is moving toward *more* real-time information, 2024–2025 revisions unverified in final-rule text) appears nowhere in the draft; it is both a risk (moving compliance target) and an argument *for* the standard (build the redundant channels once, ahead of the mandate). (c) The "current Board officer term" adoption window and "all scopes not yet advertised" are schedule assertions with no ledger record on C/D advertisement dates — the window may be real, but nothing in the file establishes its width.
+- **Remedy:** Answer the Board-demand objection in one sentence (the July 2026 announcement *is* the Board's question; the standard is the answer to how the program gets specified). Add the rulemaking direction as a paragraph-level point. Qualify the procurement window as management's-best-understanding, pending the C/D procurement schedule.
+
+### F-16. Small staleness and consistency items
+
+- **Charge:** Stale data; minor inconsistency. (a) "$12.77 **today**": the figure is the 2025A OS forecast base, quoted through Bond Buyer (E-0003); `airline-commercial-strategist::E-0114` separately reports 2024 actual CPE at $12.88. In August 2026, "today" is unsupported — write "from a $12.77 base in the 2025 forecast." (b) American's 53% DCA share is year-end 2024 (E-0117); footnote dates it correctly, body says "is… at more than half" in present tense across a year in which DCA traffic fell 5.4% and its slot mix changed — add "as of year-end 2024." (c) Copenhagen appears in the exec-summary peer list on a single low-confidence secondary (E-0072, correctly flagged in [^6]); consider whether it earns exec-summary placement at all. (d) "roughly 198 combined gates" is 139+59, both ASSUMPTION-labeled in E5 with "MWAA public counts vary by counting rule" — add "approximately… depending on counting rule" or drop the precision.
+- **Remedy:** Qualify each as noted.
+
+---
+
+## Claim-to-evidence coverage summary
+
+Of the draft's 24 footnotes: **17 trace cleanly** to ledger clusters at medium-high confidence or better ([^2]–[^7], [^10]–[^12], [^14]–[^16], [^18]–[^19], [^21]–[^24]). **Five are compromised**: [^1] (square-footage attribution, F-13), [^8] (non-reproducible arithmetic, F-6/7/8/9), [^9] (wrong AAR author plus narrative excess, F-3/4), [^13] (contradicted flight count plus unsupported causal hinge, F-1/2), [^17] (self-referential, corroboration overstated, F-10). One in-text claim carries no footnote at all and needs one: the Virginia/DC code-adoption bridge (F-5). No footnote is fabricated; the pattern is drift and embellishment at the edges of real evidence, not invention of sources.
+
+## The five most load-bearing claims, and whether each survives
+
+1. **NFPA 72 / ACRP 175 / IEC 60268-16 define a testable intelligibility floor.** SURVIVES. Ten-plus corroborating records, primary regulation and TRB research (E-0073/74 cluster, E-0019 cluster, E-0042/52). The single best-supported proposition in the file. The *bridge* making it binding on MWAA (F-5) needs a source.
+2. **The Design Manual is the enforceable vehicle ("force of law").** SURVIVES, with two caveats: the six-agent "corroboration" is six quotations of the same MWAA self-description, not independent verification; and what the manual already contains is unproven (F-12).
+3. **The federal accessibility floor (49 CFR 27.71, 14 CFR 382.53, ADAAG) mandates redundant channels.** SURVIVES. Direct eCFR sourcing (E-0132/E-0133). Note 27.71 rests on a single agent's find — flag for fact-check priority, since so much of the argument stands on it.
+4. **The cost is trivial relative to the program ($12M–$40M; $0.03–$0.11/enplanement).** DOES NOT SURVIVE AS STATED. The direction is safe; the figures are not reproducible and the denominators are mixed (F-6, F-7, F-8, F-9). This is the draft's largest repair job.
+5. **The adoption window is now (before C/D and DCA T1 scopes harden).** SURVIVES FOR C/D ONLY. The C/D urgency is real and evidenced; DCA T1 imminence and the "scopes not yet advertised" window are asserted, not shown (F-11, F-15c).
+
+## Counterevidence minimized or omitted
+
+- The unanswered Board-demand/opportunity-cost objection (F-15a).
+- The DOT ACAA/PRM rulemaking direction — omitted entirely (F-15b).
+- Virtual-pat's inverse tenant-audio estimate, which cuts against the 30–40% figure the draft uses (F-10).
+- The possibility that the 2020 Design Manual already contains acoustic criteria (F-12).
+- The E1 sensitivity scenario halving the avoided-rework range (F-9).
+
+## Narrative flourish outrunning the factual record
+
+The FLL scene-setting (TSA officers, "minute 91," the hour of silence — F-4); the ATL timestamp and megaphones (F-2); "three or four decibels, not thirty" (F-10); "would fail a Part 27 challenge before lunch" (F-14); "an airport still counting the funerals" — eighteen months after the accident, this reads as emotional inflation of NTSB facts the draft otherwise handles with discipline; and "United, which co-authored the Concourse E and the July 2026 transformation" — United co-announced and co-invested; "co-authored" is unevidenced. Also noted for the Editor's jurisdiction, not mine: the draft self-declares ~2,200 words against a 1,500–2,000 word contract.
+
+## Acquittals — important claims that are well supported
+
+- **The SFO treatment** (traceable 47%/60% vs. self-reported 40%/90-minute, mechanism over headline) is exemplary — the draft does the curator's do-not-claim #4 exactly right (E-0032, E-0054).
+- **The NTSB handling**: probable cause stated accurately, terminal communications explicitly not attached (do-not-claim #14 respected); the AIR-26-02 report number is supported by the E-0155 URL (`AIR2602.pdf`); Route 4 removal and dates corroborated three ways (E-0138, E-0216, E-0230).
+- **The alarm-fatigue firewall** ("the medical numbers do not transfer… the mechanism does") — precisely the right epistemic posture.
+- **Dubai and Denver-Southwest** both carried with their correct flags (operator-reported; single-source illustrative).
+- **Traffic and share statistics**: IAD 29.01M/10.53M international (36.3% checks out), DCA 24.89M/−5.4%, American ~53% (E-0117), slot exemptions and Section 502 dates (E-0118/0139/0156/0157) — all clean.
+- **Concourse E facts**: 435,000 sf, 14 gates, 40,000-sf club, $898.2M Tier 2 / $235.8M grants (E-0082, E-0113, E-0227, E-0260) — correctly kept distinct from the ~$500M concourse-only figure.
+- **Sensory-room and hearing-loop precedents** (PIT/ATL/IND; MSP/PANYNJ) — supported (E-0067/68/71, E-0069/70/0254).
+- **The refusal to claim operational outcomes for silent-airport policies** — the draft's most important act of restraint, held consistently from the executive summary onward.
+
+---
+
+*Answer format request to the Strategist: respond finding-by-finding (F-1 through F-16) in the v2 revision notes — remedy applied, or defense with evidence IDs.*
