@@ -79,12 +79,25 @@ any adjustments}}
 
 ## Length
 
-{{FINAL DOCUMENT LENGTH — for example: "8,000-10,000 words for the full report;
-~1,100-word executive summary. This is a substantive piece, not a blog post."}}
+{{FINAL DOCUMENT LENGTH — default: "A 1,500–2,000-word narrative feature —
+one continuous argument, no appendices or separate executive summary."}}
 
 ## Output format
 
-{{report | article | brief | recommendations}}
+{{article (default) | report | brief | recommendations}}
+
+## Lines of inquiry (optional)
+
+<!--
+Promising threads, not assignments or a required outline. Name the tensions,
+comparisons, hidden numbers, places, people, or counter-cases most likely to
+make the argument surprising. Delete this section if you want the research
+swarm to discover its own paths.
+-->
+
+- {{THREAD WORTH FOLLOWING}}
+- {{REVEALING COMPARISON OR CASE}}
+- {{STRONGEST COUNTER-CASE}}
 
 ## What this is NOT
 
@@ -116,12 +129,13 @@ thesis applies to" section instead.
 
 {{OPERATOR CONTEXT — or delete this section if the run is industry-wide}}
 
-## Decision frame (recommended)
+## Decision frame (optional — delete this section for the narrative default)
 
 <!--
-This is the Council v2 difference between an interesting report and an
-assignable airport decision. Fill what you know. Use "(research and state
-explicitly)" for anything the Council should establish from evidence.
+Use this only when the work must support a named choice, owner, and approval
+path. Its absence is intentional: the Council will write a compelling narrative
+without inventing assignments. If you opt in, fill what you know and use
+"(research and state explicitly)" only for gaps the evidence should establish.
 -->
 
 - **Decision required:** {{WHAT CHOICE SHOULD THIS WORK ENABLE?}}

@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The AI Council</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f2f4f8'/%3E%3Cpath d='M32 12 52 50H12Z' fill='%234f46e5'/%3E%3Ccircle cx='32' cy='35' r='7' fill='%23ffffff'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
@@ -29,9 +30,10 @@
     </div>
 
     <nav class="side-nav">
-      <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New Research Report</button>
+      <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New Council piece</button>
       <button class="side-link" data-nav="scope"><span class="sl-ic">⛭</span> Fulfill a scope</button>
       <button class="side-link" data-nav="strengthen"><span class="sl-ic">◆</span> Strengthen an argument</button>
+      <button class="side-link" data-nav="how"><span class="sl-ic">→</span> How it works</button>
       <button class="side-link" data-nav="agents"><span class="sl-ic">◌</span> Meet the Council</button>
       <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
       <button class="side-link" data-nav="audit"><span class="sl-ic">◎</span> Council audit</button>
@@ -60,6 +62,7 @@
       <button data-nav="configure"><span>✦</span>New</button>
       <button data-nav="scope"><span>⛭</span>Scope</button>
       <button data-nav="strengthen"><span>◆</span>Argument</button>
+      <button data-nav="how"><span>→</span>How</button>
       <button data-nav="agents"><span>◌</span>Council</button>
       <button data-nav="library"><span>▦</span>Library</button>
       <button data-nav="audit"><span>◎</span>Audit</button>
@@ -84,7 +87,8 @@
           <span class="cap-chip"><b>◉</b> Live agent telemetry</span>
         </div>
         <div class="hero-actions">
-          <button id="home-new" class="btn-primary big">Begin a new report →</button>
+          <button id="home-new" class="btn-primary big">Begin a new piece →</button>
+          <button id="home-how" class="ghost-btn big">See how it works</button>
           <button id="home-council" class="ghost-btn big">Meet the Council</button>
         </div>
         <div class="hero-stats">
@@ -99,6 +103,168 @@
 
       <div class="section-head"><h2>Recent reports</h2><button class="link-btn" data-nav="library">View all →</button></div>
       <div id="home-archives" class="archive-grid"></div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="view-how" class="view hidden">
+      <header class="how-board-header">
+        <div class="how-board-title">
+          <div class="how-eyebrow">Council operating model <span>Decision assurance architecture</span></div>
+          <h1>A controlled decision system—not a chatbot.</h1>
+          <p>Independent inquiry, adversarial challenge, claim-level verification, and hash-bound executive production—under explicit human control.</p>
+        </div>
+        <div class="how-metrics" aria-label="Council operating model metrics">
+          <span><b>54</b> available roles</span>
+          <span><b>38</b> research roles</span>
+          <span><b>16</b> process roles</span>
+          <span><b>4</b> controlled stages</span>
+          <span><b>2</b> human gates</span>
+        </div>
+      </header>
+
+      <div class="how-architecture" aria-label="Decision Assurance Architecture: four controlled stages and two human checkpoints">
+        <div class="how-control-plane" aria-label="Control plane">
+          <b>Control plane</b>
+          <span>Orchestrator</span><i>◆</i><span>Run manifest</span><i>◆</i><span>Dependency receipts</span><i>◆</i><span>Live cost / ceiling</span><i>◆</i><span>Durable event journal</span>
+          <em>govern · meter · resume</em>
+        </div>
+
+        <div class="how-flow-grid">
+          <section class="how-boundary" aria-labelledby="how-boundary-title">
+            <div class="how-zone-label">Input contract</div>
+            <h2 id="how-boundary-title">Decision<br />boundary</h2>
+            <p>Bound the question before compute.</p>
+            <ul>
+              <li>Falsifiable thesis</li>
+              <li>Decision owner</li>
+              <li>Local constraints</li>
+              <li>Source material</li>
+              <li>Budget ceiling</li>
+            </ul>
+            <div class="how-flow-out" aria-hidden="true">→</div>
+          </section>
+
+          <article class="how-stage how-stage-inquiry" data-stage="1" aria-labelledby="how-stage-1-title">
+            <div class="how-stage-head"><b>01</b><span id="how-stage-1-title">Independent inquiry</span></div>
+            <p class="how-stage-summary">Parallel specialists, separate briefs</p>
+            <div class="how-context-node"><small>Shared context</small><strong>One fact base</strong></div>
+            <div class="how-motion-rig how-inquiry-rig" role="img" aria-label="Eight illustrated selected-agent workstreams descend independently into eight separate brief documents; up to 38 research roles are available">
+              <span class="how-rig-caption">8 shown · up to 38 available</span>
+              <svg viewBox="0 0 160 104" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <g class="how-independent-brief" style="--flow-delay:0s"><circle cx="11" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M11 14V77"/><g class="how-brief-page" transform="translate(5 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-.2s"><circle cx="31" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M31 14V77"/><g class="how-brief-page" transform="translate(25 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-.4s"><circle cx="51" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M51 14V77"/><g class="how-brief-page" transform="translate(45 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-.6s"><circle cx="71" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M71 14V77"/><g class="how-brief-page" transform="translate(65 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-.8s"><circle cx="91" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M91 14V77"/><g class="how-brief-page" transform="translate(85 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-1s"><circle cx="111" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M111 14V77"/><g class="how-brief-page" transform="translate(105 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-1.2s"><circle cx="131" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M131 14V77"/><g class="how-brief-page" transform="translate(125 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+                <g class="how-independent-brief" style="--flow-delay:-1.4s"><circle cx="151" cy="8" r="3"/><path class="how-inquiry-line" pathLength="1" d="M151 14V77"/><g class="how-brief-page" transform="translate(145 84)"><rect class="how-page-sheet" width="12" height="16" rx="1"/><rect class="how-page-rule" x="2" y="4" width="8" height="1"/><rect class="how-page-rule" x="2" y="7" width="7" height="1"/></g></g>
+              </svg>
+              <strong class="how-rig-outcome">8 separate brief documents</strong>
+            </div>
+            <div class="how-curator-node">
+              <small>Evidence curator</small>
+              <div><span>Accept</span><span>Reject</span><span>Rank</span></div>
+            </div>
+            <div class="how-ledger-node"><i aria-hidden="true">▦</i><span><small>Controlled artifact</small><strong>Evidence ledger</strong></span></div>
+            <p class="how-separation-rule">Researchers cannot admit their own evidence.</p>
+          </article>
+
+          <article class="how-stage how-stage-synthesis" data-stage="2" aria-labelledby="how-stage-2-title">
+            <div class="how-stage-head"><b>02</b><span id="how-stage-2-title">Adversarial synthesis</span></div>
+            <p class="how-stage-summary">Arguments attacked and rewritten</p>
+            <div class="how-frame-flow" aria-label="Three narrative frames converge on the strategist">
+              <span>Frame A</span><span>Frame B</span><span>Frame C</span><i>↓</i><strong>Strategist</strong>
+            </div>
+            <div class="how-motion-rig how-debate-rig" role="img" aria-label="Three descending argument streams show the Evidence Prosecutor challenging the draft, the Strategist rewriting it, the Airport Executive Reviewer challenging the revision, and the Strategist rewriting again">
+              <span class="how-rig-caption">Three argument streams</span>
+              <div class="how-debate-legend"><span>Evidence</span><span>Strategist</span><span>Executive</span></div>
+              <svg viewBox="0 0 160 108" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path class="how-debate-line evidence" pathLength="1" d="M26 10C132 20 28 34 132 46S28 70 132 82S30 100 116 106"/>
+                <path class="how-debate-line strategist" pathLength="1" d="M80 10C30 22 132 34 38 48S128 70 34 84S126 98 80 106"/>
+                <path class="how-debate-line executive" pathLength="1" d="M134 10C28 20 132 34 28 46S132 70 28 82S130 100 44 106"/>
+              </svg>
+              <strong class="how-rig-outcome">Challenge ↔ rewrite ↔ challenge</strong>
+            </div>
+            <div class="how-revised-node"><small>Surviving case</small><strong>Revised argument</strong></div>
+          </article>
+
+          <aside class="how-gate" data-gate="1" aria-label="Human checkpoint 1: argument direction">
+            <b>Human checkpoint 1</b><span>Argument direction</span><i aria-hidden="true">◆</i>
+          </aside>
+
+          <article class="how-stage how-stage-verification" data-stage="3" aria-labelledby="how-stage-3-title">
+            <div class="how-stage-head"><b>03</b><span id="how-stage-3-title">Claim verification</span></div>
+            <p class="how-stage-summary">Material claims earn lineage</p>
+            <div class="how-verify-chain" aria-label="Editorial and verification sequence">
+              <span>Editor</span><i>→</i><span>Humanizer</span><i>→</i><span>Fact-checker</span><i>→</i><strong>Code gate</strong>
+            </div>
+            <div class="how-motion-rig how-fact-rig" role="img" aria-label="One scan line moves quickly from a primary source to the material claim and back, repeatedly checking the claim through its evidence ID">
+              <span class="how-rig-caption">Rapid claim-to-source check</span>
+              <div class="how-fact-labels"><span>Material claim</span><span>Evidence ID</span><span>Primary source</span></div>
+              <svg viewBox="0 0 160 108" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <circle cx="80" cy="18" r="3"/><circle cx="80" cy="55" r="2"/><circle cx="80" cy="92" r="3"/>
+                <line class="how-fact-scan" x1="24" y1="92" x2="136" y2="92"/>
+              </svg>
+              <strong class="how-rig-outcome">Claim ↕ evidence ↕ source</strong>
+            </div>
+            <div class="how-gate-result"><span class="pass">Pass</span><span class="block">Block</span></div>
+            <p class="how-separation-rule">No producing role controls its own gate.</p>
+          </article>
+
+          <aside class="how-gate" data-gate="2" aria-label="Human checkpoint 2: verified draft">
+            <b>Human checkpoint 2</b><span>Verified draft</span><i aria-hidden="true">◆</i>
+          </aside>
+
+          <article class="how-stage how-stage-production" data-stage="4" aria-labelledby="how-stage-4-title">
+            <div class="how-stage-head"><b>04</b><span id="how-stage-4-title">Executive production</span></div>
+            <p class="how-stage-summary">Rendered packages pass inspection</p>
+            <div class="how-art-direction"><small>Art direction</small><strong>Visual system + narrative rhythm</strong></div>
+            <div class="how-build-fork" aria-label="Parallel Word and optional presentation builders">
+              <span><b>Word builder</b><small>DOCX</small></span>
+              <i aria-hidden="true">↓</i>
+              <span><b>Deck builder</b><small>optional PPTX</small></span>
+            </div>
+            <div class="how-motion-rig how-package-rig" role="img" aria-label="Two separate creation streams show the Word document and, when requested, optional PowerPoint deck shimmying through build and render toward inspected packages">
+              <div class="how-package-legend"><span>Word · DOCX</span><span>PowerPoint · optional</span></div>
+              <svg viewBox="0 0 160 108" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <path class="how-package-line word" pathLength="1" d="M48 8C38 19 58 29 48 40S38 60 48 70S58 90 48 98"/>
+                <path class="how-package-line deck" pathLength="1" d="M112 8C122 19 102 29 112 40S122 60 112 70S102 90 112 98"/>
+                <g class="how-package-page word" transform="translate(42 91)"><rect width="12" height="14" rx="1"/><text x="6" y="10">W</text></g>
+                <g class="how-package-page deck" transform="translate(106 91)"><rect width="12" height="14" rx="1"/><text x="6" y="10">P</text></g>
+              </svg>
+              <strong class="how-rig-outcome">Build · render · inspect</strong>
+            </div>
+            <div class="how-production-chain"><span>Full-size render</span><i>↓</i><span>Visual QA</span><i>↓</i><strong>Package hash</strong></div>
+          </article>
+
+          <section class="how-release-vault" aria-labelledby="how-release-title">
+            <div class="how-zone-label">Immutable release</div>
+            <h2 id="how-release-title">Release<br />vault</h2>
+            <ul>
+              <li>DOCX</li>
+              <li>Optional PPTX</li>
+              <li>QA receipts</li>
+              <li>Exact prompt + source snapshot</li>
+              <li>Run archive</li>
+            </ul>
+            <div class="how-release-seal"><i aria-hidden="true">✓</i><b>Hash-bound</b><span>Library ready</span></div>
+          </section>
+        </div>
+
+        <div class="how-provenance-bus" aria-label="Provenance bus">
+          <b>Provenance bus</b>
+          <span>Context</span><i>→</i><span>Independent briefs</span><i>→</i><span>Accepted evidence</span><i>→</i><span>Claim lineage</span><i>→</i><span>Visual QA</span><i>→</i><span>Release SHA</span>
+          <em>Restart from last validated artifact</em>
+        </div>
+      </div>
+
+      <aside class="how-speaker-rail" aria-label="Executive walkthrough cues">
+        <span><b>01 · Diverge</b>Selected lenses investigate independently.</span>
+        <span><b>02 · Contest</b>Two adversaries force revision.</span>
+        <span><b>03 · Verify</b>Material claims resolve to checked sources.</span>
+        <span><b>04 · Release</b>Rendered files are hash-bound.</span>
+      </aside>
     </section>
 
     <!-- AGENT CATALOG -->
@@ -147,6 +313,35 @@
             <button id="guide-btn" class="ghost-btn">📖 Writing guide</button>
           </div>
 
+          <section class="prompt-coach" aria-labelledby="prompt-coach-title">
+            <div class="prompt-coach-head">
+              <div>
+                <span class="coach-mark" aria-hidden="true">✦</span>
+                <div><h3 id="prompt-coach-title">AI Prompt Coach</h3><p>Turn a rough idea into a thesis people will want to read.</p></div>
+              </div>
+              <span class="coach-safe">GPT-5.6 Sol · form only</span>
+            </div>
+            <label class="field-label" for="prompt-coach-brief">What are you curious about?</label>
+            <textarea id="prompt-coach-brief" class="text-input" rows="3" maxlength="12000" placeholder="Explain it as you would to a smart colleague. What is surprising, unresolved, misunderstood, or wrong about the conventional answer?"></textarea>
+            <div class="prompt-coach-actions">
+              <button id="prompt-coach-draft" type="button" class="btn-primary">Draft this form</button>
+              <span id="prompt-coach-status" class="muted" role="status" aria-live="polite">No report is started and no files are created.</span>
+            </div>
+            <div id="prompt-coach-preview" class="coach-preview hidden" aria-live="polite" aria-labelledby="coach-review-title">
+              <div class="coach-review-head">
+                <div><span class="coach-preview-label">Field-by-field review</span><h4 id="coach-review-title">Choose exactly what the coach may change</h4></div>
+                <span id="coach-selection-summary" class="muted"></span>
+              </div>
+              <p class="coach-review-note">Every active field appears below. A blank suggestion can never erase your writing.</p>
+              <div id="coach-preview-fields" class="coach-diff-list" role="list"></div>
+              <div id="coach-uncertainties-wrap" class="coach-uncertainties hidden"><span class="coach-preview-label">Keep these unknowns visible</span><ul id="coach-preview-uncertainties"></ul></div>
+              <div class="prompt-coach-actions preview-actions">
+                <button id="prompt-coach-discard" type="button" class="ghost-btn">Discard</button>
+                <button id="prompt-coach-apply" type="button" class="btn-primary">Apply selected changes</button>
+              </div>
+            </div>
+          </section>
+
           <label class="field-label" for="f-title">Title</label>
           <input id="f-title" class="text-input" placeholder="A short headline for this report" />
           <p class="field-hint">Subject <em>and</em> angle, under ~8 words — it becomes the filename and the cover.</p>
@@ -167,18 +362,18 @@
 
           <div class="two-col">
             <div>
-              <label class="field-label" for="f-scope">Scope <span class="opt">optional</span></label>
-              <textarea id="f-scope" class="text-input" rows="5" placeholder="One item per line — each becomes a research assignment and a success criterion."></textarea>
+              <label class="field-label" for="f-scope">Lines of inquiry <span class="opt">optional</span></label>
+              <textarea id="f-scope" class="text-input" rows="5" placeholder="One thread per line — a tension, revealing comparison, hidden number, place, character, or counter-case worth following."></textarea>
               <div class="field-hint">
-                Name what to compare, where to look, or what would settle it. 5–8 items is the sweet spot.
+                Name what could make the story surprising or change the reader's mind. 5–8 threads is the sweet spot.
                 <details class="hint-more"><summary>Patterns that work</summary>
                   <ul>
                     <li><b>Failure taxonomy</b> — "catalog 6–10 deployments that failed, and the decision that doomed each."</li>
                     <li><b>Named benchmarks</b> — "how do high performers (FRA, AMS, ATL) actually do this?"</li>
                     <li><b>The hidden number</b> — "stated read rates vs. real performance after 2–3 years."</li>
-                    <li><b>Decision framework</b> — end with "decision framework, not preferences."</li>
+                    <li><b>Human stakes</b> — "who experiences this system differently from the people who designed it?"</li>
                     <li><b>What actually happens</b> — "…and why does it differ from what enterprise IT recommends?"</li>
-                    <li>Tie the last item to the decision you actually face.</li>
+                    <li>Use the last line for the question you most want answered.</li>
                   </ul>
                 </details>
               </div>
@@ -200,11 +395,17 @@
             </div>
           </div>
 
-          <details class="decision-frame">
-            <summary>Decision frame <span class="opt">recommended for airport-specific work</span></summary>
-            <p class="field-hint">These fields force the Council to produce an assignable decision, not a generic conclusion. Leave an unknown blank and the research team will identify it as a gap.</p>
-            <label class="field-label" for="f-operator-context">Airport or operator context</label>
-            <textarea id="f-operator-context" class="text-input" rows="3" placeholder="Named airport or authority, current program, constraints, attached plans, agreements, financial documents, or operating conditions."></textarea>
+          <label class="field-label" for="f-operator-context">Airport or operator context <span class="opt">optional</span></label>
+          <textarea id="f-operator-context" class="text-input" rows="3" placeholder="Named airport or authority, relevant places, people, programs, constraints, attached plans, or operating conditions."></textarea>
+
+          <section class="decision-frame" aria-labelledby="decision-frame-label">
+            <label class="decision-frame-choice" for="f-decision-frame-enabled">
+              <input type="checkbox" id="f-decision-frame-enabled" />
+              <span><b id="decision-frame-label">Add a decision frame</b><small>Optional. Use this only when the piece must support a named choice, owner, and approval path.</small></span>
+            </label>
+            <fieldset id="decision-frame-fields" class="decision-frame-fields hidden" disabled>
+              <legend class="sr-only">Optional decision-frame details</legend>
+              <p class="field-hint">Leave an unknown blank and the Council will preserve it as a research gap rather than inventing an answer.</p>
             <div class="two-col">
               <div>
                 <label class="field-label" for="f-decision">Decision required</label>
@@ -225,7 +426,8 @@
             </div>
             <label class="field-label" for="f-success-measure">Success measure</label>
             <input id="f-success-measure" class="text-input" placeholder="The measurable condition that would prove the decision worked" />
-          </details>
+            </fieldset>
+          </section>
 
           <label class="field-label">Output format</label>
           <div id="format-pills" class="pill-row"></div>
@@ -259,7 +461,7 @@
             <label class="deck-mode-label" for="f-deck-mode">Deck mode
               <select id="f-deck-mode" class="select-input">
                 <option value="board_decision">Board decision · 8–12 slides</option>
-                <option value="executive_briefing">Executive briefing · 12–18 slides</option>
+                <option value="executive_briefing" selected>Executive story · 12–18 slides</option>
                 <option value="technical_read_ahead">Technical read-ahead · 15–25 slides</option>
               </select>
             </label>
@@ -432,7 +634,7 @@
     <!-- LIBRARY -->
     <section id="view-library" class="view hidden">
       <div class="section-head"><h1>Library</h1></div>
-      <p class="library-intro">Open the finished work, download its executive package, or inspect the prompt that framed the Council’s assignment. A verified badge means the prompt’s bytes match the archived run manifest; older candidates are labeled plainly.</p>
+      <p class="library-intro">Open the finished work, download its executive package, or inspect the prompt that framed the Council’s inquiry. Edit changes only the card’s display details; report evidence and release bytes stay immutable. Move to Trash withdraws every Council-owned file in the report family after an exact preview, and remains recoverable.</p>
       <div id="library-grid" class="archive-grid"></div>
     </section>
 
@@ -443,6 +645,72 @@
     </section>
 
   </main>
+</div>
+
+<!-- AGENT PROFILE -->
+<div id="agent-profile-overlay" class="overlay hidden" aria-hidden="true">
+  <article class="overlay-panel agent-profile-panel" role="dialog" aria-modal="true" aria-labelledby="agent-profile-title" aria-describedby="agent-profile-description" tabindex="-1">
+    <header class="agent-profile-hero">
+      <div id="agent-profile-monogram" class="agent-profile-monogram" aria-hidden="true">AC</div>
+      <div class="agent-profile-heading">
+        <div id="agent-profile-kind" class="agent-profile-kind">Council role</div>
+        <h2 id="agent-profile-title">Agent profile</h2>
+        <p id="agent-profile-description"></p>
+      </div>
+      <button id="agent-profile-close" type="button" class="ghost-btn agent-profile-close" aria-label="Close agent profile">✕ Close</button>
+    </header>
+    <div class="agent-profile-bar" aria-label="Profile metadata">
+      <span id="agent-profile-stage">Independent research</span>
+      <i aria-hidden="true">◆</i>
+      <span>Full operational charter</span>
+      <i aria-hidden="true">◆</i>
+      <span>Browse only · starts nothing</span>
+      <span id="agent-profile-status" class="sr-only" role="status" aria-live="polite"></span>
+    </div>
+    <div id="agent-profile-body" class="agent-profile-body" role="document" aria-label="Complete operational charter" tabindex="0">Loading the complete profile…</div>
+  </article>
+</div>
+
+<!-- LIBRARY DETAILS -->
+<div id="library-edit-overlay" class="overlay hidden" aria-hidden="true">
+  <div class="overlay-panel small" role="dialog" aria-modal="true" aria-labelledby="library-edit-title" aria-describedby="library-edit-description" tabindex="-1">
+    <div class="guide-head">
+      <div><div class="prompt-provenance exact">Display metadata only</div><h2 id="library-edit-title">Edit Library details</h2></div>
+      <button id="library-edit-close" type="button" class="ghost-btn" aria-label="Close Library details dialog">✕ Close</button>
+    </div>
+    <p id="library-edit-description" class="muted library-modal-copy">This changes the Library card, never the archived prompt, report, evidence, manifest, Word package, or deck.</p>
+    <label class="field-label" for="library-edit-name">Display title</label>
+    <input id="library-edit-name" class="text-input" maxlength="200" />
+    <label class="field-label" for="library-edit-summary">Short summary <span class="opt">optional</span></label>
+    <textarea id="library-edit-summary" class="text-input" rows="4" maxlength="1000" placeholder="What decision does this work help an executive make?"></textarea>
+    <label class="field-label" for="library-edit-tags">Tags <span class="opt">optional · comma separated</span></label>
+    <input id="library-edit-tags" class="text-input" maxlength="600" placeholder="Capital, Board, Terminal planning" />
+    <div class="cp-actions library-modal-actions">
+      <span id="library-edit-status" class="muted" role="status"></span>
+      <button id="library-edit-cancel" type="button" class="cp-btn ghost">Cancel</button>
+      <button id="library-edit-save" type="button" class="cp-btn primary">Save details</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIBRARY DELETE PREVIEW -->
+<div id="library-delete-overlay" class="overlay hidden" aria-hidden="true">
+  <div class="overlay-panel delete-panel" role="dialog" aria-modal="true" aria-labelledby="library-delete-title" aria-describedby="library-delete-explanation" tabindex="-1">
+    <div class="guide-head">
+      <div><div class="prompt-provenance error">Permanent deletion</div><h2 id="library-delete-title">Delete report family</h2></div>
+      <button id="library-delete-close" type="button" class="ghost-btn" aria-label="Close Library deletion dialog">✕ Close</button>
+    </div>
+    <p id="library-delete-explanation" class="library-modal-copy">Loading the exact artifact inventory…</p>
+    <div id="library-delete-summary" class="delete-summary" aria-live="polite"></div>
+    <div id="library-delete-groups" class="delete-groups"></div>
+    <div class="delete-ready"><b>Confirm permanent deletion</b><span>No hash typing required. This action cannot be undone.</span></div>
+    <p class="field-hint">External originals are never touched. The Council-owned prompt, source copies, archives, revisions, packages, QA, metadata, and historical release bundles are deleted together so no orphaned files remain.</p>
+    <div class="cp-actions library-modal-actions">
+      <span id="library-delete-status" class="muted" role="status"></span>
+      <button id="library-delete-cancel" type="button" class="cp-btn ghost">Cancel</button>
+      <button id="library-delete-go" type="button" class="cp-btn danger" disabled>Delete entire family permanently</button>
+    </div>
+  </div>
 </div>
 
 <!-- CHECKPOINT -->
@@ -500,6 +768,12 @@
       <button class="cp-btn primary" id="revise-go">Start revision</button>
     </div>
   </div>
+</div>
+
+<div id="library-toast" class="library-toast hidden" role="status" aria-live="polite">
+  <span id="library-toast-message"></span>
+  <button id="library-toast-undo" class="ghost-btn">Undo</button>
+  <button id="library-toast-close" class="toast-close" aria-label="Dismiss">×</button>
 </div>
 
 <span id="cost-pill" class="hidden"></span>

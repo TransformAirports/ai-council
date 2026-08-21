@@ -80,6 +80,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--resume", nargs="?", const="__detect__", metavar="SLUG",
                    help="Deep link: resume an interrupted run (auto-detected if no slug).")
     p.add_argument("--audit", action="store_true", help="Deep link: council audit.")
+    p.add_argument(
+        "--doctor",
+        action="store_true",
+        help="Check authentication, renderers, disk, configuration, and local dependencies without a model call.",
+    )
     p.add_argument("--publish", nargs="?", const="__all__", metavar="SLUG",
                    help="Deep link: re-publish archived runs (all, or one slug).")
     p.add_argument(
@@ -126,9 +131,15 @@ def _friendly_failure(exc: Exception) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
-    from cli import menu
 
     try:
+        if args.doctor:
+            from cli.doctor import run_doctor
+
+            return run_doctor(REPO_ROOT, console=console)
+
+        from cli import menu
+
         if args.run and (args.dry_run or args.skip_prompts):
             console.print(
                 "[red]--run cannot be combined with --dry-run or "

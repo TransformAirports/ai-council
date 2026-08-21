@@ -21,6 +21,10 @@ if [ ! -x "$VENV/bin/council" ]; then
     echo "Error: python3 is not installed. Install Python 3.11+ and try again." >&2
     exit 1
   fi
+  if ! python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)'; then
+    echo "Error: Python 3.11 or newer is required. Current version: $(python3 --version 2>&1)" >&2
+    exit 1
+  fi
   python3 -m venv "$VENV"
   "$VENV/bin/pip" install --quiet --upgrade pip
   "$VENV/bin/pip" install --quiet -e "$REPO_ROOT"

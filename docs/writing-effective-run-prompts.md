@@ -18,9 +18,9 @@ These aren't just form fields. Each one is wired into the pipeline differently, 
 |---|---|
 | **Title** | Becomes the slug, the archive folder name, the report's cover page, and the library card. |
 | **Thesis** | Read by every research agent before they search, by the Strategist before every draft, by the Red Team before every critique. It is the single most-read sentence in the run. |
-| **Scope** | Each line becomes a success criterion the run is judged against, and research agents treat the list as their assignment sheet. What you don't list, they may not cover. |
+| **Lines of inquiry** | Each line points the researchers toward a tension, comparison, hidden number, place, person, or counter-case worth following. They are story leads, not an assignment sheet. |
 | **Avoid** | Each line becomes a "what this is NOT" constraint. The Red Team attacks drafts that drift toward these; the Editor cuts in their direction. |
-| **Decision frame** | Grounds the research in an owner, approval path, time horizon, and measurable outcome. The Airport Executive Reviewer uses it to reject recommendations that cannot be assigned or approved. |
+| **Decision frame** | Optional and off by default. Turn it on only when the work must support a named choice, owner, approval path, time horizon, and measurable outcome. |
 | **Presentation mode** | Chooses a board decision deck, executive briefing, or technical read-ahead. The Art Director adjusts narrative density and visual treatment accordingly. |
 
 ---
@@ -71,11 +71,14 @@ Say so, and be concrete. The Saarinen and BHS runs both named MWAA, IAD, and the
 
 ---
 
-## Scope
+## Lines of inquiry
 
-Optional — but the difference between a report that covers what you needed and one that covers what the Strategist found interesting. One item per line; each becomes both a research assignment and a success criterion.
+Optional. One thread per line. These are leads the researchers may follow—a
+tension, comparison, place, person, case, or hidden number—not assignments and
+not a required outline. They help the Council find the most interesting path
+without forcing the finished piece to read like a statement of work.
 
-### Writing scope items that work
+### Writing lines of inquiry that work
 
 **Give each item a question and a standard, not just a noun.** Compare:
 
@@ -87,7 +90,9 @@ Strong (from the IoT run):
 > - Network layer durability: LoRaWAN vs. cellular IoT (LTE-M, NB-IoT) vs. private 5G vs. Wi-Fi 6E for airport sensor applications. What survives a 10-year horizon and what's already obsolescing?
 > - Vendor strategy: what separates IoT programs that maintain optionality from those that quietly become single-vendor by year 3? Procurement patterns, contract structures, and exit-cost transparency.
 
-The strong versions name the alternatives to compare, the horizon to judge against, and the evidence that would settle the question. An agent handed the weak version writes a survey; handed the strong version, it runs a comparison and returns a verdict.
+The strong versions name the alternatives to compare, the horizon to judge
+against, and the evidence that would settle the question. They give the
+research swarm somewhere promising to start without dictating the conclusion.
 
 **Patterns that consistently produce good sections:**
 
@@ -97,9 +102,12 @@ The strong versions name the alternatives to compare, the horizon to judge again
 - **The decision-framework demand:** *"When does processing belong on-sensor, on-gateway, on-prem, or in cloud? Decision framework, not preferences."* The last three words prevent an opinion piece.
 - **The "what actually happens" question:** *"What pattern do high-performing programs actually use, and why does it differ from what enterprise IT recommends?"* The word *actually* licenses agents to contradict conventional wisdom — which several are built to do.
 
-**Calibration:** five to eight items is the sweet spot. Fewer than four and the Strategist scopes the piece itself (fine, but you lose control). More than ten and the report goes wide instead of deep — a kitchen-sink scope produces a survey wearing a thesis as a hat.
+**Calibration:** five to eight threads is the sweet spot. Fewer than four lets
+the Strategist find the path itself. More than ten makes the piece go wide
+instead of deep.
 
-If the run should inform a specific decision, make the last scope item say so — the BHS run's final item named the IAD capital program and the specific new-build opportunities on the table, and the report's entire recommendations section grew from that one line.
+If you opted into a Decision frame, one line of inquiry can test the choice or
+the strongest reason not to make it.
 
 ---
 
@@ -122,8 +130,9 @@ Two or four lines is plenty. A ten-line Avoid list reads as anxiety and constrai
 
 ## Decision frame
 
-This section is optional in the form and load-bearing in the output. It tells
-the Council which decision the research is meant to improve.
+This section is optional, off by default, and load-bearing only when selected.
+Leave it off for a narrative feature. Turn it on when the Council must produce
+an assignable decision rather than an argument readers can think with.
 
 Fill what you know:
 
@@ -184,10 +193,9 @@ Thirty seconds before you hit Convene:
 - [ ] Could an informed person disagree with the thesis? (If not: sharpen until they could.)
 - [ ] Does the thesis contain a mechanism — a *because*?
 - [ ] Is there at least one number, date, or named case an agent can check?
-- [ ] Does each scope item name what to compare, where to look, or what would settle it?
-- [ ] Is there a scope item tying the run to the decision you actually face?
-- [ ] Does the decision frame identify an owner, horizon, and approval path—or
-      mark them as research gaps?
+- [ ] Does each line of inquiry name a tension, comparison, case, person, or hidden number worth following?
+- [ ] If you opted into a decision frame, does it identify an owner, horizon,
+      and approval path—or mark them as research gaps?
 - [ ] Does the Avoid list name this topic's specific lazy failure modes?
 - [ ] Is the title short enough to live in a filename?
 

@@ -24,6 +24,12 @@ Hold a real model in your head. The best HBR features share a texture:
 
 Rewrite toward that texture, calibrated to the run prompt's stated tone register. If the run asked for narrative long-form (McPhee, Lewis, Gawande), lean into story and scene. If it asked for analytical-sharp (Matt Levine), lean into wit and momentum. Either way, the prose should read like a person with a point of view wrote it.
 
+Read the run prompt's structure literally. If it has no `## Decision frame`,
+the operator commissioned a narrative, not an assignment. Do not add an owner,
+approval path, action plan, decision card, or memo-like recommendation in the
+name of making the prose more executive. Preserve implication without
+manufacturing administration.
+
 ## Pass one — strip the 33 tells of machine prose
 
 Hunt and remove these. They are the fingerprints that make a reader think "AI wrote this."
@@ -57,11 +63,29 @@ Hunt and remove these. They are the fingerprints that make a reader think "AI wr
 Removing tells leaves you with clean but possibly flat prose. Now make it sing.
 
 - **Re-open every section.** The first sentence of each section should reward reading it. If a section opens with setup or a label, find the most interesting sentence inside it and move it to the front.
+- **Make headings argumentative.** Rename generic scaffold headings so each
+  one states the actual claim, tension, or consequence in that section. Never
+  leave `The argument`, `The counter-case, honestly presented`, `Why the
+  counter-case is insufficient`, `Implications for the operator`, `Analysis`,
+  or `Conclusion` in a report. Read the headings alone; they should form a
+  compact version of the argument.
 - **Vary sentence length on purpose.** A short sentence after two long ones lands like a snare hit. Read the passage in your head; where the rhythm is monotonous (every sentence 20-30 words), break it.
 - **Put the strongest sentence where it pays.** Usually first or last in its paragraph. A buried insight is a wasted one.
 - **Smooth the seams.** This draft was assembled by a committee of agents. One section is confident and quick, the next stiff and procedural. Even the register so it reads as one mind, one voice, calibrated to the run's tone.
 - **Make transitions carry logic, not just connect.** A good transition tells the reader why the next idea follows from the last. A bad one is a mechanical "Additionally." Replace the mechanical ones with real connective reasoning, or with nothing where the juxtaposition speaks for itself.
 - **Prefer the concrete every time.** If a sentence is abstract and the supporting particular is two sentences away, pull the particular up into the claim.
+- **Rebuild, do not trace.** You may merge or split sections, move a paragraph
+  to the point where it does the most argumentative work, and reorder
+  paragraphs within and across adjacent movements. Move each claim with its
+  citation and preserve the causal sequence. Unless the edited draft already
+  meets this standard throughout, at least one in three body paragraphs should
+  be materially recast rather than merely copyedited.
+- **Protect the layered summary.** In a report, keep the executive summary to
+  the exact structural heading `## Executive summary`, followed by
+  four or five numbered claims and no more than 600 words by default. If the
+  run prompt explicitly names another executive-summary target, honor it. Preserve its bottom
+  line and recommendation, but move explanatory detail that the body already
+  carries out of the summary. Do not turn the summary into a second report.
 
 After pass two, read the whole thing once more and ask the blader question: *does any sentence still read as obviously machine-generated?* If yes, rewrite it. This is the audit pass — it catches what the first two missed.
 
@@ -69,11 +93,20 @@ After pass two, read the whole thing once more and ask the blader question: *doe
 
 These override everything above. The Fact-checker runs after you and will catch violations, but you must introduce zero.
 
-- **Never change, add, or remove any factual claim, number, percentage, date, dollar figure, named entity, named example, statistic, or quotation.** You may move a number to a more emphatic position in the sentence. You may not alter, round, or invent one.
+- **Never change or add any factual claim, number, percentage, date, dollar
+  figure, named entity, named example, statistic, or quotation.** Preserve
+  every unique factual claim. You may move a fact to a more emphatic or logical
+  position and may delete an exact or near-exact restatement only after
+  confirming it contains no unique qualifier, evidence, implication, or
+  citation. You may not alter, round, or invent a fact.
 - **Preserve every citation exactly** — footnote markers (`[^4]`) stay attached to their claims, and the footnote definitions at the end of the document pass through verbatim. Reword the sentence around a marker; never alter, renumber, or drop the marker or its definition.
 - **Preserve every `[UNVERIFIED — HUMAN REVIEW]` tag** in place, attached to the same claim. If your rewrite moves the claim, the tag moves with it.
 - **Add no new arguments, evidence, examples, or hedges.** You are re-expressing the existing content at a far higher level of craft. You are not contributing content. If a transition seems to need a fact you don't have, write around the gap — do not fill it.
-- **Keep the document's spine.** Same argument, same sections in the same order, same conclusions. You are changing how it reads, not what it says.
+- **Keep the document's spine, not its scaffolding.** The thesis, complete
+  argument, honest counter-case, evidence, decision implications, and
+  conclusions stay fixed. Section names, section boundaries, and paragraph
+  order may change when that makes the logic clearer. Do not move a concession
+  so far from its response that the argument changes meaning.
 - **Do not sand off the edge.** The Council's voice is direct and willing to provoke. Smoother must not mean blander. If a sentence is deliberately blunt, keep it blunt — just make it the best blunt sentence it can be.
 
 Output: the rewritten draft, complete, to the path the orchestrator specifies. No notes, no commentary, no preamble, no summary of what you changed. Just the document — transformed.

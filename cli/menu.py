@@ -43,7 +43,7 @@ OUTPUTS_DIR = REPO_ROOT / "outputs"
 
 FORMAT_TITLES = {
     "report": "Full Research Report",
-    "article": "Long-Form Article",
+    "article": "Narrative Feature",
     "brief": "Brief",
     "recommendations": "Concise Recommendations",
 }
@@ -247,9 +247,9 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
 
     Returns (ok, human_message). Result is cached for the session so the
     pre-flight screen can redraw without re-probing. Pass force=True to re-probe
-    after a `claude login`.
+    after `claude auth login`.
 
-    Philosophy: block ONLY on a confirmed failure (a 401, or no CLI at all).
+    Philosophy: block ONLY on a confirmed failure (a 401/403, or no CLI at all).
     Never block on an inconclusive probe — that would be as bad as the bug it
     replaces. If the probe is ambiguous, allow the run; Stage 1 will surface a
     real problem with a clear message.
@@ -275,7 +275,19 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
     try:
         with console.status("[dim]Checking Claude authentication…[/dim]"):
             proc = subprocess.run(
-                [claude, "-p", "Reply with exactly: PONG", "--max-turns", "1"],
+                [
+                    claude,
+                    "-p",
+                    "Reply with exactly: PONG",
+                    "--max-turns",
+                    "1",
+                    "--max-budget-usd",
+                    "0.05",
+                    "--tools",
+                    "",
+                    "--output-format",
+                    "json",
+                ],
                 stdin=subprocess.DEVNULL,
                 capture_output=True,
                 text=True,
@@ -287,16 +299,32 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
         elif any(
             marker in blob.casefold()
             for marker in (
-                "401",
-                "authenticat",
-                "not logged in",
-                "please run /login",
-                "please run `claude login`",
+                "disabled claude subscription access",
+                "use an anthropic api key",
+                "ask your admin to enable access",
             )
         ):
             _auth_probe_cache = (
                 False,
-                "⚠ authentication failed (401) — run `claude login`",
+                "Claude access is disabled for this organization — add "
+                "ANTHROPIC_API_KEY to .env or ask the Claude administrator "
+                "to enable Claude Code subscription access",
+            )
+        elif any(
+            marker in blob.casefold()
+            for marker in (
+                "401",
+                '"api_error_status":403',
+                '"api_error_status": 403',
+                "authenticat",
+                "not logged in",
+                "please run /login",
+                "please run `claude auth login`",
+            )
+        ):
+            _auth_probe_cache = (
+                False,
+                "⚠ authentication failed (401) — run `claude auth login`",
             )
         else:
             # Reached the model but got an unexpected reply — not an auth
@@ -351,7 +379,7 @@ def preflight(spec) -> dict | None:
             f"[bold]Claude isn't authenticated, so the run can't proceed.[/bold]\n\n"
             f"{auth_msg}\n\n"
             f"Fix it in one step:\n"
-            f"  [cyan]claude login[/cyan]\n\n"
+            f"  [cyan]claude auth login[/cyan]\n\n"
             f"Verify with:  [cyan]claude -p \"say PONG\" --max-turns 1[/cyan]\n"
             f"Then relaunch [cyan]./council[/cyan] and choose Resume.",
             border_style="red", title="Authentication required",

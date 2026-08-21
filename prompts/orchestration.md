@@ -13,8 +13,8 @@ manually invoking a fixed roster of agents.
 2. Run the deterministic prompt preflight. It must reject unresolved
    `{{...}}` tokens, missing required sections, an invalid output or deck mode,
    a missing supplied source, and an empty research roster.
-3. Read the prompt and confirm the thesis, decision frame, selected research
-   lenses, requested deliverables, and configured budget with the user. Make
+3. Read the prompt and confirm the thesis, writing mode, any opted-in decision
+   frame, selected research lenses, requested deliverables, and configured budget with the user. Make
    clear that this is a paid, multi-model run. Do not quote a fixed time or cost
    for every roster.
 4. After confirmation, launch the exact file:
@@ -37,7 +37,8 @@ quarantine and regenerate it.
 
 ## Public stage 1 — context, parallel research, and curation
 
-1. Create `outputs/run-manifest.json`. It records the decision frame, selected
+1. Create `outputs/run-manifest.json`. It records whether a decision frame was
+   opted into, its fields when present, selected
    research and process agents, actual models, prompt hashes, contracts,
    artifacts, dependency receipts, Council execution-contract fingerprints,
    and stage state.

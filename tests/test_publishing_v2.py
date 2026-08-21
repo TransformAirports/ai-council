@@ -68,6 +68,31 @@ The benefit is primarily community value, not a measurable operating saving.[^4]
 
 
 class PublishingV2Tests(unittest.TestCase):
+    def test_report_without_decision_frame_does_not_invent_decision_package(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            final = root / "final.md"
+            method = root / "method.md"
+            final.write_text(FINAL_DRAFT, encoding="utf-8")
+            method.write_text("# Method\n\nIndependent review.", encoding="utf-8")
+            with patch(
+                "cli.docx_builder.render_office_artifact", return_value=([], [])
+            ), patch("cli.docx_builder.prepare_word_visual_inspection_receipt"):
+                report, summary = build_documents(
+                    slug="narrative-report",
+                    title="Narrative report",
+                    final_draft=final,
+                    methodology=method,
+                    out_dir=root / "stage4",
+                    output_format="report",
+                    decision_frame_enabled=False,
+                )
+
+            text = "\n".join(paragraph.text for paragraph in Document(report).paragraphs)
+            self.assertIsNone(summary)
+            self.assertNotIn("Executive decision brief", text)
+            self.assertIn("Executive summary", text)
+
     def test_unverified_tag_is_release_blocking(self) -> None:
         issues = lint_reader_text(
             "The project costs $4 million. [UNVERIFIED — HUMAN REVIEW]"
@@ -648,7 +673,7 @@ The airport cannot preserve the published passenger-service threshold.
 
             article_path, article_summary = built["article"]
             article_text = document_text(article_path)
-            self.assertIsNotNone(article_summary)
+            self.assertIsNone(article_summary)
             self.assertIn("At 6 a.m.", article_text)
             self.assertNotIn("Executive decision brief", article_text)
             self.assertNotIn("Contents", article_text)

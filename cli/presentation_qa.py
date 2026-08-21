@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -51,6 +52,21 @@ INTERNAL_TOKEN_RE = re.compile(
     re.IGNORECASE,
 )
 SIGNATURE_VISUAL_PREFIX = "SIGNATURE VISUAL —"
+VISIBLE_WORD_RE = re.compile(r"\b[\w]+(?:[-’'][\w]+)*\b", re.UNICODE)
+FULFILLED_ASSET_STATUSES = {
+    "supplied",
+    "retrieved",
+    "generated",
+    "fallback",
+    "not_required",
+}
+EXTERNAL_ASSET_ROLES = {
+    "photograph",
+    "official_plan",
+    "source_document",
+    "map",
+    "logo",
+}
 
 
 @dataclass(frozen=True)
@@ -71,6 +87,10 @@ class PresentationQAConfig:
     deck_mode: str | None = None
     appendix_body_pt: float | None = None
     require_render: bool = False
+    visible_word_warning: int | None = 90
+    visible_word_error: int | None = 180
+    speaker_led_word_warning: int = 70
+    speaker_led_word_error: int = 105
 
     @classmethod
     def process_explainer(cls) -> "PresentationQAConfig":
@@ -84,6 +104,8 @@ class PresentationQAConfig:
             profile="internal_process_explainer",
             body_type_severity="warning",
             evidence_issue_severity="warning",
+            visible_word_warning=140,
+            visible_word_error=220,
         )
 
     @classmethod
@@ -97,6 +119,8 @@ class PresentationQAConfig:
                 slide_count_severity="error",
                 deck_mode=deck_mode,
                 require_render=True,
+                visible_word_warning=70,
+                visible_word_error=140,
             )
         if deck_mode == "executive_briefing":
             return cls(
@@ -105,6 +129,8 @@ class PresentationQAConfig:
                 slide_count_severity="error",
                 deck_mode=deck_mode,
                 require_render=True,
+                visible_word_warning=90,
+                visible_word_error=220,
             )
         if deck_mode == "technical_read_ahead":
             return cls(
@@ -114,6 +140,8 @@ class PresentationQAConfig:
                 deck_mode=deck_mode,
                 appendix_body_pt=12.0,
                 require_render=True,
+                visible_word_warning=140,
+                visible_word_error=300,
             )
         raise ValueError(f"Unknown deck mode: {deck_mode!r}")
 
@@ -133,6 +161,8 @@ class PresentationQAConfig:
             slide_count_severity="error",
             deck_mode="argument_brief",
             require_render=True,
+            visible_word_warning=80,
+            visible_word_error=180,
         )
 
 
@@ -641,18 +671,47 @@ def qa_visual_inspection_receipt(
 
 
 def _shape_text(shape) -> str:
-    if not getattr(shape, "has_text_frame", False):
-        return ""
-    return shape.text_frame.text.strip()
+    if getattr(shape, "has_text_frame", False):
+        return shape.text_frame.text.strip()
+    if getattr(shape, "has_table", False):
+        return "\n".join(
+            cell.text.strip()
+            for row in shape.table.rows
+            for cell in row.cells
+            if cell.text.strip()
+        )
+    if getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.GROUP:
+        return "\n".join(
+            text
+            for child in shape.shapes
+            if (text := _shape_text(child))
+        )
+    return ""
 
 
 def _runs_with_sizes(shape) -> Iterable[tuple[str, float | None]]:
-    if not getattr(shape, "has_text_frame", False):
+    if getattr(shape, "has_text_frame", False):
+        for paragraph in shape.text_frame.paragraphs:
+            for run in paragraph.runs:
+                if run.text.strip():
+                    yield run.text, run.font.size.pt if run.font.size is not None else None
         return
-    for paragraph in shape.text_frame.paragraphs:
-        for run in paragraph.runs:
-            if run.text.strip():
-                yield run.text, run.font.size.pt if run.font.size is not None else None
+    if getattr(shape, "has_table", False):
+        for row in shape.table.rows:
+            for cell in row.cells:
+                for paragraph in cell.text_frame.paragraphs:
+                    for run in paragraph.runs:
+                        if run.text.strip():
+                            yield (
+                                run.text,
+                                run.font.size.pt
+                                if run.font.size is not None
+                                else None,
+                            )
+        return
+    if getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.GROUP:
+        for child in shape.shapes:
+            yield from _runs_with_sizes(child)
 
 
 def _notes_text(slide) -> str:
@@ -737,6 +796,182 @@ def _likely_text_overflow(shape, smallest_size: float | None) -> bool:
     )
     line_height = smallest_size * 1.22
     return estimated_lines * line_height > height_pt * 1.12
+
+
+def _is_page_number_shape(shape, text: str, slide_height: Emu) -> bool:
+    name = str(getattr(shape, "name", "") or "").casefold()
+    if "page number" in name or "slide number" in name:
+        return True
+    return bool(
+        re.fullmatch(r"\d{1,2}", text.strip())
+        and getattr(shape, "top", 0) >= int(slide_height * 0.88)
+    )
+
+
+def _visible_word_count(slide, slide_height: Emu) -> int:
+    """Count audience-facing words, excluding sources and page markers."""
+
+    count = 0
+    for shape in slide.shapes:
+        text = _shape_text(shape)
+        if (
+            not text
+            or _is_source_shape(shape, text)
+            or _is_page_number_shape(shape, text, slide_height)
+        ):
+            continue
+        count += len(VISIBLE_WORD_RE.findall(text))
+    return count
+
+
+def _brief_visible_word_budget(expected_slide: dict | None) -> int | None:
+    if not isinstance(expected_slide, dict):
+        return None
+    explicit = expected_slide.get("visible_word_budget")
+    if isinstance(explicit, int) and not isinstance(explicit, bool):
+        return explicit
+    density = str(expected_slide.get("density_budget") or "")
+    match = re.search(
+        r"(?:<=|<|no\s+more\s+than|maximum(?:\s+of)?)\s*(\d{2,3})"
+        r"\s+(?:visible\s+)?words?",
+        density,
+        re.IGNORECASE,
+    )
+    return int(match.group(1)) if match else None
+
+
+def _layout_fingerprint(
+    slide,
+    *,
+    slide_width: Emu,
+    slide_height: Emu,
+) -> tuple[tuple[str, int, int, int, int], ...]:
+    """Return a coarse geometry fingerprint for repeated-silhouette warnings."""
+
+    shapes: list[tuple[str, int, int, int, int]] = []
+    for shape in slide.shapes:
+        text = _shape_text(shape)
+        if text and (
+            _is_source_shape(shape, text)
+            or _is_page_number_shape(shape, text, slide_height)
+        ):
+            continue
+        try:
+            width = int(shape.width)
+            height = int(shape.height)
+            left = int(shape.left)
+            top = int(shape.top)
+        except (AttributeError, TypeError, ValueError):
+            continue
+        if width <= 0 or height <= 0:
+            continue
+        if getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.PICTURE:
+            kind = "picture"
+        elif getattr(shape, "has_chart", False):
+            kind = "chart"
+        elif getattr(shape, "has_table", False):
+            kind = "table"
+        elif getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.GROUP:
+            kind = "group"
+        elif text:
+            kind = "text"
+        else:
+            kind = "shape"
+        shapes.append(
+            (
+                kind,
+                round(left / slide_width * 16),
+                round(top / slide_height * 9),
+                round(width / slide_width * 16),
+                round(height / slide_height * 9),
+            )
+        )
+    return tuple(sorted(shapes))
+
+
+def _equal_card_grid_size(
+    slide,
+    *,
+    slide_width: Emu,
+    slide_height: Emu,
+) -> int:
+    """Return the largest set of materially equal panel shapes on a slide."""
+
+    candidates: list[tuple[float, float, float, float]] = []
+    for shape in slide.shapes:
+        if getattr(shape, "shape_type", None) not in {
+            MSO_SHAPE_TYPE.AUTO_SHAPE,
+            MSO_SHAPE_TYPE.GROUP,
+        }:
+            continue
+        text = _shape_text(shape)
+        if text and (
+            _is_source_shape(shape, text)
+            or _is_page_number_shape(shape, text, slide_height)
+        ):
+            continue
+        try:
+            width = int(shape.width) / slide_width
+            height = int(shape.height) / slide_height
+            center_x = (int(shape.left) + int(shape.width) / 2) / slide_width
+            center_y = (int(shape.top) + int(shape.height) / 2) / slide_height
+        except (AttributeError, TypeError, ValueError, ZeroDivisionError):
+            continue
+        if 0.08 <= width <= 0.42 and 0.07 <= height <= 0.48:
+            candidates.append((width, height, center_x, center_y))
+
+    largest = 0
+    for width, height, _, _ in candidates:
+        peers = [
+            item
+            for item in candidates
+            if abs(item[0] - width) <= max(0.012, width * 0.07)
+            and abs(item[1] - height) <= max(0.012, height * 0.07)
+        ]
+        if len(peers) < 4:
+            continue
+        x_positions = {round(item[2], 2) for item in peers}
+        y_positions = {round(item[3], 2) for item in peers}
+        if len(x_positions) >= 4 or (
+            len(x_positions) >= 2 and len(y_positions) >= 2
+        ):
+            largest = max(largest, len(peers))
+    return largest
+
+
+def _repeated_runs(
+    values: list[object],
+    *,
+    minimum: int,
+) -> list[tuple[int, int, object]]:
+    runs: list[tuple[int, int, object]] = []
+    start = 0
+    while start < len(values):
+        value = values[start]
+        end = start + 1
+        while end < len(values) and values[end] == value:
+            end += 1
+        if value is not None and end - start >= minimum:
+            runs.append((start + 1, end, value))
+        start = end
+    return runs
+
+
+def _asset_request_map(
+    brief: dict | None,
+) -> tuple[dict[str, dict], list[dict]]:
+    requests = (
+        brief.get("asset_requests", [])
+        if isinstance(brief, dict)
+        else []
+    )
+    records = [item for item in requests if isinstance(item, dict)]
+    by_id = {
+        str(item.get("id")): item
+        for item in records
+        if str(item.get("id") or "").strip()
+    }
+    return by_id, records
 
 
 def qa_presentation(
@@ -830,6 +1065,13 @@ def qa_presentation(
     title_sizes: list[float] = []
     body_sizes: list[float] = []
     source_sizes: list[float] = []
+    visible_word_counts: list[int] = []
+    layout_families: list[str | None] = []
+    colorways: list[str | None] = []
+    layout_fingerprints: list[tuple | None] = []
+    table_slide_numbers: list[int] = []
+    card_grid_slides: dict[int, int] = {}
+    picture_slide_numbers: set[int] = set()
     brief_slides = (
         brief.get("slides", [])
         if isinstance(brief, dict)
@@ -879,6 +1121,82 @@ def qa_presentation(
             )
         )
 
+    asset_requests_by_id, asset_request_records = _asset_request_map(brief)
+    asset_ids = [
+        str(item.get("id") or "").strip()
+        for item in asset_request_records
+        if str(item.get("id") or "").strip()
+    ]
+    duplicate_asset_ids = sorted(
+        item for item, count in Counter(asset_ids).items() if count > 1
+    )
+    if duplicate_asset_ids:
+        issues.append(
+            QualityIssue(
+                code="duplicate_asset_request_id",
+                severity="error",
+                message=(
+                    "Asset-request IDs must be unique: "
+                    + ", ".join(duplicate_asset_ids)
+                    + "."
+                ),
+                location=str(path),
+            )
+        )
+
+    for request in asset_request_records:
+        request_id = str(request.get("id") or "unnamed asset").strip()
+        legacy_status = str(request.get("status") or "").casefold()
+        approval = str(request.get("approval_status") or "").casefold()
+        fulfillment = str(
+            request.get("fulfillment_status") or (
+                legacy_status if legacy_status in FULFILLED_ASSET_STATUSES else ""
+            )
+        ).casefold()
+        approved = approval == "approved" or legacy_status == "approved"
+        fulfilled = fulfillment in FULFILLED_ASSET_STATUSES
+        required_asset = bool(request.get("required"))
+        if approved and not fulfilled:
+            issues.append(
+                QualityIssue(
+                    code="approved_asset_unfulfilled",
+                    severity="error" if required_asset else "warning",
+                    message=(
+                        f"Approved asset request {request_id!r} is not fulfilled"
+                        + (
+                            " and is required for release."
+                            if required_asset
+                            else "; resolve it or approve the named fallback."
+                        )
+                    ),
+                    location=str(path),
+                )
+            )
+        media_role = str(request.get("media_role") or "").casefold()
+        if (
+            fulfillment in {"supplied", "retrieved"}
+            and media_role in EXTERNAL_ASSET_ROLES
+        ):
+            missing_provenance = [
+                field
+                for field in ("source", "rights", "credit")
+                if not str(request.get(field) or "").strip()
+            ]
+            if missing_provenance:
+                issues.append(
+                    QualityIssue(
+                        code="asset_provenance_incomplete",
+                        severity="warning",
+                        message=(
+                            f"Asset request {request_id!r} is marked "
+                            f"{fulfillment} but lacks "
+                            + ", ".join(missing_provenance)
+                            + "."
+                        ),
+                        location=str(path),
+                    )
+                )
+
     for slide_number, slide in enumerate(deck.slides, 1):
         location = f"slide {slide_number}"
         title_shape = _find_title_shape(slide, deck.slide_height)
@@ -893,12 +1211,36 @@ def qa_presentation(
                 )
             )
 
-        slide_text_parts: list[str] = []
         source_present = False
         slide_has_numeric_claim = False
         slide_visuals = 0
         vector_shapes = 0
+        slide_has_table = False
+        slide_has_picture = False
         expected_slide = expected_by_number.get(slide_number)
+        expected_visual_type = (
+            str(expected_slide.get("visual_type") or "").casefold()
+            if isinstance(expected_slide, dict)
+            else ""
+        )
+        layout_family = (
+            str(expected_slide.get("layout_family") or "").strip().casefold()
+            if isinstance(expected_slide, dict)
+            else ""
+        )
+        colorway = (
+            str(expected_slide.get("colorway") or "").strip().casefold()
+            if isinstance(expected_slide, dict)
+            else ""
+        )
+        layout_families.append(layout_family or None)
+        colorways.append(colorway or None)
+        layout_fingerprint = _layout_fingerprint(
+            slide,
+            slide_width=deck.slide_width,
+            slide_height=deck.slide_height,
+        )
+        layout_fingerprints.append(layout_fingerprint or None)
         if expected_slide is not None:
             expected_headline = str(expected_slide.get("headline") or "")
             if (
@@ -947,7 +1289,6 @@ def qa_presentation(
             ):
                 signature_markers.append(slide_number)
             if text:
-                slide_text_parts.append(text)
                 copy_issues = lint_reader_text(text, location=location)
                 if config.allow_internal_terms:
                     copy_issues = [
@@ -1071,10 +1412,16 @@ def qa_presentation(
                     )
                 )
 
-            if (
+            shape_is_picture = (
                 getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.PICTURE
+            )
+            shape_is_table = bool(getattr(shape, "has_table", False))
+            slide_has_picture = slide_has_picture or shape_is_picture
+            slide_has_table = slide_has_table or shape_is_table
+            if (
+                shape_is_picture
                 or getattr(shape, "has_chart", False)
-                or getattr(shape, "has_table", False)
+                or shape_is_table
                 or getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.GROUP
             ):
                 slide_visuals += 1
@@ -1089,6 +1436,110 @@ def qa_presentation(
                 and not is_source
             ):
                 vector_shapes += 1
+
+        visible_words = _visible_word_count(slide, deck.slide_height)
+        visible_word_counts.append(visible_words)
+        brief_word_budget = _brief_visible_word_budget(expected_slide)
+        speaker_led = bool(
+            isinstance(expected_slide, dict)
+            and expected_slide.get("speaker_led") is True
+        )
+        word_warning = (
+            config.speaker_led_word_warning
+            if speaker_led
+            else config.visible_word_warning
+        )
+        word_error = (
+            config.speaker_led_word_error
+            if speaker_led
+            else config.visible_word_error
+        )
+        if brief_word_budget is not None:
+            word_warning = (
+                min(word_warning, brief_word_budget)
+                if word_warning is not None and speaker_led
+                else brief_word_budget
+            )
+            brief_hard_limit = max(
+                brief_word_budget + 20,
+                math.ceil(brief_word_budget * 1.25),
+            )
+            word_error = (
+                min(word_error, brief_hard_limit)
+                if word_error is not None and speaker_led
+                else max(word_error or 0, brief_hard_limit)
+            )
+        if word_error is not None and visible_words > word_error:
+            issues.append(
+                QualityIssue(
+                    code="visible_word_budget_exceeded",
+                    severity="error",
+                    message=(
+                        f"Slide contains {visible_words} visible words; hard "
+                        f"limit is {word_error}. Shorten the copy or use a "
+                        "read-ahead layout."
+                    ),
+                    location=location,
+                )
+            )
+        elif word_warning is not None and visible_words > word_warning:
+            issues.append(
+                QualityIssue(
+                    code="visible_word_budget_exceeded",
+                    severity="warning",
+                    message=(
+                        f"Slide contains {visible_words} visible words; target "
+                        f"is {word_warning}. Confirm the density is deliberate."
+                    ),
+                    location=location,
+                )
+            )
+
+        if slide_has_picture:
+            picture_slide_numbers.add(slide_number)
+        if slide_has_table or any(
+            token in expected_visual_type
+            for token in ("table", "register", "ledger")
+        ):
+            table_slide_numbers.append(slide_number)
+
+        card_count = _equal_card_grid_size(
+            slide,
+            slide_width=deck.slide_width,
+            slide_height=deck.slide_height,
+        )
+        if card_count >= 4:
+            card_grid_slides[slide_number] = card_count
+            issues.append(
+                QualityIssue(
+                    code="excessive_equal_card_grid",
+                    severity="warning",
+                    message=(
+                        f"Slide contains {card_count} materially equal panels; "
+                        "prefer one dominant editorial composition unless the "
+                        "comparison requires a grid."
+                    ),
+                    location=location,
+                )
+            )
+
+        if isinstance(expected_slide, dict):
+            referenced_assets = expected_slide.get("asset_request_ids") or []
+            if isinstance(referenced_assets, list):
+                for asset_id in referenced_assets:
+                    asset_key = str(asset_id)
+                    if asset_key not in asset_requests_by_id:
+                        issues.append(
+                            QualityIssue(
+                                code="unknown_asset_request",
+                                severity="error",
+                                message=(
+                                    f"Visual brief references asset request "
+                                    f"{asset_key!r}, but no such request exists."
+                                ),
+                                location=location,
+                            )
+                        )
 
         notes = _notes_text(slide)
         source_present = source_present or bool(SOURCE_RE.search(notes))
@@ -1161,6 +1612,155 @@ def qa_presentation(
                         f"'{SIGNATURE_VISUAL_PREFIX}<concept>'."
                     ),
                     location=location,
+                )
+            )
+
+    explicit_layout_count = sum(item is not None for item in layout_families)
+    explicit_layout_runs = _repeated_runs(layout_families, minimum=3)
+    for start, end, family in explicit_layout_runs:
+        issues.append(
+            QualityIssue(
+                code="repeated_layout_family",
+                severity="warning",
+                message=(
+                    f"Slides {start}–{end} repeat layout family {family!r}; "
+                    "vary adjacent silhouettes when the narrative job changes."
+                ),
+                location=str(path),
+            )
+        )
+    if explicit_layout_count < math.ceil(slide_count * 0.70):
+        for start, end, _ in _repeated_runs(layout_fingerprints, minimum=4):
+            issues.append(
+                QualityIssue(
+                    code="repeated_slide_silhouette",
+                    severity="warning",
+                    message=(
+                        f"Slides {start}–{end} use the same coarse layout "
+                        "silhouette. Inspect the montage for visual monotony."
+                    ),
+                    location=str(path),
+                )
+            )
+
+    explicit_layouts = {item for item in layout_families if item is not None}
+    if slide_count >= 8 and explicit_layout_count >= math.ceil(slide_count * 0.70):
+        minimum_layouts = 3 if slide_count <= 12 else 4
+        if len(explicit_layouts) < minimum_layouts:
+            issues.append(
+                QualityIssue(
+                    code="insufficient_layout_diversity",
+                    severity="warning",
+                    message=(
+                        f"Visual brief uses {len(explicit_layouts)} layout "
+                        f"families across {slide_count} slides; use at least "
+                        f"{minimum_layouts} deliberate silhouettes."
+                    ),
+                    location=str(path),
+                )
+            )
+
+    explicit_colorways = [item for item in colorways if item is not None]
+    if (
+        slide_count >= 8
+        and len(explicit_colorways) >= math.ceil(slide_count * 0.70)
+        and len(set(explicit_colorways)) == 1
+    ):
+        issues.append(
+            QualityIssue(
+                code="flat_colorway_rhythm",
+                severity="warning",
+                message=(
+                    "Every specified slide uses the same colorway; confirm the "
+                    "opening, major turn, and decision close have deliberate "
+                    "visual pacing."
+                ),
+                location=str(path),
+            )
+        )
+
+    table_count = len(table_slide_numbers)
+    mode_for_density = requested_mode or config.deck_mode or "default"
+    if mode_for_density == "board_decision":
+        table_warning, table_error = 2, max(4, math.ceil(slide_count * 0.50))
+    elif mode_for_density == "executive_briefing":
+        table_warning, table_error = 4, max(7, math.ceil(slide_count * 0.55))
+    elif mode_for_density == "technical_read_ahead":
+        table_warning = max(6, math.ceil(slide_count * 0.40))
+        table_error = math.ceil(slide_count * 0.70)
+    elif mode_for_density == "argument_brief":
+        table_warning = max(1, math.ceil(slide_count * 0.30))
+        table_error = max(3, math.ceil(slide_count * 0.60))
+    else:
+        table_warning = max(3, math.ceil(slide_count * 0.35))
+        table_error = max(5, math.ceil(slide_count * 0.65))
+    if table_count > table_error:
+        issues.append(
+            QualityIssue(
+                code="table_heavy_deck",
+                severity="error",
+                message=(
+                    f"Deck uses table-like layouts on {table_count} of "
+                    f"{slide_count} slides; the mode's hard limit is "
+                    f"{table_error}."
+                ),
+                location=str(path),
+            )
+        )
+    elif table_count > table_warning:
+        issues.append(
+            QualityIssue(
+                code="table_heavy_deck",
+                severity="warning",
+                message=(
+                    f"Deck uses table-like layouts on {table_count} slides; "
+                    f"the {mode_for_density} target is no more than "
+                    f"{table_warning}."
+                ),
+                location=str(path),
+            )
+        )
+
+    for request in asset_request_records:
+        request_id = str(request.get("id") or "").strip()
+        if not request_id:
+            continue
+        fulfillment = str(
+            request.get("fulfillment_status") or request.get("status") or ""
+        ).casefold()
+        media_role = str(request.get("media_role") or "").casefold()
+        if (
+            fulfillment not in {"supplied", "retrieved"}
+            or media_role not in EXTERNAL_ASSET_ROLES
+        ):
+            continue
+        target_numbers: set[int] = set()
+        if isinstance(request.get("slide_number"), int):
+            target_numbers.add(int(request["slide_number"]))
+        if isinstance(request.get("slide_numbers"), list):
+            target_numbers.update(
+                int(item)
+                for item in request["slide_numbers"]
+                if isinstance(item, int) and not isinstance(item, bool)
+            )
+        for number, slide_brief in expected_by_number.items():
+            if request_id in (slide_brief.get("asset_request_ids") or []):
+                target_numbers.add(number)
+        if target_numbers and not (target_numbers & picture_slide_numbers):
+            required_asset = bool(request.get("required"))
+            approved = str(
+                request.get("approval_status") or ""
+            ).casefold() == "approved"
+            issues.append(
+                QualityIssue(
+                    code="fulfilled_asset_not_placed",
+                    severity="error" if required_asset and approved else "warning",
+                    message=(
+                        f"Asset request {request_id!r} is marked {fulfillment}, "
+                        "but no picture appears on its target slide(s) "
+                        f"{sorted(target_numbers)}."
+                    ),
+                    location=str(path),
                 )
             )
 
@@ -1253,6 +1853,17 @@ def qa_presentation(
             "visual_brief_slides": len(expected_by_number),
             "signature_visual_slide": signature_slide_number,
             "signature_visual_markers": signature_markers,
+            "visible_words_by_slide": visible_word_counts,
+            "maximum_visible_words": (
+                max(visible_word_counts) if visible_word_counts else 0
+            ),
+            "layout_families": layout_families,
+            "layout_family_count": len(explicit_layouts),
+            "colorways": colorways,
+            "table_slides": table_slide_numbers,
+            "equal_card_grid_slides": card_grid_slides,
+            "asset_requests": len(asset_request_records),
+            "picture_slides": sorted(picture_slide_numbers),
         },
         rendered_files=rendered_files,
     )

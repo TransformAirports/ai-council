@@ -1,9 +1,9 @@
 # The Transform Airports AI Council
 
-**Ask one sharp question about the airport industry. Get back an
-executive-grade decision package built by an independent research swarm,
-curated evidence, two different adversarial reviews, primary-source
-verification, and visual production QA.**
+**Ask one sharp question about the airport industry. Get back a fascinating,
+source-checked narrative built by an independent research swarm, curated
+evidence, two different adversarial reviews, primary-source verification, and
+visual production QA. Add a formal decision frame only when you need one.**
 
 The Council exists because a single AI, asked to write a long analytical
 piece, can produce something fluent and subtly useless: it hedges, flatters the
@@ -14,9 +14,33 @@ the recommendations survive airport governance and operating reality. A source
 verifier checks the final reader-facing draft. Deterministic gates stop
 publishing defects.
 
-The deliverables form an executive packet: a polished read-ahead, a concise
-decision brief, a technical evidence appendix, and—on request—a board decision,
-executive briefing, or technical PowerPoint.
+The default deliverable is a 1,500–2,000-word Narrative Feature: one continuous,
+enjoyable argument with no decision-card catalog or technical appendix. The
+operator can instead choose a full report, brief, or recommendations and can
+opt into a named decision frame. PowerPoint remains optional.
+
+---
+
+## Start it on a new machine
+
+The shortest safe path is:
+
+```bash
+git clone https://github.com/TransformAirports/ai-council.git
+cd ai-council
+./council --doctor
+./council
+```
+
+Before the doctor can pass, install Python 3.11+, Claude Code, LibreOffice, and
+Poppler, then sign in with `claude auth login` (or configure an Anthropic API
+key). The first launch creates the local virtual environment automatically.
+The doctor is read-only and makes no model call.
+
+Follow the copy-and-paste macOS and Ubuntu path in
+**[Get the AI Council running](docs/getting-started.md)**. It covers Claude
+subscription versus API billing, optional OpenAI Deep Research, first-run
+expectations, output locations, resuming failures, and Office-rendering fixes.
 
 ---
 
@@ -212,11 +236,15 @@ volume.
 ### Prerequisites
 
 - macOS or Linux with Python 3.11+ (`python3 --version` to check)
-- A Claude subscription with Opus access (sign in once with `claude login`) **or** an `ANTHROPIC_API_KEY`
-- *(Optional)* `OPENAI_API_KEY` — only if you seat the Deep Research lens
+- A Claude subscription with Opus access (sign in once with `claude auth login`) **or** an `ANTHROPIC_API_KEY`
+- LibreOffice (`soffice`) and Poppler (`pdftoppm`) for mandatory rendered QA
+- `OPENAI_API_KEY` for the GPT-5.6 Sol Prompt Coach; also used when you seat the Deep Research lens
 - This repository cloned locally
 
 The first `./council` creates a virtual environment and installs everything automatically. No manual `pip install`.
+
+Run `./council --doctor` before the first report. The complete installation
+path is in [docs/getting-started.md](docs/getting-started.md).
 
 ### API keys
 
@@ -237,6 +265,7 @@ verification. The optional Deep Research lens runs on OpenAI's
 
 | Flag | Effect |
 |---|---|
+| `--doctor` | Read-only setup check for Python, Claude authentication, LibreOffice, Poppler, packages, writable folders, disk, and model configuration. Makes no model call. |
 | `--run FILE` | Validate and execute a prepared file inside `prompts/runs/` through the canonical pipeline. |
 | `--budget USD` | Set a finite Claude-spend ceiling for `--run` or `--pptx`; zero permits no Claude calls. OpenAI Deep Research is billed separately. |
 | `--terminal` | The full menu in the terminal instead of the browser (SSH / no-browser use). |

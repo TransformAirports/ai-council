@@ -14,11 +14,38 @@ from cli.runfile import (
 
 
 class RunFileV2Tests(unittest.TestCase):
+    def test_decision_frame_is_absent_by_default_and_preserves_explicit_opt_in(self) -> None:
+        narrative = RunSpec(
+            title="Why the Concourse Feels Late",
+            slug="why-the-concourse-feels-late",
+            thesis="The concourse feels late because its operating assumptions expired before its concrete did.",
+            is_not=["A technical inventory."],
+            is_yes=["A narrative feature."],
+            success_criteria=["The opening earns the next page."],
+            selected_research_agents=["operations-analyst"],
+        )
+        self.assertNotIn("## Decision frame", render_run_file(narrative))
+
+        opted_in = RunSpec(
+            **{**narrative.__dict__, "decision_frame_enabled": True}
+        )
+        text = render_run_file(opted_in)
+        self.assertIn("## Decision frame", text)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "opted-in.md").write_text(text, encoding="utf-8")
+            parsed = parse_run_file("opted-in", runs_dir=root)
+        self.assertTrue(parsed.decision_frame_enabled)
+
     def test_decision_frame_and_deck_mode_round_trip(self) -> None:
         spec = RunSpec(
             title="Peak-hour checkpoint decision",
             slug="peak-hour-checkpoint-decision",
             thesis="The airport should pilot a new operating model before building.",
+            lines_of_inquiry=[
+                "Follow the peak-hour gate conflict through one operating day.",
+                "Compare the strongest case for building immediately.",
+            ],
             operator_context="Example Airport, Terminal A.",
             decision_required="Authorize a 90-day pilot",
             decision_owner="Chief Operating Officer",
@@ -45,6 +72,8 @@ class RunFileV2Tests(unittest.TestCase):
             parsed = parse_run_file(spec.slug, runs_dir=root)
 
         self.assertEqual(parsed.decision_required, spec.decision_required)
+        self.assertTrue(parsed.decision_frame_enabled)
+        self.assertEqual(parsed.lines_of_inquiry, spec.lines_of_inquiry)
         self.assertEqual(parsed.decision_owner, spec.decision_owner)
         self.assertEqual(parsed.time_horizon, spec.time_horizon)
         self.assertEqual(parsed.approval_path, spec.approval_path)
@@ -86,6 +115,7 @@ Direct.
             parsed = parse_run_file("legacy", runs_dir=root)
 
         self.assertFalse(parsed.want_pptx)
+        self.assertFalse(parsed.decision_frame_enabled)
         self.assertEqual(parsed.deck_mode, "board_decision")
         self.assertEqual(parsed.decision_required, "")
         self.assertEqual(parsed.selected_research_agents, ["operations-analyst"])

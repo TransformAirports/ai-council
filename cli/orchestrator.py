@@ -1348,13 +1348,13 @@ async def _run_agent(
             # The last attempt threw something other than our retry signal; re-raise.
             raise last_exc
         # A 1-turn / $0 result with no output almost always means the Claude
-        # Code subprocess could not authenticate (expired `claude login` token
+        # Code subprocess could not authenticate (expired `claude auth login` token
         # is the usual culprit). The pre-flight auth check should catch this
         # first, but if a token expires mid-run, point at the real cause.
         raise RuntimeError(
             f"{step_label} produced no output (the agent ran 0–1 turns at $0). "
             f"This is almost always a Claude authentication failure — your "
-            f"`claude login` token may have expired. Run `claude login`, verify "
+            f"`claude auth login` token may have expired. Run `claude auth login`, verify "
             f"with `claude -p \"say PONG\" --max-turns 1`, then relaunch and "
             f"choose Resume."
         )
@@ -1864,10 +1864,18 @@ async def run_airport_context(
     agent = by_name.get(step.agent)
     context_path = outputs_dir / step.output
     sources_path = outputs_dir / "context" / "context-sources.jsonl"
+    decision_frame_enabled = bool(
+        getattr(spec, "decision_frame_enabled", False)
+        or str(getattr(spec, "decision_required", "") or "").strip()
+    )
     await emit(
         "phase_start",
         phase="context",
-        label="Build airport and decision context",
+        label=(
+            "Build airport and decision context"
+            if decision_frame_enabled
+            else "Build airport and reporting context"
+        ),
     )
     update_stage(manifest_path, "context", "running")
 
@@ -1879,31 +1887,45 @@ async def run_airport_context(
             f"- `{path}`" for path in list(getattr(spec, "source_paths", []) or [])
         ) or "- No operator-supplied source files were attached."
         context_path.parent.mkdir(parents=True, exist_ok=True)
+        decision_sections = (
+            f"## Decision\n\n{getattr(spec, 'decision_required', '') or 'Not specified.'}\n\n"
+            f"## Decision owner\n\n{getattr(spec, 'decision_owner', '') or 'Not specified.'}\n\n"
+            if decision_frame_enabled
+            else ""
+        )
         context_path.write_text(
-            "# Airport and decision context\n\n"
+            "# Airport and reporting context\n\n"
             "The dedicated airport-context builder is not installed in this "
             "environment. Researchers must use the run prompt and attached sources "
             "without assuming a specific airport, governance model, airline "
             "agreement, approval path, capital plan, or operating constraint.\n\n"
-            f"## Decision\n\n{getattr(spec, 'decision_required', '') or 'Not specified.'}\n\n"
-            f"## Decision owner\n\n{getattr(spec, 'decision_owner', '') or 'Not specified.'}\n\n"
+            f"{decision_sections}"
             f"## Operator context\n\n{getattr(spec, 'operator_context', '') or 'Not specified.'}\n\n"
             f"## Attached sources\n\n{source_lines}\n",
             encoding="utf-8",
         )
         sources_path.write_text("\n", encoding="utf-8")
     else:
+        framing_instruction = (
+            "Identify the decision owner, decision required, time horizon, "
+            "approval path, and any unresolved decision dependencies."
+            if decision_frame_enabled
+            else "This run has no Decision frame. Do not invent a decision owner, "
+            "approval path, action plan, or success measure. Identify the factual "
+            "setting, institutions, places, people, tensions, and source limitations "
+            "that will help independent researchers tell the story accurately."
+        )
         prompt = (
             f"Read the authoritative run contract at `outputs/run-manifest.json` "
             f"and the run prompt at `{run_file}`. Build a concise airport context "
             "packet before the research swarm begins.\n\n"
-            "Identify the named airport/operator, decision owner, decision required, "
-            "time horizon, approval path, governance, airline/use-and-lease context, "
+            f"{framing_instruction} Identify the named airport/operator, governance, "
+            "airline/use-and-lease context, "
             "capital and financial constraints, operating conditions, relevant plans, "
             "and source limitations. Read every operator-supplied source declared in "
             "the manifest. If no airport or operator is named, do not conduct broad "
             "airport web research or invent a local profile; summarize only the "
-            "decision framing and attached-source context, and label what remains "
+            "operator framing and attached-source context, and label what remains "
             "unknown.\n\n"
             "Write the readable packet to `outputs/context/airport-context.md`. "
             "Write one JSON object per line to "
@@ -2812,10 +2834,22 @@ async def run_art_direction(
     """Create the visual contract used by both document and slide production."""
 
     output_format = str(getattr(spec, "output_format", "report"))
-    needed = bool(getattr(spec, "want_pptx", False)) or output_format not in {
-        "brief",
-        "recommendations",
-    }
+    decision_frame_enabled = bool(
+        getattr(spec, "decision_frame_enabled", False)
+        or any(
+            str(getattr(spec, field, "") or "").strip()
+            for field in (
+                "decision_required",
+                "decision_owner",
+                "time_horizon",
+                "approval_path",
+                "success_measure",
+            )
+        )
+    )
+    needed = bool(getattr(spec, "want_pptx", False)) or (
+        output_format == "report" and decision_frame_enabled
+    )
     if not needed:
         await emit(
             "manifest_update",
@@ -2835,24 +2869,32 @@ async def run_art_direction(
             "and presentations."
         )
     out_path = outputs_dir / step.output
-    decision_required = (
-        getattr(spec, "decision_required", "") or "Not specified in run prompt."
-    )
-    decision_owner = (
-        getattr(spec, "decision_owner", "")
-        or "Decision-critical unknown; establish from verified authority."
-    )
-    approval_path = (
-        getattr(spec, "approval_path", "")
-        or "Decision-critical unknown; establish from verified authority."
-    )
-    success_measure = (
-        getattr(spec, "success_measure", "")
-        or "Define a measurable acceptance and stop condition from verified evidence."
-    )
-    time_horizon = (
-        getattr(spec, "time_horizon", "") or "Not specified in run prompt."
-    )
+    decision_required = getattr(spec, "decision_required", "") or ""
+    decision_owner = getattr(spec, "decision_owner", "") or ""
+    approval_path = getattr(spec, "approval_path", "") or ""
+    success_measure = getattr(spec, "success_measure", "") or ""
+    time_horizon = getattr(spec, "time_horizon", "") or ""
+    if decision_frame_enabled:
+        decision_contract = (
+            "Carry this opted-in run-prompt decision frame into the canonical "
+            "top-level fields. Preserve named authorities and thresholds exactly; "
+            "qualify a conflict instead of silently replacing it:\n"
+            f"- decision: {decision_required or 'Not specified in run prompt.'}\n"
+            f"- decision_owner: {decision_owner or 'Establish from verified authority.'}\n"
+            f"- approval_path: {approval_path or 'Establish from verified authority.'}\n"
+            f"- time horizon for the first action: {time_horizon or 'Not specified in run prompt.'}\n"
+            f"- first success measure: {success_measure or 'Establish from verified evidence.'}\n"
+            "Derive `first_90_day_action` from the verified draft and evidence. "
+            "Write `success_measures` as a non-empty array.\n\n"
+        )
+    else:
+        decision_contract = (
+            "This is a narrative commission with no decision frame. Do not invent "
+            "an owner, approval path, action plan, or success measure. Keep `decision`, "
+            "`decision_owner`, `approval_path`, and `first_90_day_action` as empty "
+            "strings and `success_measures` as an empty array. Let `communication_job`, "
+            "`visual_thesis`, and evidence-bound report visuals carry the story.\n\n"
+        )
     prompt = (
         f"Read `{run_file}`, `outputs/run-manifest.json`, "
         "`outputs/context/airport-context.md`, `outputs/stage1/evidence-map.md`, "
@@ -2871,18 +2913,8 @@ async def run_art_direction(
         f"The requested presentation mode is "
         f"`{getattr(spec, 'deck_mode', 'board') or 'board'}`. "
         "Separate speaker-led board slides from read-ahead/appendix material.\n\n"
-        "Carry this run-prompt decision frame into the canonical top-level "
-        "fields. Preserve named authorities and thresholds exactly; qualify a "
-        "conflict instead of silently replacing it:\n"
-        f"- decision: {decision_required}\n"
-        f"- decision_owner: {decision_owner}\n"
-        f"- approval_path: {approval_path}\n"
-        f"- time horizon for the first action: {time_horizon}\n"
-        f"- first success measure: {success_measure}\n"
-        "Derive `first_90_day_action` from the verified draft and evidence. "
-        "Write `success_measures` as a non-empty array, beginning with the "
-        "run-prompt measure above when it was specified.\n\n"
-        "Write valid JSON—not markdown—to `outputs/stage4/visual-brief.json` with "
+        + decision_contract
+        + "Write valid JSON—not markdown—to `outputs/stage4/visual-brief.json` with "
         "top-level keys: `communication_job`, `audience`, `decision`, "
         "`decision_owner`, `approval_path`, `first_90_day_action`, "
         "`success_measures`, `deck_mode`, "
@@ -4825,6 +4857,19 @@ def write_run_marker(outputs_dir: Path, spec: RunSpec) -> None:
         "format": getattr(spec, "output_format", "report"),
         "want_pptx": getattr(spec, "want_pptx", False),
         "deck_mode": getattr(spec, "deck_mode", "board"),
+        "decision_frame_enabled": bool(
+            getattr(spec, "decision_frame_enabled", False)
+            or any(
+                str(getattr(spec, field, "") or "").strip()
+                for field in (
+                    "decision_required",
+                    "decision_owner",
+                    "time_horizon",
+                    "approval_path",
+                    "success_measure",
+                )
+            )
+        ),
         "decision_required": getattr(spec, "decision_required", ""),
         "decision_owner": getattr(spec, "decision_owner", ""),
         "time_horizon": getattr(spec, "time_horizon", ""),
@@ -5277,8 +5322,21 @@ async def run_pipeline(
         for name in spec.selected_research_agents
     )
     output_format = str(getattr(spec, "output_format", "report"))
+    has_decision_frame = bool(
+        getattr(spec, "decision_frame_enabled", False)
+        or any(
+            str(getattr(spec, field, "") or "").strip()
+            for field in (
+                "decision_required",
+                "decision_owner",
+                "time_horizon",
+                "approval_path",
+                "success_measure",
+            )
+        )
+    )
     needs_art_direction = bool(getattr(spec, "want_pptx", False)) or (
-        output_format not in {"brief", "recommendations"}
+        output_format == "report" and has_decision_frame
     )
     regular_process_calls = 11
     optional_production_calls = 1 + int(needs_art_direction) + int(
@@ -5603,6 +5661,11 @@ async def run_pipeline(
         tally=tally,
         manifest_path=manifest_path,
     )
+    from cli.publishing_quality import executive_summary_word_target
+
+    executive_summary_target_words = executive_summary_word_target(
+        run_file.read_text(encoding="utf-8", errors="ignore")
+    )
     report_path, executive_path = build_documents(
         slug=spec.slug,
         title=spec.title,
@@ -5610,6 +5673,7 @@ async def run_pipeline(
         methodology=repo_root / "docs" / "methodology.md",
         out_dir=outputs_dir / "stage4",
         output_format=getattr(spec, "output_format", "report"),
+        decision_frame_enabled=has_decision_frame,
         visual_brief=(
             outputs_dir / "stage4" / "visual-brief.json"
             if (outputs_dir / "stage4" / "visual-brief.json").is_file()
@@ -5622,6 +5686,7 @@ async def run_pipeline(
             "time_horizon": getattr(spec, "time_horizon", ""),
             "success_measure": getattr(spec, "success_measure", ""),
         },
+        executive_summary_target_words=executive_summary_target_words,
     )
     await run_word_visual_inspection(
         artifacts=[
@@ -5634,10 +5699,7 @@ async def run_pipeline(
         manifest_path=manifest_path,
         step_label="stage4/word-visual-inspection",
     )
-    executive_required = getattr(spec, "output_format", "report") not in {
-        "brief",
-        "recommendations",
-    }
+    executive_required = executive_path is not None
     for artifact_path, artifact_id, role, required in (
         (report_path, "stage4/word-report", "word_report", True),
         (
@@ -6411,10 +6473,17 @@ async def run_revision_pipeline(
     archive_dir = source.archive_dir
     output_format = _detect_format(source)
     length_instruction = ""
+    executive_summary_target_words: int | None = None
     revision_decision_context: dict[str, str] = {}
+    revision_decision_frame_enabled = False
     if source.run_file is not None and source.run_file.is_file():
         run_prompt_text = source.run_file.read_text(
             encoding="utf-8", errors="ignore"
+        )
+        from cli.publishing_quality import executive_summary_word_target
+
+        executive_summary_target_words = executive_summary_word_target(
+            run_prompt_text
         )
         length_match = re.search(
             r"(?ms)^## Length(?:\s+\([^)]*\))?\s*$\n"
@@ -6435,6 +6504,9 @@ async def run_revision_pipeline(
             # verified prose remains publishable without inventing metadata.
             pass
         else:
+            revision_decision_frame_enabled = bool(
+                getattr(source_spec, "decision_frame_enabled", False)
+            )
             revision_decision_context = {
                 "decision": source_spec.decision_required,
                 "decision_owner": source_spec.decision_owner,
@@ -6918,7 +6990,7 @@ async def run_revision_pipeline(
                 break
 
     visual_path: Path | None = None
-    if output_format not in {"brief", "recommendations"}:
+    if output_format == "report" and revision_decision_frame_enabled:
         await emit(
             "stage_start",
             stage=4,
@@ -7073,7 +7145,7 @@ async def run_revision_pipeline(
     report_path = stage4_dir / f"{release_slug}.docx"
     executive_path = (
         stage4_dir / f"{release_slug}-executive-summary.docx"
-        if output_format in {"report", "article"}
+        if output_format == "report" and revision_decision_frame_enabled
         else None
     )
     word_outputs = (
@@ -7114,8 +7186,10 @@ async def run_revision_pipeline(
         "slug": release_slug,
         "title": title,
         "output_format": output_format,
+        "decision_frame_enabled": revision_decision_frame_enabled,
         "decision_context": revision_decision_context,
         "revision_label": f"Revised — Version {version}",
+        "executive_summary_target_words": executive_summary_target_words,
     }
     word_build_reusable, word_build_fingerprint = revision_step_matches(
         state_path=revision_state_path,
@@ -7150,9 +7224,11 @@ async def run_revision_pipeline(
             methodology=repo_root / "docs" / "methodology.md",
             out_dir=stage4_dir,
             output_format=output_format,
+            decision_frame_enabled=revision_decision_frame_enabled,
             visual_brief=visual_path,
             decision_context=revision_decision_context,
             revision_label=f"Revised — Version {version}",
+            executive_summary_target_words=executive_summary_target_words,
         )
         record_revision_step(
             state_path=revision_state_path,

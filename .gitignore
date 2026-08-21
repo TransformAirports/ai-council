@@ -22,6 +22,10 @@ reports/
 council.toml
 logs/
 
+# Operator-local Library display metadata, recoverable deletions, and mutation
+# journals. These files are app state rather than versioned Council behavior.
+.council-state/
+
 # Operator-supplied source material — the drop zone is emptied into the
 # durable local sources/runs/<slug>/ library; source bytes are never committed.
 sources/

@@ -61,6 +61,13 @@ SOURCE_URL_RE = re.compile(r"https?://[^\s]+")
 INTERNAL_CITATION_RE = re.compile(
     r"\s?\[[^\]]*\b(?:brief|Stage\s*1)\b[^\]]*\]", re.IGNORECASE
 )
+# Stable evidence-ledger keys are useful inside the Council, but labels such
+# as ``[operations-analyst::ev-014]`` are production lineage rather than a
+# citation a reader can follow.  Keep the pattern deliberately narrow: a
+# bracketed namespace separator is not normal report prose.
+INTERNAL_LINEAGE_TOKEN_RE = re.compile(
+    r"\s*\[[A-Za-z0-9_.-]+::[^\[\]\r\n]+\]", re.IGNORECASE
+)
 INTERNAL_STAGE_LINE_RE = re.compile(
     r"(?im)^\s*#{0,6}\s*.*\bStage\s+[123]\b.*"
     r"\b(?:draft|fact[- ]?checked|output)\b.*(?:\n|$)"
@@ -94,7 +101,8 @@ AI_ACCOUNTABILITY_NOTICE = (
 
 def strip_internal_citations(text: str) -> str:
     """Remove agent/brief provenance tags that should never reach a reader."""
-    return INTERNAL_CITATION_RE.sub("", text)
+    text = INTERNAL_CITATION_RE.sub("", text)
+    return INTERNAL_LINEAGE_TOKEN_RE.sub("", text)
 
 
 def sanitize_reader_markdown(text: str) -> str:
@@ -134,6 +142,10 @@ def _compact_argument_memo_source_urls(markdown: str) -> str:
 
 def _add_inline(paragraph, text: str, base_size: int = 11, font: str = "Calibri") -> None:
     """Add a text run, parsing **bold**, *italic*, `code`, and [^n] footnotes."""
+    # This is the final common boundary for prose written into a Word file.
+    # Sanitizing here also covers structured visual-brief fields and source
+    # appendix records that do not pass through ``sanitize_reader_markdown``.
+    text = strip_internal_citations(text)
     if not text:
         return
     pos = 0
@@ -635,6 +647,71 @@ def _add_table_of_contents(doc: Document) -> None:
     doc.add_page_break()
 
 
+_FRONT_SUMMARY_HEADINGS = frozenset(
+    {"executive summary", "executive decision brief"}
+)
+
+
+def _without_front_summary(markdown: str) -> str:
+    """Remove the authored front summary while retaining every source note.
+
+    The full package already opens with a generated decision brief. Repeating
+    the draft's Executive summary immediately after the contents page makes
+    the reader restart the report.  This transformation is intentionally
+    local to Word assembly: it neither edits the verified Markdown nor changes
+    the standalone executive-summary document.
+    """
+    lines = markdown.splitlines()
+    kept: list[str] = []
+    removed_definitions: list[tuple[str, str]] = []
+    removing = False
+    removed = False
+
+    for line in lines:
+        heading = HEADING_RE.match(line.strip())
+        if heading and len(heading.group(1)) <= 2:
+            heading_text = re.sub(r"[*_`]", "", heading.group(2)).strip()
+            normalized = heading_text.rstrip(":").casefold()
+            if not removed and normalized in _FRONT_SUMMARY_HEADINGS:
+                removing = True
+                removed = True
+                continue
+            if removing:
+                removing = False
+
+        if removing:
+            note = FOOTNOTE_DEF_RE.match(line.strip())
+            if note:
+                removed_definitions.append((note.group(1), line))
+            continue
+        kept.append(line)
+
+    if not removed:
+        return markdown
+
+    # A source definition may sit inside (or after a final) summary section.
+    # Keep it exactly once so the narrative and evidence appendix never lose
+    # an endnote merely because the duplicate prose was suppressed.
+    retained_note_ids = {
+        match.group(1)
+        for line in kept
+        if (match := FOOTNOTE_DEF_RE.match(line.strip()))
+    }
+    missing_definitions: list[str] = []
+    for note_id, line in removed_definitions:
+        if note_id in retained_note_ids:
+            continue
+        retained_note_ids.add(note_id)
+        missing_definitions.append(line)
+    if missing_definitions:
+        while kept and not kept[-1].strip():
+            kept.pop()
+        kept.extend(("", *missing_definitions))
+
+    result = "\n".join(kept)
+    return result + ("\n" if markdown.endswith("\n") else "")
+
+
 def _build_full_report(
     title: str,
     final_draft_md: str,
@@ -642,31 +719,44 @@ def _build_full_report(
     out_path: Path,
     visual_brief: dict | None = None,
     decision_context: DecisionContext | dict | None = None,
+    decision_frame_enabled: bool = True,
     revision_label: str | None = None,
+    executive_summary_target_words: int | None = None,
 ) -> None:
-    assert_quality(lint_markdown(final_draft_md, location="final draft"))
+    assert_quality(lint_markdown(
+        final_draft_md,
+        location="final draft",
+        executive_summary_target_words=executive_summary_target_words,
+    ))
     doc = Document()
     _configure_document(doc)
     _add_cover_page(
         doc,
         title=title,
-        subtitle="Independent analysis for airport decision-makers",
+        subtitle=(
+            "Independent analysis for airport decision-makers"
+            if decision_frame_enabled
+            else "Independent analysis for airport leaders"
+        ),
         revision_label=revision_label,
     )
-    brief = _build_decision_brief(
-        final_draft_md,
-        visual_brief=visual_brief,
-        decision_context=decision_context,
-    )
-    _add_decision_brief(doc, brief)
-    doc.add_page_break()
+    narrative_md = final_draft_md
+    if decision_frame_enabled:
+        brief = _build_decision_brief(
+            final_draft_md,
+            visual_brief=visual_brief,
+            decision_context=decision_context,
+        )
+        narrative_md = _without_front_summary(final_draft_md)
+        _add_decision_brief(doc, brief)
+        doc.add_page_break()
     _add_table_of_contents(doc)
-    _markdown_to_docx(doc, final_draft_md, body_size=11)
+    _markdown_to_docx(doc, narrative_md, body_size=11)
     if _renderable_exhibits(visual_brief):
         doc.add_page_break()
         _add_decision_exhibits(doc, visual_brief)
     doc.add_page_break()
-    _add_technical_evidence_appendix(doc, final_draft_md, visual_brief)
+    _add_technical_evidence_appendix(doc, narrative_md, visual_brief)
     doc.add_page_break()
     doc.add_heading("Technical appendix: Methodology", level=1)
     _markdown_to_docx(doc, methodology_md, body_size=11)
@@ -698,6 +788,34 @@ class DecisionBrief:
         "Set measurable acceptance, stop, and reporting criteria before launch.",
     )
     time_horizon: str = ""
+
+
+# The front brief is a scan-first decision instrument, not a second report.
+# These budgets hold its generated and structured inputs to roughly two pages
+# under the package's normal page geometry and type scale.
+DECISION_BRIEF_MAX_ITEMS = {
+    "why_now": 2,
+    "evidence": 3,
+    "recommendations": 3,
+    "risks": 2,
+    "success_measures": 2,
+}
+# Source notes deliberately have no independent item cap: they follow the
+# retained citation markers exactly, so provenance is never discarded merely
+# to save a line in the brief.
+DECISION_BRIEF_MAX_WORDS = {
+    "bottom_line": 40,
+    "why_now": 22,
+    "evidence": 24,
+    "recommendations": 24,
+    "risks": 22,
+    "decision_owner": 14,
+    "approval_route": 22,
+    "first_90_day_action": 26,
+    "success_measures": 20,
+    "time_horizon": 16,
+    "source_reference": 18,
+}
 
 
 @dataclass(frozen=True)
@@ -1713,15 +1831,28 @@ def _content_units(markdown: str) -> list[_ContentUnit]:
     units: list[_ContentUnit] = []
     section = ""
     paragraph: list[str] = []
+    bullet_parts: list[str] = []
     index = 0
 
-    def flush() -> None:
+    def flush_paragraph() -> None:
         nonlocal index
         joined = " ".join(paragraph).strip()
         paragraph.clear()
         if joined:
             units.append(_ContentUnit(section, "paragraph", joined, index))
             index += 1
+
+    def flush_bullet() -> None:
+        nonlocal index
+        joined = " ".join(bullet_parts).strip()
+        bullet_parts.clear()
+        if joined:
+            units.append(_ContentUnit(section, "bullet", joined, index))
+            index += 1
+
+    def flush() -> None:
+        flush_paragraph()
+        flush_bullet()
 
     for raw in body_lines:
         line = raw.strip()
@@ -1733,8 +1864,7 @@ def _content_units(markdown: str) -> list[_ContentUnit]:
         bullet = BULLET_RE.match(line) or ORDERED_RE.match(line)
         if bullet:
             flush()
-            units.append(_ContentUnit(section, "bullet", bullet.group(1).strip(), index))
-            index += 1
+            bullet_parts.append(bullet.group(1).strip())
             continue
         if not line:
             flush()
@@ -1745,34 +1875,173 @@ def _content_units(markdown: str) -> list[_ContentUnit]:
         if line.startswith("|") or PIPE_DIVIDER_RE.match(line):
             flush()
             continue
-        paragraph.append(line)
+        if bullet_parts:
+            bullet_parts.append(line)
+        else:
+            paragraph.append(line)
     flush()
     return units
 
 
 def _plain_for_scoring(text: str) -> str:
+    text = strip_internal_citations(text)
     text = FOOTNOTE_MARK_RE.sub("", text)
     text = re.sub(r"[*_`>#]", "", text)
     return " ".join(text.split())
 
 
 def _clip_sentences(text: str, max_words: int) -> str:
-    """Keep complete opening sentences up to a firm decision-brief budget."""
+    """Select complete sentences without changing a verified claim's meaning."""
+    text = strip_internal_citations(text).strip()
+    if not text or max_words <= 0:
+        return ""
     sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\[])|(?<=\])\s+(?=[A-Z0-9])", text)
     kept: list[str] = []
     words = 0
     for sentence in sentences:
         count = len(_plain_for_scoring(sentence).split())
-        if kept and words + count > max_words:
-            break
+        if not count:
+            continue
+        if words + count > max_words:
+            # Never bisect a fact-checked sentence. If the opening sentence is
+            # too long, a later complete sentence may still fit the brief.
+            if kept:
+                break
+            continue
         kept.append(sentence.strip())
         words += count
         if words >= max_words:
             break
     result = " ".join(kept).strip()
-    if not result:
-        return text.strip()
     return result
+
+
+def _bounded_brief_items(
+    values: tuple[str, ...],
+    *,
+    count: int,
+    max_words: int,
+) -> tuple[str, ...]:
+    """Clean, bound, and de-duplicate one decision-brief list."""
+    bounded: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        clipped = _clip_sentences(value, max_words)
+        key = re.sub(r"\W+", " ", _plain_for_scoring(clipped).casefold()).strip()
+        if not clipped or not key or key in seen:
+            continue
+        seen.add(key)
+        bounded.append(clipped)
+        if len(bounded) >= count:
+            break
+    return tuple(bounded)
+
+
+def _compact_source_reference(note: str) -> str:
+    """Reduce a source note to a short descriptor plus a traceable host."""
+    cleaned = " ".join(strip_internal_citations(note).split())
+    if not cleaned:
+        return ""
+    urls = SOURCE_URL_RE.findall(cleaned)
+    if not urls:
+        # A source citation may be longer than the display target, but unlike
+        # a claim it cannot be shortened safely without losing provenance.
+        return cleaned
+
+    raw_url = urls[0].rstrip(".,;)")
+    host = urlsplit(raw_url).netloc.casefold()
+    if host.startswith("www."):
+        host = host[4:]
+    descriptor = " ".join(SOURCE_URL_RE.sub("", cleaned).split())
+    if not host:
+        return descriptor or cleaned
+    descriptor = _clip_sentences(
+        descriptor,
+        DECISION_BRIEF_MAX_WORDS["source_reference"] - 2,
+    ).rstrip(". ;,—-")
+    reference = f"{descriptor} — {host}" if descriptor else host
+    return reference
+
+
+def _bound_decision_brief(brief: DecisionBrief) -> DecisionBrief:
+    """Apply the brief's reader-facing size and hygiene contract once."""
+    bottom_line = _clip_sentences(
+        brief.bottom_line, DECISION_BRIEF_MAX_WORDS["bottom_line"]
+    ) or "No substantive reader-facing argument was available."
+    why_now = _bounded_brief_items(
+        brief.why_now,
+        count=DECISION_BRIEF_MAX_ITEMS["why_now"],
+        max_words=DECISION_BRIEF_MAX_WORDS["why_now"],
+    )
+    evidence = _bounded_brief_items(
+        brief.evidence,
+        count=DECISION_BRIEF_MAX_ITEMS["evidence"],
+        max_words=DECISION_BRIEF_MAX_WORDS["evidence"],
+    )
+    recommendations = _bounded_brief_items(
+        brief.recommendations,
+        count=DECISION_BRIEF_MAX_ITEMS["recommendations"],
+        max_words=DECISION_BRIEF_MAX_WORDS["recommendations"],
+    )
+    risks = _bounded_brief_items(
+        brief.risks,
+        count=DECISION_BRIEF_MAX_ITEMS["risks"],
+        max_words=DECISION_BRIEF_MAX_WORDS["risks"],
+    )
+    decision_owner = _clip_sentences(
+        brief.decision_owner, DECISION_BRIEF_MAX_WORDS["decision_owner"]
+    )
+    approval_route = _clip_sentences(
+        brief.approval_route, DECISION_BRIEF_MAX_WORDS["approval_route"]
+    )
+    first_90_day_action = _clip_sentences(
+        brief.first_90_day_action,
+        DECISION_BRIEF_MAX_WORDS["first_90_day_action"],
+    )
+    success_measures = _bounded_brief_items(
+        brief.success_measures,
+        count=DECISION_BRIEF_MAX_ITEMS["success_measures"],
+        max_words=DECISION_BRIEF_MAX_WORDS["success_measures"],
+    )
+    time_horizon = _clip_sentences(
+        brief.time_horizon, DECISION_BRIEF_MAX_WORDS["time_horizon"]
+    )
+
+    retained_text = " ".join(
+        (
+            bottom_line,
+            *why_now,
+            *evidence,
+            *recommendations,
+            *risks,
+            decision_owner,
+            approval_route,
+            first_90_day_action,
+            *success_measures,
+            time_horizon,
+        )
+    )
+    cited_ids = list(dict.fromkeys(FOOTNOTE_MARK_RE.findall(retained_text)))
+    note_definitions = {str(note_id): note for note_id, note in brief.notes}
+    notes = tuple(
+        (note_id, compact)
+        for note_id in cited_ids
+        if (compact := _compact_source_reference(note_definitions.get(note_id, "")))
+    )
+
+    return DecisionBrief(
+        bottom_line=bottom_line,
+        why_now=why_now,
+        evidence=evidence,
+        recommendations=recommendations,
+        risks=risks,
+        notes=notes,
+        decision_owner=decision_owner,
+        approval_route=approval_route,
+        first_90_day_action=first_90_day_action,
+        success_measures=success_measures,
+        time_horizon=time_horizon,
+    )
 
 
 def _rank_units(
@@ -1858,7 +2127,10 @@ def _split_recommendation_sentences(text: str) -> tuple[str, ...]:
     return tuple(
         _clip_sentences(sentence.strip(), 48)
         for sentence in sentences
-        if len(_plain_for_scoring(sentence).split()) >= 7
+        # Executive actions are frequently short imperatives ("Start the
+        # pilot." / "Publish the threshold."). Do not discard them merely
+        # because they are more concise than analytical prose.
+        if len(_plain_for_scoring(sentence).split()) >= 4
     )[:5]
 
 
@@ -1972,9 +2244,11 @@ def _build_decision_brief(
     """Distill a verified argument by decision relevance, not document order."""
 
     def finish(brief: DecisionBrief) -> DecisionBrief:
-        return _apply_structured_decision_context(
-            _apply_visual_decision_context(brief, visual_brief),
-            decision_context,
+        return _bound_decision_brief(
+            _apply_structured_decision_context(
+                _apply_visual_decision_context(brief, visual_brief),
+                decision_context,
+            )
         )
 
     explicit = _explicit_decision_brief(markdown)
@@ -2117,14 +2391,14 @@ def _add_decision_brief(doc: Document, brief: DecisionBrief) -> None:
         label_cell, value_cell = row.cells
         _set_cell_margins(label_cell)
         _set_cell_margins(value_cell)
-        _set_cell_shading(label_cell, "0B2D4D")
+        _set_cell_shading(label_cell, APRON_FOG)
         if row_index % 2:
             _set_cell_shading(value_cell, APRON_FOG)
         label_p = label_cell.paragraphs[0]
-        _add_inline(label_p, label, base_size=9, font=BODY_FONT)
+        _add_inline(label_p, label, base_size=8.5, font=BODY_FONT)
         for run in label_p.runs:
             run.bold = True
-            run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+            run.font.color.rgb = RUNWAY_NAVY
         for value_index, value in enumerate(values):
             value_p = (
                 value_cell.paragraphs[0]
@@ -2180,28 +2454,19 @@ def _add_decision_brief(doc: Document, brief: DecisionBrief) -> None:
     bullets("Risks and conditions", brief.risks)
 
     if brief.notes:
-        _add_section_label(doc, "Decision-brief notes")
-        notes_table = doc.add_table(rows=0, cols=2)
-        notes_table.autofit = True
-        for index in range(0, len(brief.notes), 2):
-            row = notes_table.add_row()
-            _prevent_row_split(row)
-            note_items = brief.notes[index:index + 2]
-            if len(note_items) == 1:
-                row.cells[0].merge(row.cells[1])
-            for column, note_item in enumerate(note_items):
-                note_id, note = note_item
-                cell = row.cells[column]
-                _set_cell_margins(cell, top=35, start=55, bottom=45, end=90)
-                p = cell.paragraphs[0]
-                p.paragraph_format.space_after = Pt(0)
-                mark = p.add_run(note_id)
-                mark.font.superscript = True
-                mark.font.size = Pt(8)
-                p.add_run("  ")
-                _add_inline(p, note, base_size=8.5, font=BODY_FONT)
-                for run in p.runs:
-                    run.font.color.rgb = OPERATIONS_SLATE
+        _add_section_label(doc, "Sources cited in this brief")
+        for note_id, note in brief.notes:
+            p = doc.add_paragraph()
+            p.paragraph_format.left_indent = Pt(8)
+            p.paragraph_format.first_line_indent = Pt(-8)
+            p.paragraph_format.space_after = Pt(2)
+            mark = p.add_run(note_id)
+            mark.font.superscript = True
+            mark.font.size = Pt(7.5)
+            p.add_run("  ")
+            _add_inline(p, note, base_size=8.25, font=BODY_FONT)
+            for run in p.runs:
+                run.font.color.rgb = OPERATIONS_SLATE
 
 
 def _decision_brief_to_markdown(brief: DecisionBrief) -> str:
@@ -2351,16 +2616,21 @@ def _build_article(
     out_path: Path,
     *,
     revision_label: str | None = None,
+    executive_summary_target_words: int | None = None,
 ) -> None:
     """Build the continuous narrative without report-only front or back matter."""
 
-    assert_quality(lint_markdown(final_draft_md, location="final draft"))
+    assert_quality(lint_markdown(
+        final_draft_md,
+        location="final draft",
+        executive_summary_target_words=executive_summary_target_words,
+    ))
     doc = Document()
     _configure_document(doc)
     _add_cover_page(
         doc,
         title=title,
-        subtitle="A long-form argument for airport leaders",
+        subtitle="A narrative feature for airport leaders",
         revision_label=revision_label,
     )
     _markdown_to_docx(doc, final_draft_md, body_size=11)
@@ -2375,6 +2645,7 @@ def _build_compact_output(
     artifact_label: str,
     context_heading: str,
     decision_context: DecisionContext | dict | None,
+    decision_frame_enabled: bool = True,
     revision_label: str | None = None,
 ) -> None:
     """Build a short decision tool with no report-only appendices or TOC."""
@@ -2388,11 +2659,12 @@ def _build_compact_output(
         artifact_label=artifact_label,
         revision_label=revision_label,
     )
-    _add_compact_decision_context(
-        doc,
-        decision_context,
-        heading=context_heading,
-    )
+    if decision_frame_enabled:
+        _add_compact_decision_context(
+            doc,
+            decision_context,
+            heading=context_heading,
+        )
     _markdown_to_docx(doc, final_draft_md, body_size=10)
     doc.save(out_path)
 
@@ -2590,6 +2862,7 @@ def _build_brief(
     out_path: Path,
     *,
     decision_context: DecisionContext | dict | None,
+    decision_frame_enabled: bool = True,
     revision_label: str | None = None,
 ) -> None:
     _build_compact_output(
@@ -2599,6 +2872,7 @@ def _build_brief(
         artifact_label="Executive brief",
         context_heading="Decision frame",
         decision_context=decision_context,
+        decision_frame_enabled=decision_frame_enabled,
         revision_label=revision_label,
     )
 
@@ -2609,6 +2883,7 @@ def _build_recommendations(
     out_path: Path,
     *,
     decision_context: DecisionContext | dict | None,
+    decision_frame_enabled: bool = True,
     revision_label: str | None = None,
 ) -> None:
     _build_compact_output(
@@ -2618,6 +2893,7 @@ def _build_recommendations(
         artifact_label="Action recommendations",
         context_heading="Decision mandate",
         decision_context=decision_context,
+        decision_frame_enabled=decision_frame_enabled,
         revision_label=revision_label,
     )
 
@@ -2629,9 +2905,14 @@ def _build_executive_summary(
     visual_brief: dict | None = None,
     decision_context: DecisionContext | dict | None = None,
     revision_label: str | None = None,
+    executive_summary_target_words: int | None = None,
 ) -> None:
     """Build a concise decision instrument from the verified argument."""
-    assert_quality(lint_markdown(final_draft_md, location="final draft"))
+    assert_quality(lint_markdown(
+        final_draft_md,
+        location="final draft",
+        executive_summary_target_words=executive_summary_target_words,
+    ))
     doc = Document()
     _configure_document(doc, compact=True)
 
@@ -2693,9 +2974,11 @@ def build_documents(
     methodology: Path,
     out_dir: Path,
     output_format: str = "report",
+    decision_frame_enabled: bool | None = None,
     visual_brief: Path | None = None,
     decision_context: DecisionContext | dict | None = None,
     revision_label: str | None = None,
+    executive_summary_target_words: int | None = None,
 ) -> tuple[Path, Path | None]:
     """Build format-specific Stage 4 Word artifacts from the verified draft."""
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -2721,6 +3004,31 @@ def build_documents(
             raise ValueError(f"Visual brief must contain a JSON object: {visual_brief}")
         visual_payload = payload
 
+    if decision_frame_enabled is None:
+        decision = _coerce_decision_context(decision_context)
+        decision_frame_enabled = any(
+            (
+                decision.decision,
+                decision.decision_owner,
+                decision.approval_path,
+                decision.first_action,
+                decision.time_horizon,
+                decision.success_measures,
+            )
+        ) or bool(
+            isinstance(visual_payload, dict)
+            and any(
+                visual_payload.get(field)
+                for field in (
+                    "decision",
+                    "decision_owner",
+                    "approval_path",
+                    "first_90_day_action",
+                    "success_measures",
+                )
+            )
+        )
+
     primary_path = out_dir / f"{slug}.docx"
     exec_path: Path | None = None
     if requested_format == "report":
@@ -2731,32 +3039,28 @@ def build_documents(
             primary_path,
             visual_brief=visual_payload,
             decision_context=decision_context,
+            decision_frame_enabled=decision_frame_enabled,
             revision_label=revision_label,
+            executive_summary_target_words=executive_summary_target_words,
         )
-        exec_path = out_dir / f"{slug}-executive-summary.docx"
-        _build_executive_summary(
-            title,
-            final_draft_md,
-            exec_path,
-            visual_brief=visual_payload,
-            decision_context=decision_context,
-            revision_label=revision_label,
-        )
+        if decision_frame_enabled:
+            exec_path = out_dir / f"{slug}-executive-summary.docx"
+            _build_executive_summary(
+                title,
+                final_draft_md,
+                exec_path,
+                visual_brief=visual_payload,
+                decision_context=decision_context,
+                revision_label=revision_label,
+                executive_summary_target_words=executive_summary_target_words,
+            )
     elif requested_format == "article":
         _build_article(
             title,
             final_draft_md,
             primary_path,
             revision_label=revision_label,
-        )
-        exec_path = out_dir / f"{slug}-executive-summary.docx"
-        _build_executive_summary(
-            title,
-            final_draft_md,
-            exec_path,
-            visual_brief=visual_payload,
-            decision_context=decision_context,
-            revision_label=revision_label,
+            executive_summary_target_words=executive_summary_target_words,
         )
     elif requested_format == "brief":
         _build_brief(
@@ -2764,6 +3068,7 @@ def build_documents(
             final_draft_md,
             primary_path,
             decision_context=decision_context,
+            decision_frame_enabled=decision_frame_enabled,
             revision_label=revision_label,
         )
     else:
@@ -2772,6 +3077,7 @@ def build_documents(
             final_draft_md,
             primary_path,
             decision_context=decision_context,
+            decision_frame_enabled=decision_frame_enabled,
             revision_label=revision_label,
         )
 

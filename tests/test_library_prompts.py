@@ -10,6 +10,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 import cli.server as server
+from cli.agents import load_all_agents
 from cli.publish import ReportSource, resolve_report_prompt
 
 
@@ -155,6 +156,32 @@ class AgentCatalogEndpointTests(unittest.TestCase):
         self.assertEqual(len(process), 16)
         self.assertEqual(len(all_names), len(set(all_names)))
         self.assertTrue(all(item["display"] and item["description"] for item in research + process))
+        self.assertTrue(all("profile" not in item for item in research + process))
+
+    def test_full_profile_is_lazy_authenticated_and_registry_bound(self) -> None:
+        expected = {agent.name: agent for agent in load_all_agents()}["airport-ceo"]
+        headers = {
+            "origin": ORIGIN,
+            server._SESSION_HEADER: server._SESSION_TOKEN,
+            server._CLIENT_HEADER: CLIENT_ID,
+        }
+        with TestClient(
+            server.app,
+            base_url=ORIGIN,
+            client=("127.0.0.1", 51001),
+        ) as client:
+            forbidden = client.post("/api/agents/airport-ceo/profile")
+            response = client.post("/api/agents/airport-ceo/profile", headers=headers)
+            unknown = client.post("/api/agents/not-a-registered-role/profile", headers=headers)
+
+        self.assertEqual(forbidden.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["profile"], expected.system_prompt)
+        self.assertEqual(response.json()["display"], expected.display_name)
+        self.assertNotIn("path", response.json())
+        self.assertNotIn("provider", response.json())
+        self.assertNotIn("model_override", response.json())
+        self.assertEqual(unknown.status_code, 404)
 
 
 if __name__ == "__main__":

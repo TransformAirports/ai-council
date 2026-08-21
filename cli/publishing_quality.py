@@ -68,6 +68,46 @@ INTERNAL_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 
 FOOTNOTE_MARK_RE = re.compile(r"\[\^([A-Za-z0-9_-]+)\](?!:)")
 FOOTNOTE_DEF_RE = re.compile(r"(?m)^\[\^([A-Za-z0-9_-]+)\]:")
+MARKDOWN_HEADING_RE = re.compile(r"(?m)^(#{2,6})\s+(.+?)\s*$")
+MARKDOWN_LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+)")
+MARKDOWN_WORD_RE = re.compile(r"\b[\w]+(?:[-’'][\w]+)*\b", re.UNICODE)
+RUN_LENGTH_SECTION_RE = re.compile(
+    r"(?ms)^##\s+Length(?:\s+\([^\n)]*\))?\s*$\n"
+    r"(?P<body>.*?)(?=^##\s+|\Z)"
+)
+
+# These labels describe the writing process instead of the subject. The first
+# group is the legacy report scaffold and receives a stronger diagnostic; the
+# checks remain advisory because prose-style defects should not strand an
+# otherwise verified paid run at the packaging step.
+REJECTED_REPORT_HEADINGS = {
+    "the argument",
+    "why the counter case is insufficient",
+    "implications for the operator",
+}
+GENERIC_SECTION_HEADINGS = REJECTED_REPORT_HEADINGS | {
+    "the case",
+    "the counter case",
+    "the counter case honestly presented",
+    "analysis",
+    "background",
+    "conclusion",
+    "discussion",
+    "findings",
+    "next steps",
+    "overview",
+}
+LIST_FORWARD_SECTION_HEADINGS = {
+    "executive summary",
+    "decision and bottom line",
+    "three findings that carry the decision",
+    "recommended action and guardrails",
+    "recommendations",
+    "sources",
+    "source appendix",
+    "notes",
+    "methodology",
+}
 
 
 @dataclass(frozen=True)
@@ -147,9 +187,306 @@ def lint_reader_text(text: str, *, location: str = "text") -> list[QualityIssue]
     return issues
 
 
-def lint_markdown(markdown: str, *, location: str = "markdown") -> QualityReport:
+def _markdown_words(text: str) -> list[str]:
+    """Return reader-facing words for conservative prose-density checks."""
+
+    text = re.sub(r"```.*?```", " ", text, flags=re.DOTALL)
+    text = re.sub(r"`[^`]+`", " ", text)
+    text = re.sub(r"!?(?:\[([^\]]*)\])\([^)]*\)", r"\1", text)
+    text = FOOTNOTE_MARK_RE.sub(" ", text)
+    return MARKDOWN_WORD_RE.findall(text)
+
+
+def _normalise_markdown_heading(title: str) -> str:
+    title = re.sub(r"[*_`~]", "", title)
+    title = re.sub(r"\s+#+\s*$", "", title)
+    return " ".join(re.findall(r"[a-z0-9]+", title.casefold()))
+
+
+def executive_summary_word_target(run_prompt: str) -> int | None:
+    """Return an explicit executive-summary target without reading report length.
+
+    The match is intentionally anchored to the words ``executive summary`` so
+    a total-report range such as ``4,000–6,000 words`` cannot be mistaken for
+    the summary contract that follows it.
+    """
+
+    section = RUN_LENGTH_SECTION_RE.search(run_prompt)
+    if section is None:
+        return None
+    length_text = re.sub(r"[*_`~]", "", section.group("body"))
+    for clause in re.split(r"[;\n.]", length_text):
+        if re.search(r"(?i)\bexecutive\s+summary\b", clause) is None:
+            continue
+        candidates: list[int] = []
+        for raw in re.findall(r"(?<![\w])\d[\d,]*", clause):
+            try:
+                value = int(raw.replace(",", ""))
+            except ValueError:
+                continue
+            if 100 <= value <= 5_000:
+                candidates.append(value)
+        if candidates:
+            # A range names its upper target last (900–1,100); choosing the
+            # maximum also ignores nearby claim counts such as "five claims".
+            return max(candidates)
+    return None
+
+
+def _markdown_sections(
+    markdown: str,
+) -> list[tuple[int, str, str, str]]:
+    """Return ``(line, title, normalised title, body)`` for H2-H6 sections."""
+
+    matches = list(MARKDOWN_HEADING_RE.finditer(markdown))
+    sections: list[tuple[int, str, str, str]] = []
+    for index, match in enumerate(matches):
+        level = len(match.group(1))
+        body_end = len(markdown)
+        for following in matches[index + 1:]:
+            if len(following.group(1)) <= level:
+                body_end = following.start()
+                break
+        title = match.group(2).strip()
+        sections.append(
+            (
+                markdown.count("\n", 0, match.start()) + 1,
+                title,
+                _normalise_markdown_heading(title),
+                markdown[match.end():body_end].strip(),
+            )
+        )
+    return sections
+
+
+def _markdown_paragraphs(markdown: str) -> list[tuple[int, str]]:
+    """Return plain prose blocks while excluding headings, lists, and notes."""
+
+    paragraphs: list[tuple[int, str]] = []
+    block: list[str] = []
+    block_line = 1
+    in_fence = False
+
+    def flush() -> None:
+        nonlocal block
+        text = "\n".join(block).strip()
+        block = []
+        if not text:
+            return
+        first = text.lstrip()
+        if (
+            first.startswith("#")
+            or first.startswith("|")
+            or first.startswith(">")
+            or first.startswith("[^")
+            or MARKDOWN_LIST_ITEM_RE.match(first)
+        ):
+            return
+        paragraphs.append((block_line, text))
+
+    for line_number, line in enumerate(markdown.splitlines(), 1):
+        if line.lstrip().startswith("```"):
+            flush()
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if not line.strip():
+            flush()
+            continue
+        if not block:
+            block_line = line_number
+        block.append(line)
+    flush()
+    return paragraphs
+
+
+def _lint_narrative_markdown(
+    markdown: str,
+    *,
+    location: str,
+    executive_summary_target_words: int = 600,
+) -> tuple[list[QualityIssue], dict[str, Any]]:
+    """Check prose architecture without pretending to judge literary taste."""
+
+    issues: list[QualityIssue] = []
+    sections = _markdown_sections(markdown)
+    generic_sections: list[tuple[int, str, str]] = []
+    headings_seen: dict[str, tuple[int, str]] = {}
+    bodies_seen: dict[str, tuple[int, str]] = {}
+    long_paragraphs = 0
+    list_heavy_sections = 0
+
+    for line, title, normalised, body in sections:
+        if normalised in GENERIC_SECTION_HEADINGS:
+            generic_sections.append((line, title, normalised))
+            issues.append(
+                QualityIssue(
+                    code="generic_section_heading",
+                    severity="warning",
+                    message=(
+                        f"Generic heading {title!r} describes report scaffolding; "
+                        "replace it with a content-specific assertion."
+                    ),
+                    location=f"{location}:line {line}",
+                )
+            )
+
+        if normalised:
+            if normalised in headings_seen:
+                prior_line, prior_title = headings_seen[normalised]
+                issues.append(
+                    QualityIssue(
+                        code="duplicate_section_heading",
+                        severity="warning",
+                        message=(
+                            f"Heading {title!r} repeats the section at line "
+                            f"{prior_line} ({prior_title!r})."
+                        ),
+                        location=f"{location}:line {line}",
+                    )
+                )
+            else:
+                headings_seen[normalised] = (line, title)
+
+        body_without_notes = "\n".join(
+            body_line
+            for body_line in body.splitlines()
+            if not body_line.lstrip().startswith("[^")
+        )
+        body_words = _markdown_words(body_without_notes)
+        if len(body_words) >= 50:
+            normalised_body = " ".join(word.casefold() for word in body_words)
+            if normalised_body in bodies_seen:
+                prior_line, prior_title = bodies_seen[normalised_body]
+                issues.append(
+                    QualityIssue(
+                        code="duplicate_section_body",
+                        severity="error",
+                        message=(
+                            f"Section {title!r} duplicates the reader-facing "
+                            f"body of {prior_title!r} at line {prior_line}."
+                        ),
+                        location=f"{location}:line {line}",
+                    )
+                )
+            else:
+                bodies_seen[normalised_body] = (line, title)
+
+        list_lines = [
+            body_line
+            for body_line in body_without_notes.splitlines()
+            if MARKDOWN_LIST_ITEM_RE.match(body_line)
+        ]
+        list_word_count = sum(len(_markdown_words(item)) for item in list_lines)
+        if (
+            normalised not in LIST_FORWARD_SECTION_HEADINGS
+            and len(list_lines) >= 6
+            and len(body_words) >= 120
+            and list_word_count / max(1, len(body_words)) >= 0.55
+        ):
+            list_heavy_sections += 1
+            issues.append(
+                QualityIssue(
+                    code="list_heavy_prose",
+                    severity="warning",
+                    message=(
+                        f"Section {title!r} puts most of its argument in "
+                        "list items; convert analytical scaffolding to prose."
+                    ),
+                    location=f"{location}:line {line}",
+                )
+            )
+
+        if normalised == "executive summary":
+            summary_words = len(body_words)
+            summary_target = max(100, int(executive_summary_target_words))
+            if summary_words > summary_target:
+                issues.append(
+                    QualityIssue(
+                        code="oversized_executive_summary",
+                        severity="warning",
+                        message=(
+                            f"Executive summary contains {summary_words} words; "
+                            f"this run's layered summary target is {summary_target}."
+                        ),
+                        location=f"{location}:line {line}",
+                    )
+                )
+            numbered_claims = sum(
+                1
+                for body_line in body.splitlines()
+                if re.match(r"^\s*\d+[.)]\s+", body_line)
+            )
+            if numbered_claims > 5:
+                issues.append(
+                    QualityIssue(
+                        code="too_many_summary_claims",
+                        severity="warning",
+                        message=(
+                            f"Executive summary has {numbered_claims} numbered "
+                            "claims; keep the decision layer to four or five."
+                        ),
+                        location=f"{location}:line {line}",
+                    )
+                )
+
+    if len(generic_sections) >= 2:
+        issues.append(
+            QualityIssue(
+                code="generic_section_scaffold",
+                severity="warning",
+                message=(
+                    "Multiple generic headings expose the report outline "
+                    "instead of telling the reader's argument: "
+                    + ", ".join(repr(item[1]) for item in generic_sections)
+                    + "."
+                ),
+                location=location,
+            )
+        )
+
+    for line, paragraph in _markdown_paragraphs(markdown):
+        word_count = len(_markdown_words(paragraph))
+        if word_count <= 220:
+            continue
+        long_paragraphs += 1
+        issues.append(
+            QualityIssue(
+                code="oversized_paragraph",
+                severity="warning",
+                message=(
+                    f"Paragraph contains {word_count} words; split it at a "
+                    "real turn in the argument."
+                ),
+                location=f"{location}:line {line}",
+            )
+        )
+
+    return issues, {
+        "sections": len(sections),
+        "generic_headings": len(generic_sections),
+        "oversized_paragraphs": long_paragraphs,
+        "list_heavy_sections": list_heavy_sections,
+        "executive_summary_target_words": executive_summary_target_words,
+    }
+
+
+def lint_markdown(
+    markdown: str,
+    *,
+    location: str = "markdown",
+    executive_summary_target_words: int | None = None,
+) -> QualityReport:
     """Validate reader-facing Markdown before layout."""
+    summary_target = executive_summary_target_words or 600
     issues = lint_reader_text(markdown, location=location)
+    narrative_issues, narrative_metadata = _lint_narrative_markdown(
+        markdown,
+        location=location,
+        executive_summary_target_words=summary_target,
+    )
+    issues.extend(narrative_issues)
 
     markers = set(FOOTNOTE_MARK_RE.findall(markdown))
     definitions = set(FOOTNOTE_DEF_RE.findall(markdown))
@@ -180,6 +517,7 @@ def lint_markdown(markdown: str, *, location: str = "markdown") -> QualityReport
             "characters": len(markdown),
             "footnote_markers": len(markers),
             "footnote_definitions": len(definitions),
+            **narrative_metadata,
         },
     )
 

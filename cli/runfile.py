@@ -69,6 +69,18 @@ def render_run_file(spec: RunSpec) -> str:
     if spec.source_paths:
         lines.append("## Source material")
         lines.append("")
+
+    if spec.lines_of_inquiry:
+        lines.append("## Lines of inquiry")
+        lines.append("")
+        lines.append(
+            "These are promising threads for the independent researchers to follow, "
+            "not assignments or a required outline."
+        )
+        lines.append("")
+        for item in spec.lines_of_inquiry:
+            lines.append(f"- {item}")
+        lines.append("")
         lines.append(
             "Operator-supplied files attached to this run. Read them before "
             "conducting your own research; treat them as the primary starting "
@@ -105,7 +117,11 @@ def render_run_file(spec: RunSpec) -> str:
         ("Approval path", spec.approval_path),
         ("Success measure", spec.success_measure),
     ]
-    if any(value.strip() for _, value in decision_fields):
+    decision_frame_enabled = bool(
+        getattr(spec, "decision_frame_enabled", False)
+        or any(value.strip() for _, value in decision_fields)
+    )
+    if decision_frame_enabled:
         lines.append("## Decision frame")
         lines.append("")
         lines.append(
@@ -453,9 +469,11 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
         tone=_section_body(text, "Tone"),
         length=length,
         output_format=output_format,
+        lines_of_inquiry=_bullets(_section_body(text, "Lines of inquiry")),
         is_not=_bullets(_section_body(text, "What this is NOT")),
         is_yes=_bullets(_section_body(text, "What this IS")),
         operator_context=_section_body(text, "Operator-specific framing"),
+        decision_frame_enabled=bool(_section_body(text, "Decision frame").strip()),
         decision_required=_named_bold_item(
             _section_body(text, "Decision frame"), "Decision required"
         ),

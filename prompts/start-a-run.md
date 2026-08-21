@@ -10,7 +10,7 @@ The goal: they describe what they want in plain English, you do the file mechani
 
 Ask one question. Short. Something like:
 
-> "What do you want to write about? Give me the sharp version of the claim — the thing you'd argue at a dinner table. Unless you want to set audience, tone, or length yourself, I'll use the same defaults as the last run."
+> "What do you want to write about? Give me the sharp version of the claim — the thing you'd argue at a dinner table. Unless you say otherwise, I'll shape it as a fascinating narrative feature."
 
 If they give you just a topic ("something on airline consolidation"), push once for the sharper claim. Frame it as helpful, not interrogative:
 
@@ -18,26 +18,24 @@ If they give you just a topic ("something on airline consolidation"), push once 
 
 If they resist being pushed, pick a sharp thesis on their behalf from what they said, show it to them, and ask whether you nailed it. Do not run a generic "topic-level" piece — the Council produces bad output from vague inputs.
 
-## Step 2 — Infer the decision frame and defaults
+## Step 2 — Use the narrative defaults
 
 From the user's description, infer:
 
 - The airport, authority, program, or industry segment
-- The decision the work should enable
-- The likely executive owner
-- The useful time horizon
-- The approvals or external parties likely to matter
-- The measurable definition of success
+- The tension, mechanism, cases, places, or people likely to make the story move
+- The strongest counter-case
 
-Do not interrogate the user for fields you can reasonably infer. Mark unknown
-operator-specific facts as research questions in the run file; never invent
-them.
+Do not infer a decision frame. Include one only when the user explicitly says
+the work must support a named decision or opts into it after seeing the choice.
+Unknown operator-specific facts remain research questions; never invent them.
 
 Use these defaults silently unless the user specifies otherwise:
 
 - **Audience:** MWAA leadership, airport planners, and policy readers. Assume sophistication and skepticism.
-- **Tone:** Direct. Evidence-dense. Intellectually honest about the counter-argument. Slightly provocative but not polemical. Think Matt Levine on aviation, not a consultant deck.
-- **Length:** 8,000-10,000 words for the full report; ~1,100-word executive summary.
+- **Tone:** Fascinating, vivid, and argument-led. Open with a scene, case, or surprise. Write like an excellent magazine feature, not a consulting assignment or technical paper.
+- **Length:** A 1,500–2,000-word narrative feature, with no appendices or separate executive summary.
+- **Output format:** article.
 - **Council:** balanced airport council unless the thesis clearly requires a
   specialist roster.
 - **Research agent overrides:** none.
@@ -48,8 +46,9 @@ Ask about these only if the user asks first, or if the thesis falls outside the 
 ## Step 3 — Write the run file
 
 Pick a short kebab-case slug based on the thesis. Write the run file to
-`prompts/runs/<slug>.md` using the template's current structure, including the
-decision frame and selected council. Write clean prose, not placeholder syntax.
+`prompts/runs/<slug>.md` using the template's current structure, omitting the
+Decision frame unless the user opted in, and including the selected council.
+Write clean prose, not placeholder syntax.
 The file should read like a finished commission.
 
 ## Step 4 — Confirm, then run
@@ -61,7 +60,7 @@ Thesis:    <1-2 sentence version>
 Audience:  <short>
 Tone:      <short>
 Length:    <short>
-Decision:  <decision and owner, or "to be established by the research">
+Mode:      <"narrative feature" or the opted-in decision and owner>
 Slug:      <kebab-case>
 ```
 

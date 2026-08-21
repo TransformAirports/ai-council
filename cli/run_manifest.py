@@ -61,9 +61,12 @@ APP_SHELL_PATHS: frozenset[str] = frozenset(
     {
         "cli/__main__.py",     # argv parsing
         "cli/audit.py",        # post-hoc retrospective reader
+        "cli/doctor.py",       # read-only local setup diagnostics
         "cli/events.py",       # event sink and transport
         "cli/interactive.py",  # terminal prompts
+        "cli/library_lifecycle.py",  # post-run Library metadata and trash
         "cli/menu.py",         # terminal UI
+        "cli/prompt_assist.py",  # pre-run form drafting only
         "cli/resume_repair.py",  # the repair tool itself
         "cli/server.py",       # HTTP/WebSocket transport and dispatch
     }
@@ -1135,6 +1138,19 @@ def create_run_manifest(
             "output_format": str(getattr(spec, "output_format", "report")),
             "want_pptx": bool(getattr(spec, "want_pptx", False)),
             "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
+            "decision_frame_enabled": bool(
+                getattr(spec, "decision_frame_enabled", False)
+                or any(
+                    str(getattr(spec, field, "") or "").strip()
+                    for field in (
+                        "decision_required",
+                        "decision_owner",
+                        "time_horizon",
+                        "approval_path",
+                        "success_measure",
+                    )
+                )
+            ),
             "decision_required": str(
                 getattr(spec, "decision_required", "") or ""
             ),
@@ -1143,6 +1159,9 @@ def create_run_manifest(
             "approval_path": str(getattr(spec, "approval_path", "") or ""),
             "success_measure": str(getattr(spec, "success_measure", "") or ""),
             "operator_context": str(getattr(spec, "operator_context", "") or ""),
+            "lines_of_inquiry": list(
+                getattr(spec, "lines_of_inquiry", []) or []
+            ),
             "is_not": list(getattr(spec, "is_not", []) or []),
             "is_yes": list(getattr(spec, "is_yes", []) or []),
             "success_criteria": list(
@@ -1266,6 +1285,19 @@ def create_run_manifest(
         "output_format": str(getattr(spec, "output_format", "report")),
         "want_pptx": bool(getattr(spec, "want_pptx", False)),
         "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
+        "decision_frame_enabled": bool(
+            getattr(spec, "decision_frame_enabled", False)
+            or any(
+                str(getattr(spec, field, "") or "").strip()
+                for field in (
+                    "decision_required",
+                    "decision_owner",
+                    "time_horizon",
+                    "approval_path",
+                    "success_measure",
+                )
+            )
+        ),
         "decision_required": str(
             getattr(spec, "decision_required", "") or ""
         ),
@@ -1274,6 +1306,9 @@ def create_run_manifest(
         "approval_path": str(getattr(spec, "approval_path", "") or ""),
         "success_measure": str(getattr(spec, "success_measure", "") or ""),
         "operator_context": str(getattr(spec, "operator_context", "") or ""),
+        "lines_of_inquiry": list(
+            getattr(spec, "lines_of_inquiry", []) or []
+        ),
         "source_paths": list(getattr(spec, "source_paths", []) or []),
         "source_material": source_material,
         "source_library": source_library,

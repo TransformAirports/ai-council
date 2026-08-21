@@ -31,14 +31,17 @@ The JSON must include:
 - `communication_job`
 - `audience`
 - `decision`
-- `decision_owner`: the accountable executive named in the run prompt, or an
-  explicit decision-critical unknown when the evidence does not establish one
-- `approval_path`: the required governance sequence, preserving the run
-  prompt's language and qualifying any unresolved authority
-- `first_90_day_action`: the first observable, assignable move; never a vague
-  instruction to "develop a strategy"
-- `success_measures`: one or more measurable acceptance, reporting, or stop
-  conditions, beginning with the run prompt's success measure when supplied
+- `decision_owner`
+- `approval_path`
+- `first_90_day_action`
+- `success_measures`
+
+The run prompt controls whether those five decision fields are active. When it
+contains `## Decision frame`, preserve its accountable owner, governance route,
+first observable move, and measurable conditions; unresolved details remain
+explicit gaps. When that section is absent, this is a narrative commission:
+leave the four decision strings empty and `success_measures` as an empty array.
+Do not turn an interesting argument into an assignment merely to fill a schema.
 - `deck_mode`: board_decision, executive_briefing, technical_read_ahead, or
   argument_brief. For argument_brief, the orchestrator supplies an exact slide
   count; the `slides` array must match it exactly.
@@ -56,11 +59,30 @@ The JSON must include:
   - `source_note`
   - `density_budget`
   - `speaker_note`
+  - `layout_family`: cover, section_break, split_media, full_bleed_media,
+    assertion, hero_metric, comparison, timeline, process_flow, map_plan,
+    chart, table, decision, source_appendix, or custom
+  - `colorway`: light, dark, split, accent, monochrome, or custom
+  - `speaker_led`: true when the slide supports a live speaker and must stay
+    below the main-deck word budget; false for a deliberately denser read-ahead
+    slide
+  - `visible_word_budget`: an integer ceiling for audience-facing words,
+    excluding the source footer and page number
+  - `visual_priority`: high, medium, or low
+  - `asset_request_ids`: the IDs of any approved or pending asset requests the
+    slide depends on
 - `report_visuals`: complete, evidence-bound structures the Word builder can
   publish as finished exhibits; follow the contract below exactly
 - `source_appendix`
 - `accessibility_checks`
-- `asset_requests`
+- `asset_requests`: an ordered asset plan. Each object has an `id`, the target
+  `slide_numbers`, a concrete `description`, `media_role`, preferred
+  authoritative `source`, `rights`, `credit`, `approval_status`,
+  `fulfillment_status`, and `required`. Use `approval_status` values requested,
+  approved, rejected, or not_required. Use `fulfillment_status` values pending,
+  supplied, retrieved, generated, fallback, unavailable, or not_required. An
+  approved required asset cannot remain pending when the brief is handed to
+  production.
 
 ## Visual vocabulary
 
@@ -76,6 +98,35 @@ Photography is used only when a real airport image adds place, scale, or
 operational meaning. Never request decorative stock photography, clip art, or
 an icon grid.
 
+Use supplied client assets first. Next prefer rights-cleared material from the
+airport, airline, public agency, project team, manufacturer, or the primary
+source already attached to the evidence ledger. An authoritative document crop,
+airport plan, or operating photograph is usually more useful than a generic
+image. Record the exact source, publication rights, and audience-facing credit
+before marking an asset `supplied` or `retrieved`. If rights are unclear, keep
+the request pending or specify an honest designer-built fallback. Never solve a
+missing place-specific asset with decorative stock.
+
+## Composition and visual rhythm
+
+Choose layout families before production. The sequence must feel composed,
+not templated:
+
+- Use at least three layout families in an 8–12 slide board deck and at least
+  four in longer modes, unless the run's supplied template explicitly requires
+  a narrower system.
+- Do not assign the same layout family to three consecutive slides. Change the
+  silhouette because the narrative job changes, not merely to create novelty.
+- Use dark, split, or accent colorways deliberately for the opening, a major
+  turn, or the decision close. Do not alternate colors mechanically.
+- Reserve tables for evidence that truly requires row-and-column comparison.
+  A board deck should rarely need more than two table slides; an executive
+  briefing rarely more than four.
+- Avoid four-or-more equal card grids. Prefer one dominant composition with a
+  clear reading order.
+- A high-priority slide receives a distinctive evidence-bearing visual or
+  composition. Do not spend the strongest visual treatment on a source list.
+
 ## Density
 
 - Board decision: 8–12 slides, minimal text, explicit decision and ask.
@@ -89,6 +140,12 @@ an icon grid.
 Every slide gets one job and one primary claim. Sources must remain readable.
 Do not invent data or visual assets. Use only evidence IDs present in the
 ledger.
+
+For `speaker_led: true`, budget no more than 70 visible words including the
+headline but excluding the source footer and page number. A deliberately denser
+read-ahead slide must set `speaker_led: false`, state the higher word ceiling in
+`density_budget`, and use a layout designed for reading rather than shrinking
+type.
 
 ## Finished Word-exhibit contract
 
@@ -130,10 +187,10 @@ will omit the exhibit section rather than publish a disguised production plan.
 
 ## Decision-field integrity
 
-The run prompt is the source of truth for the requested decision, owner,
-approval path, time horizon, and success measure. Carry those fields into the
-top-level JSON without silently rewriting a named authority or threshold. Use
-the verified draft and evidence ledger to make the first 90-day action
-executable. If a field is blank or the evidence contradicts it, state the
-decision-critical unknown in that field; do not guess. These top-level fields
-feed the Word decision brief as well as the presentation.
+The run prompt is the source of truth. When it contains `## Decision frame`,
+carry its requested decision, owner, approval path, time horizon, and success
+measure into the top-level JSON without silently rewriting a named authority or
+threshold. Use the verified draft and evidence ledger to make the first 90-day
+action executable. If the opted-in frame leaves a field blank or the evidence
+contradicts it, state the decision-critical unknown; do not guess. When the
+section is absent, leave all decision fields empty as instructed above.

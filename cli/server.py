@@ -22,6 +22,7 @@ import re
 import secrets
 import traceback
 import zipfile
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -37,6 +38,7 @@ from cli.events import WebSink, set_sink
 from cli.interactive import (
     AGENT_GROUPS,
     DEFAULT_AUDIENCE,
+    DEFAULT_LENGTH,
     DEFAULT_TONE,
     OUTPUT_FORMATS,
     FORMAT_KEYS,
@@ -57,7 +59,34 @@ ARGUMENT_UPLOAD_MAX_TOTAL_BYTES = 100 * 1024 * 1024
 ARGUMENT_UPLOAD_MAX_FILES = 20
 SOURCE_UPLOAD_PURPOSES = {"report", "scope", "argument"}
 
-app = FastAPI(title="Transform Airports AI Council")
+
+@dataclass(frozen=True)
+class LibraryRecoveryFailure:
+    """Typed fail-closed state retained after startup or retry recovery fails."""
+
+    cause_code: str
+    cause_type: str
+    message: str
+    failed_at: str
+    repo_root: str
+
+    def public_dict(self) -> dict[str, str]:
+        return {
+            "code": "library_recovery_required",
+            "cause_code": self.cause_code,
+            "message": self.message,
+            "failed_at": self.failed_at,
+        }
+
+
+@contextlib.asynccontextmanager
+async def _app_lifespan(_: FastAPI):
+    await _recover_library_lifecycle()
+    yield
+
+
+app = FastAPI(title="Transform Airports AI Council", lifespan=_app_lifespan)
+app.state.library_recovery_failure = None
 
 # Module-level single-run state.
 _active_sink: WebSink | None = None
@@ -228,6 +257,83 @@ def _coerce_budget(value: object) -> float | None:
         raise ValueError("Budget must be a finite number, zero or greater.")
     return budget
 _active_task: asyncio.Task | None = None
+_prompt_assist_lock = asyncio.Lock()
+# Starting a paid run and moving Library-owned files are mutually exclusive.
+# The short critical section closes the check-then-act gap between the HTTP
+# lifecycle endpoints and the WebSocket control plane.
+_run_library_lock = asyncio.Lock()
+_PROMPT_ASSIST_MAX_BODY_BYTES = 32 * 1024
+_library_lifecycle_service: Any | None = None
+_library_recovery_failure: LibraryRecoveryFailure | None = None
+
+
+def _set_library_recovery_failure(
+    failure: LibraryRecoveryFailure | None,
+) -> None:
+    """Keep the module and FastAPI app state in sync for tests and diagnostics."""
+
+    global _library_recovery_failure
+    _library_recovery_failure = failure
+    app.state.library_recovery_failure = failure
+
+
+def _recovery_failure_from(exc: Exception) -> LibraryRecoveryFailure:
+    from cli.library_lifecycle import LibraryLifecycleError
+
+    cause_code = (
+        exc.code if isinstance(exc, LibraryLifecycleError) else "unexpected_recovery_error"
+    )
+    detail = str(exc).strip()
+    if not isinstance(exc, LibraryLifecycleError) or not detail:
+        detail = "The recovery journal could not be reconciled safely."
+    return LibraryRecoveryFailure(
+        cause_code=cause_code,
+        cause_type=type(exc).__name__,
+        message=(
+            "Library recovery could not complete safely. Council runs and "
+            f"Library changes are paused. {detail}"
+        ),
+        failed_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        repo_root=str(REPO_ROOT.resolve()),
+    )
+
+
+def _library_service():
+    """Return a repository-bound service; tests may replace ``REPO_ROOT``."""
+
+    global _library_lifecycle_service
+    from cli.library_lifecycle import LibraryLifecycle
+
+    root = REPO_ROOT.resolve()
+    if (
+        _library_lifecycle_service is None
+        or _library_lifecycle_service.repo_root != root
+    ):
+        _library_lifecycle_service = LibraryLifecycle(root)
+        # A failure belongs to one repository-bound service. Tests and embedded
+        # callers may rebind REPO_ROOT without carrying a stale production gate.
+        _set_library_recovery_failure(None)
+    return _library_lifecycle_service
+
+
+async def _retry_library_recovery_locked() -> LibraryRecoveryFailure | None:
+    """Retry recovery while the caller holds ``_run_library_lock``."""
+
+    try:
+        await asyncio.to_thread(_library_service().recover_pending_transactions)
+    except Exception as exc:
+        failure = _recovery_failure_from(exc)
+        _set_library_recovery_failure(failure)
+        return failure
+    _set_library_recovery_failure(None)
+    return None
+
+
+async def _recover_library_lifecycle() -> None:
+    """Recover at startup while leaving read-only Library browsing available."""
+
+    async with _run_library_lock:
+        await _retry_library_recovery_locked()
 
 
 # ----------------------------------------------------------------------------
@@ -292,6 +398,28 @@ async def api_agents() -> JSONResponse:
     return JSONResponse({"groups": groups, "process": procs})
 
 
+@app.post("/api/agents/{agent_name}/profile")
+async def api_agent_profile(agent_name: str, request: Request) -> JSONResponse:
+    """Return one registered Council charter after same-origin authentication.
+
+    Full operational profiles are fetched only when a user opens a card.  The
+    public startup roster stays small, and a URL segment is never resolved as
+    a filesystem path.
+    """
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    agent = {item.name: item for item in load_all_agents()}.get(agent_name)
+    if agent is None or not (agent.is_research or agent.is_process):
+        return JSONResponse({"error": "Agent profile not found."}, status_code=404)
+    return JSONResponse({
+        "name": agent.name,
+        "display": agent.display_name,
+        "description": agent.description,
+        "profile": agent.system_prompt,
+    })
+
+
 @app.get("/api/meta")
 async def api_meta(request: Request) -> JSONResponse:
     host_authority = _authority(request.headers.get("host", ""))
@@ -299,6 +427,7 @@ async def api_meta(request: Request) -> JSONResponse:
         return JSONResponse({"error": "local access only"}, status_code=403)
     cfg = get_config()
     from cli.menu import check_claude_auth
+    from cli.prompt_assist import PROMPT_ASSIST_MODEL
     from cli.sources import discover_dropzone, format_size
     # The auth check shells out to `claude -p` — run it off the event loop.
     ok, auth_msg = await asyncio.to_thread(check_claude_auth)
@@ -321,12 +450,109 @@ async def api_meta(request: Request) -> JSONResponse:
         "auth_ok": ok,
         "auth_message": auth_msg,
         "openai_key": bool(os.environ.get("OPENAI_API_KEY")),
+        "prompt_coach_ok": bool(os.environ.get("OPENAI_API_KEY")),
+        "prompt_coach_message": (
+            f"{PROMPT_ASSIST_MODEL} via OpenAI API"
+            if os.environ.get("OPENAI_API_KEY")
+            else "Prompt Coach requires OPENAI_API_KEY in .env. Add it, restart the Council, and reload."
+        ),
+        "prompt_coach_model": PROMPT_ASSIST_MODEL,
         "sources": sources,
         "active_run": bool(_active_task is not None and not _active_task.done()),
         # The browser's same-origin policy protects this per-process token.
         # It authenticates the WebSocket handshake and state-changing requests.
         "session_token": _SESSION_TOKEN,
     })
+
+
+@app.post("/api/run-prompt/draft")
+async def api_run_prompt_draft(request: Request) -> JSONResponse:
+    """Draft wizard fields in one bounded, tool-free call; never start a run."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    if _run_is_live():
+        return JSONResponse(
+            {"error": "The prompt coach is unavailable while a Council run is active."},
+            status_code=409,
+        )
+    if _prompt_assist_lock.locked():
+        return JSONResponse(
+            {"error": "The prompt coach is already drafting for another tab."},
+            status_code=409,
+        )
+    if not request.headers.get("content-type", "").lower().startswith(
+        "application/json"
+    ):
+        return JSONResponse({"error": "JSON input is required."}, status_code=400)
+    content_length = request.headers.get("content-length")
+    if content_length:
+        try:
+            if int(content_length) > _PROMPT_ASSIST_MAX_BODY_BYTES:
+                return JSONResponse(
+                    {"error": "Prompt-coach input is too large."}, status_code=413
+                )
+        except ValueError:
+            return JSONResponse({"error": "Invalid content length."}, status_code=400)
+    # The locked() check and this immediate acquire contain no intervening
+    # await, so one event-loop turn atomically claims the paid coach call.
+    # Claim before reading the request body: a second valid request must get a
+    # 409, not wait behind the first and spend on another model invocation.
+    await _prompt_assist_lock.acquire()
+    try:
+        body = await request.body()
+        if len(body) > _PROMPT_ASSIST_MAX_BODY_BYTES:
+            return JSONResponse(
+                {"error": "Prompt-coach input is too large."}, status_code=413
+            )
+        try:
+            payload = json.loads(body)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            return JSONResponse({"error": "Malformed JSON input."}, status_code=400)
+
+        from cli.prompt_assist import (
+            PROMPT_ASSIST_MODEL,
+            PromptAssistModelError,
+            PromptAssistValidationError,
+            generate_prompt_draft,
+        )
+
+        # Starting the full paid pipeline and spending the bounded coach call
+        # are one-at-a-time activities. Whichever acquires this gate first is
+        # allowed to begin; the other observes the resulting active state.
+        async with _run_library_lock:
+            if _run_is_live():
+                return JSONResponse(
+                    {"error": "The prompt coach is unavailable while a Council run is active."},
+                    status_code=409,
+                )
+            try:
+                result = await asyncio.wait_for(
+                    generate_prompt_draft(
+                        payload,
+                        model=PROMPT_ASSIST_MODEL,
+                        repo_root=REPO_ROOT,
+                    ),
+                    timeout=75,
+                )
+            except PromptAssistValidationError as exc:
+                return JSONResponse({"error": str(exc)}, status_code=400)
+            except PromptAssistModelError as exc:
+                return JSONResponse(
+                    {
+                        "error": str(exc),
+                        "code": "prompt_coach_model_error",
+                    },
+                    status_code=502,
+                )
+            except TimeoutError:
+                return JSONResponse(
+                    {"error": "The prompt coach timed out. No form fields were changed."},
+                    status_code=504,
+                )
+        return JSONResponse(result)
+    finally:
+        _prompt_assist_lock.release()
 
 
 def _argument_upload_dir(
@@ -743,11 +969,23 @@ def _sanitize_diagnostic(value: str) -> str:
 def _build_spec(data: dict) -> RunSpec:
     from slugify import slugify
     title = (data.get("title") or "Untitled Run").strip()
-    fmt = data.get("output_format") or "report"
+    fmt = data.get("output_format") or "article"
+    if fmt not in {"report", "article", "brief", "recommendations"}:
+        fmt = "article"
     length = next((v for k, v in OUTPUT_FORMATS.items() if FORMAT_KEYS[k] == fmt),
-                  OUTPUT_FORMATS["Full Research Report (4,000–6,000 words)"])
+                  DEFAULT_LENGTH)
     scope = [s.strip() for s in (data.get("scope") or []) if s.strip()]
     avoid = [s.strip() for s in (data.get("avoid") or []) if s.strip()]
+    decision_frame_enabled = data.get("decision_frame_enabled") is True
+    decision = {
+        "decision_required": (data.get("decision_required") or "").strip(),
+        "decision_owner": (data.get("decision_owner") or "").strip(),
+        "time_horizon": (data.get("time_horizon") or "").strip(),
+        "approval_path": (data.get("approval_path") or "").strip(),
+        "success_measure": (data.get("success_measure") or "").strip(),
+    }
+    if not decision_frame_enabled:
+        decision = {key: "" for key in decision}
     return RunSpec(
         title=title,
         slug=slugify(title) or "untitled-run",
@@ -756,16 +994,23 @@ def _build_spec(data: dict) -> RunSpec:
         tone=data.get("tone") or DEFAULT_TONE,
         length=length,
         output_format=fmt,
+        lines_of_inquiry=scope,
         is_not=avoid or ["A vendor pitch for any specific platform or product"],
-        is_yes=(scope[:1] + ["A sharp, evidence-driven argument that earns its conclusions"])
-        if scope else ["A sharp, evidence-driven argument that earns its conclusions"],
-        success_criteria=scope or ["Every numerical claim traces to a primary source"],
+        is_yes=[
+            "A fascinating, evidence-driven argument that rewards the reader's attention",
+            "An honest steelman of the strongest counter-case",
+        ],
+        success_criteria=[
+            "A sophisticated reader wants to keep reading after the first 500 words",
+            "Every numerical claim traces to a primary source",
+        ],
         operator_context=(data.get("operator_context") or "").strip(),
-        decision_required=(data.get("decision_required") or "").strip(),
-        decision_owner=(data.get("decision_owner") or "").strip(),
-        time_horizon=(data.get("time_horizon") or "").strip(),
-        approval_path=(data.get("approval_path") or "").strip(),
-        success_measure=(data.get("success_measure") or "").strip(),
+        decision_frame_enabled=decision_frame_enabled,
+        decision_required=decision["decision_required"],
+        decision_owner=decision["decision_owner"],
+        time_horizon=decision["time_horizon"],
+        approval_path=decision["approval_path"],
+        success_measure=decision["success_measure"],
         selected_research_agents=list(data.get("agents") or []),
         want_pptx=bool(data.get("want_pptx")),
         deck_mode=(
@@ -773,7 +1018,7 @@ def _build_spec(data: dict) -> RunSpec:
             if data.get("deck_mode") in {
                 "board_decision", "executive_briefing", "technical_read_ahead"
             }
-            else "board_decision"
+            else "executive_briefing"
         ),
     )
 
@@ -812,21 +1057,34 @@ async def ws(socket: WebSocket) -> None:
             mtype = msg.get("type")
 
             if mtype == "start":
-                if _active_task is not None and not _active_task.done():
-                    await socket.send_json({"type": "run_error",
-                                            "message": "A run is already in progress."})
-                    continue
-                mode = str(msg.get("mode") or "new")
-                journal_path = REPO_ROOT / "outputs" / "run-events.jsonl"
-                sink = WebSink(
-                    None if mode == "new" else journal_path,
-                    append=mode == "resume",
-                )
-                _active_sink = sink
-                _active_owner = connection_client
-                _active_task = asyncio.create_task(
-                    _drive_run(mode, msg, sink)
-                )
+                async with _run_library_lock:
+                    if _active_task is not None and not _active_task.done():
+                        await socket.send_json({"type": "run_error",
+                                                "message": "A run is already in progress."})
+                        continue
+                    recovery_failure = await _retry_library_recovery_locked()
+                    if recovery_failure is not None:
+                        await socket.send_json(
+                            {
+                                "type": "run_error",
+                                "message": recovery_failure.message,
+                                "code": "library_recovery_required",
+                                "status": 409,
+                                "recovery": recovery_failure.public_dict(),
+                            }
+                        )
+                        continue
+                    mode = str(msg.get("mode") or "new")
+                    journal_path = REPO_ROOT / "outputs" / "run-events.jsonl"
+                    sink = WebSink(
+                        None if mode == "new" else journal_path,
+                        append=mode == "resume",
+                    )
+                    _active_sink = sink
+                    _active_owner = connection_client
+                    _active_task = asyncio.create_task(
+                        _drive_run(mode, msg, sink)
+                    )
                 if pump is not None:
                     pump.cancel()
                 await socket.send_json(_control_status(connection_client))
@@ -1796,13 +2054,231 @@ async def api_home() -> JSONResponse:
             )
     archives.extend(_scope_home_entries())
     archives.extend(_argument_home_entries())
+    library = _library_service()
+    for archive in archives:
+        archive.setdefault("summary", "")
+        archive.setdefault("tags", [])
+        try:
+            metadata = library.read_metadata(
+                str(archive.get("mode") or "report"),
+                str(archive.get("slug") or ""),
+            )
+        except Exception as exc:  # keep one corrupt sidecar from blanking the Library
+            from cli.library_lifecycle import LibraryLifecycleError
+
+            if not isinstance(exc, LibraryLifecycleError):
+                raise
+            archive["metadata_warning"] = "Display details could not be read."
+            continue
+        if metadata:
+            for field in ("title", "summary", "tags"):
+                if field in metadata:
+                    archive[field] = metadata[field]
+            archive["metadata_updated_at"] = metadata.get("updated_at", "")
     archives.sort(key=lambda a: a["date"], reverse=True)
     return JSONResponse({
         "interrupted": ({"slug": interrupted["slug"], "title": interrupted["title"],
                          "where": interrupted["where"], "age": interrupted["age"]}
                         if interrupted and interrupted.get("slug") else None),
         "archives": archives,
+        "library_recovery_warning": (
+            _library_recovery_failure.public_dict()
+            if _library_recovery_failure is not None
+            else None
+        ),
     })
+
+
+async def _bounded_json_body(
+    request: Request, *, maximum: int = 16 * 1024
+) -> tuple[object | None, JSONResponse | None]:
+    if not request.headers.get("content-type", "").lower().startswith(
+        "application/json"
+    ):
+        return None, JSONResponse({"error": "JSON input is required."}, status_code=400)
+    raw_length = request.headers.get("content-length")
+    if raw_length:
+        try:
+            if int(raw_length) > maximum:
+                return None, JSONResponse({"error": "Request is too large."}, status_code=413)
+        except ValueError:
+            return None, JSONResponse({"error": "Invalid content length."}, status_code=400)
+    body = await request.body()
+    if len(body) > maximum:
+        return None, JSONResponse({"error": "Request is too large."}, status_code=413)
+    try:
+        return json.loads(body), None
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None, JSONResponse({"error": "Malformed JSON input."}, status_code=400)
+
+
+def _library_error_response(exc: Exception) -> JSONResponse:
+    from cli.library_lifecycle import LibraryLifecycleError
+
+    if isinstance(exc, LibraryLifecycleError):
+        return JSONResponse(
+            {"error": str(exc), "code": exc.code}, status_code=exc.http_status
+        )
+    raise exc
+
+
+def _library_recovery_response(
+    failure: LibraryRecoveryFailure,
+) -> JSONResponse:
+    """Return the stable fail-closed boundary for Library/run mutations."""
+
+    return JSONResponse(
+        {
+            "error": failure.message,
+            "code": "library_recovery_required",
+            "recovery": failure.public_dict(),
+        },
+        status_code=409,
+    )
+
+
+async def _library_card_exists(mode: str, slug: str) -> bool:
+    response = await api_home()
+    payload = json.loads(bytes(response.body))
+    return any(
+        item.get("mode") == mode and item.get("slug") == slug
+        for item in payload.get("archives", [])
+        if isinstance(item, dict)
+    )
+
+
+def _interrupted_library_slug() -> str | None:
+    from cli.menu import detect_interrupted_run
+
+    interrupted = detect_interrupted_run()
+    return str(interrupted.get("slug")) if interrupted and interrupted.get("slug") else None
+
+
+@app.patch("/api/library/{mode}/{slug}")
+async def api_library_update(mode: str, slug: str, request: Request) -> JSONResponse:
+    """Patch display-only Library metadata; immutable artifacts never change."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    payload, error = await _bounded_json_body(request)
+    if error is not None:
+        return error
+    async with _run_library_lock:
+        if _run_is_live():
+            return JSONResponse(
+                {"error": "Wait for the active Council run before editing the Library."},
+                status_code=409,
+            )
+        recovery_failure = await _retry_library_recovery_locked()
+        if recovery_failure is not None:
+            return _library_recovery_response(recovery_failure)
+        if not await _library_card_exists(mode, slug):
+            return JSONResponse({"error": "Library item not found."}, status_code=404)
+        try:
+            saved = await asyncio.to_thread(
+                _library_service().update_metadata, mode, slug, payload
+            )
+        except Exception as exc:  # normalized by the lifecycle boundary
+            return _library_error_response(exc)
+    return JSONResponse({"metadata": saved})
+
+
+@app.post("/api/library/{mode}/{slug}/delete-plan")
+async def api_library_delete_plan(
+    mode: str, slug: str, request: Request
+) -> JSONResponse:
+    """Return the exact inventory before a Library family is permanently deleted."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    client_id = request.headers.get(_CLIENT_HEADER, "")
+    service = _library_service()
+    async with _run_library_lock:
+        if _run_is_live():
+            return JSONResponse(
+                {"error": "Wait for the active Council run before changing the Library."},
+                status_code=409,
+            )
+        try:
+            # Recovery must precede the card lookup: a crashed move may have
+            # temporarily removed the very pointer used to discover the card.
+            recovery_failure = await _retry_library_recovery_locked()
+            if recovery_failure is not None:
+                return _library_recovery_response(recovery_failure)
+            if not await _library_card_exists(mode, slug):
+                return JSONResponse({"error": "Library item not found."}, status_code=404)
+            plan = await asyncio.to_thread(
+                service.create_delete_plan,
+                mode,
+                slug,
+                client_id=client_id,
+                active_run=_run_is_live(),
+                interrupted_slug=_interrupted_library_slug(),
+                permanent=True,
+            )
+        except Exception as exc:
+            return _library_error_response(exc)
+    return JSONResponse(plan.as_dict())
+
+
+@app.delete("/api/library/{mode}/{slug}")
+async def api_library_delete(mode: str, slug: str, request: Request) -> JSONResponse:
+    """Commit a still-matching, server-bound permanent deletion plan."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    payload, error = await _bounded_json_body(request)
+    if error is not None:
+        return error
+    if not isinstance(payload, dict):
+        return JSONResponse({"error": "Delete input must be an object."}, status_code=400)
+    async with _run_library_lock:
+        if _run_is_live():
+            return JSONResponse(
+                {"error": "Wait for the active Council run before changing the Library."},
+                status_code=409,
+            )
+        try:
+            recovery_failure = await _retry_library_recovery_locked()
+            if recovery_failure is not None:
+                return _library_recovery_response(recovery_failure)
+            receipt = await asyncio.to_thread(
+                _library_service().commit_delete,
+                payload.get("plan_id"),
+                client_id=request.headers.get(_CLIENT_HEADER, ""),
+                confirmation=payload.get("confirmation"),
+                active_run=_run_is_live(),
+                interrupted_slug=_interrupted_library_slug(),
+            )
+        except Exception as exc:
+            return _library_error_response(exc)
+    return JSONResponse({"receipt": receipt.as_dict()})
+
+
+@app.post("/api/library/trash/{receipt_id}/restore")
+async def api_library_restore(receipt_id: str, request: Request) -> JSONResponse:
+    """Undo one recoverable Library deletion if no destination now conflicts."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    async with _run_library_lock:
+        if _run_is_live() or _interrupted_library_slug():
+            return JSONResponse(
+                {"error": "Finish or resolve the current run before restoring Library files."},
+                status_code=409,
+            )
+        try:
+            recovery_failure = await _retry_library_recovery_locked()
+            if recovery_failure is not None:
+                return _library_recovery_response(recovery_failure)
+            restored = await asyncio.to_thread(
+                _library_service().restore,
+                receipt_id,
+                active_run=False,
+            )
+        except Exception as exc:
+            return _library_error_response(exc)
+    return JSONResponse({"restore": restored.as_dict()})
 
 
 @app.get("/api/guide")

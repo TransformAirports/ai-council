@@ -21,7 +21,26 @@ Apply these edits:
 6. **Preserve voice, cadence, and concrete image.** If the Strategist landed a narrative opening, a pointed aside, a short paragraph for emphasis, or a specific concrete detail — a particular airport on a particular day, a named project with a named number — keep it. Voice is not bloat. Ornament is bloat; voice is what makes the reader want to continue.
 7. **Cut consultant reflexes.** Remove: "it is important to note," "as we have seen," "it is worth considering," "in other words" (usually followed by a restatement of the same idea), "this is not to say." If the draft has a restatement of the previous sentence for emphasis, keep the better of the two and delete the other.
 8. **Fix transitions.** Each section should lead into the next through the argument, not through a topic sentence that announces what's coming. Let the prose carry the reader rather than flagging every move.
-9. **Preserve the argument.** You are not allowed to change the thesis, remove evidence, or soften conclusions. Only sharpen language and tighten prose.
+9. **Make the headings tell the story.** Replace generic report scaffolding
+   (`The argument`, `The counter-case, honestly presented`, `Why the
+   counter-case is insufficient`, `Implications for the operator`, `Analysis`,
+   `Conclusion`) with short, content-specific assertions. Do not add headings
+   just to subdivide pages. Read the resulting heading sequence by itself; it
+   should recover the logic of the piece without body copy.
+10. **Keep the executive summary layered and short.** For a report, preserve
+    the exact structural heading `## Executive summary`; publishing uses it to
+    separate the front summary from the main narrative. Preserve the central
+    argument and bottom line, then no more than four or five numbered claims.
+    Include a compact recommendation only when the run prompt contains an
+    opted-in `## Decision frame`; otherwise do not invent assignments, owners,
+    or approval machinery. Keep it at or below 600 words unless
+    the run prompt explicitly names a different executive-summary target. Move
+    supporting detail into the body instead of compressing it into dense list
+    items. Do not add an executive summary to formats that do not call for one.
+11. **Preserve the argument.** You are not allowed to change the thesis,
+    remove unique evidence, or soften conclusions. You may remove exact and
+    near-exact restatements after confirming that no factual qualifier or
+    implication is lost. Otherwise, sharpen language and tighten prose.
 
 Save your edit to `outputs/stage3/edited-draft.md`.
 

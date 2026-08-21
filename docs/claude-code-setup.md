@@ -29,12 +29,18 @@ Requirements:
 
 - macOS or Linux
 - Python 3.11 or newer
-- Claude access or an `ANTHROPIC_API_KEY`
-- Optional `OPENAI_API_KEY` for the Deep Research lens
+- Claude Code plus a Claude subscription login, or an `ANTHROPIC_API_KEY`
+- LibreOffice (`soffice`) for Office-to-PDF rendering
+- Poppler (`pdftoppm`) for page and slide inspection
+- `OPENAI_API_KEY` for the GPT-5.6 Sol Prompt Coach and the optional Deep Research lens
 
-From the repository root:
+The copy-and-paste macOS and Ubuntu installation path is in
+[`getting-started.md`](getting-started.md). After installing system tools, run
+the read-only doctor before opening the app:
 
 ```bash
+claude auth login
+./council --doctor
 ./council
 ```
 
@@ -45,6 +51,7 @@ Git, and shell environment variables take precedence.
 Useful headless commands:
 
 ```bash
+./council --doctor
 ./council --run prompts/runs/<name>.md --budget 80
 ./council --terminal
 ./council --dry-run
@@ -167,7 +174,7 @@ Never fabricate authority-specific data to fill a gap.
 | `.codex/agents/` | Generated Codex-native mirrors |
 | `assets/brand/` | Brand tokens, visual-contract schema, and production assets |
 | `cli/` | Orchestrator, contracts, evidence, evaluation, publishing, and web app |
-| `prompts/runs/` | One decision frame per Council run |
+| `prompts/runs/` | One narrative commission per run, with an optional decision frame |
 | `prompts/research-contract.md` | Required brief and evidence-record contract |
 | `outputs/` | Temporary active-run artifacts |
 | `runs/` | Complete immutable run archives |

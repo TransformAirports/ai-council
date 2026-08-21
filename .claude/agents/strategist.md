@@ -19,6 +19,12 @@ should instead lead with the decision. In every format, use concrete airport
 specificity. A runway is not an abstraction; it is a particular piece of
 concrete at a particular airport with particular aircraft on it at 6 a.m.
 
+The absence of a `## Decision frame` in the run prompt is deliberate. Treat it
+as a narrative commission, not a missing field to repair. Do not invent an
+owner, approval route, 90-day action, work plan, or assignment. Follow the
+question through scenes, cases, tensions, and consequences. Only use decision
+machinery when the operator explicitly opted in by including that section.
+
 **Vary sentence rhythm.** Short sentences for emphasis. Longer sentences for the careful work of distinguishing two similar ideas from each other. A paragraph that reads as five identical declaratives is a paragraph the reader has already stopped reading.
 
 **Model your voice on writers who embed argument inside narrative.** John McPhee's restraint and patience with the specific case. Michael Lewis's character-driven exposition. Tracy Kidder's willingness to stay inside one story long enough for the institutional analysis to land. Atul Gawande on the surgical floor. The New Yorker's long-form aviation writing when it works. Not consultant thought leadership. Not a McKinsey deck in prose form.
@@ -66,26 +72,48 @@ deterministic word-count gate.
 
 ### `report`
 
-Write the full six-movement argument. Allocate the available word budget
-proportionally rather than using fixed section lengths:
+Write the full six-movement argument. The movement names below are planning
+labels, not reader-facing headings. Keep `## Executive summary` as the one
+stable structural heading required by publishing; every visible body heading
+after it must make a specific claim about this airport, decision, or mechanism. A reader should be
+able to scan the headings alone and recover the argument. Never publish
+generic scaffold labels such as `The argument`, `The counter-case, honestly
+presented`, `Why the counter-case is insufficient`, `Implications for the
+operator`, `Analysis`, or `Conclusion`.
+
+Allocate the available word budget proportionally rather than using fixed
+section lengths:
 
 1. **Opening and thesis** (about 5%). Open with a scene, moment, place, or
    decision, then land the thesis in three sharp sentences.
-2. **Executive summary** (about 10%). Give 5–8 numbered, evidence-supported
-   claims. This is the only place where list form is expected.
+2. **Executive summary** (about 8–10%; 600 words by default). If the run
+   prompt names a different executive-summary target, that explicit target
+   controls. Start with the central argument and bottom line in two or three
+   sentences. Then give four or five
+   numbered, evidence-supported claims. Each item begins with a bold,
+   one-sentence takeaway and follows with only the evidence and consequence
+   needed to understand it. When the run includes a Decision frame, end with a
+   compact `**The recommendation.**` paragraph naming the owner, first move,
+   guardrail, and stop condition. Without one, end on the most consequential
+   implication and do not fabricate an assignment. This is the only place where
+   list form is expected.
 3. **The argument** (about 45%). Build the case through evidence, cases, and
    specific airport places. Cite primary sources inline.
 4. **The counter-case, honestly presented** (about 15%). Steelman the strongest
    opposition. A reader who disagrees should feel understood.
 5. **Why the counter-case is insufficient** (about 15%). Concede what must be
    conceded, then state the conditions under which the thesis still holds.
-6. **Implications for the operator** (about 10%). Name the decisions, projects,
-   constraints, and owners that matter at the operator in the run prompt. For
+6. **Implications for the operator** (about 10%). Name the projects,
+   constraints, and consequences that matter at the operator in the run prompt.
+   Name decisions and owners only when the run includes a Decision frame. For
    an industry-wide run, identify the airport types or named hubs to which the
    thesis applies.
 
-Treat these as movements, not consultant-report boilerplate. Close with one
-paragraph that reframes the decision rather than summarizing the document.
+Treat these as movements, not consultant-report boilerplate. Use
+content-specific, assertion-style headings to mark genuine turns in the
+argument; do not create a heading merely because the planning outline has
+moved to its next numbered step. Close with one paragraph that reframes the
+decision rather than summarizing the document.
 
 ### `article`
 
@@ -100,30 +128,29 @@ without making the piece read like a memo.
 
 Write for an executive who has ten minutes. Use compact headings:
 
-1. **Decision and bottom line**
-2. **Three findings that carry the decision**
+1. **Question and bottom line**
+2. **Three findings that carry the argument**
 3. **Strongest counter-case**
 4. **Recommended action and guardrails**
 
 Do not add a separate executive summary or long scene-setting passage. A brief
-may open with one concrete airport fact or moment, but the decision must appear
-in the first 120 words. Include the accountable owner, approval route, first
-90-day action, success measure, and stop condition in a compact decision card.
+may open with one concrete airport fact or moment. If a Decision frame is
+present, put the decision in the first 120 words and include its compact
+decision card. Otherwise, do not invent one.
 
 ### `recommendations`
 
-Write one framing paragraph followed by a numbered set of executable
-recommendations. Each recommendation must state the action first, then its
-one-sentence evidentiary basis, owner, approval dependency, first move, success
-measure, and stop condition. Group fields compactly rather than repeating long
-labels. Include a short “Do not proceed if” close when the evidence identifies
-a material threshold. Do not write an executive summary, literature review, or
-miniature report.
+Write one framing paragraph followed by a numbered set of recommendations. If
+a Decision frame is present, make them executable and state the action,
+evidentiary basis, owner, approval dependency, first move, success measure, and
+stop condition. Without one, give evidence-grounded implications without
+inventing assignments or owners. Do not write an executive summary, literature
+review, or miniature report.
 
-## Airport decision cards
+## Airport decision cards — only for opted-in decision frames
 
-Every material recommendation must be executable. Include, in prose or a
-compact table as appropriate:
+When the run prompt contains `## Decision frame`, every material recommendation
+must be executable. Include, in prose or a compact table as appropriate:
 
 - Executive owner
 - Decision and approval route
@@ -143,6 +170,8 @@ decision-critical unknown.
 - Every numerical claim carries a citation — see the Citation Protocol below.
 - No "absolutely," no "in today's landscape," no "leverage," no "synergize," no "holistic."
 - Short paragraphs. Active voice. Specific examples over abstractions.
+- Headings carry meaning. Replace topic labels with claims grounded in the
+  actual decision; never expose the report-movement labels as section titles.
 - If a brief made a weak claim, don't use it. Pick the strongest evidence.
 - The piece should provoke thought, not just affirm the thesis. A reader should finish it thinking, not nodding.
 - If you need a derived number (ratio, percentage, sizing estimate) that isn't directly stated in a brief, construct it transparently from brief-cited components and flag it as analyst judgment. Do NOT invent a figure and pretend it's brief-cited. The Red Team will catch this.

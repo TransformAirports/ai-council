@@ -33,13 +33,15 @@ DEFAULT_AUDIENCE = (
 )
 
 DEFAULT_TONE = (
-    "Analytical sharp. Direct. Evidence-dense. Intellectually honest about "
-    "the counter-argument. Slightly provocative but not polemical. Model: "
-    "Matt Levine on aviation, not a consultant thought-leadership piece."
+    "Fascinating, vivid, and argument-led. Open with a concrete scene, case, "
+    "or surprise that earns the reader's attention, then let the evidence "
+    "change how they see the subject. Write with the clarity and momentum of "
+    "an excellent magazine feature, not a consulting assignment or technical paper."
 )
 
 DEFAULT_LENGTH = (
-    "4,000–6,000 words for the full research report; ~1,100-word executive summary."
+    "A 1,500–2,000-word narrative feature — one continuous argument, no appendices "
+    "or decision-card catalog."
 )
 
 # Output formats the operator can pick from. The chosen string is written into
@@ -47,12 +49,13 @@ DEFAULT_LENGTH = (
 # format KEY also travels through the run file so the publisher can style the
 # polished document appropriately (see FORMAT_KEYS and cli/publish.py).
 OUTPUT_FORMATS: dict[str, str] = {
-    "Full Research Report (4,000–6,000 words)": (
-        "4,000–6,000 words for the full research report; ~1,100-word executive summary."
+    "Narrative Feature (1,500–2,000 words)": (
+        "A 1,500–2,000-word narrative feature — one continuous argument, no appendices "
+        "or separate executive summary. Make it fascinating, specific, and enjoyable "
+        "to read while preserving the evidence trail."
     ),
-    "Long-Form Article (1,500–2,000 words)": (
-        "A 1,500–2,000-word long-form article — one continuous argument, no appendices; "
-        "~400-word executive summary."
+    "Full Research Report (4,000–6,000 words)": (
+        "4,000–6,000 words for the full research report; ~600-word executive summary."
     ),
     "Brief (700–1,000 words)": (
         "A 700–1,000-word brief: the thesis, the three strongest pieces of evidence, "
@@ -68,8 +71,8 @@ OUTPUT_FORMATS: dict[str, str] = {
 # Stable keys for each format label — written into the run file and read by
 # the publisher to pick the right document treatment.
 FORMAT_KEYS: dict[str, str] = {
+    "Narrative Feature (1,500–2,000 words)": "article",
     "Full Research Report (4,000–6,000 words)": "report",
-    "Long-Form Article (1,500–2,000 words)": "article",
     "Brief (700–1,000 words)": "brief",
     "Concise recommendations": "recommendations",
 }
@@ -198,9 +201,11 @@ class RunSpec:
     audience: str = DEFAULT_AUDIENCE
     tone: str = DEFAULT_TONE
     length: str = DEFAULT_LENGTH
+    lines_of_inquiry: list[str] = field(default_factory=list)
     is_not: list[str] = field(default_factory=list)
     is_yes: list[str] = field(default_factory=list)
     operator_context: str = ""
+    decision_frame_enabled: bool = False
     decision_required: str = ""
     decision_owner: str = ""
     time_horizon: str = ""
@@ -210,8 +215,8 @@ class RunSpec:
     selected_research_agents: list[str] = field(default_factory=list)
     agent_overrides: dict[str, str] = field(default_factory=dict)
     want_pptx: bool = False
-    deck_mode: str = "board_decision"
-    output_format: str = "report"  # report | article | brief | recommendations
+    deck_mode: str = "executive_briefing"
+    output_format: str = "article"  # report | article | brief | recommendations
     source_paths: list[str] = field(default_factory=list)  # readable paths for sources
 
 
@@ -417,13 +422,9 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
 
     # Map the simplified inputs onto the run-file structure the strategist,
     # red-team, editor, and fact-checker already know how to read.
-    is_yes = (
-        [scope_items[0]] + DEFAULT_IS_YES
-        if scope_items
-        else DEFAULT_IS_YES.copy()
-    )
+    is_yes = DEFAULT_IS_YES.copy()
     is_not = avoid_items if avoid_items else DEFAULT_IS_NOT.copy()
-    success_criteria = scope_items if scope_items else DEFAULT_SUCCESS_CRITERIA.copy()
+    success_criteria = DEFAULT_SUCCESS_CRITERIA.copy()
 
     return RunSpec(
         title=title,
@@ -432,6 +433,7 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
         audience=DEFAULT_AUDIENCE,
         tone=DEFAULT_TONE,
         length=length,
+        lines_of_inquiry=scope_items,
         is_not=is_not,
         is_yes=is_yes,
         operator_context="",

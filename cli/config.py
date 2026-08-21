@@ -84,25 +84,49 @@ class Config:
         return self.models.get(role, DEFAULT_MODELS.get(role, "opus"))
 
 
+@dataclass(frozen=True)
+class BlockedModelSelection:
+    """A saved model choice that normal configuration loading will replace."""
+
+    role: str
+    configured: str
+    replacement: str
+
+
+@dataclass(frozen=True)
+class ConfigInspection:
+    """Read-only configuration result with defects preserved for diagnostics."""
+
+    config: Config
+    parse_error: str | None = None
+    blocked_models: tuple[BlockedModelSelection, ...] = ()
+
+
 _cached: Config | None = None
 
 
-def load_config(path: Path = CONFIG_PATH) -> Config:
+def _inspect_config(path: Path, *, persist_rewrites: bool) -> ConfigInspection:
     cfg = Config()
-    rewrote = False
+    blocked_models: list[BlockedModelSelection] = []
     if path.is_file():
         try:
             raw = tomllib.loads(path.read_text(encoding="utf-8"))
-        except (tomllib.TOMLDecodeError, OSError):
-            return cfg
+        except (tomllib.TOMLDecodeError, OSError, UnicodeError) as exc:
+            return ConfigInspection(cfg, parse_error=str(exc))
         models = raw.get("models", {})
         if isinstance(models, dict):
             for k, v in models.items():
                 if isinstance(v, str) and v.strip():
                     val = v.strip()
                     if val in BLOCKED_MODELS:
+                        blocked_models.append(
+                            BlockedModelSelection(
+                                role=str(k),
+                                configured=val,
+                                replacement=BLOCKED_MODELS[val],
+                            )
+                        )
                         val = BLOCKED_MODELS[val]
-                        rewrote = True
                     cfg.models[k] = val
         run = raw.get("run", {})
         if isinstance(run, dict):
@@ -114,9 +138,27 @@ def load_config(path: Path = CONFIG_PATH) -> Config:
                 cfg.default_format = run["default_format"]
     # Persist the substitution so the next inspection shows clean values.
     # The save path itself calls reload_config(), so guard against recursion.
-    if rewrote and path.is_file():
+    if blocked_models and persist_rewrites and path.is_file():
         _write_config(cfg, path)
-    return cfg
+    return ConfigInspection(cfg, blocked_models=tuple(blocked_models))
+
+
+def inspect_config(path: Path = CONFIG_PATH) -> ConfigInspection:
+    """Parse *path* without writing it and retain errors for ``--doctor``.
+
+    Normal Council loading intentionally repairs known stale model IDs.  A
+    diagnostic command must not do that behind the operator's back, so this
+    separate path reports the pending substitutions while returning the
+    resolved in-memory configuration.
+    """
+
+    return _inspect_config(path, persist_rewrites=False)
+
+
+def load_config(path: Path = CONFIG_PATH, *, persist_rewrites: bool = True) -> Config:
+    """Load configuration, preserving the historical auto-rewrite by default."""
+
+    return _inspect_config(path, persist_rewrites=persist_rewrites).config
 
 
 def _write_config(cfg: Config, path: Path) -> None:
