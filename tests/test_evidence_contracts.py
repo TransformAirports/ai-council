@@ -94,6 +94,202 @@ class EvidenceContractTests(unittest.TestCase):
             )
             self.assertFalse(lineage[0]["primary_source_checked"])
 
+    def test_claim_lineage_rejects_invented_evidence_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            known_id = "operations-analyst::ev-known"
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                json.dumps(
+                    {
+                        "evidence_id": known_id,
+                        "claim": "Passenger growth",
+                        "source": "Airport annual report",
+                        "source_url": "https://airport.example/report",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            final = root / "final-draft.md"
+            final.write_text(
+                "Passenger volume rose ten percent.[^1]\n\n"
+                "[^1]: Airport annual report, https://airport.example/report\n",
+                encoding="utf-8",
+            )
+            lineage_path = root / "claim-lineage.jsonl"
+            lineage_path.write_text(
+                json.dumps(
+                    {
+                        "claim_id": "claim-agent-1",
+                        "claim": "Passenger volume rose ten percent.",
+                        "citation": (
+                            "Airport annual report, "
+                            "https://airport.example/report"
+                        ),
+                        "footnote_id": "1",
+                        "evidence_ids": ["council-analysis::ev-invented"],
+                        "verification_status": "verified",
+                        "primary_source_checked": True,
+                        "retained": True,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            lineage, generated = ensure_claim_lineage(
+                final_draft=final,
+                evidence_ledger=ledger,
+                output_path=lineage_path,
+            )
+
+            self.assertTrue(generated)
+            self.assertEqual(lineage[0]["evidence_ids"], [known_id])
+            self.assertNotIn(
+                "council-analysis::ev-invented",
+                lineage_path.read_text(encoding="utf-8"),
+            )
+            self.assertEqual(lineage[0]["claim_id"], "claim-agent-1")
+            self.assertEqual(lineage[0]["verification_status"], "verified")
+            self.assertTrue(lineage[0]["primary_source_checked"])
+            self.assertEqual(
+                lineage[0]["match_status"], "matched_to_evidence_ledger"
+            )
+
+    def test_claim_lineage_repairs_only_record_with_unknown_evidence_id(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            known_id = "operations-analyst::ev-known"
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                json.dumps(
+                    {
+                        "evidence_id": known_id,
+                        "claim": "Passenger growth",
+                        "source": "Airport annual report",
+                        "source_url": "https://airport.example/report",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            final = root / "final-draft.md"
+            final.write_text(
+                "Passenger volume rose ten percent.[^1] Another unsupported "
+                "claim followed.[^2]\n\n"
+                "[^1]: Airport annual report, https://airport.example/report\n"
+                "[^2]: Unmatched industry conversation\n",
+                encoding="utf-8",
+            )
+            good_record = {
+                "claim_id": "claim-good",
+                "claim": "Passenger volume rose ten percent.",
+                "citation": (
+                    "Airport annual report, https://airport.example/report"
+                ),
+                "footnote_id": "1",
+                "evidence_ids": [known_id],
+                "verification_status": "verified",
+                "primary_source_checked": True,
+                "retained": True,
+                "verification_note": "Checked on page 14 of the report.",
+                "lineage_mode": "fact-checker-authored",
+                "reviewer": "fact-checker",
+            }
+            bad_record = {
+                "claim_id": "claim-bad",
+                "claim": "Another unsupported claim followed.",
+                "citation": "Unmatched industry conversation",
+                "footnote_id": "2",
+                "evidence_ids": ["council-analysis::ev-invented"],
+                "verification_status": "verified",
+                "primary_source_checked": True,
+                "retained": True,
+                "verification_note": "Previously marked verified.",
+                "lineage_mode": "fact-checker-authored",
+            }
+            lineage_path = root / "claim-lineage.jsonl"
+            lineage_path.write_text(
+                "\n".join(json.dumps(record) for record in (good_record, bad_record))
+                + "\n",
+                encoding="utf-8",
+            )
+
+            lineage, generated = ensure_claim_lineage(
+                final_draft=final,
+                evidence_ledger=ledger,
+                output_path=lineage_path,
+            )
+
+            self.assertTrue(generated)
+            self.assertEqual(lineage[0], good_record)
+            self.assertEqual(lineage[1]["claim_id"], "claim-bad")
+            self.assertEqual(lineage[1]["evidence_ids"], [])
+            self.assertEqual(lineage[1]["verification_status"], "unverified")
+            self.assertFalse(lineage[1]["primary_source_checked"])
+            self.assertTrue(lineage[1]["retained"])
+            self.assertEqual(
+                lineage[1]["lineage_mode"], "agent-lineage-sanitized"
+            )
+
+    def test_claim_lineage_preserves_known_canonical_evidence_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            known_id = "operations-analyst::ev-known"
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                json.dumps(
+                    {
+                        "evidence_id": known_id,
+                        "claim": "Passenger growth",
+                        "source": "Airport annual report",
+                        "source_url": "https://airport.example/report",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            final = root / "final-draft.md"
+            final.write_text(
+                "Passenger volume rose ten percent.[^1]\n\n"
+                "[^1]: Airport annual report, https://airport.example/report\n",
+                encoding="utf-8",
+            )
+            canonical_record = {
+                "claim_id": "claim-agent-1",
+                "claim": "Passenger volume rose ten percent.",
+                "citation": (
+                    "Airport annual report, https://airport.example/report"
+                ),
+                "footnote_id": "1",
+                "evidence_ids": [known_id],
+                "verification_status": "verified",
+                "primary_source_checked": True,
+                "retained": True,
+                "verification_note": "Opened and checked against the source.",
+                "lineage_mode": "fact-checker-authored",
+            }
+            lineage_path = root / "claim-lineage.jsonl"
+            lineage_path.write_text(
+                json.dumps(canonical_record) + "\n", encoding="utf-8"
+            )
+
+            lineage, generated = ensure_claim_lineage(
+                final_draft=final,
+                evidence_ledger=ledger,
+                output_path=lineage_path,
+            )
+
+            self.assertFalse(generated)
+            self.assertEqual(lineage, [canonical_record])
+            self.assertEqual(
+                json.loads(lineage_path.read_text(encoding="utf-8")),
+                canonical_record,
+            )
+
     def test_agent_local_evidence_ids_are_namespaced(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

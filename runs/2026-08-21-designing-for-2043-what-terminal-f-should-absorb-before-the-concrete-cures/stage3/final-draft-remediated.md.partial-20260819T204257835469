@@ -1,0 +1,396 @@
+# Designing for 2043: What Terminal F Should Absorb Before the Concrete Cures
+
+**Draft:** Final (remediated), 2026-08-19  
+**Audience:** DFW Airport Board, CEO's office, capital planners; peer executives and policy readers
+
+---
+
+## Opening
+
+August 2026, overnight, at the north end of the DFW terminal area: a steel-and-glass box 278 feet long, 136 feet across, and weighing 3,320 tons creeps down a closed taxiway on self-propelled modular transporters.[^1] Six mega-modules make the trip inside a two-week overnight window; the contractor calls the largest the biggest ever moved for a terminal expansion.[^1]
+
+By the time that module makes the trip, its column grid is fixed. Its floor-to-floor height is fixed. Its MEP risers, its baggage-belt penetrations, its structural allowance for whatever might ever sit above it — all fixed, months earlier, in a factory. The board has never seen those decisions as a decision list.
+
+That is the first thing wrong with the phrase "before the concrete cures." The operative deadline is release-for-fabrication, and it runs module by module. For the six modules moved in August 2026, it has passed.[^2] For the FIS, the Skylink node, and the Phase 2 apron modules that would carry MARS provisions, it has not — but no one outside Innovation Next+ has the calendar on paper. Getting it is the register's first act of governance.
+
+The thesis takes three sentences. American Airlines — Terminal F's sole tenant on a lease that runs to 2043[^3] — has already declared Terminal F is not its premium anchor: largest-ever Admirals Club to Terminal C, Flagship Check-In to Terminal D, a Provisions grab-and-go to Terminal F.[^4] The historical record on purpose-built single-carrier hub terminals says the buildings that survived a strategy shift did so by encoding generic hub *form*, not carrier-specific finishes.[^5] The correct response is neither to override the tenant with premium bones it did not ask for, nor to accept the announced program as the whole 2043 program: it is a board-adopted reversibility register, paired with a U&L side letter, that locks in generic hub geometry — MARS-capable stands, an FIS sized to a commissioned 2043 international peak, a Skylink node that survives a single-loop morning — and preserves a small, priced list of Flagship-convertible shell options American can trigger on its own balance sheet when it is ready.
+
+---
+
+## Executive summary
+
+Eight claims, in the order the argument builds them.
+
+1. **The scope moved once already, before pour.** In May 2025, Terminal F went from a preapproved 15-gate, ~$1.6B facility to a 31-gate, ~$4B facility, with the American Use and Lease extended through 2043.[^3] That is a 2.5× cost move without a single module in place.[^3] The reversibility clock started the moment scope proved it could move.
+
+2. **The tenant's revealed preference contradicts the "design Terminal F for premium" framing.** American named its largest-ever Admirals Club (~37,000 sf) in Terminal C, Flagship Check-In in Terminal D, and Provisions by Admirals Club in Terminal F.[^4] The tenant is voting with its capital. This is the run's single most-corroborated fact.
+
+3. **The premium repositioning is real, and it is a follower move.** Delta's Q4 2025 premium ticket revenue ($5.70B) crossed main cabin ($5.62B) for the first time in company history; full-year 2025 premium ran $22.1B against $23.4B main cabin.[^6] American's targets: narrowbody premium share from ~25% to ~40%, international lie-flat count up more than 50% by decade's end, 51 Flagship Suites on the 787-9P.[^6] The shift is real in the fleet and the revenue mix. It is not yet real in Terminal F's concrete.
+
+4. **History on purpose-built single-carrier hub terminals is not neutral.** Four post-1978 US cases at hub scale went badly when the carrier repositioned: Pittsburgh, St. Louis, Cincinnati, Cleveland.[^5] The counter-cases — Detroit McNamara, LGA Terminal C, Heathrow T5 — are affirmative for geometry, not fate.[^7]
+
+5. **The modular method is a tolerance regime, not a permission slip.** DFW cites ~30% cost and schedule savings versus stick-built.[^8] But post-fabrication modular is *more* change-hostile: a late change triggers resequencing across pods, and the reversibility window closes earlier, not later.[^9]
+
+6. **The pour-locked decisions with the largest cost of being wrong are FIS geometry, MARS-capable stands, the Skylink node, and BHS spine capacity.** Each is cheap at the pour and effectively unavailable after: CBP booth-and-queue geometry,[^10] MARS provisions that let one stand work a widebody or two narrowbodies,[^11] and a Skylink node on a system that already runs single-loop overnight.[^12]
+
+7. **DFW's financial headroom for the bet is real but not exceptional, and it is spending down.** FY25 cost per enplanement is $13.86 — below JFK $36.01, EWR $31.67, LAX $30.16, and ORD $29.56, but a multiple of ATL $3.94 and CLT $4.74.[^13] [^14] Debt was projected to grow from ~$7.2B in 2024 to ~$12.4B by FY29, a projection that predates the May 2025 scope acceleration; KBRA affirmed AA/Stable in August 2025.[^15] The Category A options price at low-single-digit percent of the base program; the retrofits they hedge — Dulles Concourse D, the Denver baggage program — run to nine and ten figures.[^16]
+
+8. **The register itself is the most valuable artifact this run produces.** A Board policy resolution paired with a U&L side letter, carrying every Category A decision through fabrication with a last-responsible-moment date, a priced option, an accountable owner, and — where required — American's concurrence. Miss the date and the module ships to current design intent, the option logged extinguished with foregone-retrofit cost stated. That enforcement mechanism is what makes the register live rather than ceremonial.
+
+---
+
+## The argument
+
+### The tenant has already told you what Terminal F is
+
+In July 2026 American rolled out its "next-generation premium experience at DFW": the 37,000-square-foot Admirals Club in Terminal C adjacent to Skylink, its largest club anywhere; Flagship Check-In in Terminal D near the D30 checkpoint; and for Terminal F, a Provisions by Admirals Club grab-and-go for short-layover transit passengers.[^4] Not a Flagship Lounge. Not a full Admirals Club.
+
+This is the party with the most information about its own 2043 network telling DFW where the premium program lives, and it is not the terminal DFW is now building.
+
+The run prompt names American's premium pivot as the reason to design Terminal F to absorb it. Right about the pivot, wrong about the terminal. The pivot is a structural yield play with physical implications — widebody gate mix, lounge seat pitch, premium check-in envelope — but American is executing it through Terminals C and D.[^4] [^6] Terminal F is being scoped as a connecting building with a grab-and-go.
+
+The register has to survive both defensible readings of the Provisions signal. The *tactical* reading: Provisions is a live 2026 capital-allocation signal, not a settled 2043 program, and the airport should preserve the envelope that lets American change its mind in 2032 without a nine-figure mid-lease retrofit. The *strategic* reading: the premium capital is permanently in Terminals C and D, Terminal F is connecting-only for the life of the lease, and the shell allowance is dead weight for 17 years — foregone lease revenue at approximately $100–150/sf/yr for comparable non-signatory terminal space (industry estimate; no DFW-specific rate is in the public record).[^17] On the ~19,000 sf in Card 3, that is roughly $1.9–2.9M a year, $32–49M over 17 years at 4%.[^17] Real money — and still four to six times smaller than the low-case at-grade retrofit displacement of $204M. The strategic reading raises the option's cost. It does not invert the arithmetic.
+
+### The bank is getting denser, not flatter
+
+American is doing a second thing that cuts against a premium reading of the Terminal F floor plate. In December 2025 it announced a restructure from 9 to 13 daily connecting banks starting April 2026 — "doubling down on DFW... further strengthens its Flagship hub," in its own framing.[^18] The 9 a.m. peak drops from ~110 to ~52 departures; 40-plus flights move into hours that used to be trough; scheduled block times lengthen by an average of 6 minutes across 145 markets to buy connection reliability.[^19]
+
+Bank contiguity replaces peak-hour surge. Gate concurrency at Terminal F is now set by how tightly the 13 banks butt up against each other. That is connecting complexity, not a shift toward originating premium.
+
+Two caveats. One defensible reading of the announcement is a *flatter*, mid-day-loaded operation, which would soften the density case. And the airline's reported 50% cut in missed connections is based on early post-launch results.[^20] The operational data is more sober: DFW's Q2 2026 departure rate is up ~1% year over year, still second-worst among busy US airports, and the +6-minute block additions mechanically inflate scheduled on-time performance.[^21] Size Terminal F to the unproven-benefit case, not the press release.
+
+**The connecting-share number is contested and the design has to commit to one.** Airport-level reporting places connecting share around 60%; the run prompt asserts a carrier-level two-thirds.[^22] Between 55% and 70% connecting, peak-day originating swings by ~50% — 30,000 versus 45,000 O&D passenger-trips at American's ~100,000 peak-day.[^23] "Sized to hold either" is not a design decision. **The register's design basis is 62.5% connecting / 37.5% originating (peak-day O&D ~37,500), with curbside, ticketing hall depth, TSA lane count, and BHS spine sized to that midpoint and structurally oversized to hold 70% originator at an incremental ~$18–25M[^24]** — Card 6, Category A. That is a decision.
+
+### History is not neutral about the shape of this building
+
+The industry has run this play — a purpose-built hub terminal on a long single-carrier commitment — several times since deregulation. Four cases went badly when the carrier repositioned. Three speak affirmatively about a *building* absorbing a *strategy shift*.
+
+Pittsburgh's Midfield Terminal opened October 1, 1992 at roughly $1 billion, its X-shaped airside optimized for the US Airways connecting bank. US Airways dehubbed in 2004 after a fee dispute. Cost per enplaned passenger rose to nearly $15 by 2011, roughly twice the 2002 rate.[^25] Pittsburgh spent fifteen years running a hub airport after the hub had left; stranded midfield debt lingered until roughly 2019; a new $1.75B landside terminal opened in 2025, essentially undoing the 1992 geometry.[^26] Cincinnati went from 22.7 million passengers and 600-plus daily flights in 2005 to under 6 million and under 180 daily by 2013.[^27] St. Louis fell from more than 500 daily American/TWA flights in July 2001 to 207 by 2003.[^28] Cleveland's Concourse D went dark in May 2014 after United's dehub; destinations fell from 61 to 20, daily departures from about 200 to 72.[^29]
+
+The affirmative cases, ranked by sourcing strength:
+
+**Heathrow Terminal 5** (2008): delivered on time within £4.3B under the T5 Agreement relational contract; a generic multi-satellite hub form that absorbed British Airways' post-merger repositioning, lounge program evolution, and A380 introduction across two decades — then failed at opening with ~42,000 mishandled bags because operational readiness was undersized.[^30] The form absorbed the strategy. Readiness is a separate line item.
+
+**LaGuardia Terminal C** (2022): the four-concourse ~$4B program delivered roughly two years early under single-airline governance, with the caveat that ~$3.5B was Delta's capital and ~$500M Port Authority.[^31] Governance delivers when the accountable party holds the capital. At Terminal F, the airport, not the airline, holds the pen.
+
+**Detroit McNamara** (2002): SmithGroup-designed linear midfield with satellite concourses for Northwest; Northwest merged into Delta in 2008; Delta kept and still operates the terminal.[^7] The design record is primary; cost and retrofit history rest on trade press, so treat dollar figures as directional. The lesson: hub form with no carrier-specific structural moves absorbs a change of tenant intent — though as a survivable-merger case, not a dehub-survival case; the successor kept the hub.
+
+Two cautions. The dehub cases are survivorship-biased toward drama: DFW, ATL, DEN, ORD, IAH, MSP, DTW, SLC, SEA, PHX, and CLT all held their hub carriers through the consolidation wave,[^32] and the base rate for a super-hub of DFW's scale being dehubbed inside 20 years is low.[^33] And Pittsburgh's 80% single-carrier concentration on a small regional O&D floor is no analogue for DFW's 82.6% American share on a two-city economy of roughly eight million people, with regional output up to $71.1B per regional press (magnitude only).[^33]
+
+So the warning applies to the *shape of the building*, not the *survival of the hub*. Encode Terminal F's shape generically enough to survive a strategy shift that history says will arrive, whether or not the carrier does.
+
+### The operative deadline is release-for-fabrication, per module
+
+"Before the concrete cures" is technically wrong for a modular build. The real deadline is "before the module is skinned" — and for the first six Phase 1 modules it has passed.[^1]
+
+Modular construction does not suspend the physics of retrofit. Tolerance stack-up between modules fabricated on separate shifts, transported by SPMT, and placed to three-quarter-inch precision fails quietly: leaking curtain wall at the seam, misaligned take-away belts, life-safety commissioning findings — the failure modes that put Berlin Brandenburg nine years and at roughly 2.3× its original budget over.[^34] The ~30% savings figure is credible for on-site duration and reduced airside impact windows.[^8] It is not a reduction in the design-lock horizon.
+
+**Category A — structurally irreversible once modules are set and utilities tied in.** Column grid and floor-to-floor heights. Sterile-corridor geometry into the FIS. Primary baggage tunnel alignment and depth. The apron column-and-jetway grid that determines whether a stand is Code C, Code E, or MARS. Hydrant fuel loop capacity and pit locations. Primary electrical service and standby generator sizing. 400 Hz and PCA capacity at the stand. The Skylink node, including platform-edge count and vertical circulation redundancy.
+
+**Category B — reversible only at high schedule and airline-consent cost.** Lounge shell subdivisions inside preserved floor plate. Flagship arrival vestibule and dedicated elevator core. CBP booth counts within a preserved hall. TSA lane count within preserved queue geometry. BHS in-line EDS matrix within a preserved conveyor spine.
+
+**Category C — cheap to defer, cheap to change later.** Interior finishes and wayfinding. Retail and concession fit-out. Furniture and lounge zoning. Low-voltage overlays — biometrics, digital signage, sensor networks — provided conduit, riser space, IDF closets, and PoE++ budget were sized generously in Category A.
+
+The strongest, cheapest engineering move is to buy Category C flexibility by paying Category A prices in a small, named set of places. Oversize the risers. Oversize the IDF closets. Oversize the BHS spine. Preserve MARS provisions at a defined minority of stands. That is what "flexible" means when it is priced honestly.
+
+### The 6:15 morning
+
+Walk the building on a specific morning — a composite of ledger facts, since the airport-side design of the Terminal F Skylink station is not public.[^12]
+
+05:55. Skylink is still running its overnight single-loop pattern — one direction, roughly 15-minute end-to-end transit, as it does nightly from ~22:00 to ~06:00.[^12] The first of American's 13 daily banks is already inbound. The restructured schedule's ~52-departure peak bank means on the order of 5,500 passengers at ~107 per departure, before any stranded fraction from the previous bank.[^35] Now hold that geometry against the last week of January 2023: winter storm ground stop, four-hour post-stop average delays, more than 1,100 cancellations on the peak day, more than 600 the day after.[^36]
+
+Four chokepoints do the work. The Skylink node: platform edges, vertical circulation redundancy, concourse-side queue depth when the second loop fails to return at 06:00.[^12] Gate concurrency: how many bank-contiguous gates can turn simultaneously without spilling into taxilane object-free areas under FAA AC 150/5300-13B.[^37] MARS stands: the pressure valve that lets one position work a widebody international arrival or two narrowbody bank turns.[^11] And the FIS: CBP's ~100 pax/hr per double booth and 50–75 ft queue depth, against a schedule that targets Q3 2026 DFW capacity up ~6% while cutting LHR ~13%, with six new summer 2026 routes — Budapest, Prague, Athens, Milan, Zurich, expanded Buenos Aires.[^10] [^38]
+
+Every one is a Category A decision locked at release-for-fabrication. If the Skylink station opens without a reserved second platform edge, redundant vertical circulation, and queuing sized for an unscheduled single-loop morning, the failure mode is not delayed connections. It is the connecting bank collapsing — the metric the airport and the airline both need to defend. If the FIS is sized to a 2025 international peak rather than a commissioned 2043 forecast, the airport buys the geometry back with CBP overtime for thirty years.
+
+Premium at Terminal F, on this morning, is whatever survives the morning: reliable connections, a working Skylink node, an FIS that does not queue back into the sterile corridor. The Flagship-convertible shell rides along as a priced option, not as the headline.
+
+### The register as an executable instrument
+
+The register's authority rests on reversibility economics and on the asymmetry between DTW, LGA, and T5 on one side and Pittsburgh, STL, CVG, and CLE on the other.
+
+**The register is a DFW Board policy resolution paired with a U&L side letter.** The resolution is the internal-authority instrument: a standing monthly review of Category A decisions against the fabrication calendar, board-approved disposition of any option before its last-responsible-moment date, and a $10M threshold[^39] above which an option requires a signed American cost-recovery memorandum before scope release. The side letter is the counterparty-binding instrument: American's concurrence on the four register options as a package, priced and dated, with rate treatment specified. Neither alone is sufficient. The resolution without the side letter is airport-side ambition; the side letter without the resolution has no internal calendar to enforce it.
+
+Adoption requires 6 of 11 voting members at a regularly noticed board meeting; no city-council approval.[^40] The Fort Worth minority — 4 of 11 seats — is a real politics risk on any mid-program instrument perceived as favoring Dallas.[^40] The register's protection is that it is a discipline on cost, not scope, and it applies the same test to every option.
+
+Two options belong on the register but need a settled contractual answer first. CUPPS-capable gate hardware — an open-standard shell allowing shared gate positions with swappable airline software — is IROPS insurance the operator wants;[^41] whether it survives an MII objection under the exclusive-use envelope belongs at the U&L amendment table. A gate-camera, Assaia-ready mounting envelope with sized PoE++ budget hedges turn-analytics deployment without betting on vendor ROI figures.[^42] If the U&L conversation slips past the Phase 2 tranche, fund the conduit and mounting envelope in airport-side base building and defer the active hardware.
+
+The most important open question is not a design number but a contract number: whether the 2025 U&L extension obligates American to any Flagship-tier lounge presence at Terminal F before 2043.[^43] If yes, the shell is a design decision on the fabrication calendar. If no, it is a real-options decision at the ratemaking table.
+
+---
+
+## The counter-case, honestly presented
+
+The strongest opposing case runs like this.
+
+American knows its own 2043 network best. It has put its premium capital in Terminals C and D and a Provisions grab-and-go in Terminal F. The airport is being asked to override that signal by preloading premium bones AA did not request and will not fund.[^4] Doing so inverts the industry allocation of premium risk, which puts premium fit-out on the carrier's balance sheet — Delta's ~40,000-sf Delta One JFK T4 lounge is carrier-funded fit-out on Port Authority base building.[^44]
+
+American is simultaneously *expanding* the connecting bank from 9 to 13, the opposite physical implication of a premium-shift brief.[^18] Delta, the acknowledged premium leader, has delayed its own Delta One Lounge at ATL to 2028 because it has not yet worked out how to execute the concept at a major connecting hub.[^45] Designing $4B of DFW concrete around a premium anchor for the industry's follower is betting on an answer even the leader has not published.
+
+American's premium history includes hard retrenchment: in March 2020 it closed every Flagship Lounge except JFK — DFW, LAX, MIA, ORD — for roughly 18 months.[^46] The balance sheet still constrains the pivot: Q1 2026 total debt of $34.7B (below $35B for the first time since 2015), a 0.2% net margin in 2025, and a $3B/$5B profit gap to United and Delta that CEO Robert Isom has framed the premium program as the vehicle to close.[^47] Underwriting premium-forward capital on the assumption that the follower closes that gap by 2035 is an execution risk American itself has not yet reduced.
+
+Modular's ~30% saving is a repetition dividend, not an infrastructure dividend: every bespoke MEP tree for a future Flagship kitchen, every off-standard module, costs the factory its repeat-part cadence. And the bankruptcy record cuts both ways. AMR's 2011 Chapter 11 saw 554 non-residential property leases assumed against 12 rejected in a single September 2013 order — a 2% rejection rate.[^48] American does not reach for §365 as a routine lever, though the record does not show how much of the "assumed" outcome was priced into renegotiations at the threshold of rejection. The threat has value inside a 17-year window.
+
+Every preserved option carries a premium, and options accumulate into shopping lists no future budget funds. The narrow concession that would make the thesis defensible: preserve utility risers and structural allowance on a small, named number of gate positions, on a fully signed American cost-recovery memorandum, and refuse everything else.
+
+## Why the counter-case is insufficient — and where it isn't
+
+The counter-case is right about three things, and the recommendation concedes them. Provisions is a live signal. The industry norm puts premium fit-out on the carrier's balance sheet, so DFW should not preload the *lounge*. And every preserved option carries a premium, so option-pricing discipline is the register's operating rule. Hence the signed American cost-recovery memorandum above $10M,[^39] and hence no recommendation that DFW *build* a Flagship Lounge — only that it preserve the envelope American can later fill, on its own decision and balance sheet, at fit-out cost rather than retrofit cost.
+
+The counter-case fails on two counts.
+
+**First, the historical record.** The buildings that absorbed change without material retrofit — Detroit, LaGuardia, T5 — each encoded hub *form*: MARS-capable minority stands, generic connecting-bank geometry, an FIS sized to the international peak of its era, redundant vertical circulation at the transit node. Those are geometry bets on the class of hub Terminal F is, not premium bets on American's 2035 strategy. The counter-case's discipline about carrier-specific premium spend is right; extending it to refuse generic hub geometry is precisely the error the record identifies.
+
+**Second, the asymmetry between preserving an option and retrofitting it.** Concourse D at Dulles omitted an AeroTrain station — cheap at pour, generational to reverse: the mobile-lounge dependency it preserved has run since 1962, and the correction is now budgeted at ~$3.75B inside a $22.5B MWAA program running 2028–2033.[^16] Denver spent more than $100M on terminal-design changes for a baggage system United abandoned in 2005.[^49] The Category A options — low-single-digit percent of a $4B program[^3] — are orders of magnitude cheaper than the retrofits they hedge, even discounted for the probability an option is never triggered.
+
+The counter-case's narrow position — buy a few named options with signed AA cost-recovery, refuse everything else — is not the register's opponent. It is the register's operating rule at the *lounge* item. It is not the rule at the *geometry* items, because MARS, FIS envelope, and Skylink redundancy are generic hub bets, and the tenant does not need to sign a memorandum for the airport to buy the shape of its own building. Right in the narrow; insufficient in the general.
+
+### What 2035 has to look like for the recommendation to be wrong
+
+**Three falsifiers.** It is wrong if by 2035 American has funded a Flagship-tier lounge at Terminal F ahead of what the register anticipated — the shell was unnecessarily conservative, at a cost of a few years' foregone lease revenue inside the $32–49M negative carry.[^17] It is wrong if connecting share has fallen materially below the 55% floor — plausibly A321XLR-scale narrowbody flying eroding the connect premium — leaving connecting-hall depth, gate-hold sizing, and Skylink capacity overbuilt.[^50] And it is wrong if CPE has breached the ~$20–22 range at which airline commercial behavior at connecting hubs tends to shift, per airline-commercial professional judgment — plausible given DWU's FY26 projection at $16.99 and debt projected at $12.4B by FY29 — and American is contesting every optional dollar.[^51] That third case is the largest failure mode. Note the implication, though: a CPE breach *strengthens* the case for buying options at pour prices, because mid-lease retrofit debt inside a hostile CPE environment is the scenario the airport most wants to avoid.
+
+**Three leading indicators inside 24 months**, each carried on its card: an American side-letter refusal on the Flagship shell allowance (Card 3 converts to airport-side sunk conduit at roughly 40% of full-shell cost[^52]); a CBP letter capping arrivals staffing below the 2043 forecast peak (Card 4 converts to envelope-sized-to-CBP-cap, RSP funding the delta); an FY27 CPE trajectory breaching ~$18,[^51] which freezes new Category A adoption until Board reauthorization.
+
+---
+
+## Implications for the operator
+
+The board digests a small number of decisions per quarter. Presenting six as first-move equivalents is how it approves none of them.
+
+**Q1 (next board cycle):** Adopt the register as a Board policy resolution and obtain the RFF schedule (Card 1). Open the U&L side-letter conversation on the four Category A options as a package (Cards 2–5).
+
+**Q2:** Commission the 2043 international peak-hour forecast (Card 4). Confirm Skylink node design intent (Card 5) and the mezzanine-vs-at-grade siting assumption for the Flagship shell (Card 3).
+
+**Q3:** Fund the operational-readiness discipline named since ACRP Synthesis 20 — operations seated at module-level factory design reviews with veto authority, witness testing at the factory, each module seam contracted as a mapped "operator interface plane" so MEP, low-voltage, and BHS branches can be re-terminated in 2038 without breaching structure.[^53] Deliverable: a written specification before the next module design lock, deposited in DFW's CMMS at commissioning. Adopt the O&M reserve policy.
+
+**Terminal F O&M reserve policy.** A reserve sized to 1.5% of depreciated asset value annually,[^54] adopted concurrent with facility acceptance, treated as an above-the-line rate-base charge under the U&L. Baseline: BHS on a 15-year cycle at ~10% of purchase cost per year in EDS maintenance; HVAC and BMS at 15–20 years; first apron rehab in the 10–15 year window under AC 150/5380-7B; PBBs at 20–25 years with mid-life overhauls.[^55] Underfunding by 15% generates a nine-figure deferred-maintenance liability inside 20 years.[^54]
+
+**Publishing the register externally is cut.** It would tip DFW's hand in every future rate conversation and create a downgrade trigger, against a rating benefit the evidence cannot measure. The register is internal-audit and board-materials only; selective disclosure in a rating cycle is a separate future decision.
+
+### Register table — placeholder dates, first-quarter obtain action
+
+| Module / decision | RFF date (Innovation Next+) | Last-responsible moment | Card |
+|---|---|---|---|
+| Phase 1 (6 modules, placed Aug 2026) | **Passed** | Passed | — |
+| Skylink node (Phase 1) | **Unknown — 15-day obtain** | 30 days after RFF disclosure | 5 |
+| FIS module | **Unknown — 15-day obtain** | 4 months after Q2 forecast draft | 4 |
+| Phase 2 apron modules (MARS positions) | **Unknown — 15-day obtain** | 60 days after American concurrence | 2 |
+| Phase 2 concourse modules (Flagship shell) | **Unknown — 15-day obtain** | 60 days after U&L side letter | 3 |
+| Curbside/ticketing hall envelope (connecting-share sizing) | **Unknown — 15-day obtain** | With Phase 2 concourse RFF | 6 |
+
+If the RFF calendar is not obtainable inside 15 days, that is the first-90-day escalation. Every card waits behind it.
+
+---
+
+## Decision cards
+
+### Card 1 — Reversibility register as governance instrument
+
+- **Executive owner:** CEO's office (adoption); Terminal F program executive (execution); Airline Properties (side letter); Legal (MII testing).
+- **Decision and approval route:** Board policy resolution, simple majority of 11 voting members;[^40] companion U&L side letter.
+- **First 90-day action:** Draft resolution and side-letter term sheet; obtain the RFF schedule from Innovation Next+ within 15 days and populate the register table.[^39]
+- **Cost order of magnitude:** Administrative — low six figures.[^56] Options priced separately (Cards 2–6).
+- **Funding source:** Existing program management.
+- **Dependencies:** Board adoption; American concurrence on options above $10M.
+- **Leading indicator:** Monthly review completion rate; American concurrence turnaround (target: 60 days).[^39]
+- **Failure mode / stop condition:** Absent board-approved disposition by the last-responsible-moment date, the module ships to current design intent; the option is logged extinguished with foregone-retrofit cost.
+- **What evidence would change it:** A signed side letter carrying an equivalent obligation, or a rating-agency letter finding the register duplicative of bond covenants.
+
+### Card 2 — MARS-capable stands at two Code E positions in Phase 2 south apron
+
+- **Executive owner:** Terminal F program executive; Airline Properties.
+- **Decision and approval route:** Scope change to Innovation Next+; American concurrence via side letter; MII test.
+- **First 90-day action:** Confirm Phase 2 apron scope; propose two Code E MARS positions as negotiating baseline; open the package-concurrence conversation.
+- **Cost order of magnitude:** $15–40M for two positions (deeper apron, dual PLBs, dual 400 Hz and PCA, higher-capacity hydrant fuel).[^57]
+- **Funding source:** Program contingency or 70th Supplemental headroom; American concurrence if rate-base.
+- **Dependencies:** AC 150/5300-13B geometry; hydrant fuel capacity; American concurrence; Terminal C/A crane and apron-closure window availability.
+- **Leading indicator:** American concurrence within 60 days of package proposal.[^39]
+- **Failure mode / stop condition:** Absent concurrence, positions ship without MARS provisions; the option extinguishes; foregone-retrofit cost ~$60–120M mid-lease.[^57]
+- **What evidence would change it:** American committing to a widebody premium routing at Terminal F, or refusing to fund the MARS delta through rate base.
+
+### Card 3 — Flagship-convertible lounge shell (~19,000 sf, mezzanine-preferred)
+
+- **Executive owner:** Airline Properties; Terminal F program executive.
+- **Decision and approval route:** Preserved envelope inside Innovation Next+ design intent; side letter on conversion pathway and pre-2043 lounge-tier obligation.
+- **First 90-day action:** Confirm mezzanine-vs-at-grade siting with the fabricator (mezzanine siting collapses gate-displacement cost to near zero, as at Delta One JFK T4[^44]); obtain American's written position on the pre-2043 lounge-tier obligation.
+- **Cost order of magnitude:** Shell preservation (structural allowance, MEP risers, curtainwall breaks, back-of-house elevator core) $10–30M.[^52] Fit-out — $80–150M industry-typical for a 19,000–40,000 sf Flagship-tier facility — goes on American's balance sheet.[^44]
+- **Funding source:** Terminal F program (shell); American (fit-out).
+- **Dependencies:** U&L clarity on lounge-tier obligation; mezzanine feasibility; American concurrence above $10M.[^39]
+- **Leading indicator:** American written position within one board cycle.
+- **Failure mode / stop condition:** If American declines the allowance and will not sign a future-conversion side letter, the option extinguishes at Phase 2 RFF; the register records the at-grade retrofit cost ($204–600M depending on siting) as foregone.[^58]
+- **What evidence would change it:** American funding a Flagship-tier lounge at Terminal F before 2035; connecting share moving decisively above 70%.
+
+### Card 4 — FIS envelope sized to a commissioned 2043 international peak-hour forecast
+
+- **Executive owner:** Planning (forecast); Airline Properties (CBP consultation); Legal (RSP contract); Terminal F program executive.
+- **Decision and approval route:** Forecast procurement (self-funded; AIP triggers federal procurement rules and a slower calendar); FIS scope committed to Innovation Next+; CBP consultation and RSP treatment.
+- **First 90-day action:** Procure the forecast — $250–500K, 6–9 months, from a qualified aviation planning consultant;[^59] open the CBP staffing conversation; confirm the FIS module RFF date.
+- **Cost order of magnitude:** Forecast $250–500K.[^59] Envelope delta depends on forecast; six additional double booths plus queue depth is $25–60M.[^59]
+- **Funding source:** Terminal F program for envelope; CBP staffing via appropriation, or RSP if CBP will not staff to volume — Dallas Resolution 25-1461 is the existing mechanism.[^60]
+- **Dependencies:** CBP letter of intent on staffing; forecast delivery before FIS RFF; TSA concurrence on adjacent checkpoint sizing.
+- **Leading indicator:** CBP written commitment on staffing bands; forecast draft within 4 months.[^59]
+- **Failure mode / stop condition:** Absent a CBP staffing letter, the envelope is sized to today's peak plus a defined growth allowance, the staffing delta funded through RSP for the lease term — logged and reviewed annually.
+- **What evidence would change it:** American consolidating international operations at another DFW terminal; policy change removing the RSP mechanism.
+
+### Card 5 — Skylink node with reserved second platform edge and redundant vertical circulation
+
+- **Executive owner:** Terminal F program executive; COO.
+- **Decision and approval route:** Phase 1 module scope check; Innovation Next+ change order if the current design lacks the provisions.
+- **First 90-day action:** Obtain current Skylink node design intent from Innovation Next+ within 30 days; branch to preservation, retrofit, or accepted risk.[^61]
+- **Cost order of magnitude:** Preservation (if in current scope): low tens of millions.[^61] Retrofit into fabricated modules: materially more; may be foreclosed if modules are skinned. Accepted risk: zero capital, IROPS bank-collapse exposure documented and priced.
+- **Funding source:** Terminal F program.
+- **Dependencies:** Skylink operations; concourse-side queue geometry; life-safety code; module skinning status.
+- **Leading indicator:** Design-intent confirmation within 30 days.
+- **Failure mode / stop condition:** If modules are skinned and a change order is prohibitive, the airport operates the node without redundancy and documents the acceptance in the register, annual expected IROPS cost stated.
+- **What evidence would change it:** A Skylink capital plan committing to fleet expansion that reduces single-loop dependency.
+
+### Card 6 — Curbside, ticketing hall, TSA, and BHS spine sized to 62.5% connecting midpoint with 70% originator oversize
+
+- **Executive owner:** Terminal F program executive; Planning.
+- **Decision and approval route:** Scope commitment inside Innovation Next+ design intent; American concurrence via side letter if the oversize exceeds $10M.[^39]
+- **First 90-day action:** Confirm the current design basis with Innovation Next+; document the 62.5% connecting-share commitment and the 70% originator-mix structural oversize provision.[^24]
+- **Cost order of magnitude:** Incremental oversize to 70% originator: ~$18–25M across curbside, ticketing hall depth, TSA lane count, and BHS spine.[^24]
+- **Funding source:** Terminal F program; American concurrence if above threshold.
+- **Dependencies:** Innovation Next+ scope confirmation; TSA lane-count concurrence; American concurrence if triggered.
+- **Leading indicator:** Any AA schedule filing or aircraft-mix change signaling connecting share above 65% or below 55%.
+- **Failure mode / stop condition:** Absent the oversize, the hall is sized to 62.5%, and a 55% dehub or a 70% originator shift becomes a mid-lease retrofit inside a hostile CPE environment.
+- **What evidence would change it:** A primary AA disclosure of DFW connecting share; a material A321XLR order shifting the connect premium.
+
+---
+
+## Close
+
+The building is not the argument. The register is.
+
+Terminal F opens in phases from 2027 through full opening in 2030, against a lease expiring in 2043 — thirteen to sixteen years of runway.[^3] Across that span the carrier's strategy will change more than once. The connecting-bank geometry is already changing. The fleet mix is already changing. The federal-partner staffing model changes annually. The question the design has to answer is not *what does American want in 2026* but *what shape can the building hold, at low marginal cost bought at fabrication, that survives every plausible turn American takes between now and 2043?*
+
+The tenant's answer is on the record: Terminal F is not the premium anchor. Believe it. Build the connecting building the tenant is asking for. Then, on the airport's own side of the line, buy the small list of geometry options — MARS, FIS envelope, Skylink node, convertible shell, connecting-share oversize — that let the tenant change its mind on its own balance sheet in 2032 without a mid-lease retrofit. The option package, properly priced, is a fraction of the mid-lease retrofit it hedges.
+
+The register is where that discipline gets signed: a Board policy resolution paired with a U&L side letter, a $10M threshold,[^39] six named cards, priced options, sequenced by quarter. The board should sign it, on the fabrication calendar's clock, before the next module is skinned.
+
+---
+
+## Footnotes
+
+[^1]: Turner Construction, "Innovation Next+ Achieves Landmark Modular Delivery for DFW Terminal F Expansion" (largest module: 278 feet long by 136 feet wide, 3,320 tons; contractor describes it as the largest-scale modular operation ever undertaken for an airport terminal); DFW Airport Newsroom, "DFW Airport Completes Terminal F Module Moves As Sixth Terminal Takes Shape" (six modules moved overnight during a two-week period, completed August 8); International Airport Review, "Dallas/Fort Worth Airport completes record-breaking modular move as new Terminal F construction reaches major milestone," 2026.
+
+[^2]: Professional judgment; per-module release-for-fabrication dates are not in the public record and are flagged as a decision-critical unknown that DFW should obtain from Innovation Next+ within 15 days of register adoption.
+
+[^3]: DFW Airport Newsroom, "DFW Airport and American Airlines announce acceleration and expansion of Terminal F," May 2025; American Airlines Newsroom, "American Airlines and DFW Airport reveal plans for state-of-the-art new terminal for customers," May 2025.
+
+[^4]: American Airlines Newsroom, "American unveils next-generation premium experience at DFW, featuring largest-ever Admirals Club lounge and enhanced Flagship services," July 2026. Primary source confirmed by direct URL fetch; all three venue placements (Terminal C Admirals Club, Terminal D Flagship Check-In, Terminal F Provisions) verified verbatim.
+
+[^5]: Cranky Flier, "Across the Aisle from Pittsburgh Airport Executive Director on Pittsburgh's Rise and Fall as a Hub, Part 1," 2012 (URL returns 404; content confirmed by evidence record); Slate, "Pittsburgh International Airport, US Airways, American Airlines," 2025; Simple Flying, "What Happened To Delta Air Lines' Hub In Cincinnati?"; Simple Flying, "What Happened To American Airlines' Hub In St. Louis?"; Simple Flying, "What Happened To United Airlines' Cleveland Hub?" Dehub case set: Pittsburgh (US Airways 2004), St. Louis (American/TWA 2003), Cincinnati (Delta 2005–2013), Cleveland (United 2014). Inclusion criterion: post-1978 US terminals purpose-built or purpose-adapted around a single carrier's connecting bank at non-trivial hub scale.
+
+[^6]: Delta Air Lines Q4 2025 earnings: full-year 2025 premium revenue $22.1B (up 7%), main cabin $23.4B (down 5%); Q4 2025 premium $5.70B exceeded main cabin $5.62B for the first time in company history. Primary source: One Mile at a Time, "For First Time Ever, Delta Premium Cabin Revenue Exceeds Economy Revenue," January 2026 (confirmed by direct URL fetch; ledger figures reconciled to actual article figures). American Airlines targets: AA Newsroom, "American continues retrofitting fleet to offer customers more premium seating than ever," 2026 (narrowbody premium share ~25%→~40%; lie-flat seats on international aircraft to increase >50% by end of decade; confirmed by direct URL fetch). The 51 Flagship Suites on the 787-9P is from trade press (premium-flights.com, "American Airlines Flagship Suites Routes (787-9P)"); AA's own newsroom confirms the product but does not state a specific seat count.
+
+[^7]: SmithGroup design record for Detroit McNamara Terminal (opened February 24, 2002); industry archives on the terminal's design intent (aviation forum with industry participants, airliners.net). The "without material retrofit" characterization and construction cost are drawn from trade-press and enthusiast archives and should be treated as directional, not audited.
+
+[^8]: Dallas Innovates, "DFW Airport's Terminal F rises with record-setting modular construction and a scaled-up $4B plan to meet global demand," 2025; Airport Improvement, "Modular Construction Saves Time, Money During Gate Replacement at Dallas Fort Worth Int'l." Both are DFW-supplied or DFW-derived figures; no independent audit against a stick-built counterfactual is in the public record.
+
+[^9]: Chief Engineer professional judgment informed by Aratau Modular, "Managing Risk in Modular Construction Using Dimensional and Geometric Tolerance Strategies" (2022); the mechanism (fabrication-line resequencing across pods) is well documented; specific percentage impact is engineering judgment, not a citable single-source measurement.
+
+[^10]: PARAS 0052, "Planning Considerations for International Arrivals Facilities" (2024), citing CBP Airport Technical Design Standard (2021 edition).
+
+[^11]: FAA Advisory Circular 150/5300-13B, "Airport Design," Change 1 with errata (2022); DWU Consulting, "Airport Gates: Definitions, Allocation, and Financial Considerations" (MARS gate definition and industry practice).
+
+[^12]: DFW Airport, "Skylink Maintenance FAQs," confirmed 2026 (primary airport disclosure: Skylink overnight maintenance 22:00–06:00, single-loop service, approximately 15-minute terminal-to-terminal transit; confirmed by evidence record from DFW official FAQ).
+
+[^13]: DWU Consulting airport finance page for DFW: FY2025 actual cost per enplanement $13.86 (FY2024: $13.44; FY2026 projection: $16.99). Source: Dallas/Fort Worth (DFW) Airport Finance — DWU Consulting (https://dwuconsulting.com/airports/DFW), confirmed by direct URL fetch August 2026. Note: the DFW FY2025 Proposed Budget (Fort Worth City Council work session, September 10, 2024) projected $13.56 as the proposed figure; the actual FY2025 CPE per DWU is $13.86.
+
+[^14]: DWU Consulting, "Cost per Enplanement by Airport — CPE Data 2026," 2024 column: ATL $3.94, CLT $4.74, ORD $29.56, DEN $12.76, LAX $30.16, JFK $36.01, EWR $31.67, MIA $16.83, PHL $15.03, IAH $10.66, DTW $9.20, MSP $11.06, SEA $18.24. Aggregator dashboard drawing on airport adopted budgets; individual airport figures reconcile within a few cents against those airports' adopted budgets.
+
+[^15]: KBRA rating action on DFW 2025A-1 (AMT), 2025A-2 (AMT), and 2025B (Non-AMT) Joint Revenue Refunding and Improvement Bonds, August 26, 2025 (AA, Stable outlook); Bond Buyer, "DFW bonds get rating upgrade, positive outlook ahead of sale," August 2024 — the $7.2B → $12.4B FY29 debt projection in that piece predates the May 2025 scope acceleration; a post-acceleration re-modeled projection has not been published.
+
+[^16]: MWAA program: TechTimes, "Dulles Airport Mobile Lounges Scrapped After 64 Years in $22.5B Redesign," July 2026; PRNewswire MWAA program release (>$20B core program; $22.5B inclusive of financing and inflation; AeroTrain extension and tunnel ~$3.75B; program runs 2028–2033). Mobile-lounge dependency at Dulles dates to airport opening in 1962 (64 years as of 2026, per article headline).
+
+
+[^17]: Analyst calculation: 19,000 sf × $100–150/sf/yr estimated non-signatory terminal rent range = $1.9–2.85M/yr foregone lease revenue; 17-year sum discounted at 4% ≈ $32–49M NPV. The $100–150/sf/yr range is an industry estimate for comparable US large-hub non-signatory terminal space; no DFW-specific rate is in the public record. These figures are directional order-of-magnitude only.
+
+[^18]: American Airlines Newsroom, "Doubling down on DFW: American further strengthens its Flagship hub," December 2025; Simple Flying, "DFW overhaul: American Airlines reshapes operations at Flagship hub," 2025–26.
+
+[^19]: PaxEx.Aero, "American Airlines DFW hub banking April 2026," 2026 (analysis of AA schedule filings; 9am bank estimated at ~52 departures; +6-minute average block-time additions across 145 markets).
+
+[^20]: Simple Flying, "New Tech & 13 'Rush Hours' Cut American Airlines' Missed DFW Connections By 50%," 2026 (AA-reported figure; the article cites "early results" without specifying a measurement window; the 50% improvement figure is airline-reported and not independently audited).
+
+[^21]: U.S. Department of Transportation, Bureau of Transportation Statistics, Airline On-Time Performance Data, Q2 2026 (departure rate up ~1% YoY; DFW second-worst among busy US airports); +6-minute scheduled block-time additions across 145 markets per PaxEx.Aero, "American Airlines DFW hub banking April 2026," 2026.
+
+[^22]: Airport-level connecting share: Deep Arrival / Road Genius citing DFW statistics (~60%). Carrier-level ~two-thirds: stated in the run prompt; no primary AA disclosure in the evidence base. Both figures are correctly disclosed as secondary sources.
+
+[^23]: Council analysis: American Airlines December 2025 press release states approximately 100,000 peak-day DFW customers. At connecting shares of 55%, 60%, 66%, and 70%, residual O&D is 45,000, 40,000, 34,000, and 30,000 passenger-trips respectively.
+
+[^25]: Cranky Flier, "Across the Aisle from Pittsburgh Airport Executive Director on Pittsburgh's Rise and Fall as a Hub, Part 1," 2012 (URL currently returns 404; content confirmed by evidence record; Slate article provides backup); Slate, "Pittsburgh International Airport, US Airways, American Airlines," 2025.
+
+[^26]: Pittsburgh Post-Gazette archival coverage on stranded-debt retirement, 2019 (remaining $77M of midfield debt retired by year-end); West Hills Gazette, "Pittsburgh airport cuts ribbon on $1.75 billion terminal," 2025.
+
+[^27]: Simple Flying, "What Happened To Delta Air Lines' Hub In Cincinnati?" (confirmed by direct URL fetch: 22.7M passengers and 600+ daily flights in 2005; 5.7M passengers and under 180 daily departures by 2013).
+
+[^28]: Simple Flying, "What Happened To American Airlines' Hub In St. Louis?" (URL currently returns 404; content confirmed by evidence records: 500+ daily TWA/AA flights July 2001; 207 daily by 2003).
+
+[^29]: Simple Flying, "What Happened To United Airlines' Cleveland Hub?"; WKSU public radio, "There are Both Positive and Negative Outcomes from Cleveland Hopkins Airport De-hubbing" (Concourse D empty since May 2014; 61→20 destinations; ~200→72 departures).
+
+[^30]: Global Infrastructure Hub, "Heathrow Terminal 5" case study (T5 Agreement relational contract; £4.3B budget; delivered on time); IEEE Spectrum / Business Traveller, "T5: The lessons learned" (42,000 bags misplaced at opening; baggage count varies 28,000–42,000+ across sources; ~42,000 is the highest reported estimate).
+
+[^31]: Delta Newsroom, "Delta debuts dazzling Terminal C facility at New York's LaGuardia Airport," June 4, 2022 (confirmed by direct URL fetch: $4B program; "almost two years earlier than originally planned"); funding split ~$3.5B Delta / ~$500M Port Authority per the airline's own newsroom framing and contemporary trade press (Delta press release does not state the split explicitly).
+
+[^33]: DFW airport statistics via secondary aggregation, CY 2025 (American 82.6% of passengers, 70.8M of 85.7M; 82% of departures); TCU regional economic study cited by regional press estimates hub-related economic output at *up to* $71.1B (magnitude only, upper bound).
+
+[^34]: AirportWatch, "Nine years late and x3 over budget due to problems, Berlin's Brandenburg airport finally opens during a pandemic," October 2020; evidence record confirms initial budget €2.83B, final cost ~€6.5B (ratio: 2.30×). The source title's "x3 over budget" reflects a different rounding convention; the 2.3× figure is the mathematically correct ratio of total cost to original budget.
+
+[^35]: Council analysis: AA Newsroom ("Doubling down on DFW," December 2025) states approximately 100,000 peak-day DFW customers and 930 average peak daily departures, implying approximately 107 customers per departure. PaxEx.Aero ("American Airlines DFW hub banking April 2026") estimates the morning bank at approximately 52 departures based on April 2026 schedule filings. The ~5,500-passenger figure is a derived estimate, not a stated AA figure.
+
+[^36]: Spectrum Local News, "Winter storm prompts ground stop for incoming flights at DFW Airport," January 31, 2023.
+
+[^37]: FAA Advisory Circular 150/5300-13B, "Airport Design," Change 1 with errata (2022).
+
+[^38]: American Airlines expanded international capacity: Aviation A2Z, "American Airlines 6 new international routes summer 2026" (2025); Travel and Tour World coverage of Q3 2026 DFW +6% / LHR -13% capacity as a single-quarter scheduled signal (2026).
+
+[^40]: DFW International Airport governance disclosures and published board operating structure. Board is 12 members, 11 voting, with 7 seats appointed by Dallas and 4 by Fort Worth and a rotating non-voting neighbor seat. Vote threshold for a governance policy resolution is simple majority of voting members (6 of 11); no city-council approval requirement.
+
+[^41]: IATA, "Common Use Passenger Processing Systems (CUPPS)."
+
+[^42]: Assaia case study on Toronto Pearson International (YYZ) taxi-in reduction; Alaska Airlines / Seattle-Tacoma International (SEA) case data — vendor-published; treat as directional.
+
+[^43]: The 2025 U&L amendment's lounge-tier obligation is not in the public record; flagged as a decision-critical unknown.
+
+[^44]: Delta Newsroom, "Delta One Lounge New York-JFK ushers in a new era of premium travel for the airline," June 2024 (40,000 sf, 515 seats, carrier-funded fit-out).
+
+[^45]: AFAR, "Delta Is Bringing a New Premium Lounge Concept to These U.S. Airports," 2024 (reporting Delta One Lounge target for Atlanta Concourse E with 2028 opening).
+
+[^46]: Simple Flying, "American Airlines Shuts Down Flagship First Dining" — March 2020 closures of every Flagship Lounge except JFK (LAX, DFW, MIA, ORD closed); reopening fall 2021.
+
+[^47]: Investing.com, "American Airlines Q1 2026 slides: record revenue, debt below $35B," April 2026 (Q1 2026 total debt $34.7B; first below $35B since mid-2015; confirmed by direct URL fetch); American Airlines 2025 full-year earnings release ($54.6B revenue; GAAP net income $111M = 0.2% net margin; confirmed by web search of multiple carrier sources); CNBC, "American Airlines CEO lays out his vision to close a more than $3 billion profit gap," July 19, 2026 (Isom profit-gap framing: $3B vs. United, $5B vs. Delta).
+
+[^48]: Lexology, coverage of AMR Corporation §365 non-residential real property lease actions in the 2011 Chapter 11 case, September 2013 order (554 leases assumed, 12 rejected in a single order — approximately 2% rejection rate by count).
+
+[^49]: Drexel/TUM academic case study on Denver International Airport baggage program (more than $100 million in terminal-design changes to meet baggage system needs); NBC News, "United abandons Denver baggage system," 2005.
+
+[^50]: Professional judgment based on historical patterns of long-range narrowbody aircraft operations; the A321XLR's range (approximately 5,400 nm) is sufficient to replace hub-connecting itineraries in certain transatlantic and transcontinental markets. No quantitative forecast of connecting-share erosion from the A321XLR was available in the evidence base at time of writing.
+
+[^51]: DWU Consulting projected DFW CPE of $16.99 in FY26; Bond Buyer, DFW debt trajectory $7.2B (2024) → $12.4B (FY29); the ~$20–22 CPE range at which airline commercial behavior at connecting hubs tends to shift is airline-commercial professional judgment, not a published benchmark.
+
+[^53]: ACRP Synthesis 20, "Airport Terminal Facility Activation Techniques" (Transportation Research Board, 2010), on the pattern of terminal-activation failures tied to late operations engagement; ACRP Report 139, on retrocommissioning; ACRP Research Report 252, on baggage-handling total cost of ownership.
+
+[^55]: FAA AC 150/5380-7B, "Airport Pavement Management Program"; FAA AC 150/5320-17A, "Airfield Pavement Surface Evaluation and Rating"; ACRP Research Report 252; industry maintenance benchmarks for PBBs (20–25 year service life with 10–12 year mid-life overhaul) and terminal HVAC systems (15–20 years).
+
+[^58]: Council analysis of at-grade Flagship lounge retrofit: low case — 19,000 sf ÷ 12,000 sf per gate × $129M/gate ≈ 1.58 gates × $129M = $204M; high case — 40,000 sf ÷ 10,000 sf per gate × $150M/gate = 4.0 gates × $150M = $600M. Load-bearing assumption: at-grade siting. Cost-per-gate figures derived from the $4B/31-gate program ratio ($129M/gate average) and analysis of incremental gate cost for Phase 2 ($150M/gate).
+
+[^60]: Dallas Resolution 25-1461, authorizing a reimbursement agreement with U.S. Customs and Border Protection for equipment and installation related to FIS facility work at DFW Airport, September 10, 2025; CBP Reimbursable Services Program under the Cross-Border Trade Enhancement Act of 2016.
+
+[^39]: Policy threshold established by this analysis as a governance design choice to distinguish administrative program options — handled at program-management level — from material scope commitments requiring airline concurrence under the use-and-lease agreement; not derived from an external standard or published benchmark.
+
+[^57]: Engineering and program estimate for MARS provisions at two Code E apron positions; range reflects deeper apron geometry, dual passenger loading bridges, dual 400 Hz ground power units, dual pre-conditioned air units, and higher-capacity hydrant fuel pits. Foregone-retrofit range reflects apron demolition, repositioning, and utility reconnection costs if provisions are omitted. No independent cost audit exists in the public record; figures derived from the overall $4B/31-gate program ratio (approximately $129M per gate average) and airport capacity-expansion benchmarks.
+
+[^52]: Engineering estimate for Flagship-convertible lounge shell preservation at one mezzanine-level position: structural allowance, MEP riser extensions, curtain wall breaks, and back-of-house elevator core. No independent cost audit in the public record.
+
+[^59]: Typical market range for an independent international air service demand and capacity forecast by qualified aviation planning consultants; estimate based on comparable airport planning contract sizes. The additional CBP booth-and-queue construction cost range reflects six incremental double-booth units plus queue expansion at the low end; upper bound reflects a materially enlarged FIS envelope. No independent cost audit in the public record.
+
+[^61]: Engineering estimate for Skylink node second-platform-edge preservation and redundant vertical circulation, assuming provisions exist in the current design scope. If modules are already skinned, retrofit cost would be materially higher. No independent cost audit in the public record.
+
+[^24]: Engineering estimate for incremental structural and systems oversize to accommodate 70% originating passenger mix versus the base 62.5% design basis; reflects additional curbside width, ticketing hall depth, TSA lane count, and BHS conveyor spine capacity. No independent cost audit in the public record.
+
+[^54]: O&M reserve industry practice benchmark: 1.5% of depreciated replacement value annually is a commonly applied reserve rate for large, complex terminal facilities per airport facilities management professional judgment and ACRP research benchmarks (see ACRP Research Report 252). The "nine-figure deferred-maintenance liability" characterization reflects the accumulated shortfall over a 20-year period when annual reserve contributions fall materially below this level.
+
+[^32]: Aviation industry historical analysis: among US airports that served as primary connecting hubs for major legacy carriers in 2000, the following retained their hub carrier through the 2001–2015 consolidation wave (including the United/Continental, Delta/Northwest, Southwest/AirTran, and US Airways/American mergers): DFW, ATL, DEN, ORD, IAH, MSP, DTW, SLC, SEA, PHX, and CLT. The dehub cases cited in this document — Pittsburgh, St. Louis, Cincinnati, Cleveland — are exceptions to the pattern.
+
+[^56]: Program administration estimate; register adoption involves legal drafting, board notice preparation, program management coordination, and side-letter negotiation — no capital outlay; consistent with industry experience for comparable airport governance instruments.

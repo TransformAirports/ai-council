@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from claude_agent_sdk import ResultMessage
 
@@ -15,8 +16,14 @@ from cli.orchestrator import (
     EVIDENCE_LEDGER_CONTRACT,
     CostTally,
     RunBudgetExceeded,
+    _is_transient_model_failure,
+    _existing_artifacts,
+    _checkpoint_outputs_match_manifest,
     _required_outputs_match_manifest,
     _run_agent,
+    report_runtime_preflight,
+    prepare_outputs,
+    run_pipeline,
     run_quality_gate_with_remediation,
 )
 from cli.quality_gate import PublicationQualityError, QualityIssue
@@ -40,6 +47,8 @@ def _result(
     is_error: bool = False,
     stop_reason: str | None = "end_turn",
     cost: float = 0.25,
+    errors: list[str] | None = None,
+    api_error_status: int | None = None,
 ) -> ResultMessage:
     return ResultMessage(
         subtype="success",
@@ -50,6 +59,8 @@ def _result(
         session_id="test-session",
         stop_reason=stop_reason,
         total_cost_usd=cost,
+        errors=errors,
+        api_error_status=api_error_status,
     )
 
 
@@ -70,8 +81,350 @@ class CostTallyTests(unittest.TestCase):
         with self.assertRaises(RunBudgetExceeded):
             tally.reserve("first")
 
+    def test_reported_cost_reduces_the_retry_reservation(self) -> None:
+        tally = CostTally(budget_usd=1.0)
+        tally.plan_calls(1)
+        self.assertEqual(tally.reserve("one"), 1.0)
+        tally.add("one", 0.6)
+        self.assertAlmostEqual(tally.reservation("one") or 0.0, 0.4)
+        self.assertAlmostEqual(tally.total, 0.6)
+        self.assertAlmostEqual(tally.remaining or 0.0, 0.0)
+
 
 class AgentRuntimeTests(unittest.TestCase):
+    def test_web_new_run_confirms_stale_output_in_the_browser(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = Path(directory) / "outputs"
+            outputs.mkdir()
+            stale = outputs / "run-manifest.json"
+            stale.write_text("{}", encoding="utf-8")
+            checkpoint = AsyncMock(return_value={"action": "clear"})
+            with (
+                patch("cli.orchestrator.get_sink", return_value=object()),
+                patch("cli.orchestrator.request_checkpoint", checkpoint),
+                patch(
+                    "cli.orchestrator.questionary.confirm"
+                ) as terminal_confirm,
+            ):
+                asyncio.run(
+                    prepare_outputs(
+                        outputs, auto_approve=False, resume=False
+                    )
+                )
+            terminal_confirm.assert_not_called()
+            checkpoint.assert_awaited_once()
+            self.assertFalse(stale.exists())
+
+    def test_checkpoint_requires_current_artifact_receipts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = Path(directory) / "outputs"
+            outputs.mkdir()
+            manifest = outputs / "run-manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "2.0",
+                        "run": {"resume_identity_sha256": "a" * 64},
+                        "artifacts": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            draft = outputs / "stage2" / "strategist-draft-v3.md"
+            draft.parent.mkdir(parents=True)
+            draft.write_text(" ".join(["approved"] * 300), encoding="utf-8")
+            update_artifact(
+                manifest,
+                draft,
+                validate_artifact(draft),
+                dependencies=build_dependency_fingerprint(
+                    manifest, ("run-manifest.json",)
+                ),
+            )
+            self.assertTrue(
+                _checkpoint_outputs_match_manifest(
+                    manifest, ("stage2/strategist-draft-v3.md",)
+                )
+            )
+            draft.write_text(" ".join(["changed"] * 300), encoding="utf-8")
+            self.assertFalse(
+                _checkpoint_outputs_match_manifest(
+                    manifest, ("stage2/strategist-draft-v3.md",)
+                )
+            )
+
+    def test_event_journal_is_not_a_conflicting_run_artifact(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = Path(directory) / "outputs"
+            outputs.mkdir()
+            journal = outputs / "run-events.jsonl"
+            journal.write_text('{"type":"run_start","seq":1}\n', encoding="utf-8")
+            self.assertNotIn(journal, _existing_artifacts(outputs))
+
+    def test_transient_failure_classifier_is_narrow(self) -> None:
+        self.assertTrue(_is_transient_model_failure(api_status=429))
+        self.assertTrue(_is_transient_model_failure(api_status=503))
+        self.assertTrue(
+            _is_transient_model_failure(
+                messages=("connection reset by peer",)
+            )
+        )
+        self.assertFalse(_is_transient_model_failure(api_status=401))
+        self.assertFalse(
+            _is_transient_model_failure(messages=("permission denied",))
+        )
+
+    def test_preflight_catches_stage4_tools_before_model_work(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            with (
+                patch("cli.orchestrator.shutil.which", return_value=None),
+                self.assertRaisesRegex(
+                    RuntimeError, "before any model call.*LibreOffice.*Poppler"
+                ),
+            ):
+                report_runtime_preflight(root, outputs)
+
+    def test_preflight_rejects_deep_research_without_openai_key(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            with (
+                patch("cli.orchestrator.shutil.which", return_value="/tool"),
+                patch.dict(os.environ, {"OPENAI_API_KEY": ""}),
+                self.assertRaisesRegex(RuntimeError, "OPENAI_API_KEY"),
+            ):
+                report_runtime_preflight(
+                    root,
+                    outputs,
+                    selected_research_agents=("deep-research",),
+                )
+
+    def test_failed_preflight_does_not_create_a_run_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            run_file = root / "prompts" / "runs" / "test.md"
+            run_file.parent.mkdir(parents=True)
+            run_file.write_text("# Run: Test", encoding="utf-8")
+            spec = type(
+                "Spec",
+                (),
+                {
+                    "slug": "test",
+                    "selected_research_agents": [],
+                },
+            )()
+            with patch(
+                "cli.orchestrator.report_runtime_preflight",
+                side_effect=RuntimeError("preflight stopped"),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "preflight stopped"):
+                    asyncio.run(
+                        run_pipeline(
+                            spec=spec,
+                            run_file=run_file,
+                            repo_root=root,
+                            auto_approve=False,
+                        )
+                    )
+            self.assertFalse((root / "outputs" / "run-manifest.json").exists())
+
+    def test_transient_transport_error_retries_then_succeeds(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.md"
+            calls = 0
+
+            async def fake_query(*, prompt, options):
+                nonlocal calls
+                del prompt, options
+                calls += 1
+                if calls == 1:
+                    raise TimeoutError("provider request timed out")
+                output.write_text(
+                    " ".join(["completed"] * 30), encoding="utf-8"
+                )
+                yield _result()
+
+            with (
+                patch("claude_agent_sdk.query", fake_query),
+                patch(
+                    "cli.orchestrator.asyncio.sleep", new=AsyncMock()
+                ),
+            ):
+                result = asyncio.run(
+                    _run_agent(
+                        agent=_agent(root),
+                        user_prompt="Write it.",
+                        model="test-model",
+                        cwd=root,
+                        step_label="test/transient",
+                        tally=CostTally(),
+                        output_path=output,
+                        artifact_contract=ArtifactContract(
+                            "markdown", min_words=20
+                        ),
+                    )
+                )
+
+            self.assertEqual(calls, 2)
+            self.assertFalse(result["skipped"])
+            self.assertTrue(output.is_file())
+
+    def test_retry_uses_only_the_unspent_step_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.md"
+            attempt_budgets: list[float | None] = []
+
+            async def fake_query(*, prompt, options):
+                del prompt
+                attempt_budgets.append(options.max_budget_usd)
+                if len(attempt_budgets) == 1:
+                    yield _result(
+                        is_error=True,
+                        stop_reason="error",
+                        cost=0.6,
+                        errors=["HTTP 429 rate limit"],
+                        api_error_status=429,
+                    )
+                    return
+                output.write_text(
+                    " ".join(["completed"] * 30), encoding="utf-8"
+                )
+                yield _result(cost=0.3)
+
+            tally = CostTally(budget_usd=1.0)
+            tally.plan_calls(1)
+            with (
+                patch("claude_agent_sdk.query", fake_query),
+                patch("cli.orchestrator.asyncio.sleep", new=AsyncMock()),
+            ):
+                result = asyncio.run(
+                    _run_agent(
+                        agent=_agent(root),
+                        user_prompt="Write it.",
+                        model="test-model",
+                        cwd=root,
+                        step_label="test/budgeted-retry",
+                        tally=tally,
+                        output_path=output,
+                        artifact_contract=ArtifactContract(
+                            "markdown", min_words=20
+                        ),
+                    )
+                )
+
+            self.assertFalse(result["skipped"])
+            self.assertEqual(len(attempt_budgets), 2)
+            self.assertAlmostEqual(attempt_budgets[0] or 0.0, 1.0)
+            self.assertAlmostEqual(attempt_budgets[1] or 0.0, 0.4)
+            self.assertAlmostEqual(tally.total, 0.9)
+
+    def test_successful_result_survives_a_stream_cleanup_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.md"
+            calls = 0
+
+            async def fake_query(*, prompt, options):
+                nonlocal calls
+                del prompt, options
+                calls += 1
+                output.write_text(
+                    " ".join(["completed"] * 30), encoding="utf-8"
+                )
+                yield _result(cost=0.2)
+                raise ConnectionError("connection reset during stream cleanup")
+
+            with patch("claude_agent_sdk.query", fake_query):
+                result = asyncio.run(
+                    _run_agent(
+                        agent=_agent(root),
+                        user_prompt="Write it.",
+                        model="test-model",
+                        cwd=root,
+                        step_label="test/cleanup",
+                        tally=CostTally(),
+                        output_path=output,
+                        artifact_contract=ArtifactContract(
+                            "markdown", min_words=20
+                        ),
+                    )
+                )
+            self.assertFalse(result["skipped"])
+            self.assertEqual(calls, 1)
+            self.assertTrue(output.is_file())
+
+    def test_transient_transport_error_exhausts_four_bounded_attempts(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calls = 0
+
+            async def fake_query(*, prompt, options):
+                nonlocal calls
+                del prompt, options
+                calls += 1
+                raise ConnectionError("connection reset by peer")
+                yield  # pragma: no cover - keeps this an async generator
+
+            with (
+                patch("claude_agent_sdk.query", fake_query),
+                patch("cli.orchestrator.asyncio.sleep", new=AsyncMock()),
+            ):
+                with self.assertRaisesRegex(ConnectionError, "connection reset"):
+                    asyncio.run(
+                        _run_agent(
+                            agent=_agent(root),
+                            user_prompt="Write it.",
+                            model="test-model",
+                            cwd=root,
+                            step_label="test/transient-exhausted",
+                            tally=CostTally(),
+                            output_path=root / "report.md",
+                            artifact_contract=ArtifactContract(
+                                "markdown", min_words=20
+                            ),
+                        )
+                    )
+            self.assertEqual(calls, 4)
+
+    def test_permission_failure_is_never_retried(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calls = 0
+
+            async def fake_query(*, prompt, options):
+                nonlocal calls
+                del prompt, options
+                calls += 1
+                raise PermissionError("permission denied")
+                yield  # pragma: no cover - keeps this an async generator
+
+            with (
+                patch("claude_agent_sdk.query", fake_query),
+                patch("cli.orchestrator.asyncio.sleep", new=AsyncMock()),
+            ):
+                with self.assertRaisesRegex(PermissionError, "permission denied"):
+                    asyncio.run(
+                        _run_agent(
+                            agent=_agent(root),
+                            user_prompt="Write it.",
+                            model="test-model",
+                            cwd=root,
+                            step_label="test/permission",
+                            tally=CostTally(),
+                            output_path=root / "report.md",
+                            artifact_contract=ArtifactContract(
+                                "markdown", min_words=20
+                            ),
+                        )
+                    )
+            self.assertEqual(calls, 1)
+
     def test_gate_remediation_binds_outputs_to_immutable_input_snapshots(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

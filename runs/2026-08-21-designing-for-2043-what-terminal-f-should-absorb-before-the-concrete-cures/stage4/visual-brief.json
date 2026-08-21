@@ -1,0 +1,592 @@
+{
+  "schema_version": "2.0",
+  "communication_job": "Convince DFW airport executives, capital planners, and skeptical peer readers that the operative design deadline at Terminal F is release-for-fabrication per module — not the concrete pour — and that a short, priced, module-by-module reversibility register, executed inside real contract instruments (JV change-order envelope, a Terminal F Reversibility Side Letter to the 2025 U&L amendment), is how the building absorbs American's premium repositioning instead of being retrofitted against it.",
+  "audience": "DFW Airport Board (Operations, Safety & Security Committee and Finance & Audit Committee routing); CEO's office; capital-planning peers at large US hubs. Sophisticated, skeptical; tired of consultant decks.",
+  "decision": "Not specified in run prompt. The verified draft frames the implied decision as: adopt the six-decision program (D0–D5) that establishes a module-by-module reversibility register before the fabrication-release window closes in 2030 — beginning with D0, confirming the Innovation Next+ JV procurement path for owner-directed template changes at repeat-part cost.",
+  "decision_owner": "Decision-critical unknown; the run prompt names no accountable executive. The verified draft assigns D0 to the Chief Procurement Officer, D2 (the register) to the Vice President Terminal Development, with the CEO's office signing any unwind; board-level ownership must be established from verified authority before release.",
+  "approval_path": "Decision-critical unknown; the run prompt names no approval path. Verified constraints that any path must respect: register briefings route through the Operations, Safety & Security Committee; the Finance & Audit Committee sets the forward-CPE ceiling the aggregate register premium must live inside; and further new-money debt authorization beyond the 70th Supplemental Bond Ordinance's $3.0 billion (through February 2026) requires both Dallas and Fort Worth city-council approval [quantitative-analyst::ev-c214ece13d4d].",
+  "first_90_day_action": "Execute Decision D0 and D2 phase 1: the Chief Procurement Officer obtains written confirmation of whether the Innovation Next+ JV design-build contract permits owner-directed template changes at repeat-part cost within the current change-order envelope, and the VP Terminal Development obtains the per-module release-for-fabrication schedule from the JV as contract disclosure — so the board can see which Terminal F decisions are still live and which have quietly closed.",
+  "success_measures": [
+    "Measurable acceptance condition: 100% of Terminal F module fabrication releases are preceded by a written register finding (item, cost order of magnitude, funding source, federal dependency), reported quarterly to the Operations, Safety & Security Committee.",
+    "Aggregate register premium remains inside the Finance & Audit Committee's forward-CPE ceiling every cycle; any breach triggers unwind review.",
+    "Written TSA and CBP concurrence on checkpoint and FIS geometry obtained before any affected module's fabrication release (D4).",
+    "Stop condition: American announces a formal Flagship-tier build-out at Terminal F on a published schedule — a specific fit-out program replaces the register.",
+    "Stop condition: AA connecting share falls below a connecting-majority floor across two consecutive annual cycles — the connecting-heavy sizing assumption softens and affected geometry is re-tested.",
+    "Stop condition: any Side Letter shell uncountersigned by American after two fabrication cycles is dropped from the register."
+  ],
+  "deck_mode": "executive_briefing",
+  "visual_thesis": "One clock, drawn honestly: every consequential Terminal F decision closes at a module's release-for-fabrication, weeks to months before any concrete cures. The deck's exhibits all hang off that clock — what the tenant has signaled, what history says about purpose-built hub terminals, what geometry is pour-locked, what each preserved option costs, and the six decisions that put the register inside real contracts. Charts explain evidence; nothing decorates.",
+  "signature_visual": {
+    "slide_number": 3,
+    "concept": "The Reversibility Clock — a horizontal per-module timeline showing that the design deadline is release-for-fabrication, not the pour. Left band: the six modules set in August 2025 (largest 278 ft × 136 ft, 3,320 tons, placed to ~3/4-inch tolerance), drawn with their decision windows already closed months earlier in the factory. Right band: future modules with open decision windows, each window closing at 'release-for-fabrication' — annotated 'unpublished; obtain from JV (Decision D0/D2)'. A single callout carries the inversion: post-release, modular is MORE change-hostile than stick-built, because template changes propagate across the fabrication line; the ~30% cost and ~30% schedule savings DFW attributes to the method is a repetition dividend, DFW-supplied and not independently audited.",
+    "visual_type": "annotated_timeline",
+    "visual_spec": "16:9 full-bleed exhibit. X-axis: 2025–2030 program window. Two swimlanes per module: 'factory decision window' (solid bar ending at release-for-fabrication, marked with a lock glyph plus printed label 'decisions close here') and 'site placement' (short bar at module set). August 2025 modules rendered in operations_slate with closed locks; future modules in terminal_blue with open decision windows hatched; unknown release dates shown as dashed bars labeled 'schedule unpublished — D0/D2 disclosure'. Guidance_gold vertical rule labeled 'today'. No invented dates: only the August 2025 set (completed Aug 8, 2025), Phase 1 opening 2027, and program completion 2030 are printed as fixed points; all other release dates carry the 'unpublished' flag. Callout box quotes the repetition-dividend caveat verbatim from the source note.",
+    "evidence_ids": [
+      "chief-engineer::ev-a8acbcf926a7",
+      "infrastructure-economist::ev-56a69208d46e",
+      "quantitative-analyst::ev-72cb1cc4d88a",
+      "infrastructure-economist::ev-9df5b63ec5a6"
+    ],
+    "source_note": "Innovation Next+ JV / Walsh Group release on the August 2025 Terminal F module set; Dallas Innovates (2025) for module dimensions; ~30% cost and ~30% schedule savings are DFW-supplied figures reported in trade press (Airport Improvement, Construction Dive) — no independent audit against a stick-built counterfactual exists in the public record. Per-module release-for-fabrication dates are not public; the exhibit flags them as unpublished.",
+    "asset_source": "Designer-built from evidence above. No stock imagery."
+  },
+  "brand_profile": {
+    "identity": "Transform Airports AI Council — evidence-first executive advisory. Follow assets/brand/design-system.json v2.0.",
+    "palette": "Runway navy #0B2D4D primary; terminal blue #2E84A5 secondary; guidance gold #D4A24C reserved for thresholds, decision callouts, and the 'today' rule; operations slate #415669 for closed/locked states; alert red #A6413A only for stop conditions. Cloud-white/apron-fog backgrounds. No gradients, no drop shadows, no dashboard card grids.",
+    "typography": "Georgia display, Aptos body (Calibri fallback). Slide titles >= 35pt, body >= 16pt, source notes >= 9pt. Word: H1 19pt, body 10.5pt, notes 8.5pt.",
+    "chart_style": "Flat, gridline-light, data labels at the mark. Caveats ('DFW-supplied', 'AA internal data, 17-day window', 'projection pre-dates May 2025 scope expansion', 'constructed stress case') printed on the exhibit face, never only in notes.",
+    "photography_policy": "Real DFW/AA imagery only where it adds place, scale, or operational meaning (the August 2025 SPMT module move qualifies). Rights confirmed in writing before use; omit rather than substitute stock. No clip art, no icon grids.",
+    "section_treatments": "Speaker-led slides 1–10: one claim per slide, <= 70 visible words. Read-ahead slides 11–16: denser analytical exhibits permitted, flagged 'READ-AHEAD' in a slate header band. Recommendation callouts use a guidance-gold left rule with the decision ID (D0–D5) in Georgia."
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "narrative_job": "Open with the image that hides the argument: the August move was beautiful, and every consequential decision about those modules had already closed in a factory.",
+      "headline": "The concrete is a decoy. The register is the deadline.",
+      "evidence_ids": ["chief-engineer::ev-a8acbcf926a7"],
+      "visual_type": "annotated_photograph",
+      "visual_spec": "Full-bleed photograph of the August 2025 SPMT module move (six modules, closed taxiway, overnight window) if rights clear; annotation strip prints: largest module 278 ft × 136 ft, 3,320 tons, set to ~3/4-inch tolerance, completed Aug 8, 2025. If rights do not clear, substitute a flat elevation diagram of a module on transporters with the same printed figures — no stock imagery.",
+      "source_note": "Innovation Next+ JV / Walsh Group release, module set completed August 8, 2025; dimensions per Dallas Innovates (2025); tolerance corroborated by International Airport Review (Aug 2026).",
+      "density_budget": "Title + 3 annotation figures; <= 40 visible words.",
+      "speaker_note": "The photographs traveled well. What they hide: every consequential decision about that first module was finalized months earlier, in a factory, at a design-lock date the public record does not name. This briefing is about the decisions still open — and when each one closes.",
+      "asset_source": "DFW/AA/JV media library, written publication rights required; else designer-built diagram."
+    },
+    {
+      "slide_number": 2,
+      "narrative_job": "Size the asset and the commitment: what Terminal F is, who it serves, and how long the relationship runs.",
+      "headline": "A $4 billion, 31-gate building committed to one carrier through 2043",
+      "evidence_ids": [
+        "infrastructure-economist::ev-9df5b63ec5a6",
+        "infrastructure-economist::ev-6a303334efb7",
+        "operations-analyst::ev-6aec1ff0d1fb",
+        "operations-analyst::ev-0f74c40d0b6e"
+      ],
+      "visual_type": "stat_panel",
+      "visual_spec": "Four flat stat blocks, data labels at the mark: (1) scope growth $1.6B/15 gates → $4B/31 gates (May 2025); (2) U&L extended through 2043, American sole occupant; (3) American 82.6% of DFW passengers in 2025; (4) ~930 peak daily departures / ~100,000 peak daily AA customers. No iconography; figures in Georgia numerals.",
+      "source_note": "DFW Airport / American Airlines joint release, May 2025; DFW airport statistics via secondary reporting (2025); American Airlines newsroom, July 2026 and December 2025.",
+      "density_budget": "4 stat blocks; <= 50 visible words.",
+      "speaker_note": "Phase 1 opens 2027; the full program completes 2030. The premise throughout: the plan is sound and American is committed. The question is what the building should absorb before each module's decisions close.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 3,
+      "narrative_job": "SIGNATURE VISUAL. Reset the audience's mental model of the deadline: release-for-fabrication, per module, is the reversibility clock — and post-release modular is more change-hostile than stick-built.",
+      "headline": "The deadline is release-for-fabrication — and for six modules it has already passed",
+      "evidence_ids": [
+        "chief-engineer::ev-a8acbcf926a7",
+        "infrastructure-economist::ev-56a69208d46e",
+        "quantitative-analyst::ev-72cb1cc4d88a",
+        "infrastructure-economist::ev-9df5b63ec5a6"
+      ],
+      "visual_type": "annotated_timeline",
+      "visual_spec": "The Reversibility Clock as specified in signature_visual: per-module swimlanes 2025–2030, factory decision windows closing at release-for-fabrication with lock glyphs plus printed labels, August 2025 modules closed in operations_slate, future modules hatched terminal_blue with dashed 'schedule unpublished — D0/D2 disclosure' bars, guidance-gold 'today' rule, repetition-dividend caveat printed on the face.",
+      "source_note": "Module set: Innovation Next+ JV / Walsh Group, Aug 2025; Dallas Innovates (2025). ~30%/~30% savings are DFW-supplied trade-press figures; no independent audit exists. Per-module release dates unpublished; obtaining them is Decision D0/D2.",
+      "density_budget": "1 exhibit + 1 callout; <= 60 visible words.",
+      "speaker_note": "The savings are a repetition dividend — same module, same MEP tree, over and over. Every bespoke feature either forces an off-standard module or makes the base module carry provisions most positions don't need. Once a module clears release, changes propagate across the fabrication line. That inversion is why the register is non-optional.",
+      "asset_source": "Designer-built from evidence above."
+    },
+    {
+      "slide_number": 4,
+      "narrative_job": "Present the tenant's announced posture as a strong signal, not a settled instruction — and hold three readings open.",
+      "headline": "American has told the airport, for now, what F is for — a signal, not a settlement",
+      "evidence_ids": [
+        "contrarian::ev-e0e801801c25",
+        "airline-commercial-strategist::ev-d063ac6892ae",
+        "operations-analyst::ev-d06af7140f6b",
+        "airline-commercial-strategist::ev-9b47fcf1b976"
+      ],
+      "visual_type": "annotated_map",
+      "visual_spec": "Schematic DFW terminal diagram on the Skylink spine (C, D, F positions only; no decorative airport art). Three placements printed: Terminal C — 37,000 sq ft Admirals Club, AA's largest ever, near the Skylink station; Terminal D — Flagship Check-In near D30; Terminal F — Provisions by Admirals Club grab-and-go, explicitly scaled-down. Side rail lists the three readings from the draft: revealed preference / sequencing / Arrivals-premium node, each one line. Caveat printed on face: convergence traces to one AA press release plus secondary reporting.",
+      "source_note": "American Airlines newsroom, July 2026, corroborated by Dallas Morning News and View from the Wing. Fleet targets: AA newsroom, 2026 (narrowbody premium ~25% → ~40%; lie-flat count +50%+ by end of decade).",
+      "density_budget": "1 schematic + 3-line rail; <= 70 visible words.",
+      "speaker_note": "The repositioning is real — but it is a fleet and network story, executable inside cabins the airport does not build. Its physical anchor at F, on AA's public record, is a grab-and-go and a widebody-feeder concourse. None of the register's premium items should be conditioned on the July 2026 posture holding through 2043.",
+      "asset_source": "Designer-built schematic; no satellite imagery required."
+    },
+    {
+      "slide_number": 5,
+      "narrative_job": "Defend the sizing choice: denser peaks, not a flattened day. Show the honest split between AA's claim and the audit.",
+      "headline": "Size to the denser-peak reading: the rebank's flattening effect is claimed, not proven",
+      "evidence_ids": [
+        "airline-commercial-strategist::ev-e4842e2ba510",
+        "operations-analyst::ev-6ad1dbdb3363",
+        "airline-commercial-strategist::ev-c8d187d1b0ba",
+        "operations-analyst::ev-0f74c40d0b6e"
+      ],
+      "visual_type": "evidence_ledger_panel",
+      "visual_spec": "Two-column claim-vs-audit panel. Left (AA's case): 9 → 13 daily banks effective April 2026; missed connections down 50% in first 17 days — flagged on face 'AA internal data, short window, not independently audited'. Right (Q2 2026 audit): departure rate up ~1% YoY; DFW second-worst among busy US airports on departure performance; block times lengthened avg 6 minutes across 145 network-wide markets (CLT +17, DCA +10, MIA +9) — flagged '145-market figure is a network measure, not DFW-specific'. Footer bar: the building must serve ~100,000 peak-day customers on ~930 peak-day departures. No chart is fabricated from these point figures; they are presented as labeled evidence, not a trend line.",
+      "source_note": "AA newsroom Dec 2025 (rebank) and Apr 2026; View from the Wing (2026) reporting AA internal briefing; Airline Geeks, July 31, 2026 (Q2 2026 performance); Cirium schedule-data analysis via trade press (block times).",
+      "density_budget": "2 columns × 3 lines + footer; <= 70 visible words.",
+      "speaker_note": "This is where a design decision has to be made, not assumed. Decision D4 adopts the denser-peak reading and re-tests it annually; two consecutive corroborations of the flatter profile unwind the affected geometry.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 6,
+      "narrative_job": "Ground the recommendation in the honestly counted historical record: four failures, one generic success, one retrofit warning, one premium counter-example.",
+      "headline": "Seven purpose-built hub bets since deregulation: the mixed cases carry the lesson",
+      "evidence_ids": [
+        "aviation-historian::ev-3017ac6ef795",
+        "airline-commercial-strategist::ev-957fdc4f3f22",
+        "airline-commercial-strategist::ev-8f0f187c10b5",
+        "aviation-historian::ev-f65958bd3afa",
+        "aviation-historian::ev-fe1739039376",
+        "aviation-historian::ev-94d92992ae9c",
+        "aviation-historian::ev-76b6362aef40"
+      ],
+      "visual_type": "comparison_table",
+      "visual_spec": "Render report_visuals exhibit 'Purpose-built hub terminals since deregulation' (see report_visuals[0]) as the slide's primary visual, compressed to seven rows and three columns for the speaker-led format. Outcome column uses printed words (dehubbed / absorbed merger / retrofit required / functioned as designed), never color alone. Guidance-gold takeaway bar: 'Hub-generic bones plus priced, conditioned premium shells — not either alone.'",
+      "source_note": "Cranky Flier (PIT, 2012); Simple Flying (CVG, STL, CLE); DTW McNamara record; JetBlue investor release 2014 and World Construction Network (T5/T5i); airport-technology.com (ATL Maynard Jackson, 2012). Small sample; DFW is not Pittsburgh — AA carried 82.6% of DFW passengers in 2025 on an ~8M-person O&D economy.",
+      "density_budget": "7-row table + 1 takeaway bar; table text >= 12pt.",
+      "speaker_note": "DTW's discipline — a hub form, not a Northwest form — cost nothing at design time. T5's warning — no premium optionality in original scope — cost $200M inside six years. ATL Concourse F shows a purpose-built premium floor plate can work at a mega-connecting hub. Read together: generic bones, priced shells.",
+      "asset_source": "Designer-built from report_visuals[0]."
+    },
+    {
+      "slide_number": 7,
+      "narrative_job": "Make the sizing scenario concrete: the degraded morning is the test every remaining geometry decision must pass.",
+      "headline": "The 6:15 a.m. case: size the pour-locked geometry for the morning the building is worst",
+      "evidence_ids": [
+        "airport-coo::ev-9b8b1fc6f240",
+        "airport-coo::ev-5bbd041de017",
+        "chief-engineer::ev-7dd287447303",
+        "operations-analyst::ev-b2eb313106b9"
+      ],
+      "visual_type": "scenario_flow",
+      "visual_spec": "Left-to-right passenger flow under the degraded state: Skylink single-loop overnight (22:00–06:00 maintenance window; transit ~doubles from 9 to ~15 min) → Terminal F Skylink node (platform width, cores, queuing depth) → checkpoint (next-gen CT lane geometry; DHS 300 pax/hr/lane target) → FIS primary hall (CBP ~100 pax/hr per double booth; 50–75 ft queue depth). Overlay band: January 2023 winter event — ground stop, 1,100+ peak-day cancellations, 600+ next day. Printed caveat on face: 'Constructed stress case — professional judgment, not a documented daily event; adopted as the formal sizing scenario for exactly that reason (D4).'",
+      "source_note": "Skylink headway/transit and overnight single-loop window per operational guidance (see appendix); Spectrum News, Jan 2023 (storm); PARAS 0052 / CBP Airport Technical Design Standard 2021; DHS S&T '300 People Per Hour Per Lane' (URL confirmed; page 403 at verification).",
+      "density_budget": "1 flow, 4 nodes + 1 overlay; <= 70 visible words.",
+      "speaker_note": "The scenario has a geometry test and an operating test. The operating test is a tabletop with AA Hub Ops, TSA FSD, CBP Port Director, Guest Experience, ARFF, police, and Skylink ops at the same table. If CBP will not staff the sized hall, the shell is a moot preservation.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 8,
+      "narrative_job": "Show what generic geometry actually means as a short priced list — the pour-locked items with the largest cost of being wrong.",
+      "headline": "Eight pour-locked items, none of them a Flagship Lounge",
+      "evidence_ids": [
+        "operations-analyst::ev-e3325bc87993",
+        "chief-engineer::ev-9ab34ab87994",
+        "chief-engineer::ev-7dd287447303",
+        "operations-analyst::ev-b2eb313106b9",
+        "airport-coo::ev-9b8b1fc6f240"
+      ],
+      "visual_type": "register_table",
+      "visual_spec": "Render report_visuals exhibit 'The pour-locked register' (report_visuals[1]) as the primary visual. Cost language stays qualitative and verbatim from the draft ('modest at pour; order of magnitude higher at retrofit') — the exhibit prints 'register-grade, not audit-grade; confirm before Finance & Audit Committee' on its face. Dependencies column names the federal or airline counterparty (FAA MOS letter, CBP RSP agreement, TSA concurrence, AA Side Letter, AA IT witness testing).",
+      "source_note": "ACI-NA MARS gates (Sept 2024); FAA AC 150/5300-13B; PARAS 0052 / CBP ATDS 2021; DHS S&T CT-lane target; Skylink operational guidance. Order-of-magnitude cost characterizations are analyst-constructed and must be confirmed before the register goes to committee.",
+      "density_budget": "8-row table, 3 columns; table text >= 12pt; read-ahead detail in appendix.",
+      "speaker_note": "All of it works for a tenant DFW has not met. The airport pays an option premium now — most of it inside the module template at repeat-part cost if D0 clears — and preserves the ability for American, or a future signatory, to fit out any envelope at the tenant's expense.",
+      "asset_source": "Designer-built from report_visuals[1]."
+    },
+    {
+      "slide_number": 9,
+      "narrative_job": "Confront the affordability constraint: the arbitrage is being spent during the ramp, and the register premium must live inside a ceiling.",
+      "headline": "The affordability arbitrage is being spent — every option needs a number and a ceiling",
+      "evidence_ids": [
+        "evidence-curator::ev-cpe-fy26-os",
+        "infrastructure-economist::ev-18e1c713bc79",
+        "infrastructure-economist::ev-85be22c1fe28",
+        "quantitative-analyst::ev-c214ece13d4d"
+      ],
+      "visual_type": "quantitative_chart",
+      "visual_spec": "Two-panel exhibit. Panel A: DFW CPE, two labeled points only — FY25 actual $13.59, FY26 projected $16.99 (~25% single-year rise printed as label; no interpolated curve; face flag 'No public DFW CPE projection exists for FY27–FY30'). Panel B: outstanding debt, two labeled points — $7.224B (2024) and $12.4B (projected FY29, as of the Aug 2024 rating action) with hatched annotation 'projection pre-dates the May 2025 +$2.4B scope expansion; post-expansion trajectory unpublished and higher'. Footer: 70th Supplemental Bond Ordinance authorizes up to $3.0B new debt through Feb 2026; further authorization requires Dallas AND Fort Worth city-council approval.",
+      "source_note": "Cost per Enplanement by Airport — CPE Data 2026 (industry aggregation of the 2025 A/B bond Official Statement; OS PDF not directly retrieved this pass); The Bond Buyer, Aug 2024 (S&P upgrade to AA-; debt projection); DFW 70th Supplemental Bond Ordinance.",
+      "density_budget": "2 panels, 4 data points total + footer; <= 70 visible words.",
+      "speaker_note": "DFW remains well below JFK, LAX, EWR, and ORD on CPE — peer table is in the read-ahead. The register's answer to affordability: a Finance & Audit Committee forward-CPE ceiling the aggregate register premium may not breach, with unwind on breach.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 10,
+      "narrative_job": "Land the ask: six decisions, six chairs, sequenced, with D0 first and stop conditions attached.",
+      "headline": "Six decisions before the fabrication window closes in 2030 — D0 precedes everything",
+      "evidence_ids": [
+        "infrastructure-economist::ev-9df5b63ec5a6",
+        "quantitative-analyst::ev-72cb1cc4d88a",
+        "airport-coo::ev-9b8b1fc6f240"
+      ],
+      "visual_type": "decision_flow",
+      "visual_spec": "Render report_visuals exhibit 'Six decisions, six chairs' (report_visuals[2]) as a left-to-right flow: D0 (CPO) gating D1–D5, each node carrying decision ID, one-line action, owner title, and stop condition in 8–10 words. Guidance-gold rule under D0; alert-red text reserved for the three program stop conditions in a footer band (Flagship-tier build announced → fit-out program replaces register; connecting share below majority floor two consecutive cycles; U&L renegotiation opens before 2043 → Side Letter folds into amendment).",
+      "source_note": "Decision program per this report's decision program; fabrication window bounded by program completion 2030 (DFW/AA joint release, May 2025).",
+      "density_budget": "6 nodes + footer band; <= 70 visible words.",
+      "speaker_note": "The register does not tell DFW what to build. It tells DFW what remains to be decided, before which date, at what price, from which funding source, against which federal dependency, inside which contract instrument. The customer it protects is the connecting passenger in the first bank of a bad morning.",
+      "asset_source": "Designer-built from report_visuals[2]."
+    },
+    {
+      "slide_number": 11,
+      "narrative_job": "READ-AHEAD. Present the counter-case at full strength — four objections and why each survives as a constraint, not a defeat.",
+      "headline": "The counter-case, honestly presented: four objections, four constraints",
+      "evidence_ids": [
+        "infrastructure-economist::ev-9df5b63ec5a6",
+        "contrarian::ev-bbfb17e8f0b1",
+        "contrarian::ev-c90731082056",
+        "evidence-curator::ev-cpe-fy26-os",
+        "infrastructure-economist::ev-85be22c1fe28"
+      ],
+      "visual_type": "two_column_argument_panel",
+      "visual_spec": "Four paired rows, objection left / disposition right, verbatim-condensed from the draft: (1) AA signed to 2043 — generic geometry insures against strategy shifts, and protects the tenant too; (2) premium is the airline's side of the line (Delta's JFK T4 Delta One Lounge, ~40,000 sq ft, 515 seats, carrier-funded on others' base building) — hence Side Letter conditioning, shells only; (3) options accumulate into an unfunded shopping list — hence a 3–4-line register that refuses everything else; (4) affordability — hence the CPE ceiling and the observation that under-scoping is often the more expensive error. READ-AHEAD header band.",
+      "source_note": "Delta News Hub (JFK T4 Delta One Lounge); DFW/AA joint release May 2025; CPE Data 2026; The Bond Buyer Aug 2024.",
+      "density_budget": "Read-ahead density: 4 × 2 cells, <= 130 words total.",
+      "speaker_note": "Read-ahead only; the presenter references it if challenged. The sharpest objection is the shopping list — and its answer is the register's discipline, not its abandonment.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 12,
+      "narrative_job": "READ-AHEAD. Document premium volatility: why no register item is conditioned on AA's current posture holding.",
+      "headline": "Premium posture is a cycle, not a constant",
+      "evidence_ids": [
+        "contrarian::ev-02c3980fc7b3",
+        "airline-commercial-strategist::ev-ed425c651135",
+        "contrarian::ev-bbfb17e8f0b1",
+        "airline-commercial-strategist::ev-5b76a2fb6b0f",
+        "virtual-chris::ev-040ca84be79b"
+      ],
+      "visual_type": "annotated_timeline",
+      "visual_spec": "Single horizontal timeline 2020–2028, events printed at their dates: Mar 2020 AA closes every Flagship Lounge except JFK (LAX, DFW, MIA, ORD); fall 2021–Apr 2022 reopening sequence; Q4 2025 Delta premium ticket revenue crosses main cabin for the first time ($5.70B vs $5.62B; FY2025 premium $22.1B); 2026 AA shifts long-haul into DFW (+6% Q3 2026 YoY vs LHR −13%; six new international routes summer 2026); 2028 ATL Delta One Lounge target opening — face flag 'Delta stated the date, not the reason'. No trend lines; dated events only.",
+      "source_note": "Simple Flying (2020 Flagship closures and reopenings); Delta Q4 2025 earnings release; Afar and industry coverage (ATL 2028 target); Simple Flying / Travel and Tour World (AA long-haul capacity); AA newsroom via aviationa2z (summer 2026 routes).",
+      "density_budget": "Read-ahead density: 6 dated events, <= 110 words.",
+      "speaker_note": "A design bet that must survive to 2043 needs to survive several repetitions of the 2020–2022 cycle. That is the argument for shells American exercises at American's expense — not airport-side preload.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 13,
+      "narrative_job": "READ-AHEAD. Peer CPE context supporting the 'arbitrage' claim and the ceiling mechanism.",
+      "headline": "DFW's cost position versus peer hubs, 2024",
+      "evidence_ids": [
+        "infrastructure-economist::ev-18e1c713bc79",
+        "airline-commercial-strategist::ev-9783f6e95c10",
+        "airline-commercial-strategist::ev-37a6763aa555"
+      ],
+      "visual_type": "bar_chart",
+      "visual_spec": "Horizontal bar chart, one bar per airport, values printed at the mark, sorted ascending: DTW $9.20, IAH $10.66, MSP $11.06, DEN $12.76, DFW $13.44, PHL $15.03, MIA $16.83, SEA $18.24, ORD $29.56, LAX $30.16, EWR $31.67, JFK $36.01. DFW bar in terminal_blue, all others operations_slate (plus printed DFW label — not color-only). Face flag: 'DWU Consulting peer table, 2024 vintage; DFW's bond-covenanted FY25 signatory CPE is $13.59 and FY26 projected $16.99 — different scope, directionally consistent.'",
+      "source_note": "Cost per Enplanement by Airport — CPE Data 2026; DWU Consulting peer table (2024). Units: USD per enplaned passenger.",
+      "density_budget": "Read-ahead density: 12 bars, printed values, 1 flag.",
+      "speaker_note": "Mirrors report_visuals[3]. The arbitrage is real and closing; the ceiling converts it from a talking point into a governance instrument.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 14,
+      "narrative_job": "READ-AHEAD. Retrofit-cost precedents: what under-scoping and governance failure cost elsewhere, and the disciplined counter-example.",
+      "headline": "What the retrofit costs when the option was never bought",
+      "evidence_ids": [
+        "infrastructure-economist::ev-35edfa6b3fa1",
+        "chief-engineer::ev-ce092f7a8394",
+        "chief-engineer::ev-ce4d988ebb1e",
+        "infrastructure-economist::ev-70c2c7cae06f",
+        "operations-analyst::ev-fe6cb0a38cd7",
+        "technology-scout::ev-f80a4444caa6",
+        "infrastructure-economist::ev-3ad44367f57d",
+        "aviation-historian::ev-94d92992ae9c"
+      ],
+      "visual_type": "comparison_table",
+      "visual_spec": "Five-row precedent table: IAD AeroTrain (Concourse D stop omitted in 2000s routing; 16 years on mobile lounges; extension budgeted ~$3.75B inside a $22.5B program — flagged 'program direction, not committed contract'); DEN Great Hall ($184M P3 termination + ~$2.1B completion); LHR T5 (£4.3B on time/budget; 42,000-bag opening failure — commissioning, not geometry); JFK T5 ($875M build; $200M T5i extension 2014; 2025–26 premium refresh, cost undisclosed); LGA Terminal C ($4B, completed ~2 years ahead — the governance counter-example). Columns: precedent / what was omitted or failed / what it cost.",
+      "source_note": "NBC News and trade press (IAD); Colorado Public Radio, Aug 2019 (DEN); IEEE Spectrum, 2008 (LHR T5); JetBlue investor release 2014 / World Construction Network (JFK T5); Delta News Hub 2022 and Aviation Week 2024 (LGA).",
+      "density_budget": "Read-ahead density: 5 rows × 3 columns, <= 140 words.",
+      "speaker_note": "The affordability constraint does not repeal these lessons; it sharpens them. Under-scoping is often the more expensive error — and disciplined single-airline governance (LGA) is the existence proof for the delivery model DFW is running.",
+      "asset_source": "Designer-built."
+    },
+    {
+      "slide_number": 15,
+      "narrative_job": "READ-AHEAD. Program timeline: fixed public milestones the register must run against.",
+      "headline": "The program clock: 2025–2030",
+      "evidence_ids": [
+        "chief-engineer::ev-a8acbcf926a7",
+        "airline-commercial-strategist::ev-e4842e2ba510",
+        "contrarian::ev-e0e801801c25",
+        "infrastructure-economist::ev-9df5b63ec5a6"
+      ],
+      "visual_type": "milestone_timeline",
+      "visual_spec": "Render report_visuals exhibit 'Terminal F program milestones' (report_visuals[4]) full width: Aug 2025 module set; Dec 2025 rebank announced; Apr 2026 13-bank schedule effective; Jul 2026 AA premium siting announcement (C/D/F); 2027 Phase 1 opens; 2030 program completes and the fabrication-release window closes. Per-module release dates drawn as an unpopulated band labeled 'unpublished — D0/D2 disclosure obligation'.",
+      "source_note": "Innovation Next+ JV / Walsh Group (Aug 2025); AA newsroom Dec 2025 and Jul 2026; DFW/AA joint release May 2025.",
+      "density_budget": "Read-ahead density: 6 fixed milestones + 1 unpopulated band.",
+      "speaker_note": "Every recommendation in the report is timed to the next module's fabrication release, not to a pour date. The unpopulated band is the point: the board cannot currently see when its own decisions close.",
+      "asset_source": "Designer-built from report_visuals[4]."
+    },
+    {
+      "slide_number": 16,
+      "narrative_job": "READ-AHEAD. Quarterly board indicators and the three stop conditions — the governance dashboard the register reports into.",
+      "headline": "What the board watches quarterly, and what stops the program",
+      "evidence_ids": [
+        "airline-commercial-strategist::ev-9b47fcf1b976",
+        "airline-commercial-strategist::ev-c8d187d1b0ba",
+        "airport-coo::ev-9b8b1fc6f240"
+      ],
+      "visual_type": "indicator_panel",
+      "visual_spec": "Two stacked bands. Band 1 — six quarterly indicators as plain text rows (no gauges): % fabrication releases preceded by a written register finding; options countersigned vs retired; aggregate register premium as projected-CPE contribution vs the F&A ceiling; AA connecting share remains connecting-majority; AA premium build-out on schedule (narrowbody seat share ~25% → ~40%; lie-flat +50%+ by end of decade); Skylink single-loop overnight performance. Band 2 — three stop conditions in alert-red text with printed 'STOP' labels (not color-only), verbatim from the draft. Footer: VP Terminal Development convenes unwind review; CEO's office signs the unwind.",
+      "source_note": "Indicator definitions per this report's decision program; AA fleet targets per AA newsroom 2026; rebank monitoring per View from the Wing 2026 (AA internal data caveat applies).",
+      "density_budget": "Read-ahead density: 6 + 3 rows, <= 130 words.",
+      "speaker_note": "This is the page that keeps the register from becoming decoration on a strategy deck: a percentage, a ceiling, and three tripwires with named conveners.",
+      "asset_source": "Designer-built."
+    }
+  ],
+  "report_visuals": [
+    {
+      "title": "Purpose-built hub terminals since deregulation: seven bets, three lessons",
+      "exhibit_type": "comparison",
+      "takeaway": "Four purpose-built hub terminals were dehubbed 2–15 years after their peak; DTW survived on hub-generic geometry; JFK T5 paid $200M for omitted optionality; ATL Concourse F functioned as designed. The design instruction that survives all seven: hub-generic bones plus priced, conditioned premium shells.",
+      "evidence_ids": [
+        "aviation-historian::ev-3017ac6ef795",
+        "airline-commercial-strategist::ev-957fdc4f3f22",
+        "airline-commercial-strategist::ev-8f0f187c10b5",
+        "aviation-historian::ev-f65958bd3afa",
+        "aviation-historian::ev-fe1739039376",
+        "aviation-historian::ev-94d92992ae9c",
+        "aviation-historian::ev-76b6362aef40"
+      ],
+      "source_note": "Cranky Flier interview with the Pittsburgh Airport Executive Director (2012); Simple Flying hub retrospectives (CVG, STL, CLE); DTW McNamara Terminal record; JetBlue investor release (2014) and World Construction Network (T5/T5i); airport-technology.com (ATL Maynard H. Jackson Jr. International Terminal). Costs are approximate as published; small sample — diagnostic, not predictive.",
+      "row_header": "Terminal (opened)",
+      "columns": [
+        { "label": "Build cost (approx., as published)" },
+        { "label": "Outcome" },
+        { "label": "Design lesson" }
+      ],
+      "rows": [
+        {
+          "label": "Pittsburgh Midfield Terminal (1992)",
+          "values": ["~$1 billion", "US Airways dehubbed 2004 over a fee dispute; CPE nearly doubled to ~$14.97 by 2011", "Carrier-specific bet; debt outlived the hub"]
+        },
+        {
+          "label": "Cincinnati CVG hub peak (2005)",
+          "values": ["Not separately published in ledger", "22.7M passengers and 600+ daily flights in 2005 to under 6M and under 180 daily by 2013", "Unwind can take a decade and still be total"]
+        },
+        {
+          "label": "St. Louis (American/TWA, 2001 peak)",
+          "values": ["Not separately published in ledger", "500+ daily flights July 2001 to 207 by 2003", "The fastest dehub in the set: 2 years"]
+        },
+        {
+          "label": "Cleveland Concourse D (newer hub concourse)",
+          "values": ["Not separately published in ledger", "Concourse went dark May 2014; destinations 61 to 20; daily departures ~200 to 72", "A purpose-built concourse can simply go dark"]
+        },
+        {
+          "label": "Detroit McNamara (2002)",
+          "values": ["~$1.2 billion", "Absorbed the 2008 Delta–Northwest merger without material retrofit; still Delta's DTW hub building", "A hub form, not a Northwest form — generic geometry cost nothing at design time"]
+        },
+        {
+          "label": "JetBlue JFK Terminal 5 (2008)",
+          "values": ["~$875 million", "Required $200M international-arrivals extension (2014) and a 2025–26 premium refresh (cost undisclosed)", "Omitted optionality was paid for inside six years"]
+        },
+        {
+          "label": "Atlanta Maynard Jackson Concourse F (2012)",
+          "values": ["~$1.4 billion", "Purpose-built premium international floor plate at a mega-connecting hub; functioned as designed, no retrofit sequence", "Premium floor plates can work when priced and sited deliberately"]
+        }
+      ]
+    },
+    {
+      "title": "The pour-locked register: eight decisions with the largest cost of being wrong",
+      "exhibit_type": "table",
+      "takeaway": "The items with the largest 2043 consequence are geometric, not aesthetic — each is modest at pour and an order of magnitude more expensive as a retrofit, and each carries a named federal or airline dependency that must clear before the affected module's fabrication release.",
+      "evidence_ids": [
+        "operations-analyst::ev-e3325bc87993",
+        "chief-engineer::ev-9ab34ab87994",
+        "chief-engineer::ev-7dd287447303",
+        "operations-analyst::ev-b2eb313106b9",
+        "airport-coo::ev-9b8b1fc6f240"
+      ],
+      "source_note": "ACI-NA, 'Enhancing Airport Operations: The Power of MARS Gates' (Sept 2024); FAA AC 150/5300-13B (Airport Design, Change 1); PARAS 0052 and CBP Airport Technical Design Standard (2021); DHS S&T CT-lane throughput target; DFW Skylink operational guidance. Cost characterizations are analyst-constructed order-of-magnitude language from the verified draft — register-grade, not audit-grade; confirm before Finance & Audit Committee submission.",
+      "row_header": "Register item",
+      "columns": [
+        { "label": "What locks at pour or fabrication release" },
+        { "label": "Governing standard or driver" },
+        { "label": "Dependency to clear first" }
+      ],
+      "rows": [
+        {
+          "label": "MARS-capable stands (defined minority of widebody-reachable positions)",
+          "values": ["Fuel pit, PCA/400 Hz risers, jetbridge foundation, apron lead-in geometry", "FAA AC 150/5300-13B; one widebody or two narrowbody turns per stand", "FAA modification-of-standard letter where geometry departs from the AC"]
+        },
+        {
+          "label": "FIS floor plate and sterile-corridor width",
+          "values": ["Primary hall dimensions and queue depth", "CBP ~100 passengers/hour per double primary booth; 50–75 ft queue depth", "CBP Reimbursable Services Program agreement or staffing memo — a two-year negotiation"]
+        },
+        {
+          "label": "Checkpoint rooms",
+          "values": ["Conveyor run length, secondary search depth, ceiling height", "Next-generation CT lane geometry; DHS 300 passengers/hour/lane target", "Written TSA concurrence on layout — on the critical path"]
+        },
+        {
+          "label": "Skylink node",
+          "values": ["Platform width, circulation core count, concourse-side queuing depth", "Degraded-morning case: overnight single-loop transit ~doubles to ~15 minutes", "Adopt D4 sizing scenario; inside base scope, marginal cost is design-time"]
+        },
+        {
+          "label": "Baggage-handling trunk cross-section",
+          "values": ["Trunk dimension through the concourse", "Peak connecting bank at next-decade volumes", "None federal; disruptive and materially costlier as an operating-concourse retrofit"]
+        },
+        {
+          "label": "Lounge-capable shell (defined head-of-pier positions)",
+          "values": ["MEP risers, grease-waste rough-ins, structural allowance, curtain-wall provision — deliberately not built out", "Order of magnitude cheaper at fabrication than retrofit", "Terminal F Reversibility Side Letter; without it the ratepayer carries tenant-improvement preload"]
+        },
+        {
+          "label": "Instrumentation baseline in the module template",
+          "values": ["Sensor conduit, PoE++ ceiling drops, fiber diversity, camera and data drops at apron corners and jetbridge tunnels", "Shipped through the factory once at repeat-part cost", "Decision D0: JV contract must permit owner-directed template changes at repeat-part cost"]
+        },
+        {
+          "label": "CUPPS-capable gate hardware",
+          "values": ["Gate IT hardware provision across the exclusive-use envelope", "Low-marginal-cost preservation; absence is felt on the bad morning", "American IT participation in factory witness testing"]
+        }
+      ]
+    },
+    {
+      "title": "Six decisions, six chairs: the sequence that puts the register inside real contracts",
+      "exhibit_type": "flow",
+      "takeaway": "D0 gates everything: if the Innovation Next+ JV contract cannot absorb owner-directed template changes at repeat-part cost, the instrumentation rollout phases and the register's cadence tightens. All six land before the fabrication-release window closes in 2030.",
+      "evidence_ids": [
+        "infrastructure-economist::ev-9df5b63ec5a6",
+        "quantitative-analyst::ev-72cb1cc4d88a",
+        "airport-coo::ev-9b8b1fc6f240"
+      ],
+      "source_note": "Decision program per this report's decision program; program window per DFW Airport / American Airlines joint release, May 2025 (Phase 1 opens 2027; program completes 2030).",
+      "steps": [
+        {
+          "label": "D0 — Confirm the procurement path",
+          "detail": "Written confirmation that the Innovation Next+ JV design-build contract permits owner-directed template changes at repeat-part cost; identify the earliest module release that can absorb them without slipping Terminal C or A delivery.",
+          "owner": "Chief Procurement Officer, with the Chief Engineer",
+          "trigger": "First action; gates D2 cadence and D5 rollout"
+        },
+        {
+          "label": "D1 — Close the two contract questions",
+          "detail": "Obtain from American written confirmation of (a) any U&L obligation for a Flagship-tier lounge at F before 2043 and (b) Material Interest Increase trigger thresholds for capital additions inside the exclusive-use envelope.",
+          "owner": "General Counsel, with airline affairs",
+          "trigger": "If American declines to state, treat premium items as design questions bounded by the highest-consent MII assumption"
+        },
+        {
+          "label": "D2 — Publish the reversibility register",
+          "detail": "Phase 1: obtain the per-module release-for-fabrication schedule from the JV as contract disclosure. Phase 2: publish the first module-level register and brief the Operations, Safety & Security Committee against that module.",
+          "owner": "Vice President Terminal Development",
+          "trigger": "Every subsequent fabrication release preceded by a written register finding"
+        },
+        {
+          "label": "D3 — Execute the Reversibility Side Letter",
+          "detail": "Side Letter to the 2025 U&L amendment carrying pre-priced premium shells (Flagship-convertible lounge space, Flagship Arrivals provision at up to two international positions, CUPPS-capable hardware), activated only on American's countersigned exercise, refreshed annually.",
+          "owner": "Chief Development Officer, with General Counsel",
+          "trigger": "Drop any shell uncountersigned after two fabrication cycles; Finance & Audit Committee CPE ceiling binds the aggregate premium"
+        },
+        {
+          "label": "D4 — Adopt the degraded-morning sizing scenario",
+          "detail": "Run Skylink-node circulation, FIS queue depth, checkpoint geometry, and BHS trunk against the January 2023 winter-event demand curve on a 13-bank morning; hold the interagency tabletop; obtain written TSA and CBP concurrence before affected releases.",
+          "owner": "Chief Operating Officer, with the Chief Engineer and American DFW Hub Operations",
+          "trigger": "Annual re-test; two consecutive corroborations of the flatter-profile reading unwind the affected geometry"
+        },
+        {
+          "label": "D5 — Fix the instrumentation template",
+          "detail": "Finalize conduit spacing, PoE++ and fiber backbone, camera and data drops, and CUPPS-capable hardware; ship through the factory once with American IT in witness testing against a live A-CDM, biometric, and CBP stack.",
+          "owner": "Chief Information Officer, with the Chief Engineer",
+          "trigger": "Conditional on D0 clearance; per-gate variation eats the repetition dividend"
+        }
+      ]
+    },
+    {
+      "title": "Cost per enplanement, DFW versus peer hubs (2024 peer table)",
+      "exhibit_type": "comparison",
+      "takeaway": "DFW's cost position remains well below JFK, LAX, EWR, and ORD — the affordability arbitrage the register premium must be sized to protect, with DFW's own signatory CPE moving from $13.59 (FY25 actual) to $16.99 (FY26 projected).",
+      "evidence_ids": [
+        "infrastructure-economist::ev-18e1c713bc79",
+        "airline-commercial-strategist::ev-9783f6e95c10",
+        "airline-commercial-strategist::ev-37a6763aa555",
+        "evidence-curator::ev-cpe-fy26-os"
+      ],
+      "source_note": "'Cost per Enplanement by Airport — CPE Data 2026' industry aggregation and DWU Consulting peer table (2024 vintage). The peer figures use a broader CPE scope than the bond-covenanted signatory CPE in DFW's Official Statement (FY25 $13.59 actual; FY26 $16.99 projected); the two measures are directionally consistent. The primary Official Statement PDF was not directly retrieved in this verification pass.",
+      "row_header": "Airport",
+      "columns": [
+        { "label": "Cost per enplanement, 2024 peer table", "unit": "USD per enplaned passenger" }
+      ],
+      "rows": [
+        { "label": "DTW", "values": [9.20] },
+        { "label": "IAH", "values": [10.66] },
+        { "label": "MSP", "values": [11.06] },
+        { "label": "DEN", "values": [12.76] },
+        { "label": "DFW", "values": [13.44] },
+        { "label": "PHL", "values": [15.03] },
+        { "label": "MIA", "values": [16.83] },
+        { "label": "SEA", "values": [18.24] },
+        { "label": "ORD", "values": [29.56] },
+        { "label": "LAX", "values": [30.16] },
+        { "label": "EWR", "values": [31.67] },
+        { "label": "JFK", "values": [36.01] }
+      ]
+    },
+    {
+      "title": "Terminal F program milestones, 2025–2030",
+      "exhibit_type": "timeline",
+      "takeaway": "Six fixed public milestones bound the register's working window; the milestones that actually govern reversibility — per-module release-for-fabrication dates — are unpublished, and obtaining them is the register's first disclosure obligation (D0/D2).",
+      "evidence_ids": [
+        "chief-engineer::ev-a8acbcf926a7",
+        "airline-commercial-strategist::ev-e4842e2ba510",
+        "contrarian::ev-e0e801801c25",
+        "infrastructure-economist::ev-9df5b63ec5a6"
+      ],
+      "source_note": "Innovation Next+ JV / Walsh Group release (module set completed August 8, 2025); American Airlines newsroom, December 2025 (rebank) and July 2026 (premium siting); DFW Airport / American Airlines joint release, May 2025 (scope, Phase 1, completion). Per-module fabrication-release dates are not in the public record.",
+      "milestones": [
+        {
+          "period": "August 2025",
+          "action": "Six pre-fabricated concourse modules set at Terminal F",
+          "detail": "Moved by self-propelled modular transporter across a closed taxiway over ~two weeks; largest module 278 ft × 136 ft, 3,320 tons, placed to ~3/4-inch survey tolerance. Their factory decision windows closed months earlier."
+        },
+        {
+          "period": "December 2025",
+          "action": "American announces DFW rebank from 9 to 13 daily banks",
+          "detail": "Effective April 2026; the schedule structure Terminal F's connecting geometry must serve."
+        },
+        {
+          "period": "April 2026",
+          "action": "13-bank schedule takes effect",
+          "detail": "AA internal data reported a 50% missed-connection reduction over the first seventeen days (short window, not independently audited); Q2 2026 audit showed departure rate up ~1% YoY with DFW second-worst among busy US airports.",
+          "success_measure": "D4 annual re-test of the denser-peak sizing assumption"
+        },
+        {
+          "period": "July 2026",
+          "action": "American announces premium siting: Admirals Club (C), Flagship Check-In (D), Provisions (F)",
+          "detail": "The strongest available carrier signal about Terminal F's first years; treated as signal, not settlement (Decision D1)."
+        },
+        {
+          "period": "2027",
+          "action": "Terminal F Phase 1 opens",
+          "owner": "DFW / Innovation Next+ JV"
+        },
+        {
+          "period": "2030",
+          "action": "Program completes; fabrication-release window closes",
+          "detail": "All six decisions (D0–D5) must land before this window closes; the register's cadence is set by per-module release dates the JV must disclose.",
+          "success_measure": "100% of fabrication releases preceded by a written register finding"
+        }
+      ]
+    }
+  ],
+  "source_appendix": [
+    "Innovation Next+ JV (Archer Western–Turner–Phillips May–H.J. Russell) / Walsh Group release, Terminal F module set completed August 8, 2025; module dimensions per Dallas Innovates (2025); survey tolerance corroborated by International Airport Review (Aug 2026). [chief-engineer::ev-a8acbcf926a7]",
+    "DFW Airport / American Airlines joint release, May 2025 — Terminal F expansion to 31 gates / ~$4B; U&L extended through 2043. [infrastructure-economist::ev-9df5b63ec5a6]",
+    "American Airlines newsroom, July 2026 — premium siting at C/D/F; corroborated by Dallas Morning News and View from the Wing. Single-primary-source caveat applies. [contrarian::ev-e0e801801c25; airline-commercial-strategist::ev-d063ac6892ae; operations-analyst::ev-d06af7140f6b]",
+    "American Airlines newsroom, December 2025 — 9-to-13-bank restructure effective April 2026. [airline-commercial-strategist::ev-e4842e2ba510]",
+    "Airline Geeks, July 31, 2026 — Q2 2026 DFW departure performance; Cirium schedule-data analysis via trade press — 145-market block-time lengthening (network measure, not DFW-specific). [operations-analyst::ev-6ad1dbdb3363]",
+    "View from the Wing, 2026 — AA internal 50% missed-connection reduction, first seventeen days; AA's own data, not independently audited. [airline-commercial-strategist::ev-c8d187d1b0ba]",
+    "Hub-history sources: Cranky Flier (PIT, 2012); Simple Flying (CVG, STL, CLE); DTW McNamara record; JetBlue investor release 2014 / World Construction Network (JFK T5/T5i); airport-technology.com (ATL Concourse F). [aviation-historian::ev-3017ac6ef795; airline-commercial-strategist::ev-957fdc4f3f22; airline-commercial-strategist::ev-8f0f187c10b5; aviation-historian::ev-f65958bd3afa; aviation-historian::ev-fe1739039376; aviation-historian::ev-94d92992ae9c; aviation-historian::ev-76b6362aef40]",
+    "Standards: FAA AC 150/5300-13B (Airport Design, Change 1); ACI-NA MARS gates (Sept 2024); PARAS 0052 and CBP Airport Technical Design Standard (2021); DHS S&T '300 People Per Hour Per Lane' (URL confirmed; page returned 403 at verification — figure retained at high confidence from ledger). [chief-engineer::ev-9ab34ab87994; operations-analyst::ev-e3325bc87993; chief-engineer::ev-7dd287447303; operations-analyst::ev-b2eb313106b9]",
+    "Skylink operating profile — 2-minute headway, 9-minute max transit, 22:00–06:00 single-loop maintenance window with transit ~15 minutes; the 6:15 a.m. scenario is a constructed professional stress case, not a documented daily event. [airport-coo::ev-9b8b1fc6f240]",
+    "Spectrum News, January 2023 — DFW winter-storm ground stop; 1,100+ peak-day cancellations, 600+ next day. [airport-coo::ev-5bbd041de017]",
+    "Finance: 'Cost per Enplanement by Airport — CPE Data 2026' and DWU Consulting peer table (2024) — OS PDF not directly retrieved; The Bond Buyer, August 2024 — debt $7.224B at upgrade, $12.4B projected FY29 (pre-dates the May 2025 +$2.4B expansion); DFW 70th Supplemental Bond Ordinance ($3.0B through Feb 2026; Dallas and Fort Worth council approval required beyond). [evidence-curator::ev-cpe-fy26-os; infrastructure-economist::ev-18e1c713bc79; infrastructure-economist::ev-85be22c1fe28; quantitative-analyst::ev-c214ece13d4d; airline-commercial-strategist::ev-9783f6e95c10; airline-commercial-strategist::ev-37a6763aa555]",
+    "Premium-cycle sources: Simple Flying (2020 Flagship closures, reopening sequence); Delta Q4 2025 earnings release; Afar (ATL Delta One 2028 target — Delta stated the date, not the reason); Delta News Hub (JFK T4 Delta One Lounge); AA newsroom 2026 (fleet premium targets); Simple Flying / Travel and Tour World (long-haul capacity shift). [contrarian::ev-02c3980fc7b3; airline-commercial-strategist::ev-ed425c651135; contrarian::ev-bbfb17e8f0b1; contrarian::ev-c90731082056; airline-commercial-strategist::ev-9b47fcf1b976; airline-commercial-strategist::ev-5b76a2fb6b0f; virtual-chris::ev-040ca84be79b]",
+    "Retrofit precedents: NBC News / trade press (IAD AeroTrain, extension budgeted not contracted); Colorado Public Radio, Aug 2019 (DEN Great Hall); IEEE Spectrum, 2008 (LHR T5); Delta News Hub 2022 / Aviation Week 2024 (LGA Terminal C). [infrastructure-economist::ev-35edfa6b3fa1; chief-engineer::ev-ce092f7a8394; chief-engineer::ev-ce4d988ebb1e; infrastructure-economist::ev-70c2c7cae06f; operations-analyst::ev-fe6cb0a38cd7; technology-scout::ev-f80a4444caa6; infrastructure-economist::ev-3ad44367f57d]",
+    "Tenant commitment context: AMR §365 bankruptcy record (assumed the vast majority of real-property leases; specific 554/12 counts not independently verified from primary court documents); DFW 2025 traffic share and ~8M O&D economy. [contrarian::ev-80e5b480748b; infrastructure-economist::ev-6a303334efb7; infrastructure-economist::ev-5ada50c866d0; operations-analyst::ev-6aec1ff0d1fb; quantitative-analyst::ev-b8e18594be2d]"
+  ],
+  "accessibility_checks": [
+    "Contrast: all text and data marks meet WCAG 2.1 AA (4.5:1 body, 3:1 large text and chart elements) against cloud-white/apron-fog backgrounds; runway navy and operations slate both pass on white.",
+    "No color-only encoding: closed vs open fabrication windows use lock glyphs, hatching, and printed labels in addition to slate/blue; stop conditions carry printed 'STOP' labels, not red alone; the DFW bar in the CPE chart carries a printed label.",
+    "Minimum sizes: body >= 16pt on speaker-led slides (1–10); >= 12pt on read-ahead slides (11–16); source notes >= 9pt and legible at print scale in the Word document (8.5pt note floor per design system); chart data labels >= 12pt.",
+    "Alt text: every exhibit ships with a one-sentence alt description stating the claim and the key figure (e.g., 'Timeline showing per-module design decisions close at release-for-fabrication, months before concrete placement').",
+    "Caveats on the face: 'DFW-supplied, no independent audit', 'AA internal data, 17-day window', 'projection pre-dates May 2025 scope expansion', 'constructed stress case', and 'schedule unpublished' print on the exhibits themselves, at >= 10pt, not only in notes.",
+    "Tables render as true text tables in Word (screen-reader navigable), never as images; the deck's tables keep row striping at >= 3:1 contrast with printed row headers."
+  ],
+  "asset_requests": [
+    {
+      "id": "AR-1",
+      "description": "Rights-cleared photograph of the August 2025 Terminal F module move (SPMT transport across the closed taxiway) for slide 1. Adds place, scale, and operational meaning; it is the run's opening image.",
+      "rights": "DFW Airport media relations, American Airlines newsroom, or Innovation Next+ JV / Walsh Group communications; written publication rights confirmed before use. If rights do not clear, use the designer-built module elevation diagram specified on slide 1. No stock substitute permitted.",
+      "deadline": "Before Stage 4 deck production."
+    },
+    {
+      "id": "AR-2",
+      "description": "Confirmation of the DFW terminal-and-Skylink schematic base for slide 4: a flat, designer-drawn diagram of terminals A–F on the Skylink loop. Drawn from public airport layout; no licensed satellite or third-party map imagery required.",
+      "rights": "Designer-built; no external rights needed. Do not use Google/third-party map tiles.",
+      "deadline": "Before Stage 4 deck production."
+    },
+    {
+      "id": "AR-3",
+      "description": "Per-module release-for-fabrication schedule from the Innovation Next+ JV (Decision D0/D2 disclosure). If obtained before production, populate the signature visual's dashed 'unpublished' bars with actual dates; otherwise the bars remain flagged as unpublished — do not estimate dates.",
+      "rights": "DFW contract disclosure; not a public document. Absence is itself displayed evidence.",
+      "deadline": "Optional; production proceeds without it."
+    }
+  ]
+}

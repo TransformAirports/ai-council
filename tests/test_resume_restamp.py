@@ -15,6 +15,7 @@ import unittest
 from pathlib import Path
 
 from cli.resume_repair import _restamp_dependency_identities
+from cli.run_manifest import dependency_fingerprint_sha256
 
 OLD = "a" * 64
 NEW = "b" * 64
@@ -22,21 +23,29 @@ OTHER = "c" * 64
 
 
 def _artifact(path: str, sha256: str, identity: str) -> dict:
+    dependencies = {
+        "schema_version": "1.0",
+        "complete": True,
+        "inputs": [
+            {
+                "declared_input": "run-manifest.json",
+                "files": [
+                    {
+                        "path": "run-manifest.json",
+                        "kind": "run_identity",
+                        "sha256": identity,
+                        "size_bytes": None,
+                    }
+                ],
+            }
+        ],
+    }
+    dependencies["sha256"] = dependency_fingerprint_sha256(dependencies)
     return {
         "path": path,
         "sha256": sha256,
         "status": "complete",
-        "dependencies": {
-            "inputs": [
-                {
-                    "declared_input": "run-manifest.json",
-                    "files": [
-                        {"path": "run-manifest.json",
-                         "kind": "run_identity", "sha256": identity}
-                    ],
-                }
-            ]
-        },
+        "dependencies": dependencies,
     }
 
 
@@ -61,6 +70,11 @@ class RestampTests(unittest.TestCase):
         self.assertEqual(touched, ["stage1/brief.md"])
         entry = manifest["artifacts"][0]["dependencies"]["inputs"][0]["files"][0]
         self.assertEqual(entry["sha256"], NEW)
+        dependencies = manifest["artifacts"][0]["dependencies"]
+        self.assertEqual(
+            dependencies["sha256"],
+            dependency_fingerprint_sha256(dependencies),
+        )
 
     def test_changed_bytes_are_left_for_the_orchestrator_to_rerun(self) -> None:
         digest = self._write("stage1/brief.md", "settled work")

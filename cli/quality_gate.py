@@ -644,12 +644,17 @@ def inspect_publication_markdown(
         if not FOOTNOTE_MARKER_RE.search(segment)
     ]
     if uncited_numeric_segments:
+        examples = " | ".join(
+            re.sub(r"\s+", " ", segment).strip()[:220]
+            for segment in uncited_numeric_segments[:5]
+        )
         _issue(
             issues,
             severity="error",
             code="numeric_claims_without_footnotes",
             message=(
-                "numerical claims lack a footnote in the same sentence or table row"
+                "numerical claims lack a footnote in the same sentence or table "
+                f"row. First affected passages: {examples}"
             ),
             count=len(uncited_numeric_segments),
         )
@@ -663,12 +668,17 @@ def inspect_publication_markdown(
         and not FOOTNOTE_MARKER_RE.search(segment)
     ]
     if uncited_attributed_segments:
+        examples = " | ".join(
+            re.sub(r"\s+", " ", segment).strip()[:220]
+            for segment in uncited_attributed_segments[:5]
+        )
         _issue(
             issues,
             severity="error",
             code="attributed_claims_without_footnotes",
             message=(
-                "attributed claims lack a footnote in the same sentence"
+                "attributed claims lack a footnote in the same sentence. "
+                f"First affected passages: {examples}"
             ),
             count=len(uncited_attributed_segments),
         )

@@ -1,0 +1,67 @@
+{
+  "artifact": "designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.docx",
+  "kind": "docx",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 1,
+  "issues": [
+    {
+      "code": "empty_table_cells",
+      "severity": "warning",
+      "message": "Document contains 3 empty table cell(s).",
+      "location": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/release/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.docx"
+    }
+  ],
+  "metadata": {
+    "paragraphs": 236,
+    "tables": 10,
+    "headings": 39,
+    "words": 17396,
+    "page_number_field": true,
+    "word_visual_inspection": {
+      "pages": 37,
+      "inspector": "art-director (findings) / operator-directed remediation (fixes and re-inspection)",
+      "receipt_sha256": "c9a1ba663ec24d68c255200c98f9b42673f1214ac6ce75770d86ece75cca5ed5"
+    }
+  },
+  "rendered_files": [
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.pdf",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-01.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-02.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-03.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-04.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-05.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-06.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-07.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-08.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-09.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-10.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-11.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-12.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-13.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-14.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-15.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-16.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-17.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-18.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-19.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-20.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-21.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-22.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-23.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-24.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-25.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-26.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-27.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-28.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-29.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-30.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-31.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-32.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-33.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-34.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-35.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-36.png",
+    "qa/render/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-docx/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-37.png"
+  ]
+}

@@ -10,6 +10,10 @@ from cli.artifacts import ArtifactContract, validate_artifact
 from cli.run_manifest import (
     APP_SHELL_PATHS,
     ResumeContractMismatch,
+    assert_manifest_complete,
+    build_dependency_fingerprint,
+    dependency_fingerprint_sha256,
+    dependency_fingerprint_matches,
     generation_contract_records,
     create_run_manifest,
     update_artifact,
@@ -17,6 +21,19 @@ from cli.run_manifest import (
 
 
 class ManifestContractTests(unittest.TestCase):
+    @staticmethod
+    def _minimal_spec() -> SimpleNamespace:
+        return SimpleNamespace(
+            slug="test",
+            title="Test",
+            thesis="Test thesis",
+            selected_research_agents=[],
+            agent_overrides={},
+            output_format="brief",
+            want_pptx=False,
+            source_paths=[],
+        )
+
     @staticmethod
     def _source_spec(path: Path) -> SimpleNamespace:
         return SimpleNamespace(
@@ -51,6 +68,34 @@ class ManifestContractTests(unittest.TestCase):
                     outputs_dir=outputs,
                     all_agents=[],
                 )
+
+    def test_release_gate_rejects_an_incomplete_run_lifecycle(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = Path(directory) / "outputs"
+            outputs.mkdir()
+            manifest = outputs / "run-manifest.json"
+            stages = {
+                name: {"status": "complete"}
+                for name in (
+                    "context",
+                    "research",
+                    "evidence",
+                    "synthesis",
+                    "polish",
+                    "verification",
+                    "production",
+                    "release",
+                )
+            }
+            stages["production"]["status"] = "running"
+            manifest.write_text(
+                json.dumps({"artifacts": [], "stages": stages}),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                RuntimeError, "stage production: lifecycle status is 'running'"
+            ):
+                assert_manifest_complete(manifest)
 
     def test_manifest_rejects_symlinks_inside_the_run_library(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -210,6 +255,175 @@ class ManifestContractTests(unittest.TestCase):
                         "synthesis": "synthesis-model",
                     },
                 )
+
+    def test_resume_repairs_audited_rebaseline_digest_without_rerun(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            run_file = root / "prompts" / "runs" / "test.md"
+            run_file.parent.mkdir(parents=True)
+            run_file.write_text("# Run: Test", encoding="utf-8")
+            spec = self._minimal_spec()
+            manifest_path = create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+            )
+            context = outputs / "context" / "airport-context.md"
+            context.parent.mkdir(parents=True)
+            context.write_text(" ".join(["context"] * 40), encoding="utf-8")
+            draft = outputs / "stage2" / "strategist-draft-v1.md"
+            draft.parent.mkdir(parents=True)
+            draft.write_text(" ".join(["draft"] * 40), encoding="utf-8")
+            declarations = ("run-manifest.json", "context/airport-context.md")
+            update_artifact(
+                manifest_path,
+                draft,
+                validate_artifact(draft),
+                dependencies=build_dependency_fingerprint(
+                    manifest_path, declarations
+                ),
+            )
+
+            prior = json.loads(manifest_path.read_text(encoding="utf-8"))
+            artifact = next(
+                item for item in prior["artifacts"]
+                if item["path"] == "stage2/strategist-draft-v1.md"
+            )
+            current_identity = prior["run"]["resume_identity_sha256"]
+            previous_identity = "a" * 64
+            historical = json.loads(
+                json.dumps(artifact["dependencies"])
+            )
+            identity_entry = historical["inputs"][0]["files"][0]
+            self.assertEqual(identity_entry["sha256"], current_identity)
+            identity_entry["sha256"] = previous_identity
+            artifact["dependencies"]["sha256"] = (
+                dependency_fingerprint_sha256(historical)
+            )
+            prior["resume_rebaselines"] = [
+                {
+                    "previous_identity_sha256": previous_identity,
+                    "new_identity_sha256": current_identity,
+                    "restamped_dependency_receipts": [
+                        "stage2/strategist-draft-v1.md"
+                    ],
+                }
+            ]
+            manifest_path.write_text(json.dumps(prior), encoding="utf-8")
+
+            create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+                resume=True,
+            )
+            resumed = json.loads(manifest_path.read_text(encoding="utf-8"))
+            artifact = next(
+                item for item in resumed["artifacts"]
+                if item["path"] == "stage2/strategist-draft-v1.md"
+            )
+            self.assertTrue(
+                dependency_fingerprint_matches(
+                    manifest_path, artifact["dependencies"]
+                )
+            )
+
+    def test_resume_does_not_bless_an_arbitrary_stale_receipt_digest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            run_file = root / "prompts" / "runs" / "test.md"
+            run_file.parent.mkdir(parents=True)
+            run_file.write_text("# Run: Test", encoding="utf-8")
+            spec = self._minimal_spec()
+            manifest_path = create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+            )
+            context = outputs / "context" / "airport-context.md"
+            context.parent.mkdir(parents=True)
+            context.write_text(" ".join(["context"] * 40), encoding="utf-8")
+            draft = outputs / "stage2" / "strategist-draft-v1.md"
+            draft.parent.mkdir(parents=True)
+            draft.write_text(" ".join(["draft"] * 40), encoding="utf-8")
+            update_artifact(
+                manifest_path,
+                draft,
+                validate_artifact(draft),
+                dependencies=build_dependency_fingerprint(
+                    manifest_path,
+                    ("run-manifest.json", "context/airport-context.md"),
+                ),
+            )
+            prior = json.loads(manifest_path.read_text(encoding="utf-8"))
+            artifact = next(
+                item for item in prior["artifacts"]
+                if item["path"] == "stage2/strategist-draft-v1.md"
+            )
+            artifact["dependencies"]["sha256"] = "0" * 64
+            manifest_path.write_text(json.dumps(prior), encoding="utf-8")
+
+            create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+                resume=True,
+            )
+            resumed = json.loads(manifest_path.read_text(encoding="utf-8"))
+            artifact = next(
+                item for item in resumed["artifacts"]
+                if item["path"] == "stage2/strategist-draft-v1.md"
+            )
+            self.assertFalse(
+                dependency_fingerprint_matches(
+                    manifest_path, artifact["dependencies"]
+                )
+            )
+
+    def test_resume_preserves_unknown_audit_and_extension_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            run_file = root / "prompts" / "runs" / "test.md"
+            run_file.parent.mkdir(parents=True)
+            run_file.write_text("# Run: Test", encoding="utf-8")
+            spec = self._minimal_spec()
+            manifest_path = create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+            )
+            payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            payload["resume_rebaselines"] = [{"reason": "verified repair"}]
+            payload["checkpoints"] = {"stage2": {"approved": True}}
+            payload["run"]["extension_receipt"] = {"version": 1}
+            manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+            create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=[],
+                resume=True,
+            )
+            resumed = json.loads(manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                resumed["resume_rebaselines"], [{"reason": "verified repair"}]
+            )
+            self.assertTrue(resumed["checkpoints"]["stage2"]["approved"])
+            self.assertEqual(
+                resumed["run"]["extension_receipt"], {"version": 1}
+            )
 
     def test_resume_rejects_changed_local_execution_contract(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

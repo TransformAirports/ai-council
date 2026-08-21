@@ -36,6 +36,7 @@ from cli.run_manifest import (
     MANIFEST_NAME,
     build_execution_contract_fingerprint,
     create_run_manifest,
+    refresh_dependency_fingerprint_sha256,
 )
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -284,6 +285,10 @@ def _restamp_dependency_identities(
                     entry["sha256"] = new_identity
                     changed = True
         if changed:
+            # The embedded identity is part of the canonical receipt body.
+            # Refresh the outer digest in the same mutation so the next resume
+            # does not mistake a safe re-baseline for changed upstream work.
+            refresh_dependency_fingerprint_sha256(dependencies)
             touched.append(str(artifact.get("path", "")))
     return touched
 

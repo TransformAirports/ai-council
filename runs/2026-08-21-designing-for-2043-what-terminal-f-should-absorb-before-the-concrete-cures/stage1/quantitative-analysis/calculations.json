@@ -1,0 +1,277 @@
+{
+  "schema_version": "1.0",
+  "run_slug": "designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures",
+  "airport": "DFW",
+  "produced_by": "quantitative-analyst",
+  "produced_at": "2026-08-19",
+  "conventions": {
+    "currency": "USD nominal",
+    "geography": "DFW airport property",
+    "peak_day": "Peak-day figures per American Airlines newsroom releases; not annual averages.",
+    "enplanements_convention": "Enplaned passengers estimated as 50% of total passengers unless a primary DFW enplanements figure is cited. This is a modeling convention, not a source-verified fact."
+  },
+  "calculations": [
+    {
+      "id": "cost_per_gate_scope_revision",
+      "title": "Cost per gate — 2023 vs 2025 Terminal F scope",
+      "inputs": [
+        {"name": "2023_program_cost_usd", "value": 1600000000, "source_ref": "airport-context.md §4; DFW/AA 2025-05-01 joint announcement"},
+        {"name": "2023_gate_count", "value": 15, "source_ref": "airport-context.md §4"},
+        {"name": "2025_program_cost_usd", "value": 4000000000, "source_ref": "DFW/AA 2025-05-01 joint announcement"},
+        {"name": "2025_gate_count", "value": 31, "source_ref": "DFW/AA 2025-05-01 joint announcement; AA 2026-07 newsroom"}
+      ],
+      "formulas": {
+        "cost_per_gate_2023": "2023_program_cost_usd / 2023_gate_count",
+        "cost_per_gate_2025": "2025_program_cost_usd / 2025_gate_count",
+        "delta_usd": "cost_per_gate_2025 - cost_per_gate_2023",
+        "delta_pct": "(cost_per_gate_2025 / cost_per_gate_2023) - 1",
+        "incremental_gate_cost": "(2025_program_cost_usd - 2023_program_cost_usd) / (2025_gate_count - 2023_gate_count)"
+      },
+      "outputs": {
+        "cost_per_gate_2023_usd": 106666667,
+        "cost_per_gate_2025_usd": 129032258,
+        "delta_usd": 22365591,
+        "delta_pct": 0.2097,
+        "incremental_gate_cost_usd": 150000000
+      },
+      "sensitivities": [
+        {"scenario": "12.5% cost overrun", "assumption": "final program cost = $4.5B", "cost_per_gate_usd": 145161290, "incremental_gate_cost_usd": 181250000},
+        {"scenario": "3 gates absorbed by amenity/FIS/flex", "assumption": "final gate count = 28 at $4.0B", "cost_per_gate_usd": 142857143},
+        {"scenario": "combined overrun + gate loss", "assumption": "$4.5B, 28 gates", "cost_per_gate_usd": 160714286}
+      ],
+      "caveats": [
+        "Both cost figures are rounded planning numbers, not procurement outcomes.",
+        "Incremental gate cost mixes narrowbody, widebody, and FIS-capable positions; per-type costs will differ.",
+        "The 2023 figure is a preapproved-plan number, not an executed program cost."
+      ]
+    },
+    {
+      "id": "peak_departure_load_factor",
+      "title": "Average passengers per peak AA departure at DFW",
+      "inputs": [
+        {"name": "peak_daily_customers", "value": 100000, "source_ref": "AA newsroom 2025-12 (Doubling down on DFW)"},
+        {"name": "peak_daily_departures", "value": 930, "source_ref": "AA newsroom 2025-12; corroborated 2026-07"}
+      ],
+      "formulas": {
+        "customers_per_departure": "peak_daily_customers / peak_daily_departures"
+      },
+      "outputs": {
+        "customers_per_departure_peak": 107.53
+      },
+      "caveats": [
+        "Includes both O&D and connecting customers on a peak day.",
+        "Not equivalent to a load factor — does not compare against seat count."
+      ]
+    },
+    {
+      "id": "terminal_f_share_of_aa_operation",
+      "title": "Terminal F gate share of AA DFW operation — bracketed",
+      "inputs": [
+        {"name": "terminal_f_gates", "value": 31, "source_ref": "DFW/AA 2025-05-01 joint announcement"},
+        {"name": "current_aa_gates_at_dfw_low", "value": 130, "source_ref": "analyst estimate — flagged as evidence gap"},
+        {"name": "current_aa_gates_at_dfw_mid", "value": 148, "source_ref": "analyst estimate — flagged as evidence gap"},
+        {"name": "current_aa_gates_at_dfw_high", "value": 160, "source_ref": "analyst estimate — flagged as evidence gap"}
+      ],
+      "formulas": {
+        "tf_share": "terminal_f_gates / (current_aa_gates_at_dfw + terminal_f_gates)",
+        "implied_peak_departures_through_tf": "930 * tf_share"
+      },
+      "outputs": {
+        "share_low_case": 0.193,
+        "share_mid_case": 0.173,
+        "share_high_case": 0.162,
+        "peak_departures_low_case": 179.4,
+        "peak_departures_mid_case": 160.9,
+        "peak_departures_high_case": 150.7
+      },
+      "caveats": [
+        "Current AA gate count at DFW is an evidence gap; the range is bracketed for transparency.",
+        "Assumes AA retains all current gates and gains 31 in Terminal F — retirement of gates elsewhere would raise the share."
+      ]
+    },
+    {
+      "id": "connecting_vs_od_split_sensitivity",
+      "title": "AA peak-day connecting vs O&D split at DFW",
+      "inputs": [
+        {"name": "peak_daily_customers", "value": 100000, "source_ref": "AA newsroom 2025-12"},
+        {"name": "airport_level_connecting_share", "value": 0.60, "source_ref": "Road Genius aggregator — secondary; awaiting DFW official confirmation"},
+        {"name": "run_prompt_carrier_connecting_share", "value": 0.66, "source_ref": "run prompt assertion; not sourced to a primary AA document"}
+      ],
+      "formulas": {
+        "connecting_customers": "peak_daily_customers * connecting_share",
+        "od_customers": "peak_daily_customers * (1 - connecting_share)"
+      },
+      "outputs": {
+        "case_55_connecting": 55000, "case_55_od": 45000,
+        "case_60_connecting": 60000, "case_60_od": 40000,
+        "case_66_connecting": 66000, "case_66_od": 34000,
+        "case_70_connecting": 70000, "case_70_od": 30000,
+        "od_range_pct_variation": "50% between 30k and 45k"
+      },
+      "caveats": [
+        "Airport-level connecting share (60%) is not equivalent to carrier-level connecting share.",
+        "Design implications differ: O&D drives curbside, check-in, TSA; connecting drives lounge, gate hold, walkways."
+      ]
+    },
+    {
+      "id": "terminal_c_lounge_density_benchmark",
+      "title": "Admirals Club sq ft per gate — Terminal C benchmark",
+      "inputs": [
+        {"name": "terminal_c_admirals_club_sqft", "value": 37000, "source_ref": "AA newsroom 2026-07"},
+        {"name": "terminal_c_gates_low", "value": 28, "source_ref": "analyst estimate; needs airport-context confirmation"},
+        {"name": "terminal_c_gates_high", "value": 33, "source_ref": "analyst estimate; needs airport-context confirmation"}
+      ],
+      "formulas": {
+        "sqft_per_gate": "terminal_c_admirals_club_sqft / terminal_c_gates"
+      },
+      "outputs": {
+        "sqft_per_gate_low": 1121,
+        "sqft_per_gate_high": 1321
+      },
+      "caveats": [
+        "Terminal C exact gate count is an evidence gap in the packet.",
+        "The 37,000 sq ft lounge does not necessarily serve only Terminal C — Skylink connectivity allows cross-terminal patronage."
+      ]
+    },
+    {
+      "id": "terminal_f_lounge_gap",
+      "title": "Terminal F lounge deficit vs Terminal C density",
+      "inputs": [
+        {"name": "terminal_f_gates", "value": 31, "source_ref": "DFW/AA 2025-05-01 joint announcement"},
+        {"name": "provisions_grab_and_go_sqft_estimate", "value": 2500, "source_ref": "analyst estimate; industry benchmark for grab-and-go concepts (1,500–3,500 sq ft)"},
+        {"name": "target_density_sqft_per_gate", "value": 1220, "source_ref": "midpoint of Terminal C benchmark (1,121–1,321)"}
+      ],
+      "formulas": {
+        "target_footprint_sqft": "terminal_f_gates * target_density_sqft_per_gate",
+        "current_planned_footprint_sqft": "provisions_grab_and_go_sqft_estimate",
+        "gap_sqft": "target_footprint_sqft - current_planned_footprint_sqft",
+        "gap_pct": "1 - (current_planned_footprint_sqft / target_footprint_sqft)"
+      },
+      "outputs": {
+        "target_footprint_sqft": 37820,
+        "current_planned_footprint_sqft": 2500,
+        "gap_sqft": 35320,
+        "gap_pct": 0.934
+      },
+      "caveats": [
+        "Provisions footprint is estimated, not sourced.",
+        "Terminal C density is not necessarily the correct planning target for Terminal F.",
+        "Assumes AA would want lounge parity at Terminal F, which is contrary to the current announced posture."
+      ]
+    },
+    {
+      "id": "flagship_lounge_gate_displacement",
+      "title": "Gate positions displaced by a Flagship-tier lounge in Terminal F",
+      "inputs": [
+        {"name": "flagship_lounge_sqft_low", "value": 19000, "source_ref": "industry reporting — AA Flagship Lounge JFK; not primary here"},
+        {"name": "flagship_lounge_sqft_high", "value": 40000, "source_ref": "industry reporting — Delta ONE Lounge JFK; not primary here"},
+        {"name": "narrowbody_gate_floorplate_sqft_low", "value": 10000, "source_ref": "industry rule of thumb; analyst construction"},
+        {"name": "narrowbody_gate_floorplate_sqft_high", "value": 12000, "source_ref": "industry rule of thumb; analyst construction"},
+        {"name": "opportunity_cost_per_gate_low", "value": 129000000, "source_ref": "calculation cost_per_gate_scope_revision"},
+        {"name": "opportunity_cost_per_gate_high", "value": 150000000, "source_ref": "calculation cost_per_gate_scope_revision"}
+      ],
+      "formulas": {
+        "gate_positions_displaced": "flagship_lounge_sqft / gate_floorplate_sqft",
+        "displaced_gate_value_usd": "gate_positions_displaced * opportunity_cost_per_gate"
+      },
+      "outputs": {
+        "gate_positions_low_case": 1.58,
+        "gate_positions_high_case": 4.00,
+        "displaced_value_low_usd": 204000000,
+        "displaced_value_high_usd": 600000000
+      },
+      "caveats": [
+        "All floorplate benchmarks are industry rules of thumb, not DFW-specific.",
+        "Actual displacement depends on Terminal F module geometry, which is not disclosed.",
+        "Opportunity-cost figures assume a gate lost is a gate not replaced elsewhere in the program."
+      ]
+    },
+    {
+      "id": "debt_service_cpe_sensitivity",
+      "title": "CPE impact of the $3B new debt authorization",
+      "inputs": [
+        {"name": "new_debt_authorized_usd", "value": 3000000000, "source_ref": "Fort Worth 70th Supplemental Bond Ordinance filing"},
+        {"name": "term_years", "value": 30, "source_ref": "convention — standard airport revenue bond tenor"},
+        {"name": "dfw_2025_total_passengers", "value": 85700000, "source_ref": "Road Genius aggregator (secondary)"},
+        {"name": "enplaned_convention_factor", "value": 0.5, "source_ref": "modeling convention — assumes symmetric split"}
+      ],
+      "formulas": {
+        "annual_debt_service": "PMT(rate, term_years, -new_debt_authorized_usd)",
+        "enplaned_passengers": "dfw_2025_total_passengers * enplaned_convention_factor",
+        "cpe_impact_usd": "annual_debt_service / enplaned_passengers"
+      },
+      "outputs": {
+        "enplaned_passengers_2025_estimate": 42850000,
+        "annual_debt_service_at_4_5_pct": 184100000,
+        "annual_debt_service_at_5_0_pct": 195100000,
+        "annual_debt_service_at_5_5_pct": 205200000,
+        "cpe_impact_4_5_pct": 4.30,
+        "cpe_impact_5_0_pct": 4.55,
+        "cpe_impact_5_5_pct": 4.79
+      },
+      "sensitivities": [
+        {"scenario": "2035 enplanements down 20%", "enplanements": 34280000, "cpe_at_5_pct": 5.69},
+        {"scenario": "2035 enplanements up 20%", "enplanements": 51420000, "cpe_at_5_pct": 3.79}
+      ],
+      "caveats": [
+        "Assumes the full $3B authorization is issued (it is a ceiling, not an issuance amount).",
+        "Ignores refunding, capitalized interest, and existing debt service already in CPE.",
+        "Level-debt-service convention; actual bond structures may be sculpted."
+      ]
+    },
+    {
+      "id": "asset_life_vs_lease_runway",
+      "title": "U&L runway as fraction of Terminal F useful life",
+      "inputs": [
+        {"name": "full_opening_year", "value": 2030, "source_ref": "AA newsroom 2026-07"},
+        {"name": "ul_expiry_year", "value": 2043, "source_ref": "DFW/AA 2025-05-01 joint announcement"},
+        {"name": "useful_life_years_low", "value": 30, "source_ref": "industry standard for terminal buildings"},
+        {"name": "useful_life_years_mid", "value": 40, "source_ref": "industry standard for terminal buildings"},
+        {"name": "useful_life_years_high", "value": 50, "source_ref": "industry standard for terminal buildings"}
+      ],
+      "formulas": {
+        "ul_runway_years": "ul_expiry_year - full_opening_year",
+        "fraction_covered": "ul_runway_years / useful_life_years"
+      },
+      "outputs": {
+        "ul_runway_years": 13,
+        "fraction_covered_30yr_life": 0.433,
+        "fraction_covered_40yr_life": 0.325,
+        "fraction_covered_50yr_life": 0.260
+      },
+      "caveats": [
+        "Useful-life bands are industry conventions, not DFW-specific accounting policy.",
+        "Ignores the 3-year phase-in (2027–2030) during which portions of the terminal earn revenue earlier."
+      ]
+    },
+    {
+      "id": "modular_savings_envelope",
+      "title": "Implied conventional-construction counterfactual and change-order exposure",
+      "inputs": [
+        {"name": "modular_program_cost_usd", "value": 4000000000, "source_ref": "DFW/AA 2025-05-01 joint announcement"},
+        {"name": "modular_savings_pct", "value": 0.30, "source_ref": "Dallas Innovates citing DFW"}
+      ],
+      "formulas": {
+        "conventional_counterfactual_usd": "modular_program_cost_usd / (1 - modular_savings_pct)",
+        "savings_pool_usd": "conventional_counterfactual_usd - modular_program_cost_usd"
+      },
+      "outputs": {
+        "conventional_counterfactual_usd": 5714000000,
+        "savings_pool_usd": 1714000000
+      },
+      "caveats": [
+        "The 30% saving is a directional secondary-source figure; the exact counterfactual is not defined.",
+        "Change-order cost multipliers on modular pods after fabrication release are analyst professional judgment and belong in the brief, not this JSON."
+      ]
+    }
+  ],
+  "known_gaps": [
+    "AA-controlled gate count at DFW today",
+    "Terminal F gate mix by aircraft class",
+    "Terminal F floorplate square footage by function",
+    "Current DFW CPE and MII thresholds",
+    "U&L obligations regarding lounge tier at Terminal F",
+    "Release-for-fabrication milestone dates per pod",
+    "NEPA class-of-action for the expanded 31-gate scope"
+  ]
+}

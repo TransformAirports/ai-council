@@ -1,0 +1,141 @@
+{
+  "artifact": "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.pptx",
+  "kind": "pptx",
+  "ok": true,
+  "error_count": 0,
+  "warning_count": 15,
+  "issues": [
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'cover-subtitle'; render and inspect it.",
+      "location": "slide 1"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-02-title'; render and inspect it.",
+      "location": "slide 2"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-03-title'; render and inspect it.",
+      "location": "slide 3"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-04-title'; render and inspect it.",
+      "location": "slide 4"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-05-title'; render and inspect it.",
+      "location": "slide 5"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-06-title'; render and inspect it.",
+      "location": "slide 6"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-07-title'; render and inspect it.",
+      "location": "slide 7"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-08-title'; render and inspect it.",
+      "location": "slide 8"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-09-title'; render and inspect it.",
+      "location": "slide 9"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-10-title'; render and inspect it.",
+      "location": "slide 10"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-11-title'; render and inspect it.",
+      "location": "slide 11"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-12-title'; render and inspect it.",
+      "location": "slide 12"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-13-title'; render and inspect it.",
+      "location": "slide 13"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-14-title'; render and inspect it.",
+      "location": "slide 14"
+    },
+    {
+      "code": "likely_text_overflow",
+      "severity": "warning",
+      "message": "Text may not fit shape 'slide-16-title'; render and inspect it.",
+      "location": "slide 16"
+    }
+  ],
+  "metadata": {
+    "slides": 16,
+    "aspect_ratio": 1.7778,
+    "visual_shapes": 17,
+    "numeric_slides": 7,
+    "sourced_numeric_slides": 7,
+    "minimum_title_pt": 35.0,
+    "minimum_body_pt": 16.0,
+    "minimum_source_pt": 9.5,
+    "profile": "client_release",
+    "deck_mode": "executive_briefing",
+    "visual_brief_slides": 16,
+    "signature_visual_slide": 3,
+    "signature_visual_markers": [
+      3
+    ],
+    "visual_inspection": {
+      "deck_mode": "executive_briefing",
+      "slides": 16,
+      "inspector": "presentation-designer",
+      "receipt_sha256": "82176e97c97f618ebea76206592ddb9bae7f222b04da69ddc0dc34bb6d5b8dff"
+    }
+  },
+  "rendered_files": [
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.pdf",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-01.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-02.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-03.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-04.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-05.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-06.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-07.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-08.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-09.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-10.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-11.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-12.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-13.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-14.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-15.png",
+    "/Users/christiankessleriv/Repos/ai-council-mwaa/outputs/stage4/qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-presentation/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-16.png"
+  ]
+}

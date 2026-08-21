@@ -1,0 +1,265 @@
+{
+  "schema_version": "1.0",
+  "inspection_type": "word_pages",
+  "artifact": {
+    "path": "designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.docx",
+    "sha256": "0127779af6e7d58fcafdbe7b270ff45e674622400c92f5337d0b535f476fb17f",
+    "size_bytes": 246890
+  },
+  "pdf": {
+    "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.pdf",
+    "sha256": "1379703af1d9ebdb70b8ac98a9a514b5520d49845caf48d7d763e57cb144993f",
+    "size_bytes": 612654
+  },
+  "page_count": 39,
+  "rendered_pages": [
+    {
+      "page_number": 1,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-01.png",
+      "sha256": "e58c4652c6465f4a0c03a8fa916e23818d84e0782266cb5cc8b585c2a2d90825",
+      "size_bytes": 153448
+    },
+    {
+      "page_number": 2,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-02.png",
+      "sha256": "2926a70b95d7b918d67cb7a10fddc02bdfd4085c025dba0cc481a439cea41073",
+      "size_bytes": 250610
+    },
+    {
+      "page_number": 3,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-03.png",
+      "sha256": "f1194cb9fad37bfb9a9b86601b237df9a4e43d06659bb3339aa9cac957f3dd14",
+      "size_bytes": 353659
+    },
+    {
+      "page_number": 4,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-04.png",
+      "sha256": "1c6221d001a7a2943599db4e2cfb87bebe3fe95e6b26e4bd5710c9a512f451e4",
+      "size_bytes": 427877
+    },
+    {
+      "page_number": 5,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-05.png",
+      "sha256": "2dbc47f3d20298fdfb4834d3b360c51e0b787ae2c2887adf866b21436e4f5205",
+      "size_bytes": 17780
+    },
+    {
+      "page_number": 6,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-06.png",
+      "sha256": "5c4b776c70d4039b95456f63bd637ce5b27095b2601a2654ebfb440a0fa43851",
+      "size_bytes": 21436
+    },
+    {
+      "page_number": 7,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-07.png",
+      "sha256": "d4cfb81100c82d1ae2f2502285ae00123052dc1eab2dd4efd7dce2427e2e7684",
+      "size_bytes": 388471
+    },
+    {
+      "page_number": 8,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-08.png",
+      "sha256": "532deaf40d4f16201c0629e72995718377001f4952a107c51b68015119a07bb4",
+      "size_bytes": 518842
+    },
+    {
+      "page_number": 9,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-09.png",
+      "sha256": "3ba8a590d4291a5b2875adeed4f79481e8082b257cefa41789e57ea95dcb97a8",
+      "size_bytes": 404225
+    },
+    {
+      "page_number": 10,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-10.png",
+      "sha256": "2d18ec760f80137b5d16d6b2a384d26e281e99bb3a6a843c9a8e63434e803023",
+      "size_bytes": 423564
+    },
+    {
+      "page_number": 11,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-11.png",
+      "sha256": "1aaec045f47796f8ef430864a4ccc62033b0011d8d6fb438c190c6e9b33b8902",
+      "size_bytes": 459797
+    },
+    {
+      "page_number": 12,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-12.png",
+      "sha256": "078e8559e920c099ac3df6b851a0b84ba25ded418e60534739701a7c84b079bc",
+      "size_bytes": 461996
+    },
+    {
+      "page_number": 13,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-13.png",
+      "sha256": "549bd66e48a144d08792c09b7320b6c9b42a2786935abdb489cc920caf033b7e",
+      "size_bytes": 438848
+    },
+    {
+      "page_number": 14,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-14.png",
+      "sha256": "e0976e49103409e5068fce23b77f4f8cf4fdf0d38225e74a510598d95bbbc362",
+      "size_bytes": 402316
+    },
+    {
+      "page_number": 15,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-15.png",
+      "sha256": "36d9a7eaf377c8d0f5e95c559e884c297bf254a648ead62770ecb34d816a38e3",
+      "size_bytes": 450255
+    },
+    {
+      "page_number": 16,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-16.png",
+      "sha256": "98acf36a7c828a92d543ce11744fd6f4cf21a8661eb3b173a6319351e02c4367",
+      "size_bytes": 522471
+    },
+    {
+      "page_number": 17,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-17.png",
+      "sha256": "26970c99a4ffab9ec2213ff1e90d5dff2eacd65980d57f011ddebadf6997192a",
+      "size_bytes": 471274
+    },
+    {
+      "page_number": 18,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-18.png",
+      "sha256": "44c47b4d18bce1ddd988617227d374500820a9aed33cde1982fd7365ddcc6e59",
+      "size_bytes": 527544
+    },
+    {
+      "page_number": 19,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-19.png",
+      "sha256": "44eb2b4852de80be741a7f5f7ca81e53ef026f90133f06e83d88a671fd1cd3a7",
+      "size_bytes": 477572
+    },
+    {
+      "page_number": 20,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-20.png",
+      "sha256": "39e3e4cf20c19a3c6af7e8d1b7275f2f1c3bd53260886dd11c0f7e05a5a77355",
+      "size_bytes": 291520
+    },
+    {
+      "page_number": 21,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-21.png",
+      "sha256": "cf1d874bc49c4f746904d50f4676cb59e7e90728e882f4b105a924300901423b",
+      "size_bytes": 310435
+    },
+    {
+      "page_number": 22,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-22.png",
+      "sha256": "63cf8f9932fb435c11a8d4be60eb3b0201ec7b402ee5e89c1ff82c2d7a754dbb",
+      "size_bytes": 341950
+    },
+    {
+      "page_number": 23,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-23.png",
+      "sha256": "8c24e950b1b9e9769d3d2848011ff7d2647d2df7442e1253c64d61c33571880f",
+      "size_bytes": 133988
+    },
+    {
+      "page_number": 24,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-24.png",
+      "sha256": "f25e84414147e793d0384888cba1c2389988dddec6691997ce377f36c5b191e4",
+      "size_bytes": 250896
+    },
+    {
+      "page_number": 25,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-25.png",
+      "sha256": "388df541fa6aded6d5f5de4bbf50494a781d76549ab19b51e674f6229509a06e",
+      "size_bytes": 288007
+    },
+    {
+      "page_number": 26,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-26.png",
+      "sha256": "413194b76b1bca83c94a67ad28c3f6d32d248c2fb096188014eeedb70f32d035",
+      "size_bytes": 379646
+    },
+    {
+      "page_number": 27,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-27.png",
+      "sha256": "f0361b0dcf110d7a23e3caf16f01b9e0f69042f0d62eb892594558f01dc640cc",
+      "size_bytes": 304533
+    },
+    {
+      "page_number": 28,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-28.png",
+      "sha256": "eb92fa94346057168e2d2a86b76dc88d4fbc6c0486ef89ea4047673f5d8db774",
+      "size_bytes": 346083
+    },
+    {
+      "page_number": 29,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-29.png",
+      "sha256": "250287cddd2caf8e48ae3f6f601d7cf173a1410ee547c4839e5cea6836827919",
+      "size_bytes": 253144
+    },
+    {
+      "page_number": 30,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-30.png",
+      "sha256": "b58fcec85270cfed8ae7655ab806769dc7d39c0fd3b812cd74a733ca30129c07",
+      "size_bytes": 354651
+    },
+    {
+      "page_number": 31,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-31.png",
+      "sha256": "58c978ba45490adbfa7d49365ceea06f1b67298a5b24b7791f42ff3441350e74",
+      "size_bytes": 302400
+    },
+    {
+      "page_number": 32,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-32.png",
+      "sha256": "e8ebbdbd33856453f9e670fdfbcb33f6488ebbd078c1cce315476f6c26fa9018",
+      "size_bytes": 318735
+    },
+    {
+      "page_number": 33,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-33.png",
+      "sha256": "7cc304c37064bbc486c7e752998e81ab3417d2c8a79e54da222f5ef9fd61187c",
+      "size_bytes": 345488
+    },
+    {
+      "page_number": 34,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-34.png",
+      "sha256": "572af8708f65670b3b54342df5c3fcb0cc2146b82dab9c4639da47836c709487",
+      "size_bytes": 326421
+    },
+    {
+      "page_number": 35,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-35.png",
+      "sha256": "9c741e8c41f6e49cd6b42a8a5073257583f5bf9e49fb3febe5161730a1800c38",
+      "size_bytes": 410897
+    },
+    {
+      "page_number": 36,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-36.png",
+      "sha256": "6a619693e29e662725ad5eb3d96c0a968d1ee25c5015130f9b4e5a22129a891f",
+      "size_bytes": 395174
+    },
+    {
+      "page_number": 37,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-37.png",
+      "sha256": "b17a5fbcc7b845e83f241eb2794eac8d7f836ff467b41d3cea81c2c5294a644a",
+      "size_bytes": 405088
+    },
+    {
+      "page_number": 38,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-38.png",
+      "sha256": "e6998cbacd8fc34212a53e5b81e9139a11763998b36f8687cc14c393b4d0e425",
+      "size_bytes": 386468
+    },
+    {
+      "page_number": 39,
+      "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-39.png",
+      "sha256": "8e9ee9caa0c14964c6296e1348830caeff8bfc97010b4ad9101ab9dd40cc0a54",
+      "size_bytes": 126703
+    }
+  ],
+  "montage": {
+    "path": "qa/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/montage.png",
+    "sha256": "b70eb1910f985975e731f17a5afa6d805985fa8878a8ca3b0f839c4166dab76d",
+    "size_bytes": 4476093
+  },
+  "inspection": {
+    "inspector": "art-director",
+    "full_size_each_page_inspected": false,
+    "montage_inspected": false,
+    "findings_resolved": false,
+    "status": "pending",
+    "resolved_findings": [],
+    "unresolved_findings": []
+  }
+}

@@ -24,7 +24,25 @@ RUN_ARTIFACTS: tuple[str, ...] = (
     "claim-lineage.jsonl",
     "quality-gate.json",
     "publishing-quality.json",
+    "run-events.jsonl",
 )
+
+
+def _bind_event_journal(
+    archive_dir: Path,
+    *,
+    preserve_existing: bool,
+) -> None:
+    """Finish the optional event journal after the archive commits."""
+
+    from cli.events import get_sink
+
+    sink = get_sink()
+    if sink is not None:
+        sink.archive_to(
+            archive_dir / "run-events.jsonl",
+            preserve_existing=preserve_existing,
+        )
 
 
 def _write_retrospective(archive_dir: Path, slug: str, tally: CostTally) -> None:
@@ -509,6 +527,7 @@ def archive_run(
         # sources, generated artifacts, receipts, and release bundle. Cleanup
         # is idempotent and the manifest is deleted last, so retrying here is
         # both safe and recoverable.
+        _bind_event_journal(archive_dir, preserve_existing=True)
         _clear_outputs(outputs_dir)
         return archive_dir
     manifest_payload: dict | None = None
@@ -582,6 +601,8 @@ def archive_run(
         raise
 
     # Clearing happens only after the complete archive directory has been
-    # atomically promoted into place.
+    # atomically promoted into place. The live sink mirrors the final
+    # run-complete and stream-end events into the committed optional journal.
+    _bind_event_journal(archive_dir, preserve_existing=False)
     _clear_outputs(outputs_dir)
     return archive_dir

@@ -20,7 +20,9 @@ import math
 import os
 import re
 import secrets
+import traceback
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urlsplit
@@ -276,7 +278,7 @@ async def api_agents() -> JSONResponse:
             members.append({
                 "name": a.name,
                 "display": a.display_name,
-                "description": a.description.splitlines()[0].strip() if a.description else "",
+                "description": a.description.strip() if a.description else "",
                 "gated": a.provider != "anthropic",
                 "supplemental": a.is_supplemental,
                 "default": name in PRESET_DEFAULT,
@@ -284,7 +286,7 @@ async def api_agents() -> JSONResponse:
         groups.append({"label": label, "members": members})
     procs = [
         {"name": a.name, "display": a.display_name,
-         "description": a.description.splitlines()[0].strip() if a.description else ""}
+         "description": a.description.strip() if a.description else ""}
         for a in process_agents(agents).values()
     ]
     return JSONResponse({"groups": groups, "process": procs})
@@ -688,9 +690,54 @@ async def _drive_run(mode: str, payload: dict, sink: WebSink) -> None:
                 ]
             await _drive_new(spec, sink, auto_approve, budget)
     except Exception as e:  # noqa: BLE001 — surface to the browser
-        await sink.emit("run_error", {"message": f"{type(e).__name__}: {e}"})
+        raw_diagnostic = traceback.format_exc()
+        diagnostic = _sanitize_diagnostic(raw_diagnostic)
+        safe_error = _sanitize_diagnostic(f"{type(e).__name__}: {e}")
+        diagnostic_log = "logs/last-error.log"
+        try:
+            log_path = REPO_ROOT / diagnostic_log
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log_path.write_text(
+                f"{datetime.now(timezone.utc).isoformat()}\n\n{diagnostic}",
+                encoding="utf-8",
+            )
+        except OSError:
+            # The event journal still receives the sanitized traceback below.
+            diagnostic_log = "outputs/run-events.jsonl"
+        await sink.emit("run_error", {
+            "message": f"{safe_error} Technical details: {diagnostic_log}",
+            "diagnostic": diagnostic,
+            "diagnostic_log": diagnostic_log,
+        })
     finally:
         await sink.close()
+
+
+def _sanitize_diagnostic(value: str) -> str:
+    """Redact likely credentials before a traceback is persisted or streamed."""
+
+    clean = value
+    for name, secret in os.environ.items():
+        if (
+            len(secret) >= 8
+            and re.search(
+                r"(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)",
+                name,
+                flags=re.IGNORECASE,
+            )
+        ):
+            clean = clean.replace(secret, "[REDACTED]")
+    clean = re.sub(
+        r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{8,}",
+        r"\1[REDACTED]",
+        clean,
+    )
+    clean = re.sub(
+        r"\b(?:sk|xox[baprs])-[A-Za-z0-9_-]{8,}\b",
+        "[REDACTED]",
+        clean,
+    )
+    return clean[:131_072]
 
 
 def _build_spec(data: dict) -> RunSpec:
@@ -769,11 +816,16 @@ async def ws(socket: WebSocket) -> None:
                     await socket.send_json({"type": "run_error",
                                             "message": "A run is already in progress."})
                     continue
-                sink = WebSink()
+                mode = str(msg.get("mode") or "new")
+                journal_path = REPO_ROOT / "outputs" / "run-events.jsonl"
+                sink = WebSink(
+                    None if mode == "new" else journal_path,
+                    append=mode == "resume",
+                )
                 _active_sink = sink
                 _active_owner = connection_client
                 _active_task = asyncio.create_task(
-                    _drive_run(msg.get("mode", "new"), msg, sink)
+                    _drive_run(mode, msg, sink)
                 )
                 if pump is not None:
                     pump.cancel()
@@ -1601,11 +1653,59 @@ async def api_report(slug: str) -> JSONResponse:
     )
 
 
+@app.post("/api/library/{mode}/{slug}/prompt")
+async def api_library_prompt(
+    mode: str,
+    slug: str,
+    request: Request,
+) -> JSONResponse:
+    """Return a report's prompt with provenance, never as rendered HTML."""
+
+    if not _http_request_is_authenticated(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    if mode not in {"report", "revision"}:
+        return JSONResponse({"error": "prompt unavailable"}, status_code=404)
+
+    from cli.publish import discover_reports, resolve_report_prompt
+
+    sources = discover_reports()
+    source_slug = slug
+    if mode == "revision":
+        revision = _verified_revision_report(slug, sources)
+        if revision is None:
+            return JSONResponse({"error": "prompt unavailable"}, status_code=404)
+        source_slug = str(revision["source_slug"])
+    source = next(
+        (candidate for candidate in sources if candidate.slug == source_slug),
+        None,
+    )
+    if source is None:
+        return JSONResponse({"error": "prompt unavailable"}, status_code=404)
+
+    prompt = resolve_report_prompt(source)
+    payload: dict[str, object] = {
+        "slug": slug,
+        "source_slug": source_slug,
+        "label": "Original run prompt" if mode == "revision" else "Run prompt",
+        **prompt.metadata(),
+    }
+    if prompt.sha256 is not None:
+        payload["sha256"] = prompt.sha256
+    if prompt.size_bytes is not None:
+        payload["size_bytes"] = prompt.size_bytes
+    if not prompt.available or prompt.markdown is None:
+        payload["error"] = prompt.notice
+        status = 409 if prompt.provenance == "integrity_failure" else 404
+        return JSONResponse(payload, status_code=status)
+    payload["markdown"] = prompt.markdown
+    return JSONResponse(payload)
+
+
 @app.get("/api/home")
 async def api_home() -> JSONResponse:
     """Interrupted-run detection + the library of completed reports."""
     from cli.menu import detect_interrupted_run
-    from cli.publish import discover_reports
+    from cli.publish import discover_reports, resolve_report_prompt
     from cli.revise import next_revision_version
 
     interrupted = detect_interrupted_run()
@@ -1640,6 +1740,7 @@ async def api_home() -> JSONResponse:
             for item in verified_downloads
         ]
         revs = next_revision_version(s.archive_dir) - 1
+        prompt_metadata = resolve_report_prompt(s).metadata()
         archives.append({
             "slug": s.slug, "title": title, "date": date, "format": fmt,
             "downloads": downloads, "revisions": revs,
@@ -1648,6 +1749,7 @@ async def api_home() -> JSONResponse:
             "can_read": True,
             "can_revise": True,
             "can_build_deck": True,
+            "prompt": prompt_metadata,
             "has_deck": any(
                 item["role"] == "presentation"
                 for item in verified_downloads
@@ -1685,6 +1787,7 @@ async def api_home() -> JSONResponse:
                     "can_read": True,
                     "can_revise": True,
                     "can_build_deck": False,
+                    "prompt": prompt_metadata,
                     "has_deck": any(
                         item["role"] == "presentation"
                         for item in revision["downloads"]

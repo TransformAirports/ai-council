@@ -7,6 +7,7 @@ list of brief filenames.
 """
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 import os
 import hashlib
@@ -79,6 +80,10 @@ def generation_contract_records(
 
 class ResumeContractMismatch(RuntimeError):
     """Raised when paid artifacts no longer match the executable run contract."""
+
+
+class CheckpointInputsChanged(RuntimeError):
+    """Raised when checkpoint inputs no longer match the reviewed snapshot."""
 
 
 def _now() -> str:
@@ -240,15 +245,121 @@ def build_dependency_fingerprint(
         "complete": complete,
         "inputs": input_records,
     }
-    fingerprint["sha256"] = hashlib.sha256(
+    fingerprint["sha256"] = dependency_fingerprint_sha256(fingerprint)
+    return fingerprint
+
+
+def dependency_fingerprint_sha256(fingerprint: object) -> str:
+    """Return the canonical digest for a dependency receipt body.
+
+    A dependency fingerprint is written in more than one place: normal
+    artifact completion, resume-manifest refresh, and the audited re-baseline
+    tool.  Keeping the serializer here prevents one writer from changing the
+    receipt body without refreshing the digest that validates it.
+    """
+
+    if not isinstance(fingerprint, dict):
+        raise TypeError("Dependency fingerprint must be a mapping.")
+    body = {
+        key: value
+        for key, value in fingerprint.items()
+        if key != "sha256"
+    }
+    return hashlib.sha256(
         json.dumps(
-            fingerprint,
+            body,
             sort_keys=True,
             separators=(",", ":"),
             ensure_ascii=False,
         ).encode("utf-8")
     ).hexdigest()
-    return fingerprint
+
+
+def refresh_dependency_fingerprint_sha256(fingerprint: object) -> bool:
+    """Refresh a stored receipt digest in place; return whether it was valid."""
+
+    if not isinstance(fingerprint, dict):
+        return False
+    try:
+        fingerprint["sha256"] = dependency_fingerprint_sha256(fingerprint)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def _repair_audited_rebaseline_dependency_digest(
+    fingerprint: object,
+    *,
+    prior_manifest: dict[str, Any],
+    artifact_path: str,
+) -> bool:
+    """Repair only the historical, audited re-baseline digest defect.
+
+    Older versions of ``resume_repair`` moved an embedded run identity without
+    recomputing the receipt's outer digest.  An arbitrary stale digest must
+    remain invalid: otherwise a resume could turn receipt tampering into a
+    trusted record.  We therefore repair only when reversing the recorded
+    re-baseline transitions reconstructs the exact body covered by the stale
+    digest, and only for an artifact named in those audit entries.
+    """
+
+    if not isinstance(fingerprint, dict):
+        return False
+    recorded_digest = fingerprint.get("sha256")
+    if not isinstance(recorded_digest, str) or len(recorded_digest) != 64:
+        return False
+    try:
+        if recorded_digest == dependency_fingerprint_sha256(fingerprint):
+            return False
+    except (TypeError, ValueError):
+        return False
+
+    audits = prior_manifest.get("resume_rebaselines")
+    if not isinstance(audits, list):
+        return False
+    historical = deepcopy(fingerprint)
+    for audit in reversed(audits):
+        if not isinstance(audit, dict):
+            continue
+        restamped = audit.get("restamped_dependency_receipts")
+        if not isinstance(restamped, list) or artifact_path not in restamped:
+            continue
+        previous = audit.get("previous_identity_sha256")
+        current = audit.get("new_identity_sha256")
+        if (
+            not isinstance(previous, str)
+            or not isinstance(current, str)
+            or len(previous) != 64
+            or len(current) != 64
+        ):
+            continue
+        changed = False
+        inputs = historical.get("inputs")
+        if not isinstance(inputs, list):
+            return False
+        for record in inputs:
+            if not isinstance(record, dict):
+                continue
+            files = record.get("files")
+            if not isinstance(files, list):
+                continue
+            for entry in files:
+                if (
+                    isinstance(entry, dict)
+                    and entry.get("kind") == "run_identity"
+                    and entry.get("sha256") == current
+                ):
+                    entry["sha256"] = previous
+                    changed = True
+        if not changed:
+            continue
+        try:
+            reconstructed_digest = dependency_fingerprint_sha256(historical)
+        except (TypeError, ValueError):
+            return False
+        if reconstructed_digest == recorded_digest:
+            return refresh_dependency_fingerprint_sha256(fingerprint)
+    return False
 
 
 def dependency_fingerprint_matches(
@@ -271,6 +382,12 @@ def dependency_fingerprint_matches(
         len(declarations) != len(inputs)
         or any(not declaration for declaration in declarations)
     ):
+        return False
+    try:
+        recorded_digest = dependency_fingerprint_sha256(recorded)
+    except (TypeError, ValueError):
+        return False
+    if recorded.get("sha256") != recorded_digest:
         return False
     current = build_dependency_fingerprint(manifest_path, declarations)
     return bool(
@@ -1112,53 +1229,67 @@ def create_run_manifest(
         for item in artifacts:
             old = previous_by_path.get(item["path"])
             if old and old.get("status") in {"complete", "invalid"}:
-                item.update(
-                    {
-                        key: old[key]
-                        for key in (
-                            "status",
-                            "validation",
-                            "sha256",
-                            "size_bytes",
-                            "word_count",
-                            "record_count",
-                            "completed_at",
-                            "dependencies",
-                        )
-                        if key in old
-                    }
-                )
+                preserved = {
+                    key: deepcopy(old[key])
+                    for key in (
+                        "status",
+                        "validation",
+                        "sha256",
+                        "size_bytes",
+                        "word_count",
+                        "record_count",
+                        "completed_at",
+                        "dependencies",
+                    )
+                    if key in old
+                }
+                # Repair the one known historical receipt defect only when its
+                # audit trail proves exactly which identity bytes were moved.
+                # Arbitrary stale digests remain stale and force a safe re-run.
+                if "dependencies" in preserved:
+                    _repair_audited_rebaseline_dependency_digest(
+                        preserved["dependencies"],
+                        prior_manifest=prior,
+                        artifact_path=str(item["path"]),
+                    )
+                item.update(preserved)
 
     now = _now()
+    run_payload: dict[str, Any] = {
+        "slug": str(getattr(spec, "slug", "")),
+        "title": str(getattr(spec, "title", "")),
+        "thesis": str(getattr(spec, "thesis", "")),
+        "run_prompt": _relative(run_file, repo_root),
+        "run_prompt_sha256": run_prompt_sha256,
+        "run_prompt_size": run_prompt_size,
+        "resume_identity_sha256": resume_identity_sha256,
+        "output_format": str(getattr(spec, "output_format", "report")),
+        "want_pptx": bool(getattr(spec, "want_pptx", False)),
+        "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
+        "decision_required": str(
+            getattr(spec, "decision_required", "") or ""
+        ),
+        "decision_owner": str(getattr(spec, "decision_owner", "") or ""),
+        "time_horizon": str(getattr(spec, "time_horizon", "") or ""),
+        "approval_path": str(getattr(spec, "approval_path", "") or ""),
+        "success_measure": str(getattr(spec, "success_measure", "") or ""),
+        "operator_context": str(getattr(spec, "operator_context", "") or ""),
+        "source_paths": list(getattr(spec, "source_paths", []) or []),
+        "source_material": source_material,
+        "source_library": source_library,
+        "execution_contract": execution_contract,
+        "resume": resume,
+    }
+    if prior and isinstance(prior.get("run"), dict):
+        for key, value in prior["run"].items():
+            if key not in run_payload:
+                run_payload[key] = deepcopy(value)
+
     payload: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "created_at": prior.get("created_at", now) if prior else now,
         "updated_at": now,
-        "run": {
-            "slug": str(getattr(spec, "slug", "")),
-            "title": str(getattr(spec, "title", "")),
-            "thesis": str(getattr(spec, "thesis", "")),
-            "run_prompt": _relative(run_file, repo_root),
-            "run_prompt_sha256": run_prompt_sha256,
-            "run_prompt_size": run_prompt_size,
-            "resume_identity_sha256": resume_identity_sha256,
-            "output_format": str(getattr(spec, "output_format", "report")),
-            "want_pptx": bool(getattr(spec, "want_pptx", False)),
-            "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
-            "decision_required": str(
-                getattr(spec, "decision_required", "") or ""
-            ),
-            "decision_owner": str(getattr(spec, "decision_owner", "") or ""),
-            "time_horizon": str(getattr(spec, "time_horizon", "") or ""),
-            "approval_path": str(getattr(spec, "approval_path", "") or ""),
-            "success_measure": str(getattr(spec, "success_measure", "") or ""),
-            "operator_context": str(getattr(spec, "operator_context", "") or ""),
-            "source_paths": list(getattr(spec, "source_paths", []) or []),
-            "source_material": source_material,
-            "source_library": source_library,
-            "execution_contract": execution_contract,
-            "resume": resume,
-        },
+        "run": run_payload,
         "selected_research_agents": selected_agents,
         "process_agents": process_agents,
         "pipeline": {
@@ -1202,6 +1333,13 @@ def create_run_manifest(
         "artifacts": artifacts,
         "stages": prior.get("stages", {}) if prior else {},
     }
+    if prior:
+        # Resume refreshes the fields it owns but must not erase audit trails
+        # or extension state it does not understand.  This specifically keeps
+        # resume_rebaselines and persisted human-checkpoint approvals intact.
+        for key, value in prior.items():
+            if key not in payload:
+                payload[key] = deepcopy(value)
     _atomic_write_json(path, payload)
     return path
 
@@ -1280,6 +1418,108 @@ def update_stage(
     _atomic_write_json(manifest_path, payload)
 
 
+def checkpoint_approval_matches(
+    manifest_path: Path,
+    checkpoint_id: str,
+    declared_inputs: Iterable[str],
+) -> bool:
+    """Return whether an approval still covers the exact checkpoint inputs."""
+
+    try:
+        payload = load_run_manifest(manifest_path)
+    except (OSError, TypeError, json.JSONDecodeError):
+        return False
+    record = payload.get("checkpoints", {}).get(checkpoint_id)
+    if not isinstance(record, dict) or record.get("approved") is not True:
+        return False
+    expected = tuple(dict.fromkeys(str(item) for item in declared_inputs))
+    dependencies = record.get("dependencies")
+    recorded_inputs = tuple(
+        str(item.get("declared_input") or "")
+        for item in (
+            dependencies.get("inputs", [])
+            if isinstance(dependencies, dict)
+            else []
+        )
+        if isinstance(item, dict)
+    )
+    return bool(
+        recorded_inputs == expected
+        and dependency_fingerprint_matches(manifest_path, dependencies)
+    )
+
+
+def record_checkpoint_decision(
+    manifest_path: Path,
+    checkpoint_id: str,
+    *,
+    approved: bool,
+    action: str,
+    declared_inputs: Iterable[str],
+    auto_approved: bool = False,
+    reviewed_fingerprint: object | None = None,
+) -> None:
+    """Persist a human decision against the bytes the operator reviewed."""
+
+    if not manifest_path.is_file():
+        return
+    expected = tuple(dict.fromkeys(str(item) for item in declared_inputs))
+    if reviewed_fingerprint is None:
+        # Compatibility path for callers that have not yet captured the review
+        # snapshot. New checkpoint flows should always supply it.
+        dependencies = build_dependency_fingerprint(manifest_path, expected)
+    else:
+        dependencies = deepcopy(reviewed_fingerprint)
+        if not isinstance(dependencies, dict):
+            raise CheckpointInputsChanged(
+                f"Cannot persist {checkpoint_id}: the reviewed snapshot is "
+                "missing or malformed."
+            )
+        inputs = dependencies.get("inputs")
+        recorded_inputs = tuple(
+            str(item.get("declared_input") or "")
+            for item in (inputs if isinstance(inputs, list) else [])
+            if isinstance(item, dict)
+        )
+        if recorded_inputs != expected:
+            raise CheckpointInputsChanged(
+                f"Cannot persist {checkpoint_id}: the reviewed snapshot does "
+                "not cover the declared checkpoint inputs."
+            )
+    if dependencies.get("complete") is not True:
+        raise CheckpointInputsChanged(
+            f"Cannot persist {checkpoint_id}: one or more reviewed artifacts "
+            "are missing or unsafe."
+        )
+    if reviewed_fingerprint is not None and not dependency_fingerprint_matches(
+        manifest_path, dependencies
+    ):
+        raise CheckpointInputsChanged(
+            f"Cannot persist {checkpoint_id}: reviewed artifacts changed "
+            "while the checkpoint was awaiting a decision. Review them again."
+        )
+    payload = load_run_manifest(manifest_path)
+    payload.setdefault("checkpoints", {})[checkpoint_id] = {
+        "approved": bool(approved),
+        "action": str(action),
+        "auto_approved": bool(auto_approved),
+        "decided_at": _now(),
+        "dependencies": dependencies,
+    }
+    payload["updated_at"] = _now()
+    # Recheck immediately before the atomic manifest write. This catches a
+    # concurrent writer that moved an input while the decision record itself
+    # was being assembled.
+    if reviewed_fingerprint is not None and not dependency_fingerprint_matches(
+        manifest_path, dependencies
+    ):
+        raise CheckpointInputsChanged(
+            f"Cannot persist {checkpoint_id}: reviewed artifacts changed "
+            "while the checkpoint was awaiting a decision. Review them again."
+        )
+    _atomic_write_json(manifest_path, payload)
+
+
 def assert_manifest_complete(manifest_path: Path) -> dict[str, Any]:
     """Refuse release unless every required artifact still matches its record.
 
@@ -1326,6 +1566,32 @@ def assert_manifest_complete(manifest_path: Path) -> dict[str, Any]:
         )
     elif run_data:
         failures.append("run prompt: path is missing from the manifest")
+
+    # Current Council manifests own an explicit lifecycle. Artifacts alone are
+    # not enough: an interrupted production step must never be promoted merely
+    # because its files happen to look complete on disk. Minimal legacy/test
+    # manifests that predate the ``stages`` field retain their old behavior.
+    if "stages" in payload:
+        stages = payload.get("stages")
+        if not isinstance(stages, dict):
+            failures.append("stages: lifecycle record is missing or malformed")
+        else:
+            for stage in (
+                "context",
+                "research",
+                "evidence",
+                "synthesis",
+                "polish",
+                "verification",
+                "production",
+                "release",
+            ):
+                record = stages.get(stage)
+                status = record.get("status") if isinstance(record, dict) else None
+                if status != "complete":
+                    failures.append(
+                        f"stage {stage}: lifecycle status is {status or 'missing'!r}"
+                    )
 
     for index, source in enumerate(run_data.get("source_material", []), 1):
         raw_path = Path(str(source.get("runtime_path") or ""))

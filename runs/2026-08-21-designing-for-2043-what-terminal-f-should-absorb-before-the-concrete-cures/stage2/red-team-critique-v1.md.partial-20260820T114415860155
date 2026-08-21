@@ -1,0 +1,180 @@
+# Red Team Critique v1 — Evidence Prosecution
+
+**Run:** designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures
+**Reviewer:** evidence-prosecutor
+**Target:** `outputs/stage2/strategist-draft-v1.md` (Strategist v1, 2026-08-19)
+**Inputs:** run manifest, run prompt, all 12 selected briefs per manifest, `outputs/stage1/evidence-map.md`, `outputs/evidence-ledger.jsonl` (255 records), `outputs/stage1/quantitative-analysis/calculations.json`; one external verification (Dulles program figures, MWAA-sourced coverage).
+
+Sixteen findings. The first five are the ones that would embarrass the report in front of the named audience. Every item is answerable; none requires abandoning the thesis.
+
+---
+
+## Findings
+
+### EP-1 — The "eight of twelve" convergence is prompt-seeded, not independent
+
+- **Location:** Executive summary claim 8 and "The register is the artifact" section: "Eight of twelve independent research readings converged on the same recommendation.[^17]"
+- **Charge:** Invented construction (circular corroboration).
+- **Evidence:** The run prompt itself instructs the council: "that reversibility map is the most useful thing the council can produce" (run prompt, "What this IS," item 2). Every agent read that sentence before researching. Fn 17 then presents the resulting convergence as independent corroboration.
+- **Why it matters:** Claim 8 is the report's central recommendation, and the draft's headline evidence for it is a vote count contaminated at the source. A skeptical board member who reads the run prompt will see the circle in one pass.
+- **Remedy:** Cut the convergence framing as *evidence*. The register must stand on the reversibility economics (which are real). If the vote count stays, it must be disclosed as convergence on a framing the prompt supplied — worth one sentence, not a footnote citation.
+
+### EP-2 — The gate-displacement arithmetic does not reproduce its own source file
+
+- **Location:** Register bullet 2 and fn 37: "*building* the lounge displaces 1.6–4.0 gate positions at $129M–$181M each — $207M–$600M in foregone gate value... up to $725M at $181M."
+- **Charge:** Recalculate; overstated; hidden assumption.
+- **Evidence:** `calculations.json`, `flagship_lounge_gate_displacement`: low case is **1.58 gates × $129M = $204M** (draft says $207M); the $600M high case requires the **$150M incremental-gate figure, not $129M** — so "at $129M–$181M each" cannot produce the quoted range. The $725M variant (4.0 × $181M) mixes the displacement model with the 12.5%-overrun sensitivity from a different calculation. The calc file's caveats — floorplates are "industry rules of thumb," "actual displacement depends on Terminal F module geometry, which is not disclosed," and "assumes a gate lost is a gate not replaced" — are all dropped in the draft.
+- **Why it matters:** This is the number that quantifies "buy the shell, not the lounge." It also embeds an unstated planning assumption: that lounge square footage trades 1:1 against gate frontage at concourse level. The draft's own comparator — Delta One JFK T4 — sits *above* the concourse; a mezzanine lounge displaces roughly zero gates. If a Flagship shell can be preserved on a mezzanine, the $204–600M foregone-gate argument largely evaporates, and with it the draft's monetization of the shell option.
+- **Remedy:** Recalculate to match `calculations.json` exactly; state the displacement assumption and the mezzanine alternative explicitly; present the range as an upper bound conditional on at-grade siting.
+
+### EP-3 — The CPE paragraph cherry-picks the figure and misstates the peer position
+
+- **Location:** Executive summary claim 3/7: "Cost per enplanement was $13.86 in FY25, roughly 24% below the FY20 pandemic peak, and unusually low against large-hub peers.[^14]"
+- **Charge:** Cherry-picking; source-quality failure (secondary preferred over primary).
+- **Evidence:** The ledger holds three FY25 CPE figures: $13.86 (`infrastructure-economist::ev-6a303334efb7`, DWU aggregator), $13.59 (`airline-commercial-strategist::ev-9783f6e95c10`, same aggregator, different page), and **$13.56 from DFW's own FY2025 proposed budget** (`airline-commercial-strategist::ev-fcb92bc5fb30`, the only `is_primary: true` record of the three). The draft silently picks the secondary figure. Worse: "unusually low against large-hub peers" is contradicted by the peer table the run itself assembled (`ev-37a6763aa555`): DFW $13.44 (2024) sits at the **median** — six large hubs are lower (ATL $3.94, CLT $4.74, DTW $9.20, IAH $10.66, MSP $11.06, DEN $12.76), seven higher.
+- **Why it matters:** The financial-headroom claim underwrites the entire "buy options now" recommendation. "Unusually low" is only true against coastal gateway comps; against ATL and CLT — the two hubs most like DFW in function — DFW's CPE is roughly 3× higher. The audience will know this table.
+- **Remedy:** Recalculate and qualify: cite the primary $13.56, and rewrite the peer claim as "well below the coastal gateways, mid-pack among all large hubs, and a multiple of ATL/CLT." The 24%-below-FY20 arithmetic ($18.29 → $13.86) is correct and survives.
+
+### EP-4 — The KBRA "before the scope was modeled" claim is an unsupported transfer of someone else's caveat
+
+- **Location:** Claim 7: "KBRA affirmed AA/Stable in August 2025 on the 2025A/B series before that scope was fully modeled.[^15]"
+- **Charge:** Unsupported; citation mismatch.
+- **Evidence:** The KBRA record (`infrastructure-economist::ev-032b2c3b3fb1`) is dated **August 26, 2025 — three months after** the May 2025 $4B scope announcement, and says nothing about what KBRA did or did not model. The "predates the scope acceleration" caveat in the ledger belongs to a different record: the Bond Buyer **August 2024** debt-trajectory projection (`ev-85be22c1fe28`, $7.2B → $12.4B). The draft moved the caveat from the 2024 record to the 2025 rating action.
+- **Why it matters:** The insinuation that the AA rating rests on a stale model is the kind of claim a rating analyst will check in thirty seconds. Rating agencies model announced capex; asserting otherwise without a document is a credibility donation.
+- **Remedy:** Qualify or cut. Correct version: "the published $12.4B FY29 debt projection predates the May 2025 scope acceleration; a post-acceleration re-model has not been published." That is supported and makes the same point.
+
+### EP-5 — The rating-differential payoff contradicts the draft's own option pricing
+
+- **Location:** Implications, "Publish the register externally": "a 15–30 basis-point rating differential is $60M–$120M of lifetime interest — larger than the aggregate cost of the register's Category-A options.[^54]"
+- **Charge:** Overstated; internal contradiction; causal leap.
+- **Evidence:** Fn 54 concedes the basis-point figure is CEO-brief professional judgment. The causal chain — publishing a governance register → 15–30bp of rating differential — is asserted, not evidenced. And the comparison fails on the draft's own numbers: claim 7 prices the Category-A options at "low-single-digit percent of the base program," i.e., **$40M–$160M on $4B**. $60M–$120M is not "larger than" a range that tops out at $160M.
+- **Why it matters:** It is the report's closing monetization of its own recommendation, and it is arithmetically inconsistent with the report.
+- **Remedy:** Recalculate or cut the comparative clause. Present the rating argument as directional ("registers are the kind of governance discipline agencies cite"), not as a computed return.
+
+### EP-6 — The LGA precedent is mis-cited and its funding split is suppressed
+
+- **Location:** "Why the counter-case is insufficient": "LGA Terminal C... delivered its $4B four-concourse program roughly two years ahead of schedule under Delta's integrated project delivery contract.[^48]"
+- **Charge:** Citation mismatch; missing counterevidence.
+- **Evidence:** The $4B/two-years-early claim traces to `infrastructure-economist::ev-3ad44367f57d` — **Delta's own newsroom**. The ENR citation in fn 48 is a different project (the $2.8B airfield reconfiguration). "Integrated project delivery contract" appears in no ledger record. And the ledger caveat the draft drops: the split was **~$3.5B Delta / ~$500M Port Authority**.
+- **Why it matters:** The draft uses LGA to argue single-airline governance can deliver — but LGA was overwhelmingly the *airline's* capital at risk. Terminal F is the reverse: airport debt, airline veto. The suppressed funding split converts the precedent from supporting evidence into a caution that cuts toward the Contrarian.
+- **Remedy:** Source the schedule claim independently or attribute it as Delta-reported; correct the ENR reference; state the funding split and what it does to the analogy.
+
+### EP-7 — The argument's single positive precedent rests on a forum post
+
+- **Location:** Claim 4 and history section: "Detroit McNamara... built for Northwest Airlines at roughly $1.2 billion... absorbed the transition without material retrofit.[^7]"
+- **Charge:** Source-quality failure; overstated.
+- **Evidence:** The only McNamara record in the ledger (`aviation-historian::ev-3017ac6ef795` cluster / `ev-fe1739039376`) is an **airliners.net forum thread**, carrying design intent and opening date only. No ledger record carries the $1.2B figure. "Without material retrofit" is an absence claim with no source at all. And the test itself is weak: NWA→Delta was a merger in which the successor *kept the hub* — the gentlest strategy shift the building could have faced.
+- **Why it matters:** DTW is the keystone of the "generic geometry survives" argument — the single case doing the affirmative work against four negative cases. The weakest sourcing in the file is carrying the heaviest load.
+- **Remedy:** Source the cost and post-merger capital history from Wayne County Airport Authority or trade-press primaries; qualify "without material retrofit" to what can be shown; concede explicitly that DTW is a survivable-merger case, not a dehub-survival case.
+
+### EP-8 — The "six cases, four failed" denominator is undefined and one case is never named
+
+- **Location:** Claim 4: "Of six post-1978 US cases the run's history brief identifies, four ended badly..."; history section: "One is instructive but inconclusive."
+- **Charge:** Denominator error; cherry-picking risk.
+- **Evidence:** The draft names five (PIT, STL, CVG, CLE, DTW). The sixth — JFK T5/JetBlue or ATL Concourse F per the evidence map's case set (records 185–187) — is never identified. No selection criterion is stated for why the set is six and not ten (CLT, MEM, PHL, and MSP all hosted purpose-built or purpose-adapted single-carrier facilities in the same era).
+- **Why it matters:** "Four of six ended badly" reads as a base rate. A base rate from an undefined, curated sample of six is a rhetorical device wearing a statistic's clothes. The draft's own survivorship-bias concession (which is good) does not cure the undefined denominator.
+- **Remedy:** Name all six, state the inclusion criterion, or drop the fraction and present the cases as cases.
+
+### EP-9 — The modular change-cost mechanism is professional judgment printed as measurement
+
+- **Location:** Claim 5: "on a modular fabrication line it can consume 15–25% [of the change budget] because it triggers resequencing across pods.[^10]"
+- **Charge:** Source-quality failure; overstated precision.
+- **Evidence:** Fn 10 itself: "Chief Engineer professional judgment... not a single-source citable number." The curator's do-not-claim list is explicit: retrofit and change-cost multipliers "are professional judgment or analyst construction... Present as directional."
+- **Why it matters:** The claim underpins the report's most original reframing (the reversibility clock closes at release-for-fabrication). The reframing survives without the fake precision; with it, the fact-checker will flag the body text even though the footnote confesses.
+- **Remedy:** Qualify in the body ("the program's engineering judgment is that..."), keep the mechanism, drop the unqualified percentage or bracket it as judgment where it appears.
+
+### EP-10 — One quarter of schedule filings becomes a "Heathrow-to-DFW shift" telegraphing 2043
+
+- **Location:** "The 6:15 morning" and register bullet 3: "American's now-public shift of international capacity into DFW and out of Heathrow (DFW +6% year over year in Q3 2026 while LHR is -13%...)"; "the 2043 peak the Heathrow-to-DFW shift is telegraphing."
+- **Charge:** Causal leap; overstated.
+- **Evidence:** `airline-commercial-strategist::ev-6f157cc0ecd1` (medium confidence, trade press): American is "**targeting**" a 6% Q3 2026 DFW expansion alongside a 13% LHR reduction — scheduled capacity, one quarter, unflown at the time of sourcing. No record in the ledger contains any 2043 international demand forecast; the gap list confirms the designed FIS booth count is unknown.
+- **Why it matters:** "FIS sized to the 2043 international peak" is one of the four register options — and the record contains no 2043 peak to size against. The recommendation as written is unactionable: it names a target that does not exist in the evidence base.
+- **Remedy:** Qualify the LHR/DFW datum as a scheduled single-quarter signal. Convert the register item into what it actually is: "commission the 2043 international peak-hour forecast before FIS release-for-fabrication, and size to it." That is a stronger, honest version.
+
+### EP-11 — Two invented numbers do rhetorical load-bearing work
+
+- **Location:** Tenant section and Close: "without a $200M mid-lease retrofit" (twice); 6:15 vignette: "stage 2,000 stranded passengers."
+- **Charge:** Invented construction.
+- **Evidence:** Neither number appears in the ledger, the calculations file, or any footnote. $200M is the report's headline retrofit-avoidance figure; it has no derivation. The 2,000-passenger staging figure is presented as a design requirement inside a section that claims to be "built from ledger facts."
+- **Why it matters:** The retrofit-cost asymmetry is the sales pitch. If its price tag is unsourced, the whole asymmetry argument inherits the weakness. The fact-checker will veto both.
+- **Remedy:** Derive $200M transparently (e.g., from the lounge-displacement calc plus fit-out benchmarks) or mark it "order of magnitude, analyst construction." Size the 2,000 figure from bank size (~52 departures × ~107 pax/departure per `peak_departure_load_factor`) or mark it illustrative.
+
+### EP-12 — The Dulles comparison survives on the numbers but fails on comparability
+
+- **Location:** "Why the counter-case is insufficient": "Concourse D at Dulles was cheap at pour and expensive to reverse for six decades; the AeroTrain extension to correct that omission is now budgeted at ~$3.75B inside a $22.5B renovation program.[^16]"
+- **Charge:** Denominator/comparability error; source-quality (curable).
+- **Evidence:** I verified externally: MWAA's announced program is "more than $20B," with $22.5B the total **including financing and inflation**; AeroTrain extension + tunnel ~$3.75B; new Concourse D $3.7B (MWAA release via PRNewswire; View From The Wing on the underlying documents). So `ev-35edfa6b3fa1` (Tech Times, medium) is right — but the draft sets an inflation-and-financing-inclusive $22.5B beside Terminal F's nominal $4B program figure, a 5.6× visual on mismatched bases. Second: "Concourse D... for six decades" conflates the 1962 mobile-lounge system with a concourse built decades later.
+- **Why it matters:** The operator's own authority is MWAA. This is the one paragraph the user's colleagues will read letter by letter.
+- **Remedy:** Replace the Tech Times citation with the MWAA release; state the $22.5B basis; recut the sentence so the six-decade clock attaches to the mobile-lounge dependency, not to Concourse D.
+
+### EP-13 — "Up to $71.1B" became "$71.1B"
+
+- **Location:** Claim 4: "a two-city O&D economy of roughly eight million people plus $71.1B in TCU-estimated regional output.[^8]"
+- **Charge:** Overstated (precision laundering).
+- **Evidence:** Context packet and fn 30 both say "**up to** $71.1B," magnitude only, via regional press citation of the TCU study. The qualifier is dropped in the body.
+- **Remedy:** Restore "up to," or write "~$70B (TCU estimate, upper bound)."
+
+### EP-14 — The steelman cites a statistic that undermines its own claim
+
+- **Location:** Counter-case: "lease rejection is legally cheap and renegotiation leverage is very high... 554 non-residential real property leases assumed, 12 rejected.[^46]"
+- **Charge:** Citation mismatch.
+- **Evidence:** `contrarian::ev-80e5b480748b`. A 554-assumed / 12-rejected record is a **2% rejection rate** — AMR kept essentially everything through Chapter 11, including hub leases. The datum demonstrates the mechanism exists; it is affirmative evidence *against* "legally cheap" as a practical description of carrier behavior.
+- **Why it matters:** The draft promises to hold the steelman, not paraphrase it. Holding it with a self-refuting citation invites the reader to discount the whole counter-case section — which then weakens the draft's claim to have beaten a strong opponent.
+- **Remedy:** Defend with the tension acknowledged ("the mechanism is available even though AMR exercised it on 2% of leases — the leverage is the threat, not the usage") or cut the statistic from the steelman.
+
+### EP-15 — The flagship scenario misstates Skylink's own published operating window
+
+- **Location:** Thesis paragraph: "a Skylink node that survives a 6:15 AM single-loop failure"; register bullet 4.
+- **Charge:** Overstated/imprecise.
+- **Evidence:** `airport-coo::ev-9b8b1fc6f240` (primary, DFW FAQ): single-loop operation runs ~22:00–**06:00**. At 6:15 the second loop has resumed. The vignette's 05:55 timestamp is fine; the thesis-level phrase "6:15 AM single-loop failure" describes a condition that, per DFW's own document, does not exist at 6:15 unless something has *failed* — which is a different (and stronger) design argument.
+- **Remedy:** Recut to "a morning when the second loop fails to return at 06:00" or "an unscheduled single-loop morning." Same recommendation, accurate trigger.
+
+### EP-16 — Minor precision batch (fix in one pass)
+
+- **Charge:** Qualify.
+- (a) "Twelve nights" (Opening) — the record says "a two-week overnight window" (`airport-coo::ev-f750431bb93f`); twelve is unsourced precision.
+- (b) "the largest ever moved for a terminal expansion anywhere" (Opening) — the JV's own framing; `chief-engineer::ev-a8acbcf926a7` caveat: "a claim by the parties." Attribute it ("the contractor describes as...").
+- (c) "presiding over $11.3B of concurrent capital across Terminals F, C, and A" — the $11.3B is the whole CIP through FY30, of which the three terminal programs are components (`ev-83ce3618d87b`, `ev-f54de260a350`); as written it implies the three terminals compose the total.
+- (d) Close: "sixteen years, from opening in 2027 to lease expiry in 2043" — Phase 1 opens 2027, full opening is 2030 (`asset_life_vs_lease_runway` uses 2030; U&L runway 13 years). The draft picks the longer runway without noting the phase-in.
+- (e) Delta full-year figures: draft says $22.1B/$23.4B; the ledger quote in `ev-ed425c651135` says $22B/$23.3B while the claim line says $22.1B/$23.4B. Reconcile to Delta IR before publication.
+
+---
+
+## Claim-to-evidence coverage summary
+
+Of the draft's footnoted factual claims, roughly 85–90% trace cleanly to ledger records, and the draft is unusually disciplined about carrying caveats into the text (connecting-share denominators, modular 30% as DFW-supplied, AA's 50% missed-connection figure as self-reported, MII thresholds as confidential, vendor ROI as directional). The failures cluster in four places: (1) numbers the Strategist generated or adjusted outside the quantitative analyst's reproducible file (EP-2, EP-5, EP-11); (2) caveats transferred to the wrong record or silently dropped (EP-4, EP-6, EP-13); (3) precedent cases sourced below the standard the rest of the file meets (EP-7, EP-12); (4) one structural circularity (EP-1). Nothing in the ledger contradicts the draft's central recommendation; several things contradict the draft's *pricing* of it.
+
+## The five most load-bearing claims — do they survive?
+
+1. **American's premium geography puts Provisions at F, the 37,000-sf club at C, Flagship Check-In at D.** Survives. Twelve records across eight agents, multiple primary. The best-supported claim in the run.
+2. **Scope moved $1.6B/15 gates → $4B/31 gates in May 2025; U&L to 2043.** Survives. Primary-sourced, arithmetic checks (2.5×, 2.07×).
+3. **The operative deadline is release-for-fabrication per module, some already passed.** Survives as flagged professional judgment — fn 2 honestly concedes per-module dates are unknown. Keep the concession visible.
+4. **Generic hub geometry is what survives carrier strategy shifts (DTW lesson).** Survives directionally, but on the weakest sourcing in the file (EP-7) with an undefined denominator (EP-8). Needs repair before it can carry the "why the counter-case is insufficient" section.
+5. **The shell is cheap; the lounge foregoes $207M–$600M in gate value.** Does not survive as stated (EP-2). The asymmetry argument is likely still right; the arithmetic must be rebuilt to match the calc file and the at-grade displacement assumption must be disclosed.
+
+## Counterevidence minimized or omitted
+
+- **ATL and CLT.** The two most functionally comparable hubs run CPE at $3.94 and $4.74 against DFW's ~$13.5. The draft's headroom story never confronts the fact that its closest structural peers are 3× cheaper for the airline (EP-3).
+- **LGA's funding split.** $3.5B of the $4B was Delta's money. Presented as a governance success for the airport-funded Terminal F model, it is closer to counterevidence (EP-6).
+- **DTW as an easy test.** The merger-survivor caveat is absent where the case does its work (EP-7).
+- Credit where due: the COO's flatter-profile dissent, the Delta ATL lounge delay, the AA balance-sheet constraint, and the rebank's unproven benefits are all carried honestly.
+
+## Narrative flourish outrunning the record
+
+"The largest ever moved for a terminal expansion anywhere" (contractor's claim, stated as fact); "$200M mid-lease retrofit" (unsourced, twice); "2,000 stranded passengers" (invented inside a section labeled ledger-built); "CBP staffing overtime for thirty years" (rhetorical; fine if kept clearly rhetorical); "a 6:15 AM single-loop failure" (contradicts the cited FAQ's window). The prose discipline is otherwise good — the draft mostly earns its style.
+
+## Acquittals — well-supported claims that should stand as written
+
+- The Provisions/Admirals Club/Flagship Check-In geography and its use as the tenant's revealed preference (best-corroborated cluster in the ledger).
+- The May 2025 scope acceleration and 2043 U&L extension, with correct multiples.
+- Delta's Q4 2025 premium/main-cabin crossover and AA's 25%→40% narrowbody-premium and +50% lie-flat targets (primary and near-primary).
+- The 9→13 bank restructure, the ~110→~52 peak-departure shift, and — notably — the draft's refusal to credit the rebank's benefits beyond the evidence (Q2 2026 departure rate, block-time padding). Exemplary handling.
+- The dual-denominator treatment of connecting share (60% airport-level vs ~66% run-prompt) and the 30k–45k O&D sensitivity, which reproduces `connecting_vs_od_split_sensitivity` exactly.
+- Skylink overnight single-loop facts (primary DFW FAQ); the January 2023 storm figures; CBP ATDS ~100 pax/hr and 50–75 ft queue benchmarks (PARAS 0052); FAA AC 150/5300-13B usage.
+- The Pittsburgh case end to end (opening cost, 2004 dehub, CPE ~doubling by 2011, debt retired 2019, $1.75B landside replacement) — the best-sourced historical case in the file.
+- Board composition, McLaughlin appointment and tenure, 70th Supplemental $3.0B authorization, PFC-at-$4.50 framing.
+- The 2020–21 Flagship Lounge closures and the AMR §365 facts themselves (as facts; see EP-14 for their use).
+
+## Disposition
+
+No finding requires retreat from the core architecture: generic geometry, priced options, carrier-funded conversion, register as governance instrument. Findings EP-1 through EP-7 must be answered before this draft reaches the airport-executive reviewer; EP-8 through EP-16 are a half-day of repairs. The draft's biggest exposure is not a wrong thesis — it is that its three monetizations (gate displacement, retrofit avoidance, rating differential) are respectively mis-derived, unsourced, and self-contradictory. Fix the money and the argument holds.

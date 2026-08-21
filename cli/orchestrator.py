@@ -36,16 +36,19 @@ from cli.evidence import (
     normalise_evidence_ledger,
     write_jsonl,
 )
-from cli.events import emit
+from cli.events import emit, get_sink, request_checkpoint
 from cli.interactive import RunSpec
 from cli.quality_gate import PublicationQualityError, run_publication_quality_gate
 from cli.run_manifest import (
+    CheckpointInputsChanged,
     assert_manifest_complete,
     build_dependency_fingerprint,
     build_execution_contract_fingerprint,
+    checkpoint_approval_matches,
     create_run_manifest,
     dependency_fingerprint_matches,
     manifest_prompt_block,
+    record_checkpoint_decision,
     update_artifact,
     update_stage,
 )
@@ -76,6 +79,49 @@ class RunBudgetExceeded(RuntimeError):
     """Raised between steps when the run's cost ceiling has been reached."""
 
 
+def report_runtime_preflight(
+    repo_root: Path,
+    outputs_dir: Path,
+    *,
+    selected_research_agents: tuple[str, ...] = (),
+) -> dict[str, str]:
+    """Fail before paid research if final-package tooling cannot succeed."""
+
+    tools = {
+        "office": shutil.which("soffice") or shutil.which("libreoffice"),
+        "pdf_renderer": shutil.which("pdftoppm"),
+    }
+    issues: list[str] = []
+    if tools["office"] is None:
+        issues.append("LibreOffice (`soffice`) is not installed")
+    if tools["pdf_renderer"] is None:
+        issues.append("Poppler (`pdftoppm`) is not installed")
+    if not outputs_dir.is_dir() or not os.access(outputs_dir, os.W_OK):
+        issues.append(f"the output directory is not writable: {outputs_dir}")
+    if (
+        "deep-research" in selected_research_agents
+        and not os.environ.get("OPENAI_API_KEY")
+    ):
+        issues.append(
+            "Deep Research is seated but `OPENAI_API_KEY` is not set"
+        )
+    try:
+        free_bytes = shutil.disk_usage(repo_root).free
+    except OSError as exc:
+        issues.append(f"free disk space could not be checked: {exc}")
+    else:
+        if free_bytes < 512 * 1024 * 1024:
+            issues.append("less than 512 MB of free disk space remains")
+    if issues:
+        raise RuntimeError(
+            "Run preflight failed before any model call: "
+            + "; ".join(issues)
+            + ". Fix the local dependency, then retry (choose Resume only if "
+            "the app shows saved work)."
+        )
+    return {name: str(path) for name, path in tools.items() if path is not None}
+
+
 @dataclass
 class CostTally:
     by_step: dict[str, float] = field(default_factory=dict)
@@ -86,7 +132,16 @@ class CostTally:
     _planned_call_units: int = field(default=0, init=False, repr=False)
 
     def add(self, step: str, cost: float) -> None:
-        self.by_step[step] = self.by_step.get(step, 0.0) + cost
+        charged = max(0.0, float(cost))
+        self.by_step[step] = self.by_step.get(step, 0.0) + charged
+        # A reservation is the most this invocation may still spend. Once an
+        # attempt reports a cost, convert that portion from reserved dollars to
+        # actual dollars. Retries can use only the unspent balance instead of
+        # receiving the original per-call allowance again.
+        if step in self._reservations:
+            self._reservations[step] = max(
+                0.0, self._reservations[step] - charged
+            )
 
     @property
     def total(self) -> float:
@@ -147,6 +202,11 @@ class CostTally:
 
     def release(self, step: str) -> None:
         self._reservations.pop(step, None)
+
+    def reservation(self, step: str) -> float | None:
+        """Return the unspent reservation for one in-flight invocation."""
+
+        return self._reservations.get(step)
 
     def plan_calls(self, count: int) -> None:
         self._planned_call_units = max(0, int(count))
@@ -527,6 +587,37 @@ def _required_outputs_match_manifest(
     return True
 
 
+def _checkpoint_outputs_match_manifest(
+    manifest_path: Path,
+    declared_inputs: tuple[str, ...],
+) -> bool:
+    """Confirm checkpoint files and their upstream receipts remain current."""
+
+    outputs_dir = manifest_path.parent
+    outputs = tuple(
+        (outputs_dir / relative, contract_for_path(outputs_dir / relative))
+        for relative in declared_inputs
+    )
+    if not _required_outputs_match_manifest(outputs, manifest_path):
+        return False
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    by_path = {
+        str(item.get("path")): item
+        for item in manifest.get("artifacts", [])
+        if isinstance(item, dict)
+    }
+    for relative in declared_inputs:
+        dependencies = by_path.get(relative, {}).get("dependencies")
+        if dependencies is not None and not dependency_fingerprint_matches(
+            manifest_path, dependencies
+        ):
+            return False
+    return True
+
+
 def _sequester_unsourced_evidence(
     path: Path, contract: ArtifactContract
 ) -> list[tuple[int, str]]:
@@ -609,6 +700,54 @@ def _quarantine_partial_output(path: Path | None) -> None:
     stamp = datetime.now().strftime("%Y%m%dT%H%M%S%f")
     partial = path.with_name(f"{path.name}.partial-{stamp}")
     os.replace(path, partial)
+
+
+_TRANSIENT_MODEL_ERROR_TOKENS: tuple[str, ...] = (
+    "timed out",
+    "timeout",
+    "connection reset",
+    "connection closed",
+    "connection refused",
+    "temporarily unavailable",
+    "rate limit",
+    "overloaded",
+    "internal server error",
+    "service unavailable",
+    "socket hang up",
+    "broken pipe",
+    "http 429",
+    "status 429",
+    "http 500",
+    "http 502",
+    "http 503",
+    "http 504",
+    "status 500",
+    "status 502",
+    "status 503",
+    "status 504",
+)
+_MAX_MODEL_ATTEMPTS = 4
+
+
+def _retry_delay_seconds(attempt: int) -> int:
+    """Short exponential backoff before the next bounded provider attempt."""
+
+    return min(5 * (2 ** max(0, attempt - 1)), 30)
+
+
+def _is_transient_model_failure(
+    *,
+    api_status: object = None,
+    messages: tuple[object, ...] = (),
+) -> bool:
+    """Classify transport/rate-limit failures that are safe to retry."""
+
+    if isinstance(api_status, int) and (
+        api_status in {408, 425, 429} or 500 <= api_status <= 599
+    ):
+        return True
+    detail = " ".join(str(message) for message in messages).casefold()
+    return any(token in detail for token in _TRANSIENT_MODEL_ERROR_TOKENS)
 
 
 async def _run_agent(
@@ -799,39 +938,51 @@ async def _run_agent(
         query,
     )
 
-    options = ClaudeAgentOptions(
-        system_prompt=agent.system_prompt,
-        allowed_tools=list(agent.tools) if agent.tools else None,
-        permission_mode="bypassPermissions",
-        model=model,
-        cwd=str(cwd),
-        max_turns=max_turns,
-        max_budget_usd=call_budget,
-        # Defense in depth: the SDK reads stdout as newline-delimited JSON with
-        # a 1 MB default line limit. A single large tool-result (e.g. an agent
-        # reading a big file) crashes the reader. Source PDFs are extracted to
-        # text before agents see them, but raise the ceiling generously so an
-        # incidental large read can't take down a run.
-        max_buffer_size=64 * 1024 * 1024,
-    )
-
-    # Retry the spurious-success SDK race. When many subprocesses spawn in
+    # Retry spurious SDK races and normal transient provider failures. When
+    # many subprocesses spawn in
     # parallel, some sessions fail to establish and the SDK reports it as
     # "Claude Code returned an error result: success" — usually one turn,
-    # zero cost, no output. A single retry with backoff almost always wins,
-    # so don't fail the whole batch over a flaky session start.
+    # zero cost, no output. Four bounded attempts with backoff cover a short
+    # provider wobble without turning contract/auth failures into retry loops.
     SPURIOUS = "Claude Code returned an error result: success"
-    attempts_left = 2
+    attempts_left = _MAX_MODEL_ATTEMPTS
     last_exc: Exception | None = None
     completed_cost: float | None = None
     completed_turns: int | None = None
+
+    def remaining_attempt_budget() -> float | None:
+        if tally.budget_usd is None:
+            return call_budget
+        remaining = tally.reservation(step_label)
+        if remaining is None or remaining <= 0:
+            raise RunBudgetExceeded(
+                f"The retry allowance for '{step_label}' was consumed by "
+                "earlier attempts. Work so far is saved; Resume with a higher "
+                "run ceiling if this step still needs to run."
+            )
+        return remaining
+
     while attempts_left > 0:
         attempts_left -= 1
+        attempt = _MAX_MODEL_ATTEMPTS - attempts_left
         saw_result = False
         try:
+            options = ClaudeAgentOptions(
+                system_prompt=agent.system_prompt,
+                allowed_tools=list(agent.tools) if agent.tools else None,
+                permission_mode="bypassPermissions",
+                model=model,
+                cwd=str(cwd),
+                max_turns=max_turns,
+                max_budget_usd=remaining_attempt_budget(),
+                # The SDK reads stdout as newline-delimited JSON with a 1 MB
+                # default line limit. A large tool result must not crash it.
+                max_buffer_size=64 * 1024 * 1024,
+            )
             console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
             await emit("agent_start", step=step_label, agent=agent.name,
-                       display=agent.display_name, model=model)
+                       display=agent.display_name, model=model,
+                       attempt=attempt, max_attempts=_MAX_MODEL_ATTEMPTS)
             async for msg in query(prompt=user_prompt, options=options):
                 if isinstance(msg, AssistantMessage):
                     for block in msg.content:
@@ -867,11 +1018,21 @@ async def _run_agent(
                             )
                         )
                     ):
+                        delay = _retry_delay_seconds(attempt)
                         console.print(
                             f"  [yellow]↻ {step_label} returned 1 turn / $0 — "
-                            f"subprocess race; retrying in 5s[/yellow]"
+                            f"subprocess race; retrying in {delay}s[/yellow]"
                         )
-                        await asyncio.sleep(5)
+                        await emit(
+                            "agent_retry",
+                            step=step_label,
+                            agent=agent.name,
+                            reason="subprocess startup race",
+                            attempt=attempt + 1,
+                            max_attempts=_MAX_MODEL_ATTEMPTS,
+                            delay_seconds=delay,
+                        )
+                        await asyncio.sleep(delay)
                         last_exc = RuntimeError("spurious-success retry")
                         break
                     result_errors = list(getattr(msg, "errors", None) or [])
@@ -911,7 +1072,7 @@ async def _run_agent(
                     # subtype. Seen live when a sampled draft matched a harness
                     # stop sequence mid-write. The artifacts are the ground
                     # truth for whether work finished; when they are incomplete
-                    # this is worth one retry, not a dead run.
+                    # this is worth a bounded retry, not a dead run.
                     benign_session_flag = (
                         failed_result
                         and not result_errors
@@ -926,7 +1087,6 @@ async def _run_agent(
                         tally.add(step_label, cost)
                         if cost_journal is not None:
                             cost_journal(tally)
-                        tally.release(step_label)
                         if benign_session_flag:
                             if completion_outputs and _required_outputs_complete(
                                 completion_outputs
@@ -950,6 +1110,8 @@ async def _run_agent(
                                 )
                                 continue
                             if attempts_left > 0:
+                                remaining_attempt_budget()
+                                delay = _retry_delay_seconds(attempt)
                                 for candidate_path, _c in completion_outputs:
                                     _quarantine_partial_output(candidate_path)
                                 if output_path is not None:
@@ -957,11 +1119,46 @@ async def _run_agent(
                                 console.print(
                                     f"  [yellow]↻ {step_label} stopped early "
                                     f"(stop reason: {stop_reason or 'none'}, "
-                                    "no error detail) — retrying in 5s[/yellow]"
+                                    f"no error detail) — retrying in {delay}s[/yellow]"
                                 )
-                                await asyncio.sleep(5)
+                                await emit(
+                                    "agent_retry",
+                                    step=step_label,
+                                    agent=agent.name,
+                                    reason="session stopped without error detail",
+                                    attempt=attempt + 1,
+                                    max_attempts=_MAX_MODEL_ATTEMPTS,
+                                    delay_seconds=delay,
+                                )
+                                await asyncio.sleep(delay)
                                 last_exc = RuntimeError("spurious-success retry")
                                 break
+                        if attempts_left > 0 and _is_transient_model_failure(
+                            api_status=api_status,
+                            messages=tuple(result_errors),
+                        ):
+                            remaining_attempt_budget()
+                            delay = _retry_delay_seconds(attempt)
+                            for candidate_path, _c in completion_outputs:
+                                _quarantine_partial_output(candidate_path)
+                            _quarantine_partial_output(output_path)
+                            console.print(
+                                f"  [yellow]↻ {step_label} hit a transient "
+                                "provider or network error — retrying in "
+                                f"{delay}s[/yellow]"
+                            )
+                            await emit(
+                                "agent_retry",
+                                step=step_label,
+                                agent=agent.name,
+                                reason="transient provider or network error",
+                                attempt=attempt + 1,
+                                max_attempts=_MAX_MODEL_ATTEMPTS,
+                                delay_seconds=delay,
+                            )
+                            await asyncio.sleep(delay)
+                            last_exc = RuntimeError("transient model retry")
+                            break
                         turn_limit_exhausted = (
                             subtype.casefold() == "error_max_turns"
                             or any(
@@ -1052,28 +1249,62 @@ async def _run_agent(
             # If the ResultMessage was already accepted because every required
             # artifact is complete, the duplicate close-time exception must not
             # turn that successful recovery back into a failed run.
-            recovered_turn_limit_cleanup = bool(
+            completed_result_cleanup = bool(
                 completed_cost is not None
-                and "maximum number of turns" in str(e).casefold()
-                and completion_outputs
-                and _required_outputs_complete(completion_outputs)
+                and (
+                    not completion_outputs
+                    or _required_outputs_complete(completion_outputs)
+                )
             )
-            if recovered_turn_limit_cleanup:
+            if completed_result_cleanup:
                 await emit(
-                    "agent_turn_limit_cleanup_recovered",
+                    "agent_stream_cleanup_recovered",
                     step=step_label,
                     agent=agent.name,
+                    error_type=type(e).__name__,
                     cost=completed_cost,
                     turns=completed_turns,
                     total=tally.total,
                 )
                 break
             if SPURIOUS in str(e) and not saw_result and attempts_left > 0:
+                delay = _retry_delay_seconds(attempt)
                 console.print(
                     f"  [yellow]↻ {step_label} hit subprocess startup race "
-                    f"({type(e).__name__}); retrying in 5s[/yellow]"
+                    f"({type(e).__name__}); retrying in {delay}s[/yellow]"
                 )
-                await asyncio.sleep(5)
+                await emit(
+                    "agent_retry",
+                    step=step_label,
+                    agent=agent.name,
+                    reason="subprocess startup race",
+                    attempt=attempt + 1,
+                    max_attempts=_MAX_MODEL_ATTEMPTS,
+                    delay_seconds=delay,
+                )
+                await asyncio.sleep(delay)
+                continue
+            if attempts_left > 0 and _is_transient_model_failure(
+                messages=(e,)
+            ):
+                delay = _retry_delay_seconds(attempt)
+                for candidate_path, _c in completion_outputs:
+                    _quarantine_partial_output(candidate_path)
+                _quarantine_partial_output(output_path)
+                console.print(
+                    f"  [yellow]↻ {step_label} hit a transient "
+                    f"{type(e).__name__} — retrying in {delay}s[/yellow]"
+                )
+                await emit(
+                    "agent_retry",
+                    step=step_label,
+                    agent=agent.name,
+                    reason=str(e),
+                    attempt=attempt + 1,
+                    max_attempts=_MAX_MODEL_ATTEMPTS,
+                    delay_seconds=delay,
+                )
+                await asyncio.sleep(delay)
                 continue
             await emit(
                 "agent_error",
@@ -1502,7 +1733,9 @@ def _stage3_prompts(
             "`evidence_ids`, `retained` (boolean), "
             "`verification_status` (verified, qualified, corrected, removed, or "
             "unverified), `primary_source_checked`, and "
-            "`correction` when applicable. No markdown fence."
+            "`correction` when applicable. Every `evidence_ids` value must be an "
+            "exact `evidence_id` copied from `outputs/evidence-ledger.jsonl`; never "
+            "invent, transform, or synthesize an ID. No markdown fence."
         ),
     }
     if manifest_path is not None and repo_root is not None:
@@ -1565,6 +1798,31 @@ async def prepare_outputs(outputs_dir: Path, auto_approve: bool, resume: bool = 
             console.print(
                 f"[yellow]Clearing {len(existing)} stale file(s) from outputs/ before this run.[/yellow]"
             )
+        elif get_sink() is not None:
+            preview = "\n".join(
+                f"- `{path.relative_to(outputs_dir)}`" for path in existing[:12]
+            )
+            if len(existing) > 12:
+                preview += f"\n- …and {len(existing) - 12} more file(s)"
+            decision = await request_checkpoint(
+                "output_cleanup",
+                {
+                    "title": "Existing run work is in outputs/",
+                    "subtitle": (
+                        "Starting a different report will clear this working "
+                        "set. Completed Library reports are not affected."
+                    ),
+                    "documents": [
+                        {
+                            "name": "Files to clear",
+                            "content": preview,
+                        }
+                    ],
+                    "actions": ["clear", "abort"],
+                },
+            ) or {"action": "abort"}
+            if decision.get("action") != "clear":
+                raise RuntimeError("Aborted: existing outputs were not cleared.")
         else:
             console.print(
                 f"[yellow]Found {len(existing)} file(s) in outputs/ from a previous run.[/yellow]"
@@ -1816,7 +2074,32 @@ async def run_stage1(
                 ),
             )
         ))
-    await asyncio.gather(*tasks)
+    task_results = await asyncio.gather(*tasks, return_exceptions=True)
+    task_failures = [
+        (name, result)
+        for name, result in zip(spec.selected_research_agents, task_results)
+        if isinstance(result, BaseException)
+    ]
+    if task_failures:
+        update_stage(
+            manifest_path,
+            "research",
+            "failed",
+            failed_agents=[name for name, _ in task_failures],
+            completed_agents=sum(
+                not isinstance(result, BaseException)
+                for result in task_results
+            ),
+        )
+        detail = "; ".join(
+            f"{name}: {type(error).__name__}: {error}"
+            for name, error in task_failures
+        )
+        raise RuntimeError(
+            "Stage 1 finished the remaining parallel work but could not "
+            f"complete {len(task_failures)} agent(s). Resume will reuse every "
+            f"successful brief. {detail}"
+        )
     missing = [
         name
         for name in spec.selected_research_agents
@@ -4768,7 +5051,8 @@ async def run_quality_gate_with_remediation(
                 "`outputs/stage3/remediation-inputs/fact-check-report-before-gate.md`, "
                 "`outputs/stage3/remediation-inputs/claim-lineage-before-gate.jsonl`, "
                 "and `outputs/evidence-ledger.jsonl`.\n\n"
-                "This is the single bounded remediation pass after the deterministic "
+                f"This is bounded remediation pass {_pass} of "
+                f"{MAX_REMEDIATION_PASSES} after the deterministic "
                 "publication gate. Fix every listed blocker without adding new facts or "
                 "weakening a well-supported conclusion. Convert internal source tags to "
                 "reader-facing primary-source footnotes; repair footnote structure; "
@@ -4787,7 +5071,10 @@ async def run_quality_gate_with_remediation(
                 "the canonical fields: exact "
                 "`claim`, exact `citation`, `footnote_id`, `evidence_ids`, boolean "
                 "`retained`, boolean `primary_source_checked`, and statuses verified, "
-                "qualified, corrected, removed, or unverified. Write the complete "
+                "qualified, corrected, removed, or unverified. Every `evidence_ids` "
+                "value must be copied exactly from an `evidence_id` already present "
+                "in `outputs/evidence-ledger.jsonl`; never invent or synthesize one. "
+                "Write the complete "
                 "updated fact-check report, including a "
                 "`## Publication-gate remediation` section to "
                 "`outputs/stage3/fact-check-report-remediated.md` describing every "
@@ -4955,14 +5242,33 @@ async def run_pipeline(
     resume: bool = False,
     budget_usd: float | None = None,
 ) -> RunResult:
-    from cli.checkpoints import checkpoint_after_stage2, checkpoint_after_stage3
+    from cli.checkpoints import (
+        CheckpointResult,
+        STAGE2_CHECKPOINT_INPUTS,
+        STAGE3_CHECKPOINT_INPUTS,
+        checkpoint_after_stage2,
+        checkpoint_after_stage3,
+    )
     from cli.docx_builder import build_documents
     from cli.archive import archive_run, reserve_archive_path
 
     outputs_dir = repo_root / "outputs"
+    outputs_dir.mkdir(parents=True, exist_ok=True)
     if resume:
         assert_resume_identity(outputs_dir, spec.slug)
+    # Final-package dependencies must be healthy before a new manifest or
+    # active-run marker makes an otherwise empty run look resumable. A failed
+    # preflight is therefore a clean retry, not an interrupted Council run.
+    runtime_tools = report_runtime_preflight(
+        repo_root,
+        outputs_dir,
+        selected_research_agents=tuple(spec.selected_research_agents),
+    )
+    await emit("preflight", passed=True, tools=runtime_tools)
     await prepare_outputs(outputs_dir, auto_approve=auto_approve, resume=resume)
+    sink = get_sink()
+    if sink is not None and sink.journal_path is None:
+        sink.bind_journal(outputs_dir / "run-events.jsonl")
     all_agents = load_all_agents()
     tally = CostTally(budget_usd=budget_usd)
     by_agent_name = {agent.name: agent for agent in all_agents}
@@ -5079,11 +5385,88 @@ async def run_pipeline(
         spec, run_file, outputs_dir, all_agents, tally, manifest_path
     )
 
+    stage2_checkpoint_inputs = STAGE2_CHECKPOINT_INPUTS
     while True:
-        result = await checkpoint_after_stage2(outputs_dir, auto_approve=auto_approve)
-        _persist_checkpoint_ratings(
-            outputs_dir, result, review_id="checkpoint-stage2"
-        )
+        if not _checkpoint_outputs_match_manifest(
+            manifest_path, stage2_checkpoint_inputs
+        ):
+            console.print(
+                "[yellow]Stage 2 changed before approval; rebuilding only "
+                "the stale synthesis work before reopening review.[/yellow]"
+            )
+            await emit(
+                "checkpoint_invalidated",
+                kind="stage2",
+                reason="review inputs or their upstream receipts changed",
+            )
+            await run_stage2(
+                spec, run_file, outputs_dir, all_agents, tally, manifest_path
+            )
+            continue
+        if checkpoint_approval_matches(
+            manifest_path, "stage2", stage2_checkpoint_inputs
+        ):
+            result = CheckpointResult(approved=True)
+            console.print(
+                "[cyan]↷ Stage 2 checkpoint already approved for these "
+                "exact draft bytes.[/cyan]"
+            )
+            await emit(
+                "checkpoint_skipped",
+                kind="stage2",
+                reason="stored approval matches reviewed artifacts",
+            )
+        else:
+            result = await checkpoint_after_stage2(
+                outputs_dir, auto_approve=auto_approve
+            )
+            action = (
+                "continue"
+                if result.approved
+                else "redo"
+                if result.redo_from
+                else "abort"
+            )
+            try:
+                record_checkpoint_decision(
+                    manifest_path,
+                    "stage2",
+                    approved=result.approved,
+                    action=action,
+                    declared_inputs=stage2_checkpoint_inputs,
+                    auto_approved=auto_approve,
+                    reviewed_fingerprint=result.reviewed_fingerprint,
+                )
+            except CheckpointInputsChanged as exc:
+                console.print(
+                    "[yellow]Stage 2 changed while it was open for review; "
+                    "rebuilding stale work and reopening the checkpoint.[/yellow]"
+                )
+                await emit(
+                    "checkpoint_invalidated",
+                    kind="stage2",
+                    reason=str(exc),
+                )
+                await run_stage2(
+                    spec, run_file, outputs_dir, all_agents, tally,
+                    manifest_path,
+                )
+                continue
+            _persist_checkpoint_ratings(
+                outputs_dir, result, review_id="checkpoint-stage2"
+            )
+        if not _checkpoint_outputs_match_manifest(
+            manifest_path, stage2_checkpoint_inputs
+        ):
+            await emit(
+                "checkpoint_invalidated",
+                kind="stage2",
+                reason="review inputs changed immediately after the decision",
+            )
+            await run_stage2(
+                spec, run_file, outputs_dir, all_agents, tally, manifest_path
+            )
+            continue
         if result.approved:
             break
         if result.redo_from == "strategist-v3":
@@ -5118,10 +5501,93 @@ async def run_pipeline(
         ],
     )
 
-    result = await checkpoint_after_stage3(outputs_dir, auto_approve=auto_approve)
-    _persist_checkpoint_ratings(
-        outputs_dir, result, review_id="checkpoint-stage3"
-    )
+    stage3_checkpoint_inputs = STAGE3_CHECKPOINT_INPUTS
+    while True:
+        if not _checkpoint_outputs_match_manifest(
+            manifest_path, stage3_checkpoint_inputs
+        ):
+            console.print(
+                "[yellow]Verified Stage 3 inputs changed before approval; "
+                "rerunning fact-check and the publication gate.[/yellow]"
+            )
+            await emit(
+                "checkpoint_invalidated",
+                kind="stage3",
+                reason="verified inputs or their upstream receipts changed",
+            )
+            await run_stage3(
+                run_file, outputs_dir, all_agents, tally, manifest_path
+            )
+            await run_quality_gate_with_remediation(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs_dir,
+                all_agents=all_agents,
+                tally=tally,
+                manifest_path=manifest_path,
+                agent_names=[
+                    *spec.selected_research_agents,
+                    *process_agent_names,
+                ],
+            )
+            continue
+        if checkpoint_approval_matches(
+            manifest_path, "stage3", stage3_checkpoint_inputs
+        ):
+            result = CheckpointResult(approved=True)
+            console.print(
+                "[cyan]↷ Stage 3 checkpoint already approved for these exact "
+                "verified draft bytes.[/cyan]"
+            )
+            await emit(
+                "checkpoint_skipped",
+                kind="stage3",
+                reason="stored approval matches reviewed artifacts",
+            )
+        else:
+            result = await checkpoint_after_stage3(
+                outputs_dir, auto_approve=auto_approve
+            )
+            try:
+                record_checkpoint_decision(
+                    manifest_path,
+                    "stage3",
+                    approved=result.approved,
+                    action="approve" if result.approved else "abort",
+                    declared_inputs=stage3_checkpoint_inputs,
+                    auto_approved=auto_approve,
+                    reviewed_fingerprint=result.reviewed_fingerprint,
+                )
+            except CheckpointInputsChanged as exc:
+                await emit(
+                    "checkpoint_invalidated",
+                    kind="stage3",
+                    reason=str(exc),
+                )
+                await run_stage3(
+                    run_file, outputs_dir, all_agents, tally, manifest_path
+                )
+                await run_quality_gate_with_remediation(
+                    spec=spec,
+                    run_file=run_file,
+                    outputs_dir=outputs_dir,
+                    all_agents=all_agents,
+                    tally=tally,
+                    manifest_path=manifest_path,
+                    agent_names=[
+                        *spec.selected_research_agents,
+                        *process_agent_names,
+                    ],
+                )
+                continue
+            _persist_checkpoint_ratings(
+                outputs_dir, result, review_id="checkpoint-stage3"
+            )
+        if not _checkpoint_outputs_match_manifest(
+            manifest_path, stage3_checkpoint_inputs
+        ):
+            continue
+        break
     if not result.approved:
         console.print("[yellow]Stopping at Stage 3. No Word docs generated.[/yellow]")
         return result_out

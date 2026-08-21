@@ -35,7 +35,7 @@ def _auth(client_id: str, payload: dict) -> dict:
 
 
 @pytest.fixture(autouse=True)
-def _stub_run(monkeypatch):
+def _stub_run(monkeypatch, tmp_path):
     """A fake run: emits progress, then blocks on a checkpoint like a real one."""
 
     async def fake_drive(mode, payload, sink):
@@ -52,6 +52,7 @@ def _stub_run(monkeypatch):
             await sink.close()
 
     monkeypatch.setattr(server, "_drive_run", fake_drive)
+    monkeypatch.setattr(server, "REPO_ROOT", tmp_path)
     server._active_sink = None
     server._active_owner = None
     server._active_task = None

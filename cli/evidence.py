@@ -407,6 +407,17 @@ def ensure_claim_lineage(
     """
 
     existing, errors = _read_jsonl(output_path)
+    # An agent-authored lineage file is only canonical relative to the ledger
+    # it cites.  Load that ledger before accepting the existing file so a
+    # schema-shaped record cannot carry invented evidence identifiers into the
+    # fact-checking and publication stages.
+    ledger, ledger_errors = _read_jsonl(evidence_ledger)
+    ledger_evidence_ids = {
+        record.get("evidence_id")
+        for record in ledger
+        if isinstance(record.get("evidence_id"), str)
+        and record.get("evidence_id")
+    }
     required = {
         "claim_id",
         "claim",
@@ -424,17 +435,83 @@ def ensure_claim_lineage(
         "removed",
         "unverified",
     }
-    existing_is_canonical = bool(existing) and not errors and all(
-        required.issubset(record)
-        and record.get("verification_status") in allowed_statuses
-        and isinstance(record.get("evidence_ids"), list)
-        and isinstance(record.get("primary_source_checked"), bool)
-        for record in existing
+    def has_canonical_shape(record: dict[str, Any]) -> bool:
+        return (
+            required.issubset(record)
+            and record.get("verification_status") in allowed_statuses
+            and isinstance(record.get("evidence_ids"), list)
+            and isinstance(record.get("primary_source_checked"), bool)
+        )
+
+    existing_has_canonical_shape = (
+        bool(existing)
+        and not errors
+        and not ledger_errors
+        and all(has_canonical_shape(record) for record in existing)
+    )
+    existing_is_canonical = (
+        existing_has_canonical_shape
+        and all(
+            all(
+                isinstance(evidence_id, str)
+                and evidence_id in ledger_evidence_ids
+                for evidence_id in record.get("evidence_ids", [])
+            )
+            for record in existing
+        )
     )
     if existing_is_canonical:
         return existing, False
 
-    ledger, ledger_errors = _read_jsonl(evidence_ledger)
+    # Repair a schema-valid lineage one record at a time.  A single invented
+    # evidence identifier must not erase the Fact-checker's valid work on every
+    # other claim.  Known identifiers survive, and an affected record gets one
+    # more deterministic chance to bind its citation to the exact ledger IDs.
+    # Verification is downgraded only when neither route produces a ledger tie.
+    if existing_has_canonical_shape:
+        repaired: list[dict[str, Any]] = []
+        for original in existing:
+            original_ids = original.get("evidence_ids", [])
+            if all(
+                isinstance(evidence_id, str)
+                and evidence_id in ledger_evidence_ids
+                for evidence_id in original_ids
+            ):
+                repaired.append(original)
+                continue
+
+            record = dict(original)
+            known_ids = [
+                evidence_id
+                for evidence_id in original_ids
+                if isinstance(evidence_id, str)
+                and evidence_id in ledger_evidence_ids
+            ]
+            citation_matches = [
+                evidence_id
+                for evidence_id in _match_evidence(
+                    str(original.get("citation") or ""), ledger
+                )
+                if evidence_id in ledger_evidence_ids
+            ]
+            repaired_ids = list(dict.fromkeys([*known_ids, *citation_matches]))
+            record["evidence_ids"] = repaired_ids
+            if repaired_ids:
+                record["match_status"] = "matched_to_evidence_ledger"
+            else:
+                record["verification_status"] = "unverified"
+                record["primary_source_checked"] = False
+                record["verification_note"] = (
+                    "Lineage repair removed evidence identifiers that do not "
+                    "exist in the evidence ledger; the citation could not be "
+                    "deterministically matched to a ledger record."
+                )
+                record["match_status"] = "cited_not_matched_to_ledger"
+                record["lineage_mode"] = "agent-lineage-sanitized"
+            repaired.append(record)
+        write_jsonl(output_path, repaired)
+        return repaired, True
+
     if ledger_errors:
         ledger = []
     try:

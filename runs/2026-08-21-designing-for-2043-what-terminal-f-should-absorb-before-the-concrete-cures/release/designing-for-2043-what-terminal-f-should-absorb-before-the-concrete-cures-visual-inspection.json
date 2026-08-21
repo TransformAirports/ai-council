@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "artifact": {
+    "path": "designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures.pptx",
+    "sha256": "470590c45533b20077eb41af43803ec9cbab5d8a34a60a0d39c9ccf4d2f3dc42",
+    "size_bytes": 91976
+  },
+  "visual_brief": {
+    "path": "visual-brief.json",
+    "sha256": "01b4cc4f35fe39e12a6740af0668750bee38bb6c87a8b748d4449c7567516c9f"
+  },
+  "deck_mode": "executive_briefing",
+  "slide_count": 16,
+  "rendered_slides": [
+    {
+      "slide_number": 1,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-01.png",
+      "sha256": "d86467db4f44aae5582910d4d29042e1a25e031a64046e3ef472b40aac115f1c",
+      "size_bytes": 125999
+    },
+    {
+      "slide_number": 2,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-02.png",
+      "sha256": "db5067f1523fa295cd05a0f5040e9c82b8aef4949294385d6bc17dfc937ea822",
+      "size_bytes": 161452
+    },
+    {
+      "slide_number": 3,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-03.png",
+      "sha256": "c3530116161c30f6ac869084549b07345e03e014369eac60525a10de47a4dc3a",
+      "size_bytes": 180938
+    },
+    {
+      "slide_number": 4,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-04.png",
+      "sha256": "6a5b01958228730bcde289ba55a922b6bf9296ca23be9ebd50d4437858716a90",
+      "size_bytes": 157955
+    },
+    {
+      "slide_number": 5,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-05.png",
+      "sha256": "9c5be470ffd5cba30aa4e03684bfdf17a24fd3a20121e2268cce0811998c5a9c",
+      "size_bytes": 163761
+    },
+    {
+      "slide_number": 6,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-06.png",
+      "sha256": "43558645ab97bb69a5c0f497ec9342c72476e572051530d5ced75426f09c0de7",
+      "size_bytes": 273483
+    },
+    {
+      "slide_number": 7,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-07.png",
+      "sha256": "cfe9e3f54c57a565a376e9a5c83092d0f3828bc3bd4ed9c29580c638b0b07dd3",
+      "size_bytes": 178708
+    },
+    {
+      "slide_number": 8,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-08.png",
+      "sha256": "e04e6f990d41f46d470144c807928cca73c05af1b9f6fd4ea9775bd937f8829c",
+      "size_bytes": 297702
+    },
+    {
+      "slide_number": 9,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-09.png",
+      "sha256": "8c45ec679d282949017b4f836121211e46821199d196526762cfb09410598947",
+      "size_bytes": 168333
+    },
+    {
+      "slide_number": 10,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-10.png",
+      "sha256": "e82c79545c22a1142d513276f67de69557f9a4f36fa92e8deebc80789339710f",
+      "size_bytes": 180812
+    },
+    {
+      "slide_number": 11,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-11.png",
+      "sha256": "497ee3f4f2cb1f1e2abe42203bf5b95347c67f3a16813e793a78213ada3be9f7",
+      "size_bytes": 183144
+    },
+    {
+      "slide_number": 12,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-12.png",
+      "sha256": "7716f5c212ef317b36c2a86cf2d60e92d19fc7126515c46459ff736f33a11d54",
+      "size_bytes": 164997
+    },
+    {
+      "slide_number": 13,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-13.png",
+      "sha256": "0397bc674787f43c8c62d3793a70f6232960aacae52c9ab5443586daee794b98",
+      "size_bytes": 126947
+    },
+    {
+      "slide_number": 14,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-14.png",
+      "sha256": "9b4429145766543bc53639e3c8c86f521d4d60edaa86a57f8a66cb86d91abc0a",
+      "size_bytes": 191278
+    },
+    {
+      "slide_number": 15,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-15.png",
+      "sha256": "675f02ec79f785c0f2e9a25f7f3973fd2c6079f8649577bb0cfea1a03aaf7b9d",
+      "size_bytes": 120290
+    },
+    {
+      "slide_number": 16,
+      "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-16.png",
+      "sha256": "c1a4f5bcedab9e8b25f351466bd5027a06b7195dd33f1b6fbcfd778a96e0f35c",
+      "size_bytes": 198634
+    }
+  ],
+  "montage": {
+    "path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/montage.png",
+    "sha256": "8a1dadf3a8551da70e7bddbf01da02e9833c7b3f2eb7c1b99b0027310ca4d392",
+    "size_bytes": 804086
+  },
+  "signature_visual": {
+    "slide_number": 3,
+    "concept": "The Reversibility Clock \u2014 a horizontal per-module timeline showing that the design deadline is release-for-fabrication, not the pour. Left band: the six modules set in August 2025 (largest 278 ft \u00d7 136 ft, 3,320 tons, placed to ~3/4-inch tolerance), drawn with their decision windows already closed months earlier in the factory. Right band: future modules with open decision windows, each window closing at 'release-for-fabrication' \u2014 annotated 'unpublished; obtain from JV (Decision D0/D2)'. A single callout carries the inversion: post-release, modular is MORE change-hostile than stick-built, because template changes propagate across the fabrication line; the ~30% cost and ~30% schedule savings DFW attributes to the method is a repetition dividend, DFW-supplied and not independently audited.",
+    "visual_type": "annotated_timeline",
+    "rendered_path": "inspection/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures/designing-for-2043-what-terminal-f-should-absorb-before-the-concrete-cures-03.png",
+    "rendered_sha256": "c3530116161c30f6ac869084549b07345e03e014369eac60525a10de47a4dc3a"
+  },
+  "inspection": {
+    "inspector": "presentation-designer",
+    "full_size_each_slide_inspected": true,
+    "montage_inspected": true,
+    "signature_exhibit_present": true,
+    "signature_exhibit_matches_brief": true,
+    "findings_resolved": true,
+    "status": "pass",
+    "resolved_findings": [
+      "Slide 13: value labels on the two longest CPE bars extended past the right canvas edge; label widths reduced and re-rendered.",
+      "Deck-wide: LibreOffice rendered inherited theme drop shadows on autoshapes; theme style references removed from every shape per the no-shadow design rule.",
+      "Slide 3: 2030 milestone label clipped and the closed-lock glyph overlapped the Aug 2025 set marker on the signature exhibit; labels repositioned and lane geometry adjusted.",
+      "Slide 13: two-line title collided with the unit line and first bars; chart block shifted down to clear the full title height.",
+      "Slide 4: station letters A and B collided with the wrapped title's second line; letters moved inside the Skylink loop."
+    ],
+    "unresolved_findings": []
+  }
+}

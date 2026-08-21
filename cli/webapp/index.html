@@ -32,6 +32,7 @@
       <button class="side-link" data-nav="configure"><span class="sl-ic">✦</span> New Research Report</button>
       <button class="side-link" data-nav="scope"><span class="sl-ic">⛭</span> Fulfill a scope</button>
       <button class="side-link" data-nav="strengthen"><span class="sl-ic">◆</span> Strengthen an argument</button>
+      <button class="side-link" data-nav="agents"><span class="sl-ic">◌</span> Meet the Council</button>
       <button class="side-link" data-nav="library"><span class="sl-ic">▦</span> Library</button>
       <button class="side-link" data-nav="audit"><span class="sl-ic">◎</span> Council audit</button>
     </nav>
@@ -59,6 +60,7 @@
       <button data-nav="configure"><span>✦</span>New</button>
       <button data-nav="scope"><span>⛭</span>Scope</button>
       <button data-nav="strengthen"><span>◆</span>Argument</button>
+      <button data-nav="agents"><span>◌</span>Council</button>
       <button data-nav="library"><span>▦</span>Library</button>
       <button data-nav="audit"><span>◎</span>Audit</button>
     </nav>
@@ -81,12 +83,15 @@
           <span class="cap-chip"><b>◈</b> Multi-model orchestration</span>
           <span class="cap-chip"><b>◉</b> Live agent telemetry</span>
         </div>
-        <button id="home-new" class="btn-primary big">Begin a new report →</button>
+        <div class="hero-actions">
+          <button id="home-new" class="btn-primary big">Begin a new report →</button>
+          <button id="home-council" class="ghost-btn big">Meet the Council</button>
+        </div>
         <div class="hero-stats">
           <span><b id="stat-agents">54</b> agents</span><i></i>
-          <span><b id="stat-lenses">20</b> research lenses</span><i></i>
-          <span><b>2</b> adversarial rounds</span><i></i>
-          <span><b>2</b> human checkpoints</span>
+          <span><b id="stat-lenses">20</b> airport lenses</span><i></i>
+          <span><b id="stat-outside">18</b> outside perspectives</span><i></i>
+          <span><b id="stat-process">16</b> process agents</span>
         </div>
       </div>
 
@@ -94,6 +99,36 @@
 
       <div class="section-head"><h2>Recent reports</h2><button class="link-btn" data-nav="library">View all →</button></div>
       <div id="home-archives" class="archive-grid"></div>
+    </section>
+
+    <!-- AGENT CATALOG -->
+    <section id="view-agents" class="view hidden">
+      <div class="catalog-hero">
+        <div class="eyebrow">The people in the process</div>
+        <h1>Meet the Council</h1>
+        <p>Research agents investigate the same decision from independent disciplines. Process agents then curate the evidence, build the argument, attack it, verify it, and produce the executive package.</p>
+      </div>
+
+      <ol class="process-map" aria-label="Council report process">
+        <li><b>1</b><span>Frame<br><small>airport context</small></span></li>
+        <li><b>2</b><span>Research<br><small>parallel lenses</small></span></li>
+        <li><b>3</b><span>Curate<br><small>evidence ledger</small></span></li>
+        <li><b>4</b><span>Draft + attack<br><small>two adversaries</small></span></li>
+        <li><b>5</b><span>Verify<br><small>claim by claim</small></span></li>
+        <li><b>6</b><span>Produce<br><small>Word + deck</small></span></li>
+      </ol>
+
+      <div class="catalog-tools">
+        <input id="agent-search" class="text-input" type="search" placeholder="Search agents by name, discipline, or role" aria-label="Search Council agents" />
+        <div class="catalog-filters" role="group" aria-label="Filter Council agents">
+          <button class="catalog-filter active" data-agent-filter="all">All</button>
+          <button class="catalog-filter" data-agent-filter="airport">Airport lenses</button>
+          <button class="catalog-filter" data-agent-filter="outside">Outside perspectives</button>
+          <button class="catalog-filter" data-agent-filter="process">Process agents</button>
+        </div>
+      </div>
+      <div class="catalog-summary"><span id="agent-catalog-count">54 agents</span> · Browse only; no report will start.</div>
+      <div id="agent-catalog" class="catalog-grid"></div>
     </section>
 
     <!-- CONFIGURE (wizard) -->
@@ -397,6 +432,7 @@
     <!-- LIBRARY -->
     <section id="view-library" class="view hidden">
       <div class="section-head"><h1>Library</h1></div>
+      <p class="library-intro">Open the finished work, download its executive package, or inspect the prompt that framed the Council’s assignment. A verified badge means the prompt’s bytes match the archived run manifest; older candidates are labeled plainly.</p>
       <div id="library-grid" class="archive-grid"></div>
     </section>
 
@@ -431,6 +467,25 @@
       <button id="guide-close" class="ghost-btn">✕ Close</button>
     </div>
     <div id="guide-body" class="cp-content guide-body"><p class="muted">Loading…</p></div>
+  </div>
+</div>
+
+<!-- LIBRARY PROMPT -->
+<div id="prompt-overlay" class="overlay hidden">
+  <div class="overlay-panel prompt-panel" role="dialog" aria-modal="true" aria-labelledby="prompt-title">
+    <div class="guide-head">
+      <div>
+        <div id="prompt-provenance" class="prompt-provenance">Prompt provenance</div>
+        <h2 id="prompt-title">Run prompt</h2>
+      </div>
+      <button id="prompt-close" class="ghost-btn">✕ Close</button>
+    </div>
+    <p id="prompt-notice" class="prompt-notice"></p>
+    <pre id="prompt-body" class="prompt-body">Loading…</pre>
+    <div class="cp-actions">
+      <span id="prompt-copy-status" class="muted"></span>
+      <button id="prompt-copy" class="cp-btn primary">Copy prompt</button>
+    </div>
   </div>
 </div>
 

@@ -127,6 +127,187 @@ class ReportSource:
     run_file: Path | None
 
 
+@dataclass(frozen=True)
+class PromptRecord:
+    """A Library prompt with explicit provenance and integrity status.
+
+    Historical archives predate ``run-prompt.md``.  For those reports the only
+    remaining candidate can be the mutable file in ``prompts/runs``; callers
+    must never present that candidate as the exact prompt that produced the
+    report.
+    """
+
+    available: bool
+    exact: bool
+    provenance: str
+    notice: str
+    markdown: str | None = None
+    sha256: str | None = None
+    size_bytes: int | None = None
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "available": self.available,
+            "exact": self.exact,
+            "provenance": self.provenance,
+            "notice": self.notice,
+        }
+
+
+PROMPT_MAX_BYTES = 512 * 1024
+
+
+def _read_fixed_prompt(
+    path: Path,
+    *,
+    parent: Path,
+    max_bytes: int,
+) -> tuple[str, bytes] | None:
+    """Read one fixed prompt filename without following links or escaping.
+
+    The Library endpoint never accepts a path from the browser.  This second
+    boundary makes that invariant explicit and keeps archived prompts from
+    turning into a local-file reader if a run directory is modified later.
+    """
+
+    try:
+        if parent.is_symlink() or path.is_symlink() or not path.is_file():
+            return None
+        resolved_parent = parent.resolve(strict=True)
+        resolved_path = path.resolve(strict=True)
+        if resolved_path.parent != resolved_parent:
+            return None
+        size = resolved_path.stat().st_size
+        if size > max_bytes:
+            return None
+        raw = resolved_path.read_bytes()
+        # Strict decoding avoids silently changing the text whose digest is
+        # being reported to the reader.
+        text = raw.decode("utf-8", errors="strict")
+    except (OSError, UnicodeError):
+        return None
+    return text, raw
+
+
+def resolve_report_prompt(
+    source: ReportSource,
+    *,
+    run_prompts_dir: Path = RUN_PROMPTS_DIR,
+    max_bytes: int = PROMPT_MAX_BYTES,
+) -> PromptRecord:
+    """Resolve the best prompt for a report without overstating provenance."""
+
+    archived = source.archive_dir / "run-prompt.md"
+    if archived.exists() or archived.is_symlink():
+        loaded = _read_fixed_prompt(
+            archived,
+            parent=source.archive_dir,
+            max_bytes=max_bytes,
+        )
+        if loaded is None:
+            return PromptRecord(
+                False,
+                False,
+                "integrity_failure",
+                "The archived prompt failed its safety or encoding checks.",
+            )
+        markdown, raw = loaded
+        actual_sha = hashlib.sha256(raw).hexdigest()
+        actual_size = len(raw)
+        manifest_path = source.archive_dir / "run-manifest.json"
+        if manifest_path.exists() or manifest_path.is_symlink():
+            if manifest_path.is_symlink() or not manifest_path.is_file():
+                return PromptRecord(
+                    False,
+                    False,
+                    "integrity_failure",
+                    "The run manifest is not a regular archived file.",
+                )
+            try:
+                if manifest_path.resolve(strict=True).parent != source.archive_dir.resolve(strict=True):
+                    raise ValueError("manifest escaped archive")
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8", errors="strict"))
+            except (OSError, UnicodeError, ValueError, TypeError, json.JSONDecodeError):
+                return PromptRecord(
+                    False,
+                    False,
+                    "integrity_failure",
+                    "The archived prompt cannot be verified because its manifest is invalid.",
+                )
+            run = manifest.get("run") if isinstance(manifest, dict) else None
+            run = run if isinstance(run, dict) else {}
+            declared_slug = run.get("slug")
+            declared_sha = run.get("run_prompt_sha256")
+            declared_size = run.get("run_prompt_size")
+            complete_receipt = (
+                isinstance(declared_sha, str)
+                and bool(re.fullmatch(r"[0-9a-f]{64}", declared_sha))
+                and isinstance(declared_size, int)
+                and not isinstance(declared_size, bool)
+                and declared_size >= 0
+            )
+            partial_receipt = (
+                declared_sha is not None or declared_size is not None
+            ) and not complete_receipt
+            if partial_receipt:
+                return PromptRecord(
+                    False,
+                    False,
+                    "integrity_failure",
+                    "The archived prompt receipt is incomplete or malformed.",
+                )
+            if complete_receipt and (
+                declared_slug != source.slug
+                or declared_sha != actual_sha
+                or declared_size != actual_size
+            ):
+                return PromptRecord(
+                    False,
+                    False,
+                    "integrity_failure",
+                    "The archived prompt no longer matches the run manifest.",
+                )
+            if complete_receipt:
+                return PromptRecord(
+                    True,
+                    True,
+                    "verified_archive",
+                    "Exact archived prompt, verified against the run manifest.",
+                    markdown,
+                    actual_sha,
+                    actual_size,
+                )
+        return PromptRecord(
+            True,
+            False,
+            "archived_unverified",
+            "Archived with the report, but this older run has no prompt receipt to verify.",
+            markdown,
+            actual_sha,
+            actual_size,
+        )
+
+    live = run_prompts_dir / f"{source.slug}.md"
+    loaded = _read_fixed_prompt(live, parent=run_prompts_dir, max_bytes=max_bytes)
+    if loaded is None:
+        return PromptRecord(
+            False,
+            False,
+            "unavailable",
+            "No preserved prompt is available for this report.",
+        )
+    markdown, raw = loaded
+    return PromptRecord(
+        True,
+        False,
+        "legacy_live_candidate",
+        "Legacy candidate from prompts/runs; it may have changed since the report ran.",
+        markdown,
+        hashlib.sha256(raw).hexdigest(),
+        len(raw),
+    )
+
+
 # ----------------------------------------------------------------------------
 # Discovery.
 # ----------------------------------------------------------------------------

@@ -1,0 +1,7 @@
+scenario,program_cost_usd,gate_count,cost_per_gate_usd,notes
+2023 preapproved plan,1600000000,15,106666667,DFW/AA 2023 U&L preapproved capital
+2025 announced scope,4000000000,31,129032258,DFW/AA 2025-05-01 joint announcement
+2025 with 12.5% overrun,4500000000,31,145161290,Analyst sensitivity — modest overrun
+2025 scope minus 3 flex/amenity gates,4000000000,28,142857143,Analyst sensitivity — 3 gates absorbed
+2025 combined overrun and gate loss,4500000000,28,160714286,Analyst sensitivity — combined case
+Incremental gates only (2023 to 2025),2400000000,16,150000000,Delta cost per delta gate — 2023 to 2025 scope revision

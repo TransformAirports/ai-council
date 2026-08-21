@@ -20,6 +20,7 @@ function tabClientId() {
 
 const state = {
   meta: {}, groups: [], formats: [], selectedFormat: "report",
+  processAgents: [], agentCatalogFilter: "all", promptText: "", promptRequestId: 0,
   seated: new Set(), ws: null, reviseSlug: null, resultSlug: null,
   argumentSeated: new Set(),
   sourceUploads: { report: [], scope: [], argument: [] },
@@ -55,16 +56,18 @@ async function init() {
     fetch("/api/meta").then((r) => r.json()),
   ]);
   state.groups = agentsRes.groups;
+  state.processAgents = agentsRes.process || [];
   agentsRes.groups.forEach((g) => g.members.forEach((m) => (state.meta[m.name] = m)));
   agentsRes.process.forEach((p) => (state.meta[p.name] = { ...p, process: true }));
   state.formats = metaRes.formats;
   state.authOk = metaRes.auth_ok; state.authMsg = metaRes.auth_message;
+  state.openaiKey = Boolean(metaRes.openai_key);
   state.defaultBudget = metaRes.default_budget ?? 80;
   state.modelsCfg = metaRes.models || {};
   state.activeRun = Boolean(metaRes.active_run);
   state.sessionToken = metaRes.session_token || null;
 
-  buildFormats(); buildAgentGroups(); buildArgumentAgentGroups();
+  buildFormats(); buildAgentGroups(); buildArgumentAgentGroups(); buildAgentCatalog();
   applyPreset("default"); applyArgumentPreset("fast");
   wireUI(); buildHeroDots(); setHeroStats(agentsRes);
   await loadHome();
@@ -81,8 +84,10 @@ function modelShort(id) {
 function setHeroStats(agentsRes) {
   const members = agentsRes.groups.flatMap((g) => g.members);
   const lenses = members.filter((m) => !m.supplemental).length;
+  const outside = members.filter((m) => m.supplemental).length;
   const total = members.length + agentsRes.process.length;
   countUp($("#stat-agents"), total); countUp($("#stat-lenses"), lenses);
+  countUp($("#stat-outside"), outside); countUp($("#stat-process"), agentsRes.process.length);
   $("#ss-agents").textContent = total;
   // Sidebar footer reflects the live model routing, not a hardcoded label.
   const models = state.modelsCfg || {};
@@ -138,6 +143,7 @@ function prepArgumentView() {
 function wireUI() {
   $$("[data-nav]").forEach((b) => (b.onclick = () => nav(b.dataset.nav)));
   $("#home-new").onclick = () => nav("configure");
+  $("#home-council").onclick = () => nav("agents");
   $$("[data-preset]").forEach((b) => (b.onclick = () => applyPreset(b.dataset.preset)));
   $$("[data-argument-preset]").forEach((b) => (b.onclick = () => applyArgumentPreset(b.dataset.argumentPreset)));
   $("#wiz-back").onclick = () => goStep(state.step - 1);
@@ -174,7 +180,23 @@ function wireUI() {
   $("#guide-btn").onclick = openGuide;
   $("#guide-close").onclick = () => $("#guide-overlay").classList.add("hidden");
   $("#guide-overlay").onclick = (e) => { if (e.target === $("#guide-overlay")) $("#guide-overlay").classList.add("hidden"); };
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("#guide-overlay").classList.add("hidden"); });
+  $("#prompt-close").onclick = closePrompt;
+  $("#prompt-overlay").onclick = (e) => { if (e.target === $("#prompt-overlay")) closePrompt(); };
+  $("#prompt-copy").onclick = copyPrompt;
+  $("#agent-search").oninput = buildAgentCatalog;
+  $$('[data-agent-filter]').forEach((button) => {
+    button.onclick = () => {
+      state.agentCatalogFilter = button.dataset.agentFilter;
+      $$('[data-agent-filter]').forEach((item) => item.classList.toggle("active", item === button));
+      buildAgentCatalog();
+    };
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      $("#guide-overlay").classList.add("hidden");
+      closePrompt();
+    }
+  });
   $("#log-toggle").onclick = () => { const l = $("#activity-log"); const h = l.classList.toggle("hidden"); $("#log-toggle").textContent = h ? "Show" : "Hide"; };
 
   if (!state.authOk) { const b = $("#auth-banner"); b.textContent = "⚠ " + state.authMsg + "  —  run `claude login` in your terminal, then reload."; b.classList.remove("hidden"); }
@@ -267,15 +289,25 @@ function renderArchives(root, archives) {
     const dls = a.downloads.map((d) => `<a class="ac-btn" href="${d.url}">⤓ ${escapeHtml(d.label)}</a>`).join("");
     const rev = a.revisions > 0 ? `<span class="ac-badge">v${a.revisions}</span>` : "";
     const read = a.can_read === false ? "" : `<button class="ac-btn" data-read="${a.slug}">Read</button>`;
+    const promptBadge = a.prompt?.provenance === "verified_archive"
+      ? " ✓"
+      : a.prompt?.provenance === "archived_unverified"
+        ? " · archived"
+        : " · legacy";
+    const prompt = a.prompt?.available && ["report", "revision"].includes(a.mode || "report")
+      ? `<button class="ac-btn ac-prompt" data-prompt="${a.slug}" title="${escapeHtml(a.prompt.notice || "View the run prompt")}">Prompt${promptBadge}</button>`
+      : "";
     const revise = a.can_revise === false ? "" : `<button class="ac-btn" data-revise="${a.revise_slug || a.slug}">Revise</button>`;
     const deck = a.can_build_deck === false || a.has_deck ? "" : `<button class="ac-btn" data-deck="${a.slug}">Build deck</button>`;
     card.innerHTML = `<div class="ac-date">${escapeHtml(a.date)} · ${escapeHtml(a.format)}</div>
       <div class="ac-title">${escapeHtml(a.title)}${rev}</div>
-      <div class="ac-actions">${read}${dls}${revise}${deck}</div>`;
+      <div class="ac-actions">${read}${prompt}${dls}${revise}${deck}</div>`;
     const reader = card.querySelector("[data-read]");
     if (reader) reader.onclick = () => openReport(
       a.slug, a.title, a.revise_slug || a.slug, a.can_build_deck !== false, a.mode || "report"
     );
+    const promptButton = card.querySelector("[data-prompt]");
+    if (promptButton) promptButton.onclick = () => openPrompt(a);
     const reviser = card.querySelector("[data-revise]");
     if (reviser) reviser.onclick = () => openReviseModal(a.revise_slug || a.slug);
     const dk = card.querySelector("[data-deck]"); if (dk) dk.onclick = () => startRun({
@@ -285,6 +317,66 @@ function renderArchives(root, archives) {
     root.appendChild(card);
   });
 }
+
+async function openPrompt(archive) {
+  const requestId = ++state.promptRequestId;
+  const overlay = $("#prompt-overlay");
+  const mode = archive.mode === "revision" ? "revision" : "report";
+  state.promptText = "";
+  $("#prompt-title").textContent = archive.title;
+  $("#prompt-provenance").textContent = "Loading prompt provenance…";
+  $("#prompt-provenance").className = "prompt-provenance";
+  $("#prompt-notice").textContent = "";
+  $("#prompt-body").textContent = "Loading…";
+  $("#prompt-copy").disabled = true;
+  $("#prompt-copy-status").textContent = "";
+  overlay.classList.remove("hidden");
+  try {
+    const response = await fetch(
+      `/api/library/${mode}/${encodeURIComponent(archive.slug)}/prompt`,
+      { method: "POST", headers: sourceHeaders() },
+    );
+    const data = await response.json();
+    if (requestId !== state.promptRequestId) return;
+    if (!response.ok) throw new Error(data.error || "Prompt unavailable.");
+    state.promptText = String(data.markdown || "");
+    $("#prompt-title").textContent = `${archive.title} — ${data.label || "Run prompt"}`;
+    const provenance = data.provenance === "verified_archive"
+      ? { label: "✓ Verified archived prompt", style: "exact" }
+      : data.provenance === "archived_unverified"
+        ? { label: "Archived prompt · no historical hash receipt", style: "archived" }
+        : { label: "Legacy live prompt candidate", style: "legacy" };
+    $("#prompt-provenance").textContent = provenance.label;
+    $("#prompt-provenance").className = `prompt-provenance ${provenance.style}`;
+    $("#prompt-notice").textContent = data.notice || "";
+    // Prompts are evidence, not display markup. Keep the original text literal
+    // so embedded HTML can never execute in the Library.
+    $("#prompt-body").textContent = state.promptText;
+    $("#prompt-copy").disabled = !state.promptText;
+  } catch (error) {
+    if (requestId !== state.promptRequestId) return;
+    $("#prompt-provenance").textContent = "Prompt unavailable";
+    $("#prompt-provenance").className = "prompt-provenance error";
+    $("#prompt-notice").textContent = String(error.message || error);
+    $("#prompt-body").textContent = "";
+  }
+}
+
+function closePrompt() {
+  state.promptRequestId += 1;
+  $("#prompt-overlay")?.classList.add("hidden");
+}
+
+async function copyPrompt() {
+  if (!state.promptText) return;
+  try {
+    await navigator.clipboard.writeText(state.promptText);
+    $("#prompt-copy-status").textContent = "Copied";
+  } catch (_) {
+    $("#prompt-copy-status").textContent = "Copy failed — select the text instead.";
+  }
+}
+
 async function loadAudit() {
   $("#audit-body").innerHTML = `<p class="muted">Scanning archived runs…</p>`;
   const data = await fetch("/api/audit").then((r) => r.json());
@@ -325,6 +417,48 @@ function buildAgentGroups() {
     root.appendChild(grid);
   });
 }
+
+function buildAgentCatalog() {
+  const root = $("#agent-catalog");
+  if (!root) return;
+  const research = state.groups.flatMap((group) => group.members.map((member) => ({
+    ...member,
+    group: group.label,
+    category: member.supplemental ? "outside" : "airport",
+  })));
+  const process = state.processAgents.map((member) => ({
+    ...member,
+    group: "Production workflow",
+    category: "process",
+  }));
+  const query = String($("#agent-search")?.value || "").trim().toLowerCase();
+  const filtered = [...research, ...process].filter((member) => {
+    if (state.agentCatalogFilter !== "all" && member.category !== state.agentCatalogFilter) return false;
+    if (!query) return true;
+    return [member.display, member.name, member.description, member.group]
+      .join(" ").toLowerCase().includes(query);
+  });
+  $("#agent-catalog-count").textContent = `${filtered.length} agent${filtered.length === 1 ? "" : "s"}`;
+  root.innerHTML = "";
+  filtered.forEach((member, index) => {
+    const card = document.createElement("article");
+    card.className = "catalog-card";
+    card.style.animationDelay = `${Math.min(index, 12) * 0.025}s`;
+    const type = member.category === "process"
+      ? "Process agent"
+      : member.category === "outside" ? "Outside perspective" : member.group;
+    const flags = [
+      member.default ? '<span class="catalog-tag default">Balanced roster</span>' : "",
+      member.gated ? '<span class="catalog-tag gated">OpenAI key</span>' : "",
+    ].filter(Boolean).join("");
+    card.innerHTML = `<div class="catalog-card-top"><span class="catalog-kind">${escapeHtml(type)}</span>${flags}</div>
+      <h3>${escapeHtml(member.display)}</h3>
+      <p>${escapeHtml(String(member.description || "").replace(/\s+/g, " ").trim())}</p>`;
+    root.appendChild(card);
+  });
+  if (!filtered.length) root.innerHTML = '<p class="muted catalog-empty">No agents match that search.</p>';
+}
+
 function buildArgumentAgentGroups() {
   const root = $("#argument-agent-groups"); root.innerHTML = "";
   state.groups.forEach((g) => {
@@ -338,6 +472,10 @@ function agentChip(m, picker = "report") {
   const chip = document.createElement("div"); chip.className = "agent-chip"; chip.dataset.name = m.name; chip.dataset.picker = picker;
   chip.innerHTML = `<div class="agent-check">✓</div><div><div class="agent-name">${escapeHtml(m.display)}${m.gated ? '<span class="agent-gated">needs OpenAI key</span>' : ""}</div><div class="agent-desc">${escapeHtml(m.description)}</div></div>`;
   chip.onclick = () => {
+    if (m.gated && !state.openaiKey) {
+      alert(`${m.display} requires OPENAI_API_KEY. Set it before seating this agent, then reload the app.`);
+      return;
+    }
     const selected = picker === "argument" ? state.argumentSeated : state.seated;
     if (selected.has(m.name)) { selected.delete(m.name); chip.classList.remove("on"); }
     else { selected.add(m.name); chip.classList.add("on"); }
@@ -735,6 +873,8 @@ function handleEvent(e) {
       buildConstellation(e.agents || []);
       $("#run-title").textContent = e.title || e.slug || "Council run";
       log("Council convened: " + e.title, "ok"); break;
+    case "preflight":
+      log("✓ Preflight passed · authentication, document rendering, and storage ready", "ok"); break;
     case "deliverable_done":
       log(`📦 ${e.id} — ${e.title} → ${e.file}  (${e.done}/${e.total})`, "ok");
       $("#run-stage").textContent = `Building deliverables · ${e.done} of ${e.total} complete`;
@@ -785,12 +925,20 @@ function handleEvent(e) {
       log(`⚡ Parallel research swarm · ${e.total} agents · ${e.concurrency}-wide`); break;
     case "research_swarm_complete":
       log(`✓ Research swarm complete · ${e.total} briefs`, "ok"); break;
+    case "agent_retry":
+      nodeState(e.agent, "running");
+      log(`↻ ${state.meta[e.agent]?.display || e.agent} retry ${e.attempt || ""}/${e.max_attempts || ""}${e.delay_seconds ? ` in ${e.delay_seconds}s` : ""} · ${e.reason || "transient error"}`, "warn"); break;
     case "agent_skipped":
       nodeState(e.agent, "done"); log(`↷ ${state.meta[e.agent]?.display || e.agent} resumed from ${shortPath(e.path || "")}`); break;
     case "agent_error":
       nodeState(e.agent, "error");
       log(`✕ ${state.meta[e.agent]?.display || e.agent} — ${e.message || e.error_type || "agent failed"}`, "err"); break;
     case "checkpoint": showCheckpoint(e); break;
+    case "checkpoint_skipped":
+      log(`↷ ${e.kind || "Checkpoint"} approval restored for unchanged artifacts`, "ok"); break;
+    case "checkpoint_invalidated":
+      $("#checkpoint-overlay").classList.add("hidden");
+      log(`↻ ${e.kind || "Checkpoint"} inputs changed · rebuilding verified work before review`, "warn"); break;
     case "run_complete": state.runFinished = true; setConnectionBanner("", ""); showResult(e); break;
     case "control_error":
       log("Control denied: " + e.message, "err"); break;
@@ -826,7 +974,7 @@ function showCheckpoint(e) {
   } else rubric.classList.add("hidden");
   const notes = $("#cp-notes"); notes.classList.add("hidden"); notes.value = "";
   const actions = $("#cp-actions"); actions.innerHTML = "";
-  const defs = { continue: { label: "Approve → continue", cls: "primary" }, approve: { label: "Approve → produce documents", cls: "primary" }, redo: { label: "Redo with notes", cls: "warn" }, abort: { label: "Stop the run", cls: "ghost" } };
+  const defs = { continue: { label: "Approve → continue", cls: "primary" }, approve: { label: "Approve → produce documents", cls: "primary" }, redo: { label: "Redo with notes", cls: "warn" }, clear: { label: "Clear old outputs → start", cls: "warn" }, abort: { label: "Stop the run", cls: "ghost" } };
   e.actions.forEach((a) => { const btn = document.createElement("button"); btn.className = "cp-btn " + (defs[a]?.cls || "ghost"); btn.textContent = defs[a]?.label || a;
     btn.onclick = () => { if (a === "redo" && notes.classList.contains("hidden")) { notes.classList.remove("hidden"); notes.focus(); btn.textContent = "Submit redo"; return; }
       const ratings = {}; $$("[data-rating]").forEach((s) => { if (s.value) ratings[s.dataset.rating] = Number(s.value); });

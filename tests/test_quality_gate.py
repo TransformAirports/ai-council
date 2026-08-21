@@ -291,6 +291,10 @@ class QualityGateTests(unittest.TestCase):
         ]
         self.assertEqual(len(numeric_errors), 1)
         self.assertEqual(numeric_errors[0].count, 1)
+        self.assertIn(
+            "The project cost $4 million in 2024.",
+            numeric_errors[0].message,
+        )
 
     def test_abbreviations_do_not_break_cited_sentence_localization(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
