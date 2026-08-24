@@ -86,6 +86,10 @@ one continuous argument, no appendices or separate executive summary."}}
 
 {{article (default) | report | brief | recommendations}}
 
+## Council model
+
+{{claude-fable-5 (default) | gpt-5.6-sol}}
+
 ## Lines of inquiry (optional)
 
 <!--
@@ -191,6 +195,6 @@ open a PR against `.claude/agents/` with new agents. See
 - **slacker:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **virtual-christian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **architectural-historian:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
-- **deep-research:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED — requires OPENAI_API_KEY}}
+- **deep-research:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **virtual-chris:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}
 - **virtual-pat:** {{BLANK = USE DEFAULT, OR REMOVE LINE IF NOT SEATED}}

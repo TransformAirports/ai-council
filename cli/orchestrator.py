@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +29,7 @@ from rich.console import Console
 from cli.agents import Agent, load_all_agents
 from cli.artifacts import ArtifactContract, contract_for_path, validate_artifact
 from cli.config import get_config
+from cli.council_models import GPT_5_6_SOL, CouncilModel, council_model
 from cli.evidence import (
     bind_claim_lineage_to_draft,
     build_evidence_ledger,
@@ -64,15 +66,32 @@ from cli.revision_state import (
 
 console = Console()
 
-# Model assignments live in council.toml (see cli/config.py for defaults and
-# the Settings menu for editing). Role keys: research, synthesis (Strategist),
-# critique (Red Team), editor, humanizer, factcheck, presentation,
-# openai_deep_research. The Fact-checker defaults to a different model family
-# than the ones that write and polish — verification benefits from fresh eyes.
+# New reports bind every role to the run-level model selected during setup.
+# Older prompt files without that field retain the historical council.toml
+# role routing so interrupted runs remain reproducible and safe to resume.
+
+
+_ACTIVE_COUNCIL_MODEL: ContextVar[CouncilModel | None] = ContextVar(
+    "active_council_model", default=None
+)
 
 
 def _model(role: str) -> str:
-    return get_config().model(role)
+    selected = _ACTIVE_COUNCIL_MODEL.get()
+    return selected.id if selected is not None else get_config().model(role)
+
+
+def _effective_provider(agent: Agent) -> str:
+    selected = _ACTIVE_COUNCIL_MODEL.get()
+    return selected.provider if selected is not None else agent.provider
+
+
+def _uses_coherent_run_model() -> bool:
+    return _ACTIVE_COUNCIL_MODEL.get() is not None
+
+
+def _legacy_openai_agent(agent: Agent) -> bool:
+    return not _uses_coherent_run_model() and agent.provider == "openai"
 
 
 class RunBudgetExceeded(RuntimeError):
@@ -84,6 +103,7 @@ def report_runtime_preflight(
     outputs_dir: Path,
     *,
     selected_research_agents: tuple[str, ...] = (),
+    council_model_id: str = "",
 ) -> dict[str, str]:
     """Fail before paid research if final-package tooling cannot succeed."""
 
@@ -98,13 +118,21 @@ def report_runtime_preflight(
         issues.append("Poppler (`pdftoppm`) is not installed")
     if not outputs_dir.is_dir() or not os.access(outputs_dir, os.W_OK):
         issues.append(f"the output directory is not writable: {outputs_dir}")
+    selected_model = council_model(council_model_id)
     if (
-        "deep-research" in selected_research_agents
-        and not os.environ.get("OPENAI_API_KEY")
-    ):
-        issues.append(
-            "Deep Research is seated but `OPENAI_API_KEY` is not set"
+        (selected_model is not None and selected_model.provider == "openai")
+        or (
+            selected_model is None
+            and "deep-research" in selected_research_agents
         )
+    ):
+        from cli.codex_subscription import codex_subscription_status
+
+        codex_status = codex_subscription_status()
+        if not codex_status.authenticated:
+            issues.append(
+                "GPT-5.6 Sol requires a ChatGPT subscription session; run `codex login`"
+            )
     try:
         free_bytes = shutil.disk_usage(repo_root).free
     except OSError as exc:
@@ -618,6 +646,68 @@ def _checkpoint_outputs_match_manifest(
     return True
 
 
+def _validated_stage3_package_matches_manifest(
+    outputs_dir: Path,
+    manifest_path: Path,
+) -> bool:
+    """Recognize a completed, gate-passed Stage 3 package on resume.
+
+    A publication-gate remediation legitimately rebinds the final draft,
+    fact-check report, and lineage to the remediation snapshots rather than to
+    the Humanizer inputs consumed by the initial Fact-Checker call. Requiring
+    the original Fact-Checker dependency declaration would therefore rerun the
+    verifier on every resume after a successful remediation. The passed gate
+    is the stronger resume boundary: all four exact artifacts must match their
+    manifest hashes and each artifact's own dependency receipt must still
+    match current bytes.
+    """
+
+    package = (
+        (
+            outputs_dir / "stage3" / "final-draft.md",
+            contract_for_path(outputs_dir / "stage3" / "final-draft.md"),
+        ),
+        (
+            outputs_dir / "stage3" / "fact-check-report.md",
+            contract_for_path(outputs_dir / "stage3" / "fact-check-report.md"),
+        ),
+        (outputs_dir / "claim-lineage.jsonl", CLAIM_LINEAGE_CONTRACT),
+        (
+            outputs_dir / "quality-gate.json",
+            contract_for_path(outputs_dir / "quality-gate.json"),
+        ),
+    )
+    if not _required_outputs_match_manifest(package, manifest_path):
+        return False
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        gate = json.loads(
+            (outputs_dir / "quality-gate.json").read_text(encoding="utf-8")
+        )
+    except (OSError, json.JSONDecodeError):
+        return False
+    if gate.get("passed") is not True or gate.get("error_count") != 0:
+        return False
+    by_path = {
+        str(item.get("path")): item
+        for item in manifest.get("artifacts", [])
+        if isinstance(item, dict)
+    }
+    for path, _contract in package:
+        try:
+            relative = path.resolve().relative_to(
+                outputs_dir.resolve()
+            ).as_posix()
+        except ValueError:
+            return False
+        dependencies = by_path.get(relative, {}).get("dependencies")
+        if not isinstance(dependencies, dict) or not dependency_fingerprint_matches(
+            manifest_path, dependencies
+        ):
+            return False
+    return True
+
+
 def _sequester_unsourced_evidence(
     path: Path, contract: ArtifactContract
 ) -> list[tuple[int, str]]:
@@ -717,6 +807,7 @@ _TRANSIENT_MODEL_ERROR_TOKENS: tuple[str, ...] = (
     "broken pipe",
     "http 429",
     "status 429",
+    "status: 429",
     "http 500",
     "http 502",
     "http 503",
@@ -727,12 +818,64 @@ _TRANSIENT_MODEL_ERROR_TOKENS: tuple[str, ...] = (
     "status 504",
 )
 _MAX_MODEL_ATTEMPTS = 4
+_RATE_LIMIT_RETRY_SPACING_SECONDS = 8
+_next_rate_limit_retry_slot = 0.0
 
 
-def _retry_delay_seconds(attempt: int) -> int:
-    """Short exponential backoff before the next bounded provider attempt."""
+def _retry_delay_seconds(
+    attempt: int,
+    *,
+    rate_limited: bool = False,
+    step_label: str = "",
+) -> int:
+    """Return a bounded retry delay, with longer staggered waits for 429s.
 
-    return min(5 * (2 ** max(0, attempt - 1)), 30)
+    A normal transport wobble usually clears in seconds. Provider rate limits
+    need a materially longer cooling-off period, and parallel Stage 1 agents
+    must not all wake up on the same second and recreate the same 429 wave.
+    The stable per-step jitter keeps tests and event journals reproducible.
+    """
+
+    if not rate_limited:
+        return min(5 * (2 ** max(0, attempt - 1)), 30)
+    base = min(30 * (2 ** max(0, attempt - 1)), 120)
+    digest = hashlib.sha256(
+        f"{step_label}:{attempt}".encode("utf-8")
+    ).digest()
+    return base + digest[0] % 16
+
+
+def _is_rate_limit_failure(
+    *,
+    api_status: object = None,
+    messages: tuple[object, ...] = (),
+) -> bool:
+    """Recognize a 429 even when the SDK exposes it only in result text."""
+
+    if api_status == 429:
+        return True
+    detail = " ".join(str(message) for message in messages).casefold()
+    return any(
+        token in detail
+        for token in ("rate limit", "http 429", "status 429", "status: 429")
+    )
+
+
+def _reserve_rate_limit_retry_delay(attempt: int, step_label: str) -> int:
+    """Reserve one staggered retry slot across concurrent Claude agents."""
+
+    global _next_rate_limit_retry_slot
+    now = asyncio.get_running_loop().time()
+    candidate = now + _retry_delay_seconds(
+        attempt, rate_limited=True, step_label=step_label
+    )
+    scheduled = max(candidate, _next_rate_limit_retry_slot)
+    _next_rate_limit_retry_slot = (
+        scheduled + _RATE_LIMIT_RETRY_SPACING_SECONDS
+    )
+    # Round up without adding another dependency. A zero-second 429 retry is
+    # never useful, even if a test event loop has a coarse monotonic clock.
+    return max(1, int(scheduled - now + 0.999))
 
 
 def _is_transient_model_failure(
@@ -748,6 +891,199 @@ def _is_transient_model_failure(
         return True
     detail = " ".join(str(message) for message in messages).casefold()
     return any(token in detail for token in _TRANSIENT_MODEL_ERROR_TOKENS)
+
+
+async def _run_coherent_openai_agent(
+    *,
+    agent: Agent,
+    user_prompt: str,
+    model: str,
+    cwd: Path,
+    step_label: str,
+    tally: CostTally,
+    output_path: Path | None,
+    output_contract: ArtifactContract | None,
+    completion_outputs: tuple[tuple[Path, ArtifactContract], ...],
+    max_turns: int,
+    manifest_path: Path | None,
+    artifact_id: str | None,
+    dependency_inputs: tuple[str, ...],
+    emit_completion: bool,
+    cost_journal: Callable[[CostTally], None] | None,
+) -> dict[str, object]:
+    """Execute and commit one GPT-backed role using the normal artifact gate."""
+
+    from cli.openai_council import run_openai_council_agent
+
+    console.print(
+        f"[cyan]▶ {step_label}[/cyan] "
+        f"({agent.display_name}, {model} via ChatGPT subscription)"
+    )
+    await emit(
+        "agent_start",
+        step=step_label,
+        agent=agent.name,
+        display=agent.display_name,
+        model=model,
+        provider="openai",
+        billing="chatgpt_subscription",
+        billed_separately=False,
+    )
+
+    async def report_tool(tool: str, target: str) -> None:
+        if target:
+            console.print(f"  [dim]{tool}: {target}[/dim]")
+        await emit(
+            "agent_tool",
+            step=step_label,
+            tool=tool,
+            target=target,
+            provider="openai",
+            billing="chatgpt_subscription",
+        )
+
+    try:
+        metrics = await run_openai_council_agent(
+            agent=agent,
+            user_prompt=user_prompt,
+            model=model,
+            cwd=cwd,
+            max_turns=max_turns,
+            on_tool=report_tool,
+            write_roots=tuple(
+                dict.fromkeys(path.parent for path, _ in completion_outputs)
+            ),
+        )
+        tally.add(step_label, metrics.cost_usd)
+        if cost_journal is not None:
+            cost_journal(tally)
+        tally.release(step_label)
+    except Exception as exc:
+        tally.release(step_label)
+        for candidate_path, _ in completion_outputs:
+            _quarantine_partial_output(candidate_path)
+        await emit(
+            "agent_error",
+            step=step_label,
+            agent=agent.name,
+            error_type=type(exc).__name__,
+            message=str(exc),
+            provider="openai",
+        )
+        raise
+
+    if (
+        output_path is not None
+        and output_contract is not None
+        and not _has_content(output_path, contract=output_contract)
+    ):
+        validation = validate_artifact(output_path, output_contract)
+        if manifest_path is not None:
+            update_artifact(
+                manifest_path,
+                output_path,
+                validation,
+                artifact_id=artifact_id,
+                producer=agent.name,
+            )
+        await emit("artifact_validated", step=step_label, **validation.to_dict())
+        raise RuntimeError(
+            f"{step_label} (GPT-5.6 Sol) finished without a valid "
+            f"{output_path.name}: {'; '.join(validation.errors)}"
+        )
+
+    for candidate_path, candidate_contract in completion_outputs:
+        sequestered = _sequester_unsourced_evidence(
+            candidate_path, candidate_contract
+        )
+        if sequestered:
+            await emit(
+                "agent_warning",
+                step=step_label,
+                agent=agent.name,
+                message=(
+                    f"{candidate_path.name}: moved {len(sequestered)} unsourced "
+                    "record(s) out of the evidence ledger."
+                ),
+            )
+    incomplete = [
+        (path, validate_artifact(path, contract))
+        for path, contract in completion_outputs
+        if not validate_artifact(path, contract).valid
+    ]
+    if incomplete:
+        detail = "; ".join(
+            f"{path.name}: {', '.join(validation.errors)}"
+            for path, validation in incomplete
+        )
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        raise RuntimeError(
+            f"{step_label} did not complete its atomic artifact set: {detail}"
+        )
+
+    dependencies = (
+        build_dependency_fingerprint(manifest_path, dependency_inputs)
+        if manifest_path is not None and dependency_inputs
+        else None
+    )
+    if dependencies is not None and dependencies.get("complete") is not True:
+        for path, _ in completion_outputs:
+            _quarantine_partial_output(path)
+        raise RuntimeError(
+            f"{step_label} cannot bind its output because a declared upstream "
+            "input is missing or unsafe."
+        )
+    if manifest_path is not None:
+        for companion_path, companion_contract in completion_outputs:
+            if companion_path == output_path:
+                continue
+            update_artifact(
+                manifest_path,
+                companion_path,
+                validate_artifact(companion_path, companion_contract),
+                producer=agent.name,
+                dependencies=dependencies,
+            )
+    if output_path is not None and output_contract is not None:
+        validation = validate_artifact(output_path, output_contract)
+        if manifest_path is not None:
+            update_artifact(
+                manifest_path,
+                output_path,
+                validation,
+                artifact_id=artifact_id,
+                producer=agent.name,
+                dependencies=dependencies,
+            )
+        await emit("artifact_validated", step=step_label, **validation.to_dict())
+
+    if emit_completion:
+        console.print(
+            f"  [green]✓ {step_label} done[/green] "
+            f"[dim](ChatGPT plan, {metrics.turns} turns)[/dim]"
+        )
+        await emit(
+            "agent_done",
+            step=step_label,
+            agent=agent.name,
+            cost=metrics.cost_usd,
+            turns=metrics.turns,
+            total=tally.total,
+            provider="openai",
+            billing="chatgpt_subscription",
+            billed_separately=False,
+            usage=metrics.as_dict(),
+        )
+    return {
+        "skipped": False,
+        "provider": "openai",
+        "cost": metrics.cost_usd,
+        "turns": metrics.turns,
+        "usage": metrics.as_dict(),
+        "billing": "chatgpt_subscription",
+        "billed_separately": False,
+    }
 
 
 async def _run_agent(
@@ -784,6 +1120,7 @@ async def _run_agent(
     """
     if max_turns is None:
         max_turns = get_config().max_turns
+    effective_provider = _effective_provider(agent)
 
     output_contract = (
         artifact_contract
@@ -806,7 +1143,7 @@ async def _run_agent(
             dependency_inputs,
         )
     ):
-        if agent.provider != "openai":
+        if not _legacy_openai_agent(agent):
             tally.consume_skipped_call()
         console.print(
             f"[dim]↷ {step_label} skipped — {output_path.relative_to(cwd)} already exists[/dim]"
@@ -832,7 +1169,11 @@ async def _run_agent(
             step=step_label,
             **validation.to_dict(),
         )
-        return {"skipped": True, "provider": agent.provider}
+        return {
+            "skipped": True,
+            "provider": effective_provider,
+            "billed_separately": _legacy_openai_agent(agent),
+        }
 
     if manifest_path is not None:
         for candidate_path, candidate_contract in completion_outputs:
@@ -846,19 +1187,44 @@ async def _run_agent(
             ):
                 _quarantine_partial_output(candidate_path)
 
+    coherent_openai = effective_provider == "openai" and _uses_coherent_run_model()
+    if coherent_openai:
+        # Subscription usage has no API-dollar reservation. Keep the planner's
+        # call count accurate without applying the Claude SDK spend ceiling.
+        tally.consume_skipped_call()
     call_budget = (
         None
-        if agent.provider == "openai"
+        if _legacy_openai_agent(agent) or coherent_openai
         else tally.reserve(step_label, budget_allocation_usd)
     )
 
-    if agent.provider == "openai":
+    if coherent_openai:
+        return await _run_coherent_openai_agent(
+            agent=agent,
+            user_prompt=user_prompt,
+            model=model,
+            cwd=cwd,
+            step_label=step_label,
+            tally=tally,
+            output_path=output_path,
+            output_contract=output_contract,
+            completion_outputs=completion_outputs,
+            max_turns=max_turns,
+            manifest_path=manifest_path,
+            artifact_id=artifact_id,
+            dependency_inputs=dependency_inputs,
+            emit_completion=emit_completion,
+            cost_journal=cost_journal,
+        )
+
+    if _legacy_openai_agent(agent):
         openai_metrics = await _run_openai_deep_research(
             agent=agent,
             user_prompt=user_prompt,
             step_label=step_label,
             tally=tally,
             output_path=output_path,
+            cwd=cwd,
         )
         if (
             output_path is not None
@@ -872,7 +1238,8 @@ async def _run_agent(
                 error_type="ArtifactContractError",
                 message=f"OpenAI finished without a valid {output_path.name}.",
                 provider="openai",
-                billed_separately=True,
+                billing="chatgpt_subscription",
+                billed_separately=False,
             )
             raise RuntimeError(
                 f"{step_label} (OpenAI) finished without producing {output_path}."
@@ -918,15 +1285,18 @@ async def _run_agent(
                 turns=None,
                 total=tally.total,
                 provider="openai",
-                billed_separately=True,
+                billing="chatgpt_subscription",
+                billed_separately=False,
                 usage=openai_metrics,
             )
         return {
             "skipped": False,
             "provider": "openai",
-            "cost": None,
-            "turns": None,
+            "cost": 0.0,
+            "turns": 1,
             "usage": openai_metrics,
+            "billing": "chatgpt_subscription",
+            "billed_separately": False,
         }
 
     from claude_agent_sdk import (
@@ -967,8 +1337,15 @@ async def _run_agent(
         attempt = _MAX_MODEL_ATTEMPTS - attempts_left
         saw_result = False
         try:
+            system_prompt = agent.system_prompt
+            if _uses_coherent_run_model():
+                system_prompt += (
+                    "\n\nThe run-level Council model selection is authoritative. "
+                    "Ignore any legacy charter sentence claiming this role alone "
+                    "uses a different model or provider."
+                )
             options = ClaudeAgentOptions(
-                system_prompt=agent.system_prompt,
+                system_prompt=system_prompt,
                 allowed_tools=list(agent.tools) if agent.tools else None,
                 permission_mode="bypassPermissions",
                 model=model,
@@ -978,10 +1355,21 @@ async def _run_agent(
                 # The SDK reads stdout as newline-delimited JSON with a 1 MB
                 # default line limit. A large tool result must not crash it.
                 max_buffer_size=64 * 1024 * 1024,
+                # Empty values override inherited shell credentials in the SDK
+                # subprocess. Claude therefore uses the `claude auth login`
+                # subscription session even if a key was exported elsewhere.
+                env={
+                    "ANTHROPIC_API_KEY": "",
+                    "CLAUDE_CODE_OAUTH_TOKEN": "",
+                },
             )
-            console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model})")
+            console.print(
+                f"[cyan]▶ {step_label}[/cyan] "
+                f"({agent.display_name}, {model} via Claude subscription)"
+            )
             await emit("agent_start", step=step_label, agent=agent.name,
                        display=agent.display_name, model=model,
+                       provider="anthropic", billing="claude_subscription",
                        attempt=attempt, max_attempts=_MAX_MODEL_ATTEMPTS)
             async for msg in query(prompt=user_prompt, options=options):
                 if isinstance(msg, AssistantMessage):
@@ -1003,38 +1391,9 @@ async def _run_agent(
                     saw_result = True
                     cost = getattr(msg, "total_cost_usd", None) or 0.0
                     turns = getattr(msg, "num_turns", 0) or 0
-                    # Spurious success: SDK reports ResultMessage but the
-                    # agent did effectively no work AND wrote no file. Treat
-                    # as a retryable race.
-                    if (
-                        attempts_left > 0
-                        and turns <= 1
-                        and cost == 0.0
-                        and output_path is not None
-                        and (
-                            output_contract is None
-                            or not _has_content(
-                                output_path, contract=output_contract
-                            )
-                        )
-                    ):
-                        delay = _retry_delay_seconds(attempt)
-                        console.print(
-                            f"  [yellow]↻ {step_label} returned 1 turn / $0 — "
-                            f"subprocess race; retrying in {delay}s[/yellow]"
-                        )
-                        await emit(
-                            "agent_retry",
-                            step=step_label,
-                            agent=agent.name,
-                            reason="subprocess startup race",
-                            attempt=attempt + 1,
-                            max_attempts=_MAX_MODEL_ATTEMPTS,
-                            delay_seconds=delay,
-                        )
-                        await asyncio.sleep(delay)
-                        last_exc = RuntimeError("spurious-success retry")
-                        break
+                    result_text = str(
+                        getattr(msg, "result", None) or ""
+                    ).strip()
                     result_errors = list(getattr(msg, "errors", None) or [])
                     permission_denials = list(
                         getattr(msg, "permission_denials", None) or []
@@ -1065,6 +1424,52 @@ async def _run_agent(
                         or subtype.casefold().startswith("error")
                         or fatal_stop
                     )
+                    result_messages = (result_text, *result_errors)
+                    rate_limited = _is_rate_limit_failure(
+                        api_status=api_status,
+                        messages=result_messages,
+                    )
+                    transient_failure = _is_transient_model_failure(
+                        api_status=api_status,
+                        messages=result_messages,
+                    )
+                    failed_result = failed_result or transient_failure
+                    # Spurious success: SDK reports ResultMessage but the
+                    # agent did effectively no work AND wrote no file. Treat
+                    # as a retryable race. Inspect the result first: the SDK
+                    # also reports zero-turn / zero-cost 429s, which are real
+                    # provider limits and need a much longer staggered wait.
+                    if (
+                        attempts_left > 0
+                        and not failed_result
+                        and not transient_failure
+                        and turns <= 1
+                        and cost == 0.0
+                        and output_path is not None
+                        and (
+                            output_contract is None
+                            or not _has_content(
+                                output_path, contract=output_contract
+                            )
+                        )
+                    ):
+                        delay = _retry_delay_seconds(attempt)
+                        console.print(
+                            f"  [yellow]↻ {step_label} returned 1 turn / $0 — "
+                            f"subprocess race; retrying in {delay}s[/yellow]"
+                        )
+                        await emit(
+                            "agent_retry",
+                            step=step_label,
+                            agent=agent.name,
+                            reason="subprocess startup race",
+                            attempt=attempt + 1,
+                            max_attempts=_MAX_MODEL_ATTEMPTS,
+                            delay_seconds=delay,
+                        )
+                        await asyncio.sleep(delay)
+                        last_exc = RuntimeError("spurious-success retry")
+                        break
                     # A session-level flag with no concrete fault behind it:
                     # the CLI marked the session unsuccessful (is_error, or an
                     # unusual stop such as `stop_sequence`) yet reported no
@@ -1080,6 +1485,7 @@ async def _run_agent(
                         and not (
                             isinstance(api_status, int) and api_status >= 400
                         )
+                        and not result_text
                         and not subtype.casefold().startswith("error")
                         and not fatal_stop
                     )
@@ -1133,25 +1539,32 @@ async def _run_agent(
                                 await asyncio.sleep(delay)
                                 last_exc = RuntimeError("spurious-success retry")
                                 break
-                        if attempts_left > 0 and _is_transient_model_failure(
-                            api_status=api_status,
-                            messages=tuple(result_errors),
-                        ):
+                        if attempts_left > 0 and transient_failure:
                             remaining_attempt_budget()
-                            delay = _retry_delay_seconds(attempt)
+                            delay = (
+                                _reserve_rate_limit_retry_delay(
+                                    attempt, step_label
+                                )
+                                if rate_limited
+                                else _retry_delay_seconds(attempt)
+                            )
                             for candidate_path, _c in completion_outputs:
                                 _quarantine_partial_output(candidate_path)
                             _quarantine_partial_output(output_path)
+                            retry_reason = (
+                                "provider rate limit (429)"
+                                if rate_limited
+                                else "transient provider or network error"
+                            )
                             console.print(
-                                f"  [yellow]↻ {step_label} hit a transient "
-                                "provider or network error — retrying in "
-                                f"{delay}s[/yellow]"
+                                f"  [yellow]↻ {step_label} hit {retry_reason} "
+                                f"— retrying in {delay}s[/yellow]"
                             )
                             await emit(
                                 "agent_retry",
                                 step=step_label,
                                 agent=agent.name,
-                                reason="transient provider or network error",
+                                reason=retry_reason,
                                 attempt=attempt + 1,
                                 max_attempts=_MAX_MODEL_ATTEMPTS,
                                 delay_seconds=delay,
@@ -1206,6 +1619,7 @@ async def _run_agent(
                         ).strip()
                         details = [
                             *result_errors[:3],
+                            result_text,
                             (
                                 f"permission denials: {len(permission_denials)}"
                                 if permission_denials
@@ -1448,6 +1862,8 @@ async def _run_agent(
             agent=agent.name,
             error_type="MissingResultMessage",
             message="Agent stream ended without a successful ResultMessage.",
+            provider="anthropic",
+            billing="claude_subscription",
         )
         raise RuntimeError(
             f"{step_label} ended without a successful model result."
@@ -1455,7 +1871,7 @@ async def _run_agent(
     if emit_completion:
         console.print(
             f"  [green]✓ {step_label} done[/green] "
-            f"[dim](${completed_cost:.2f}, {completed_turns} turns)[/dim]"
+            f"[dim](Claude plan, {completed_turns} turns)[/dim]"
         )
         await emit(
             "agent_done",
@@ -1465,6 +1881,7 @@ async def _run_agent(
             turns=completed_turns,
             total=tally.total,
             provider="anthropic",
+            billing="claude_subscription",
             billed_separately=False,
         )
     return {
@@ -1472,6 +1889,8 @@ async def _run_agent(
         "provider": "anthropic",
         "cost": completed_cost,
         "turns": completed_turns,
+        "billing": "claude_subscription",
+        "billed_separately": False,
     }
 
 
@@ -1482,28 +1901,20 @@ async def _run_openai_deep_research(
     step_label: str,
     tally: CostTally,
     output_path: Path | None,
+    cwd: Path,
 ) -> dict[str, int | None]:
-    """Run a research brief through an OpenAI deep-research model.
+    """Run the legacy cross-model research seat on the ChatGPT subscription.
 
-    OpenAI agents cannot use our file tools, so the prompt must carry all
-    context inline and we write the response to `output_path` ourselves.
-    Requires OPENAI_API_KEY in the environment and the `openai` package.
+    The prompt already carries source material inline. Codex returns the brief
+    as its final message and the Council commits it to the contracted path.
     """
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise RuntimeError(
-            f"{step_label}: the Deep Research agent needs OPENAI_API_KEY set. "
-            "Export it or deselect the agent."
-        )
-    try:
-        from openai import OpenAI
-    except ImportError as e:
-        raise RuntimeError(
-            f"{step_label}: the `openai` package is not installed. "
-            "Run `pip install -e .` to pick up the new dependency."
-        ) from e
+    from cli.codex_subscription import run_codex_exec
 
-    model = agent.model_override or _model("openai_deep_research")
-    console.print(f"[cyan]▶ {step_label}[/cyan] ({agent.display_name}, {model} via OpenAI)")
+    model = GPT_5_6_SOL
+    console.print(
+        f"[cyan]▶ {step_label}[/cyan] "
+        f"({agent.display_name}, {model} via ChatGPT subscription)"
+    )
     await emit(
         "agent_start",
         step=step_label,
@@ -1511,27 +1922,17 @@ async def _run_openai_deep_research(
         display=agent.display_name,
         model=model,
         provider="openai",
-        billed_separately=True,
+        billing="chatgpt_subscription",
+        billed_separately=False,
     )
 
-    def _call() -> tuple[str, dict[str, int | None]]:
-        client = OpenAI(timeout=3600.0)
-        resp = client.responses.create(
-            model=model,
-            instructions=agent.system_prompt,
-            input=user_prompt,
-            tools=[{"type": "web_search_preview"}],
-        )
-        usage = getattr(resp, "usage", None)
-        metrics = {
-            "input_tokens": getattr(usage, "input_tokens", None),
-            "output_tokens": getattr(usage, "output_tokens", None),
-            "total_tokens": getattr(usage, "total_tokens", None),
-        }
-        return resp.output_text, metrics
-
     try:
-        text, metrics = await asyncio.to_thread(_call)
+        result = await run_codex_exec(
+            prompt=agent.system_prompt + "\n\n## Current assignment\n\n" + user_prompt,
+            model=model,
+            execution_cwd=cwd,
+            sandbox="read-only",
+        )
     except Exception as exc:
         await emit(
             "agent_error",
@@ -1540,17 +1941,24 @@ async def _run_openai_deep_research(
             error_type=type(exc).__name__,
             message=str(exc),
             provider="openai",
-            billed_separately=True,
+            billing="chatgpt_subscription",
+            billed_separately=False,
         )
         raise
     if output_path is not None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(text, encoding="utf-8")
-    # OpenAI usage is billed on the OpenAI account and intentionally excluded
-    # from the Claude-only tally and ceiling.
+        output_path.write_text(result.final_text, encoding="utf-8")
+    metrics = {
+        "input_tokens": result.input_tokens,
+        "output_tokens": result.output_tokens,
+        "total_tokens": (
+            result.input_tokens
+            + result.output_tokens
+            + result.reasoning_output_tokens
+        ),
+    }
     console.print(
-        f"  [green]✓ {step_label} done[/green] [dim](billed to OpenAI account, "
-        f"not in Claude tally)[/dim]"
+        f"  [green]✓ {step_label} done[/green] [dim](ChatGPT plan)[/dim]"
     )
     return metrics
 
@@ -1571,7 +1979,7 @@ def _stage1_prompt(agent: Agent, run_file: Path, output_path: Path, override: st
         "Critical rule: do NOT read any other agent's output in `outputs/stage1/`. "
         "Independent evidence is a design feature — Stage 2 needs your distinct lens.",
     ]
-    if agent.provider != "openai":
+    if not _legacy_openai_agent(agent):
         evidence_path = output_path.with_name(
             output_path.name.replace("-brief.md", "-evidence.jsonl")
         )
@@ -1998,12 +2406,19 @@ async def run_stage1(
     preamble = stage1_preamble(source_paths)
     by_name = {a.name: a for a in all_agents}
 
-    # Cap concurrent Claude Code subprocesses. Spawning 10+ sessions in
-    # parallel causes a real startup race: some sessions fail to authenticate
-    # cleanly and the SDK reports them as spurious "error: success" results.
-    # Four-wide is the sweet spot — meaningful parallelism without overloading
-    # the SDK or hitting concurrent API ceilings.
-    stage1_semaphore = asyncio.Semaphore(4)
+    # GPT-5.6 Sol has a ChatGPT-plan request/token window. Two concurrent
+    # research calls preserve parallel independence without making the local
+    # Codex session collide with its own top-tier-model limits. Claude keeps
+    # the proven four-subprocess ceiling.
+    stage1_concurrency = (
+        2
+        if (
+            _ACTIVE_COUNCIL_MODEL.get() is not None
+            and _ACTIVE_COUNCIL_MODEL.get().provider == "openai"
+        )
+        else 4
+    )
+    stage1_semaphore = asyncio.Semaphore(stage1_concurrency)
 
     async def _bounded_run(coro):
         async with stage1_semaphore:
@@ -2013,14 +2428,14 @@ async def run_stage1(
         "research_swarm_start",
         agents=list(spec.selected_research_agents),
         total=len(spec.selected_research_agents),
-        concurrency=4,
+        concurrency=stage1_concurrency,
     )
     update_stage(
         manifest_path,
         "research",
         "running",
         agents=len(spec.selected_research_agents),
-        concurrency=4,
+        concurrency=stage1_concurrency,
     )
     tasks = []
     for name in spec.selected_research_agents:
@@ -2028,7 +2443,7 @@ async def run_stage1(
         out = outputs_dir / "stage1" / f"{name}-brief.md"
         override = spec.agent_overrides.get(name, "")
         prompt = _stage1_prompt(agent, run_file, out, override) + preamble
-        if agent.provider == "openai":
+        if _legacy_openai_agent(agent):
             # OpenAI agents have no file tools — inline the run prompt and any
             # source-material text the operator attached.
             prompt += (
@@ -2037,7 +2452,7 @@ async def run_stage1(
             )
             prompt += inline_for_openai(source_paths, repo_root=outputs_dir.parent)
         required_outputs: list[tuple[Path, ArtifactContract]] = []
-        if agent.provider != "openai":
+        if not _legacy_openai_agent(agent):
             required_outputs.append(
                 (
                     outputs_dir / "stage1" / f"{name}-evidence.jsonl",
@@ -2131,7 +2546,7 @@ async def run_stage1(
         raise RuntimeError(f"Stage 1 agents did not write their briefs: {missing}")
     for name in spec.selected_research_agents:
         evidence_path = outputs_dir / "stage1" / f"{name}-evidence.jsonl"
-        required_evidence = by_name[name].provider != "openai"
+        required_evidence = not _legacy_openai_agent(by_name[name])
         evidence_contract = (
             ArtifactContract(
                 "jsonl",
@@ -2235,7 +2650,7 @@ async def run_evidence_curation(
     for name in spec.selected_research_agents:
         dependency_inputs.append(f"stage1/{name}-brief.md")
         agent = by_name.get(name)
-        if agent is None or agent.provider != "openai":
+        if agent is None or not _legacy_openai_agent(agent):
             dependency_inputs.append(f"stage1/{name}-evidence.jsonl")
         if name == "quantitative-analyst":
             dependency_inputs.extend(
@@ -2563,6 +2978,28 @@ async def run_stage3(
                     CLAIM_LINEAGE_AGENT_CONTRACT,
                 ),
             )
+            if _validated_stage3_package_matches_manifest(
+                outputs_dir, manifest_path
+            ):
+                tally.consume_skipped_call()
+                final_draft = outputs_dir / "stage3" / "final-draft.md"
+                console.print(
+                    "[dim]↷ stage3/fact-checker skipped — validated "
+                    "publication-gate package already exists[/dim]"
+                )
+                await emit(
+                    "agent_skipped",
+                    step="stage3/fact-checker",
+                    agent=agent.name,
+                    path=str(final_draft),
+                    reason="validated publication-gate package already complete",
+                )
+                await emit(
+                    "artifact_validated",
+                    step="stage3/fact-checker",
+                    **validate_artifact(final_draft).to_dict(),
+                )
+                continue
         await _run_agent(
             agent=agent,
             user_prompt=prompts[step.id],
@@ -2989,7 +3426,7 @@ async def run_art_direction(
             turns=turns,
             total=tally.total,
             provider=completion.get("provider"),
-            billed_separately=completion.get("provider") == "openai",
+            billed_separately=bool(completion.get("billed_separately", False)),
         )
     return out_path
 
@@ -3289,7 +3726,7 @@ async def run_word_visual_inspection(
             turns=turns,
             total=tally.total,
             provider=completion.get("provider"),
-            billed_separately=completion.get("provider") == "openai",
+            billed_separately=bool(completion.get("billed_separately", False)),
         )
 
 
@@ -3434,7 +3871,7 @@ async def run_presentation(
             turns=turns,
             total=tally.total,
             provider=completion.get("provider"),
-            billed_separately=completion.get("provider") == "openai",
+            billed_separately=bool(completion.get("billed_separately", False)),
         )
 
 
@@ -4200,7 +4637,44 @@ def _promote_archive_backfill(
         shutil.rmtree(transaction, ignore_errors=True)
 
 
+def _archived_council_model(archive_dir: Path) -> CouncilModel | None:
+    """Recover the immutable run-level route for revisions and deck backfills."""
+
+    manifest = archive_dir / "run-manifest.json"
+    if not manifest.is_file():
+        return None
+    try:
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    run = payload.get("run") if isinstance(payload, dict) else None
+    model_id = run.get("council_model", "") if isinstance(run, dict) else ""
+    return council_model(str(model_id or ""))
+
+
 async def run_presentation_for_archive(
+    *,
+    archive_dir: Path,
+    slug: str,
+    title: str,
+    repo_root: Path,
+    budget_usd: float | None = None,
+) -> Path:
+    selected = _archived_council_model(archive_dir)
+    token = _ACTIVE_COUNCIL_MODEL.set(selected)
+    try:
+        return await _run_presentation_for_archive(
+            archive_dir=archive_dir,
+            slug=slug,
+            title=title,
+            repo_root=repo_root,
+            budget_usd=budget_usd,
+        )
+    finally:
+        _ACTIVE_COUNCIL_MODEL.reset(token)
+
+
+async def _run_presentation_for_archive(
     *,
     archive_dir: Path,
     slug: str,
@@ -4855,6 +5329,7 @@ def write_run_marker(outputs_dir: Path, spec: RunSpec) -> None:
         "title": spec.title,
         "started": datetime.now().isoformat(timespec="seconds"),
         "format": getattr(spec, "output_format", "report"),
+        "council_model": getattr(spec, "council_model", ""),
         "want_pptx": getattr(spec, "want_pptx", False),
         "deck_mode": getattr(spec, "deck_mode", "board"),
         "decision_frame_enabled": bool(
@@ -5287,6 +5762,32 @@ async def run_pipeline(
     resume: bool = False,
     budget_usd: float | None = None,
 ) -> RunResult:
+    """Run a report under its explicit single-model route when present."""
+
+    selected = council_model(getattr(spec, "council_model", ""))
+    token = _ACTIVE_COUNCIL_MODEL.set(selected)
+    try:
+        return await _run_pipeline(
+            spec=spec,
+            run_file=run_file,
+            repo_root=repo_root,
+            auto_approve=auto_approve,
+            resume=resume,
+            budget_usd=budget_usd,
+        )
+    finally:
+        _ACTIVE_COUNCIL_MODEL.reset(token)
+
+
+async def _run_pipeline(
+    *,
+    spec: RunSpec,
+    run_file: Path,
+    repo_root: Path,
+    auto_approve: bool,
+    resume: bool = False,
+    budget_usd: float | None = None,
+) -> RunResult:
     from cli.checkpoints import (
         CheckpointResult,
         STAGE2_CHECKPOINT_INPUTS,
@@ -5308,6 +5809,7 @@ async def run_pipeline(
         repo_root,
         outputs_dir,
         selected_research_agents=tuple(spec.selected_research_agents),
+        council_model_id=str(getattr(spec, "council_model", "") or ""),
     )
     await emit("preflight", passed=True, tools=runtime_tools)
     await prepare_outputs(outputs_dir, auto_approve=auto_approve, resume=resume)
@@ -5317,8 +5819,8 @@ async def run_pipeline(
     all_agents = load_all_agents()
     tally = CostTally(budget_usd=budget_usd)
     by_agent_name = {agent.name: agent for agent in all_agents}
-    claude_research_calls = sum(
-        by_agent_name[name].provider != "openai"
+    planned_research_calls = sum(
+        not _legacy_openai_agent(by_agent_name[name])
         for name in spec.selected_research_agents
     )
     output_format = str(getattr(spec, "output_format", "report"))
@@ -5343,13 +5845,13 @@ async def run_pipeline(
         bool(getattr(spec, "want_pptx", False))
     )
     contingency_calls = 2  # one verifier remediation and one requested v3 redo
-    planned_claude_calls = (
-        claude_research_calls
+    planned_model_calls = (
+        planned_research_calls
         + regular_process_calls
         + optional_production_calls
         + contingency_calls
     )
-    tally.plan_calls(planned_claude_calls)
+    tally.plan_calls(planned_model_calls)
     result_out = RunResult(tally=tally)
     active_pipeline_steps = tuple(
         step
@@ -5400,13 +5902,44 @@ async def run_pipeline(
         resume=resume,
         manifest=str(manifest_path),
         pipeline_version="council-v2",
+        council_model=(
+            _ACTIVE_COUNCIL_MODEL.get().id
+            if _ACTIVE_COUNCIL_MODEL.get() is not None
+            else "legacy-role-routing"
+        ),
+        provider=(
+            _ACTIVE_COUNCIL_MODEL.get().provider
+            if _ACTIVE_COUNCIL_MODEL.get() is not None
+            else "mixed"
+        ),
+        billing=(
+            "chatgpt_subscription"
+            if (
+                _ACTIVE_COUNCIL_MODEL.get() is not None
+                and _ACTIVE_COUNCIL_MODEL.get().provider == "openai"
+            )
+            else "claude_subscription"
+            if (
+                _ACTIVE_COUNCIL_MODEL.get() is not None
+                and _ACTIVE_COUNCIL_MODEL.get().provider == "anthropic"
+            )
+            else "provider_subscriptions"
+        ),
     )
     await emit(
         "budget_plan",
         ceiling=budget_usd,
-        planned_claude_calls=planned_claude_calls,
+        planned_model_calls=planned_model_calls,
+        planned_claude_calls=(
+            planned_model_calls
+            if (
+                _ACTIVE_COUNCIL_MODEL.get() is None
+                or _ACTIVE_COUNCIL_MODEL.get().provider == "anthropic"
+            )
+            else 0
+        ),
         openai_calls_excluded=sum(
-            by_agent_name[name].provider == "openai"
+            _legacy_openai_agent(by_agent_name[name])
             for name in spec.selected_research_agents
         ),
     )
@@ -5948,8 +6481,21 @@ async def run_pipeline(
         archive=str(archive_path),
         published=str(result_out.published_path) if result_out.published_path else None,
         deck=str(result_out.deck_path) if result_out.deck_path else None,
+        billing=(
+            "chatgpt_subscription"
+            if (
+                _ACTIVE_COUNCIL_MODEL.get() is not None
+                and _ACTIVE_COUNCIL_MODEL.get().provider == "openai"
+            )
+            else "claude_subscription"
+            if (
+                _ACTIVE_COUNCIL_MODEL.get() is not None
+                and _ACTIVE_COUNCIL_MODEL.get().provider == "anthropic"
+            )
+            else "provider_subscriptions"
+        ),
     )
-    _notify_done("AI Council", f"Run complete: {spec.title} (${tally.total:.2f})")
+    _notify_done("AI Council", f"Run complete: {spec.title} (subscription plan)")
     return result_out
 
 
@@ -6115,8 +6661,10 @@ def _revision_call_values(
     values: dict[str, object] = {
         "step_label": step_label,
         "agent": agent.name,
-        "agent_provider": agent.provider,
-        "agent_model_override": agent.model_override,
+        "agent_provider": _effective_provider(agent),
+        "agent_model_override": (
+            None if _uses_coherent_run_model() else agent.model_override
+        ),
         "agent_tools": list(agent.tools),
         "agent_system_prompt_sha256": hashlib.sha256(
             agent.system_prompt.encode("utf-8")
@@ -6246,7 +6794,7 @@ async def _run_revision_agent(
         metadata={
             "agent": agent.name,
             "model": model,
-            "provider": agent.provider,
+            "provider": _effective_provider(agent),
         },
     )
     return completion
@@ -6290,7 +6838,7 @@ def _record_revision_agent_outputs(
         metadata={
             "agent": agent.name,
             "model": model,
-            "provider": agent.provider,
+            "provider": _effective_provider(agent),
             **dict(metadata or {}),
         },
     )
@@ -6453,6 +7001,24 @@ def _revision_prompts(
 
 
 async def run_revision_pipeline(
+    *,
+    request,
+    repo_root: Path,
+    auto_approve: bool,
+) -> tuple[Path | None, CostTally]:
+    selected = _archived_council_model(request.source.archive_dir)
+    token = _ACTIVE_COUNCIL_MODEL.set(selected)
+    try:
+        return await _run_revision_pipeline(
+            request=request,
+            repo_root=repo_root,
+            auto_approve=auto_approve,
+        )
+    finally:
+        _ACTIVE_COUNCIL_MODEL.reset(token)
+
+
+async def _run_revision_pipeline(
     *,
     request,  # cli.revise.RevisionRequest
     repo_root: Path,

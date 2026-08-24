@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
@@ -76,20 +76,13 @@ def _claude_auth_check(
     environment: Mapping[str, str],
     runner: Runner,
 ) -> DoctorCheck:
-    api_key_configured = bool(environment.get("ANTHROPIC_API_KEY"))
     if claude is None:
-        detail = (
-            "ANTHROPIC_API_KEY is configured, but authentication is unverified "
-            "without the Claude CLI"
-            if api_key_configured
-            else "cannot check without the Claude CLI"
-        )
         return DoctorCheck(
             "claude-auth",
             "Claude authentication",
             False,
             True,
-            detail,
+            "cannot check subscription access without the Claude CLI",
             "Install Claude Code, then run: claude auth login",
         )
     try:
@@ -100,6 +93,11 @@ def _claude_auth_check(
             text=True,
             timeout=15,
             check=False,
+            env={
+                key: value
+                for key, value in environment.items()
+                if key not in {"ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN"}
+            },
         )
         payload = json.loads(completed.stdout or "{}")
         logged_in = completed.returncode == 0 and payload.get("loggedIn") is True
@@ -118,6 +116,53 @@ def _claude_auth_check(
             else "not signed in"
         ),
         "Run: claude auth login",
+    )
+
+
+def _codex_auth_check(
+    codex: str | None,
+    *,
+    environment: Mapping[str, str],
+    runner: Runner,
+) -> DoctorCheck:
+    if codex is None:
+        return DoctorCheck(
+            "codex-auth",
+            "ChatGPT subscription",
+            False,
+            False,
+            "cannot check without the Codex CLI",
+            "Install Codex, then run: codex login",
+        )
+    try:
+        completed = runner(
+            [codex, "login", "status"],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+            env={
+                key: value
+                for key, value in environment.items()
+                if key not in {"OPENAI_API_KEY", "CODEX_API_KEY"}
+            },
+        )
+        detail = " ".join(
+            part.strip()
+            for part in (completed.stdout, completed.stderr)
+            if part.strip()
+        )
+        logged_in = completed.returncode == 0 and "chatgpt" in detail.casefold()
+    except (OSError, subprocess.SubprocessError):
+        logged_in = False
+    return DoctorCheck(
+        "codex-auth",
+        "ChatGPT subscription",
+        logged_in,
+        False,
+        "ChatGPT session present" if logged_in else "not signed in with ChatGPT",
+        "Run: codex login",
     )
 
 
@@ -220,17 +265,15 @@ def _configuration_checks(repo_root: Path, environment: Mapping[str, str]) -> li
     env_path = repo_root / ".env"
     credentials = DoctorCheck(
         "optional-credentials",
-        "Optional credentials",
+        "Subscription-only authentication",
         True,
         False,
         (
-            ".env found; GPT-5.6 Sol Prompt Coach and OpenAI Deep Research available"
-            if env_path.is_file() and environment.get("OPENAI_API_KEY")
-            else ".env found; Prompt Coach and OpenAI Deep Research not configured"
+            ".env found; provider keys are ignored for model execution"
             if env_path.is_file()
-            else "no .env file; Claude agents can run, but Prompt Coach is unavailable"
+            else "saved Claude and ChatGPT sign-ins; no API key required"
         ),
-        "Copy .env.example to .env and set OPENAI_API_KEY for Prompt Coach or Deep Research.",
+        "Use `claude auth login` and `codex login` for subscription access.",
     )
     return [configured, credentials]
 
@@ -250,13 +293,45 @@ def collect_doctor_checks(
     version = sys.version_info if python_version is None else python_version
     python = _python_check(version)
     claude_path = which("claude")
+    codex_path = which("codex")
     claude_cli = DoctorCheck(
         "claude-cli",
         "Claude Code CLI",
         claude_path is not None,
-        True,
+        False,
         str(claude_path) if claude_path else "not found",
         "Install Claude Code: curl -fsSL https://claude.ai/install.sh | bash",
+    )
+    claude_auth = _claude_auth_check(
+        claude_path, environment=env, runner=runner
+    )
+    claude_auth = replace(claude_auth, required=False)
+    codex_cli = DoctorCheck(
+        "codex-cli",
+        "Codex CLI",
+        codex_path is not None,
+        False,
+        str(codex_path) if codex_path else "not found",
+        "Install Codex: curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+    )
+    codex_auth = _codex_auth_check(
+        codex_path, environment=env, runner=runner
+    )
+    provider = DoctorCheck(
+        "report-provider",
+        "Report model provider",
+        claude_auth.ok or codex_auth.ok,
+        True,
+        (
+            "Claude Fable 5 and GPT-5.6 Sol subscription sessions are ready"
+            if claude_auth.ok and codex_auth.ok
+            else "GPT-5.6 Sol ChatGPT subscription verified"
+            if codex_auth.ok
+            else "Claude Fable 5 authentication verified"
+            if claude_auth.ok
+            else "neither Claude nor ChatGPT subscription authentication is ready"
+        ),
+        "Run `claude auth login` or `codex login`.",
     )
     office = _tool_check(
         "libreoffice",
@@ -275,7 +350,10 @@ def collect_doctor_checks(
     return [
         python,
         claude_cli,
-        _claude_auth_check(claude_path, environment=env, runner=runner),
+        claude_auth,
+        codex_cli,
+        codex_auth,
+        provider,
         office,
         poppler,
         _package_check(),

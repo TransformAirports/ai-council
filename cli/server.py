@@ -34,6 +34,11 @@ from fastapi.staticfiles import StaticFiles
 
 from cli.agents import load_all_agents, research_agents, process_agents
 from cli.config import get_config
+from cli.council_models import (
+    DEFAULT_COUNCIL_MODEL,
+    council_model,
+    council_model_payload,
+)
 from cli.events import WebSink, set_sink
 from cli.interactive import (
     AGENT_GROUPS,
@@ -381,10 +386,19 @@ async def api_agents() -> JSONResponse:
             a = by_name.get(name)
             if a is None:
                 continue
+            display = a.display_name
+            description = a.description.strip() if a.description else ""
+            if a.name == "deep-research":
+                display = "Deep Research"
+                description = (
+                    "Long-horizon, citation-dense research for questions that "
+                    "need a deeper literature and data sweep. In a new report it "
+                    "uses the same run-level model as every other Council role."
+                )
             members.append({
                 "name": a.name,
-                "display": a.display_name,
-                "description": a.description.strip() if a.description else "",
+                "display": display,
+                "description": description,
                 "gated": a.provider != "anthropic",
                 "supplemental": a.is_supplemental,
                 "default": name in PRESET_DEFAULT,
@@ -426,11 +440,15 @@ async def api_meta(request: Request) -> JSONResponse:
     if host_authority is None or not _is_loopback_name(host_authority[0]):
         return JSONResponse({"error": "local access only"}, status_code=403)
     cfg = get_config()
+    from cli.codex_subscription import codex_subscription_status
     from cli.menu import check_claude_auth
     from cli.prompt_assist import PROMPT_ASSIST_MODEL
     from cli.sources import discover_dropzone, format_size
-    # The auth check shells out to `claude -p` — run it off the event loop.
-    ok, auth_msg = await asyncio.to_thread(check_claude_auth)
+    # Both checks shell out locally and make no model call.
+    (ok, auth_msg), codex_status = await asyncio.gather(
+        asyncio.to_thread(check_claude_auth),
+        asyncio.to_thread(codex_subscription_status),
+    )
     sources = [
         {"name": p.name, "size": format_size(p.stat().st_size)}
         for p in discover_dropzone()
@@ -449,12 +467,15 @@ async def api_meta(request: Request) -> JSONResponse:
         },
         "auth_ok": ok,
         "auth_message": auth_msg,
-        "openai_key": bool(os.environ.get("OPENAI_API_KEY")),
-        "prompt_coach_ok": bool(os.environ.get("OPENAI_API_KEY")),
+        "codex_subscription_ok": codex_status.authenticated,
+        "codex_subscription_message": codex_status.detail,
+        "council_models": council_model_payload(),
+        "default_council_model": DEFAULT_COUNCIL_MODEL,
+        "prompt_coach_ok": codex_status.authenticated,
         "prompt_coach_message": (
-            f"{PROMPT_ASSIST_MODEL} via OpenAI API"
-            if os.environ.get("OPENAI_API_KEY")
-            else "Prompt Coach requires OPENAI_API_KEY in .env. Add it, restart the Council, and reload."
+            f"{PROMPT_ASSIST_MODEL} via your ChatGPT subscription"
+            if codex_status.authenticated
+            else "Prompt Coach requires a ChatGPT subscription login. Run `codex login`, restart the Council, and reload."
         ),
         "prompt_coach_model": PROMPT_ASSIST_MODEL,
         "sources": sources,
@@ -533,7 +554,7 @@ async def api_run_prompt_draft(request: Request) -> JSONResponse:
                         model=PROMPT_ASSIST_MODEL,
                         repo_root=REPO_ROOT,
                     ),
-                    timeout=75,
+                    timeout=90,
                 )
             except PromptAssistValidationError as exc:
                 return JSONResponse({"error": str(exc)}, status_code=400)
@@ -986,6 +1007,10 @@ def _build_spec(data: dict) -> RunSpec:
     }
     if not decision_frame_enabled:
         decision = {key: "" for key in decision}
+    selected_model = str(
+        data.get("council_model") or DEFAULT_COUNCIL_MODEL
+    ).strip()
+    council_model(selected_model)
     return RunSpec(
         title=title,
         slug=slugify(title) or "untitled-run",
@@ -1020,6 +1045,7 @@ def _build_spec(data: dict) -> RunSpec:
             }
             else "executive_briefing"
         ),
+        council_model=selected_model,
     )
 
 

@@ -38,8 +38,20 @@ from cli.run_manifest import (
     create_run_manifest,
     refresh_dependency_fingerprint_sha256,
 )
+from cli.council_models import council_model
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _effective_model_for_resume(spec: Any, agent: Any, role: str) -> str:
+    """Mirror the orchestrator's run-level-over-legacy model precedence."""
+
+    selected = council_model(getattr(spec, "council_model", ""))
+    if selected is not None:
+        return selected.id
+    from cli.orchestrator import _model
+
+    return agent.model_override or _model(role)
 
 
 @dataclass
@@ -113,7 +125,11 @@ def compute_current_identity(outputs_dir: Path = REPO_ROOT / "outputs") -> tuple
         and (s.id != "presentation" or bool(getattr(spec, "want_pptx", False)))
     )
     roles = {"research", *(s.model_role for s in steps)}
-    assignments = {r: _model(r) for r in sorted(roles)}
+    selected_model = council_model(getattr(spec, "council_model", ""))
+    assignments = {
+        role: selected_model.id if selected_model is not None else _model(role)
+        for role in sorted(roles)
+    }
 
     agents_dir = REPO_ROOT / ".claude" / "agents"
     with tempfile.TemporaryDirectory() as td:
@@ -178,15 +194,19 @@ def inspect(outputs_dir: Path = REPO_ROOT / "outputs") -> RepairReport:
         if _sha(agent.path) != entry.get("prompt_sha256"):
             report.blocking.append(f"agent instructions changed: {name}")
 
-    # Model routing per role.
-    from cli.orchestrator import _model
+    # Model routing per role. An explicit run-level selection is authoritative
+    # for every agent, just as it was when create_run_manifest recorded the
+    # run. Comparing those entries to legacy council.toml routing would
+    # incorrectly block every GPT-selected resume.
     seen: dict[str, str] = {}
     for entry in manifest.get("selected_research_agents", []) + manifest.get("process_agents", []):
         role, stored_model = entry.get("model_role"), entry.get("model_id")
         if not role or role in seen:
             continue
         seen[role] = stored_model
-        current_model = agents[entry["name"]].model_override or _model(role)
+        current_model = _effective_model_for_resume(
+            spec, agents[entry["name"]], role
+        )
         if current_model != stored_model:
             report.blocking.append(
                 f"model routing changed for {role}: {stored_model} → {current_model}"

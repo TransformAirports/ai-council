@@ -45,7 +45,7 @@
       <div class="sr-label">Run in progress</div>
       <div class="sr-stage" id="sr-stage">—</div>
       <div class="sr-bar"><div id="sr-fill" class="sr-fill"></div></div>
-      <div class="sr-cost" id="sr-cost">Claude $0.00</div>
+      <div class="sr-cost" id="sr-cost">Run $0.00</div>
     </div>
 
     <div class="side-status">
@@ -79,11 +79,11 @@
         </svg>
         <div class="eyebrow">Multi-agent research orchestration</div>
         <h1>Convene the Council.</h1>
-        <p class="hero-sub">A parallel research swarm investigates one thesis, an adversarial debate loop pressure-tests every claim, and a verification pass cuts what it can't source — orchestrated across frontier models, streamed to you live.</p>
+        <p class="hero-sub">A parallel research swarm investigates one thesis, an adversarial debate loop pressure-tests every claim, and a verification pass cuts what it can't source — all on one selected frontier model, streamed to you live.</p>
         <div class="cap-strip">
           <span class="cap-chip"><b>⚡</b> Parallel research swarm</span>
           <span class="cap-chip"><b>⚔</b> Adversarial synthesis loop</span>
-          <span class="cap-chip"><b>◈</b> Multi-model orchestration</span>
+          <span class="cap-chip"><b>◈</b> One-model consistency</span>
           <span class="cap-chip"><b>◉</b> Live agent telemetry</span>
         </div>
         <div class="hero-actions">
@@ -139,7 +139,7 @@
               <li>Decision owner</li>
               <li>Local constraints</li>
               <li>Source material</li>
-              <li>Budget ceiling</li>
+              <li>Execution guardrail</li>
             </ul>
             <div class="how-flow-out" aria-hidden="true">→</div>
           </section>
@@ -456,6 +456,22 @@
         <div class="wiz-panel hidden" data-panel="3">
           <div class="panel-head"><h2>Review &amp; launch</h2><p class="muted">Confirm the spec, then convene.</p></div>
           <div id="review-summary" class="review-summary"></div>
+          <fieldset class="council-model-picker" aria-describedby="council-model-note">
+            <legend>Choose one model for the entire Council</legend>
+            <label class="council-model-card">
+              <input type="radio" name="f-council-model" value="claude-fable-5" checked />
+              <span class="model-radio-mark" aria-hidden="true"></span>
+              <span><b>Claude Fable 5</b><small>Narrative judgment and editorial voice</small></span>
+              <em data-model-status="claude-fable-5">Claude account</em>
+            </label>
+            <label class="council-model-card">
+              <input type="radio" name="f-council-model" value="gpt-5.6-sol" />
+              <span class="model-radio-mark" aria-hidden="true"></span>
+              <span><b>GPT-5.6 Sol</b><small>Frontier reasoning on your ChatGPT plan</small></span>
+              <em data-model-status="gpt-5.6-sol">ChatGPT login</em>
+            </label>
+            <p id="council-model-note">Every research lens, writer, reviewer, fact-checker, and production agent uses the selected model.</p>
+          </fieldset>
           <div class="launch-row">
             <label class="toggle"><input type="checkbox" id="f-pptx" /> <span>Companion executive deck</span></label>
             <label class="deck-mode-label" for="f-deck-mode">Deck mode
@@ -466,7 +482,7 @@
               </select>
             </label>
             <label class="toggle"><input type="checkbox" id="f-review" checked /> <span>Pause at the two checkpoints</span></label>
-            <div class="budget-field"><label for="f-budget">Claude budget ceiling&nbsp;$</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
+            <div class="budget-field"><label for="f-budget">Execution guardrail&nbsp;$ equivalent</label><input id="f-budget" class="num-input" type="number" min="0" step="5" value="80" /></div>
           </div>
           <div id="auth-banner" class="auth-banner hidden"></div>
         </div>

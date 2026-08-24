@@ -48,7 +48,7 @@ class ClaudeAuthenticationTests(unittest.TestCase):
             ok, message = menu.check_claude_auth(force=True)
 
         self.assertFalse(ok)
-        self.assertIn("ANTHROPIC_API_KEY", message)
+        self.assertIn("subscription access", message)
         self.assertIn("administrator", message)
         command = runner.call_args.args[0]
         self.assertIn("--max-budget-usd", command)

@@ -60,6 +60,7 @@ class RunFileV2Tests(unittest.TestCase):
             ],
             want_pptx=True,
             deck_mode="board_decision",
+            council_model="gpt-5.6-sol",
         )
         text = render_run_file(spec)
         self.assertIn("## Decision frame", text)
@@ -80,6 +81,7 @@ class RunFileV2Tests(unittest.TestCase):
         self.assertEqual(parsed.success_measure, spec.success_measure)
         self.assertTrue(parsed.want_pptx)
         self.assertEqual(parsed.deck_mode, "board_decision")
+        self.assertEqual(parsed.council_model, "gpt-5.6-sol")
         self.assertEqual(parsed.selected_research_agents, spec.selected_research_agents)
 
     def test_legacy_run_defaults_to_no_deck_and_empty_decision(self) -> None:
@@ -113,12 +115,29 @@ Direct.
             root = Path(tmp)
             (root / "legacy.md").write_text(legacy, encoding="utf-8")
             parsed = parse_run_file("legacy", runs_dir=root)
-
+        self.assertEqual(parsed.council_model, "")
         self.assertFalse(parsed.want_pptx)
         self.assertFalse(parsed.decision_frame_enabled)
         self.assertEqual(parsed.deck_mode, "board_decision")
         self.assertEqual(parsed.decision_required, "")
         self.assertEqual(parsed.selected_research_agents, ["operations-analyst"])
+
+    def test_unknown_council_model_fails_closed(self) -> None:
+        text = """# Run: Bad routing
+
+## Council model
+
+some-unregistered-model
+
+## Research agent overrides
+
+- **operations-analyst:** (default)
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "bad.md").write_text(text, encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Unknown Council model"):
+                parse_run_file("bad", runs_dir=root)
 
     def test_template_hint_suffixes_are_machine_readable(self) -> None:
         text = """# Run: Hint headings

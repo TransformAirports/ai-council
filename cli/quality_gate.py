@@ -417,6 +417,10 @@ def _support_text_supports_claim(support_text: str, claim: str) -> bool:
     support_text = " ".join(
         support_text.split()
     )
+    # Claim-lineage records may preserve the reader-facing footnote marker as
+    # part of the exact sentence.  That marker identifies provenance; its
+    # numeric label is not a factual number the evidence record must support.
+    claim = FOOTNOTE_MARKER_RE.sub("", claim)
     claim_identity = _normalise_for_identity(claim)
     support_identity = _normalise_for_identity(support_text)
     if not claim_identity or not support_identity:
@@ -467,6 +471,14 @@ def _support_text_supports_claim(support_text: str, claim: str) -> bool:
     for number in claim_numbers:
         if number in support_numbers:
             continue
+        # Reader copy routinely rounds precise ledger values (for example,
+        # $3.1759B to $3.176B).  Accept only a very small rounding delta; the
+        # broader ten-percent tolerance still requires an explicit qualifier.
+        if any(
+            abs(candidate - number) <= max(0.01, abs(number) * 0.0005)
+            for candidate in support_numbers
+        ):
+            continue
         if approximate and any(
             abs(candidate - number) <= max(1.0, abs(number) * 0.10)
             for candidate in support_numbers
@@ -486,7 +498,7 @@ def _support_text_supports_claim(support_text: str, claim: str) -> bool:
     if not claim_tokens:
         return bool(claim_numbers and claim_numbers.issubset(support_numbers))
     overlap = claim_tokens & support_tokens
-    return len(overlap) >= 3 and (
+    return len(overlap) >= min(3, len(claim_tokens)) and (
         len(overlap) / len(claim_tokens) >= 0.25
         or len(overlap) / max(1, len(support_tokens)) >= 0.25
     )
@@ -497,7 +509,18 @@ def _evidence_supports_claim(record: dict, claim: str) -> bool:
 
     support_text = " ".join(
         str(record.get(key) or "")
-        for key in ("claim", "quote", "supporting_excerpt")
+        for key in (
+            "claim",
+            "quote",
+            "supporting_excerpt",
+            "caveat",
+            "limitations",
+            "date",
+            "data_vintage",
+            "denominator",
+            "units",
+            "calculation",
+        )
     )
     return _support_text_supports_claim(support_text, claim)
 
@@ -508,7 +531,18 @@ def _evidence_records_support_claim(records: Iterable[dict], claim: str) -> bool
     support_text = " ".join(
         str(record.get(key) or "")
         for record in records
-        for key in ("claim", "quote", "supporting_excerpt")
+        for key in (
+            "claim",
+            "quote",
+            "supporting_excerpt",
+            "caveat",
+            "limitations",
+            "date",
+            "data_vintage",
+            "denominator",
+            "units",
+            "calculation",
+        )
     )
     return _support_text_supports_claim(support_text, claim)
 

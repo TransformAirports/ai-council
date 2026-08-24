@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from zipfile import ZipFile
 
 from docx import Document
 from PIL import Image
@@ -15,10 +16,15 @@ from pypdf import PdfWriter
 from jsonschema import Draft202012Validator
 
 from cli.docx_builder import (
+    _add_decision_exhibits,
+    _add_inline,
+    _add_table_of_contents,
+    _add_technical_evidence_appendix,
     _build_decision_brief,
     _configure_document,
     _markdown_to_docx,
     _renderable_exhibits,
+    _source_appendix_entries,
     build_documents,
 )
 from cli.evidence import file_sha256
@@ -68,6 +74,287 @@ The benefit is primarily community value, not a measurable operating saving.[^4]
 
 
 class PublishingV2Tests(unittest.TestCase):
+    def test_markdown_link_renders_as_a_real_word_hyperlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "hyperlink.docx"
+            doc = Document()
+            paragraph = doc.add_paragraph()
+            _add_inline(
+                paragraph,
+                "Read the [FAA source record](https://www.faa.gov/example).",
+            )
+            doc.save(path)
+
+            with ZipFile(path) as package:
+                document_xml = package.read("word/document.xml").decode("utf-8")
+                relationships = package.read(
+                    "word/_rels/document.xml.rels"
+                ).decode("utf-8")
+
+            self.assertIn("FAA source record", document_xml)
+            self.assertNotIn("](", document_xml)
+            self.assertNotIn("https://www.faa.gov/example", document_xml)
+            self.assertIn("https://www.faa.gov/example", relationships)
+            self.assertIn("relationships/hyperlink", relationships)
+
+    def test_wrapped_list_continuations_remain_in_their_list_items(self) -> None:
+        doc = Document()
+        _markdown_to_docx(
+            doc,
+            """- First limitation begins here and
+  continues on the next physical line.
+- Second limitation.
+
+1. First action begins here and
+   continues on the next physical line.
+2. Second action.
+""",
+        )
+
+        paragraphs = [
+            (paragraph.style.name, paragraph.text)
+            for paragraph in doc.paragraphs
+            if paragraph.text.strip()
+        ]
+        self.assertEqual(
+            paragraphs,
+            [
+                (
+                    "List Bullet",
+                    "First limitation begins here and continues on the next physical line.",
+                ),
+                ("List Bullet", "Second limitation."),
+                (
+                    "List Number",
+                    "First action begins here and continues on the next physical line.",
+                ),
+                ("List Number", "Second action."),
+            ],
+        )
+
+    def test_contents_is_static_and_names_the_report_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "contents.docx"
+            doc = Document()
+            _add_table_of_contents(
+                doc,
+                """## Executive summary
+
+Front matter.
+
+## The operating opening
+
+Narrative.
+
+### What leaders should notice
+
+More narrative.
+""",
+                include_exhibits=True,
+            )
+            doc.save(path)
+
+            text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+            self.assertIn("The operating opening", text)
+            self.assertIn("What leaders should notice", text)
+            self.assertIn("Decision exhibits", text)
+            self.assertNotIn("Executive summary", text)
+            with ZipFile(path) as package:
+                document_xml = package.read("word/document.xml").decode("utf-8")
+            self.assertNotIn("TOC \\o", document_xml)
+            self.assertNotIn("w:instrText", document_xml)
+
+    def test_each_decision_exhibit_after_the_first_starts_on_a_new_page(self) -> None:
+        doc = Document()
+        visual_brief = {
+            "report_visuals": [
+                {
+                    "title": "First comparison",
+                    "exhibit_type": "comparison",
+                    "takeaway": "The first option is bounded.",
+                    "evidence_ids": ["EV-001"],
+                    "source_note": "First source.",
+                    "row_header": "Measure",
+                    "columns": [
+                        {"label": "Current"},
+                        {"label": "Pilot"},
+                    ],
+                    "rows": [
+                        {"label": "Cost", "values": ["$2m", "$1m"]}
+                    ],
+                },
+                {
+                    "title": "Second comparison",
+                    "exhibit_type": "comparison",
+                    "takeaway": "The second option is measurable.",
+                    "evidence_ids": ["EV-002"],
+                    "source_note": "Second source.",
+                    "row_header": "Measure",
+                    "columns": [
+                        {"label": "Current", "unit": "minutes"},
+                        {"label": "Pilot", "unit": "minutes"},
+                    ],
+                    "rows": [
+                        {"label": "Time", "values": [12, 8]}
+                    ],
+                },
+            ]
+        }
+        _add_decision_exhibits(doc, visual_brief)
+
+        second_heading_index = next(
+            index
+            for index, paragraph in enumerate(doc.paragraphs)
+            if "Second comparison" in paragraph.text
+        )
+        preceding_xml = "".join(
+            paragraph._p.xml for paragraph in doc.paragraphs[:second_heading_index]
+        )
+        self.assertIn('w:type="page"', preceding_xml)
+
+    def test_decision_exhibit_source_has_exactly_one_source_prefix(self) -> None:
+        doc = Document()
+        visual_brief = {
+            "report_visuals": [
+                {
+                    "title": "Bounded comparison",
+                    "exhibit_type": "comparison",
+                    "takeaway": "The comparison is evidence-bound.",
+                    "evidence_ids": ["EV-001"],
+                    "source_note": "Sources: Airport report.",
+                    "row_header": "Measure",
+                    "columns": [{"label": "Current"}, {"label": "Pilot"}],
+                    "rows": [{"label": "Cost", "values": ["$2m", "$1m"]}],
+                }
+            ]
+        }
+
+        _add_decision_exhibits(doc, visual_brief)
+
+        text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+        self.assertIn("Source: Airport report.", text)
+        self.assertNotIn("Source: Sources:", text)
+        self.assertNotIn("Source: Source:", text)
+
+    def test_notes_use_compact_spacing_and_type(self) -> None:
+        doc = Document()
+        _markdown_to_docx(
+            doc,
+            "Claim with a source.[^1]\n\n[^1]: Airport source record.",
+            body_size=11,
+        )
+
+        notes_heading_index = next(
+            index
+            for index, paragraph in enumerate(doc.paragraphs)
+            if paragraph.text.strip() == "Notes"
+        )
+        note = doc.paragraphs[notes_heading_index + 1]
+        self.assertEqual(note.paragraph_format.line_spacing, 1.0)
+        self.assertAlmostEqual(note.paragraph_format.space_after.pt, 1.5)
+        self.assertAlmostEqual(note.runs[0].font.size.pt, 7.5)
+        for run in note.runs[2:]:
+            if run.font.size is not None:
+                self.assertLessEqual(run.font.size.pt, 8.25)
+
+    def test_evidence_register_uses_explicit_headers_on_every_page(self) -> None:
+        doc = Document()
+        claims = [f"Claim {number}.[^{number}]" for number in range(1, 11)]
+        notes = [
+            f"[^{number}]: Source record {number}."
+            for number in range(1, 11)
+        ]
+        _add_technical_evidence_appendix(
+            doc,
+            "\n\n".join((*claims, *notes)),
+            None,
+        )
+
+        self.assertEqual(len(doc.tables), 4)
+        self.assertEqual(
+            [len(table.rows) - 1 for table in doc.tables],
+            [3, 3, 3, 1],
+        )
+        continuation_labels = [
+            paragraph
+            for paragraph in doc.paragraphs
+            if paragraph.text == "Report source notes · continued"
+        ]
+        self.assertEqual(len(continuation_labels), 3)
+        self.assertTrue(
+            all(
+                paragraph.paragraph_format.page_break_before
+                for paragraph in continuation_labels
+            )
+        )
+        for table in doc.tables:
+            self.assertEqual(
+                tuple(cell.text for cell in table.rows[0].cells),
+                ("Note", "Claim context", "Source record"),
+            )
+
+    def test_exhibit_source_register_starts_on_a_fresh_page(self) -> None:
+        doc = Document()
+        _add_technical_evidence_appendix(
+            doc,
+            "Claim.[^1]\n\n[^1]: Source record.",
+            {
+                "report_visuals": [
+                    {
+                        "title": "Bounded comparison",
+                        "exhibit_type": "comparison",
+                        "takeaway": "The comparison is evidence-bound.",
+                        "evidence_ids": ["EV-001"],
+                        "source_note": "Airport report.",
+                        "row_header": "Measure",
+                        "columns": [
+                            {"label": "Current"},
+                            {"label": "Pilot"},
+                        ],
+                        "rows": [
+                            {"label": "Cost", "values": ["$2m", "$1m"]}
+                        ],
+                    }
+                ]
+            },
+        )
+
+        heading = next(
+            paragraph
+            for paragraph in doc.paragraphs
+            if paragraph.text == "Exhibit source notes"
+        )
+        self.assertTrue(heading.paragraph_format.page_break_before)
+
+    def test_source_appendix_production_notes_never_enter_reader_report(self) -> None:
+        self.assertEqual(
+            _source_appendix_entries(
+                {
+                    "source_appendix": {
+                        "format": "One read-ahead slide in the companion deck.",
+                        "grouping": ["Peer comparisons", "Financial constraints"],
+                        "required_fields": ["Evidence ID", "Publication date"],
+                        "excluded_claims": ["No unsupported uniqueness claim"],
+                        "legibility": "Deck appendix body must remain at least 12 pt.",
+                    }
+                }
+            ),
+            (),
+        )
+        self.assertEqual(
+            _source_appendix_entries(
+                {
+                    "source_appendix": [
+                        {
+                            "evidence_id": "EV-001",
+                            "source": "Airport traffic report",
+                        }
+                    ]
+                }
+            ),
+            ("Source: Airport traffic report",),
+        )
+
     def test_report_without_decision_frame_does_not_invent_decision_package(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -507,7 +794,7 @@ The success measure is stated here, but it is not the first action.
                 any("↓" in cell for row in table_rows for cell in row)
             )
             self.assertIn(
-                "generated with assistance from a multi-model AI research system",
+                "generated with assistance from a multi-agent AI research system",
                 report_text,
             )
             self.assertIn("Chief Operating Officer", report_text)
@@ -556,7 +843,7 @@ The success measure is stated here, but it is not the first action.
                 ]
             )
             self.assertIn(
-                "generated with assistance from a multi-model AI research system",
+                "generated with assistance from a multi-agent AI research system",
                 summary_text,
             )
             self.assertIn("Chief Operating Officer", summary_text)

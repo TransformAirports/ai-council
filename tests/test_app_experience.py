@@ -28,6 +28,19 @@ class _ShellParser(HTMLParser):
 
 
 class AppExperienceContractTests(unittest.TestCase):
+    def test_report_setup_offers_one_model_for_every_council_role(self) -> None:
+        page = INDEX.read_text(encoding="utf-8")
+        script = APP_JS.read_text(encoding="utf-8")
+        self.assertIn('name="f-council-model" value="claude-fable-5"', page)
+        self.assertIn('name="f-council-model" value="gpt-5.6-sol"', page)
+        self.assertIn(
+            "Every research lens, writer, reviewer, fact-checker", page
+        )
+        self.assertIn("council_model: selectedCouncilModel()", script)
+        self.assertIn(
+            '["Model", escapeHtml(councilModelMeta().label)]', script
+        )
+
     def test_every_navigation_target_has_one_view_and_ids_are_unique(self) -> None:
         parser = _ShellParser()
         parser.feed(INDEX.read_text(encoding="utf-8"))
@@ -85,7 +98,7 @@ class AppExperienceContractTests(unittest.TestCase):
         self.assertIn("const canApply = Boolean(proposed) && proposed !== before", script)
         self.assertIn("!change.proposed", script)
         self.assertIn("normalizedPromptFieldValue(change, live) !== change.before", script)
-        self.assertIn("PROMPT_COACH_TIMEOUT_MS = 90_000", script)
+        self.assertIn("PROMPT_COACH_TIMEOUT_MS = 105_000", script)
         self.assertIn("gpt-5.6-sol", script)
         self.assertIn("button.disabled = busy || !state.promptCoachOk", script)
         self.assertIn("GPT-5.6 Sol · form only", markup)

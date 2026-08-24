@@ -32,14 +32,15 @@ cd ai-council
 ./council
 ```
 
-Before the doctor can pass, install Python 3.11+, Claude Code, LibreOffice, and
-Poppler, then sign in with `claude auth login` (or configure an Anthropic API
-key). The first launch creates the local virtual environment automatically.
+Before the doctor can pass, install Python 3.11+, LibreOffice, and Poppler,
+then configure at least one report provider: Claude Code signed in with
+`claude auth login`, or Codex signed in with `codex login` for GPT-5.6 Sol. The first launch
+creates the local virtual environment automatically.
 The doctor is read-only and makes no model call.
 
 Follow the copy-and-paste macOS and Ubuntu path in
 **[Get the AI Council running](docs/getting-started.md)**. It covers Claude
-subscription versus API billing, optional OpenAI Deep Research, first-run
+and ChatGPT subscription setup, first-run
 expectations, output locations, resuming failures, and Office-rendering fixes.
 
 ---
@@ -78,9 +79,10 @@ In plain English, the architecture uses:
   decision at the same time, without copying one another.
 - **Adversarial synthesis loop** — the argument is written, attacked from two
   different directions, and rewritten after each attack.
-- **Multi-model orchestration** — different model families are assigned to
-  research, writing, critique, and verification so one model does not grade
-  all of its own work.
+- **Single-model, multi-role orchestration** — choose Claude Fable 5 or
+  GPT-5.6 Sol for the run. Every report role uses that model, while separate
+  charters, independent inputs, human checkpoints, and deterministic gates
+  keep authors from controlling their own approval.
 - **Live agent telemetry** — the operator sees who is working, what passed
   validation, where evidence is thin, and what has been spent while the run is
   happening.
@@ -159,7 +161,7 @@ verification, design, production, revision, and scope fulfillment.
 
 | Agent | What they bring |
 |---|---|
-| **Deep Research** | Runs on OpenAI's deep-research model instead of Claude — a second AI family's independent, exhaustive read of the same question. Optional; requires an OpenAI account. |
+| **Deep Research** | An optional long-horizon, citation-dense research seat. In a new run it uses the same selected Fable or GPT-5.6 Sol model as every other role. |
 
 ### The supplemental council — eighteen great minds, on call
 
@@ -217,7 +219,7 @@ From the project folder, run:
 Your browser opens to the Council's web app. From there, everything is guided:
 
 - **Home** — your library of finished reports, and a one-click resume if a run was ever interrupted.
-- **New report** — a three-step wizard: frame the question (with a built-in writing guide and tips under every field), choose your council (with a live cost estimate as you pick), review and launch.
+- **New report** — a three-step wizard: frame the question, choose your council, then choose Claude Fable 5 or GPT-5.6 Sol for the complete report before launch.
 - **The live run** — watch the council work as a constellation: agents light up as they research, evidence streams toward the center, the cost ticks in real time. When it's your turn to review, the draft and critiques appear side by side for your decision.
 - **The result** — read the finished report right in the app, download the documents, revise it from feedback, or build the deck.
 
@@ -236,9 +238,9 @@ volume.
 ### Prerequisites
 
 - macOS or Linux with Python 3.11+ (`python3 --version` to check)
-- A Claude subscription with Opus access (sign in once with `claude auth login`) **or** an `ANTHROPIC_API_KEY`
+- Claude Code signed in with `claude auth login` for Fable 5 reports
+- Codex CLI signed in with `codex login` for GPT-5.6 Sol reports and Prompt Coach
 - LibreOffice (`soffice`) and Poppler (`pdftoppm`) for mandatory rendered QA
-- `OPENAI_API_KEY` for the GPT-5.6 Sol Prompt Coach; also used when you seat the Deep Research lens
 - This repository cloned locally
 
 The first `./council` creates a virtual environment and installs everything automatically. No manual `pip install`.
@@ -246,18 +248,20 @@ The first `./council` creates a virtual environment and installs everything auto
 Run `./council --doctor` before the first report. The complete installation
 path is in [docs/getting-started.md](docs/getting-started.md).
 
-### API keys
+### Subscription sign-ins
 
-Copy `.env.example` to `.env` at the repo root and fill in what you use. The CLI loads it automatically; shell exports win over `.env` values. `.env` is gitignored.
+Run `claude auth login` and `codex login` once on the machine. Both CLIs keep
+their own local subscription sessions; the Council does not use provider API
+keys for Fable, GPT-5.6 Sol, Prompt Coach, or Deep Research. API-key variables
+are removed from model subprocesses so they cannot silently change billing.
 
 ### Model routing
 
-Every process role has an explicit model assignment in `council.toml`: context,
-research, curation, creative framing, synthesis, evidence critique, executive
-review, editing, humanization, source verification, art direction, and
-presentation. The defaults deliberately vary model families across writing and
-verification. The optional Deep Research lens runs on OpenAI's
-`o3-deep-research`.
+New report prompts record one explicit Council model: `claude-fable-5` or
+`gpt-5.6-sol`. That choice overrides every historical role assignment for the
+complete report. `council.toml` remains the compatibility route for older run
+prompts, so their completed artifacts can still resume against the identity
+that created them.
 
 ### Command-line deep links
 
@@ -265,9 +269,9 @@ verification. The optional Deep Research lens runs on OpenAI's
 
 | Flag | Effect |
 |---|---|
-| `--doctor` | Read-only setup check for Python, Claude authentication, LibreOffice, Poppler, packages, writable folders, disk, and model configuration. Makes no model call. |
+| `--doctor` | Read-only setup check for Python, Claude and ChatGPT authentication, LibreOffice, Poppler, packages, writable folders, disk, and model configuration. Makes no model call. |
 | `--run FILE` | Validate and execute a prepared file inside `prompts/runs/` through the canonical pipeline. |
-| `--budget USD` | Set a finite Claude-spend ceiling for `--run` or `--pptx`; zero permits no Claude calls. OpenAI Deep Research is billed separately. |
+| `--budget USD` | Set an execution guardrail in USD-equivalent units for Claude calls. GPT-5.6 Sol uses the ChatGPT plan's own usage limits. This is not an API-billing switch. |
 | `--terminal` | The full menu in the terminal instead of the browser (SSH / no-browser use). |
 | `--resume [SLUG]` | Resume an interrupted run; auto-detects if no slug given. Completed steps are never re-run or re-billed. |
 | `--revise [SLUG]` | Revise an existing report from reader feedback. |
@@ -346,7 +350,8 @@ Four public stages, with typed artifacts between them:
 The run manifest records every selected agent, model, input, output,
 validation result, dependency receipt, and stage status. It also fingerprints
 the Council code, agent charters, research contract, and visual design system
-that shaped the run. Budget ceilings are enforced between calls; interrupted
+that shaped the run. Claude execution guardrails are enforced between calls;
+ChatGPT-plan calls remain subject to the plan's usage window. Interrupted
 runs resume only when both the artifact bytes and the exact upstream bytes
 still match. A partial run cannot silently combine outputs from two Council
 versions.

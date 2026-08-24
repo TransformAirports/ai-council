@@ -51,11 +51,11 @@ the prompt before it spends money. The direct headless equivalent is:
 ./council --run prompts/runs/<name>.md --budget 80
 ```
 
-`--budget` is a finite Claude-spend ceiling shared across the parallel swarm
-and downstream process calls. OpenAI Deep Research is billed separately. An
-explicit zero permits no Claude calls. `--dry-run` is a different mode: it
-creates a new run file interactively without model calls and cannot be
-combined with `--run`.
+`--budget` is an execution guardrail in USD-equivalent units for Claude calls
+across the parallel swarm and downstream process. GPT-5.6 Sol runs use the
+ChatGPT plan's own usage limits and do not reserve API dollars. `--dry-run` is
+a different mode: it creates a new run file interactively without model calls
+and cannot be combined with `--run`.
 
 ## What happens during a run
 
@@ -140,10 +140,10 @@ and the state of each quality gate. It is the Council’s instrument panel. If
 the browser refreshes, it reconnects to the active run without restarting
 completed work.
 
-The Council also uses **multi-model orchestration**. Different jobs can be
-routed to different model families: research, synthesis, source verification,
-and design do not necessarily use the same model. The run manifest records the
-actual model and prompt hash for every commissioned agent.
+Each new report uses **one model across many separated roles**. At setup, choose
+Claude Fable 5 or GPT-5.6 Sol. That same model performs research, synthesis,
+adversarial review, source verification, and production. The run manifest
+records the selection, provider, and prompt hash for every commissioned agent.
 
 ## What good looks like
 

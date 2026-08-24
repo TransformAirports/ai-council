@@ -30,7 +30,9 @@ const state = {
   sourceUploads: { report: [], scope: [], argument: [] },
   sourceUploading: { report: 0, scope: 0, argument: 0 },
   resultReviseSlug: null, resultMode: "report", step: 1, home: null,
+  runBilling: "provider_subscriptions",
   promptCoachOk: false, promptCoachMsg: "", promptCoachModel: "gpt-5.6-sol",
+  councilModels: [], defaultCouncilModel: "claude-fable-5",
   sessionToken: null, clientId: tabClientId(),
 };
 
@@ -49,9 +51,9 @@ const PROCESS_SLOTS = {
   "art-director": 125, "presentation-designer": 155, "red-team": 180,
 };
 const STAGE_FILL = { 1: 15, 2: 45, 3: 75, 4: 92 };
-// Let the server's 75-second model timeout return a terminal response before
-// the browser gives up, so a completed paid call is not mistaken for a retry.
-const PROMPT_COACH_TIMEOUT_MS = 90_000;
+// Let the server's 90-second subscription-model timeout return a terminal
+// response before the browser gives up, so a completed call is not retried.
+const PROMPT_COACH_TIMEOUT_MS = 105_000;
 const PROMPT_FIELD_DEFINITIONS = [
   { key: "title", label: "Title", selector: "#f-title", kind: "scalar" },
   { key: "thesis", label: "Thesis", selector: "#f-thesis", kind: "scalar" },
@@ -81,7 +83,10 @@ async function init() {
   agentsRes.process.forEach((p) => (state.meta[p.name] = { ...p, process: true }));
   state.formats = metaRes.formats;
   state.authOk = metaRes.auth_ok; state.authMsg = metaRes.auth_message;
-  state.openaiKey = Boolean(metaRes.openai_key);
+  state.codexOk = Boolean(metaRes.codex_subscription_ok);
+  state.codexMsg = metaRes.codex_subscription_message || "Codex is not signed in with ChatGPT.";
+  state.councilModels = metaRes.council_models || [];
+  state.defaultCouncilModel = metaRes.default_council_model || "claude-fable-5";
   state.promptCoachOk = Boolean(metaRes.prompt_coach_ok);
   state.promptCoachMsg = metaRes.prompt_coach_message || "Prompt Coach is unavailable.";
   state.promptCoachModel = metaRes.prompt_coach_model || "gpt-5.6-sol";
@@ -113,10 +118,51 @@ function setHeroStats(agentsRes) {
   countUp($("#stat-agents"), total); countUp($("#stat-lenses"), lenses);
   countUp($("#stat-outside"), outside); countUp($("#stat-process"), agentsRes.process.length);
   $("#ss-agents").textContent = total;
-  // Sidebar footer reflects the live model routing, not a hardcoded label.
-  const models = state.modelsCfg || {};
-  const unique = [...new Set([models.research, models.editor].filter(Boolean).map(modelShort))];
-  $("#ss-models").textContent = (unique.join(" + ") || "—") + " · live";
+  $("#ss-models").textContent = "Fable 5 / GPT-5.6 · selectable";
+}
+
+function selectedCouncilModel() {
+  return document.querySelector('input[name="f-council-model"]:checked')?.value
+    || state.defaultCouncilModel
+    || "claude-fable-5";
+}
+function councilModelMeta(modelId = selectedCouncilModel()) {
+  return state.councilModels.find((item) => item.id === modelId) || {
+    id: modelId,
+    label: modelShort(modelId),
+    provider: modelId === "gpt-5.6-sol" ? "openai" : "anthropic",
+  };
+}
+function councilModelReady(modelId = selectedCouncilModel()) {
+  return councilModelMeta(modelId).provider === "openai" ? state.codexOk : state.authOk;
+}
+function planLabel(billing = state.runBilling) {
+  if (billing === "chatgpt_subscription") return "ChatGPT plan";
+  if (billing === "claude_subscription") return "Claude plan";
+  if (billing === "provider_subscriptions") return "Subscription plans";
+  return "";
+}
+function updateCouncilModelAvailability() {
+  $$('[data-model-status]').forEach((status) => {
+    const model = councilModelMeta(status.dataset.modelStatus);
+    const ready = model.provider === "openai" ? state.codexOk : state.authOk;
+    status.textContent = ready ? "Ready" : (model.provider === "openai" ? "ChatGPT login needed" : "Claude unavailable");
+    status.classList.toggle("unavailable", !ready);
+  });
+  const banner = $("#auth-banner");
+  const selected = councilModelMeta();
+  const ready = councilModelReady();
+  banner.classList.toggle("hidden", ready);
+  if (!ready) {
+    banner.textContent = selected.provider === "openai"
+      ? "GPT-5.6 Sol uses your ChatGPT subscription. Run `codex login`, restart the Council, and reload."
+      : state.authMsg;
+  }
+  if (state.step === 3) {
+    $("#wiz-next").disabled = !ready || state.sourceUploading.report > 0;
+    buildReview();
+  }
+  updateCount();
 }
 function countUp(el, target) {
   if (!el) return; const dur = 900, t0 = performance.now();
@@ -184,6 +230,9 @@ function wireUI() {
   $("#revise-cancel").onclick = () => $("#revise-overlay").classList.add("hidden");
   $("#revise-go").onclick = submitRevise;
   $("#f-pptx").onchange = () => { if (state.step === 3) buildReview(); };
+  $$('input[name="f-council-model"]').forEach((input) => {
+    input.onchange = updateCouncilModelAvailability;
+  });
   $("#f-decision-frame-enabled").onchange = updateDecisionFrameVisibility;
   $("#scope-launch").onclick = () => {
     const title = $("#s-title").value.trim();
@@ -253,16 +302,12 @@ function wireUI() {
   });
   $("#log-toggle").onclick = () => { const l = $("#activity-log"); const h = l.classList.toggle("hidden"); $("#log-toggle").textContent = h ? "Show" : "Hide"; };
 
-  if (!state.authOk) {
-    const b = $("#auth-banner");
-    b.textContent = state.authMsg;
-    b.classList.remove("hidden");
-  }
+  updateCouncilModelAvailability();
   if (!state.promptCoachOk) {
     $("#prompt-coach-draft").disabled = true;
     $("#prompt-coach-status").textContent = state.promptCoachMsg;
   } else {
-    $("#prompt-coach-status").textContent = `${modelShort(state.promptCoachModel)} via OpenAI API · no report is started.`;
+    $("#prompt-coach-status").textContent = `${modelShort(state.promptCoachModel)} via your ChatGPT subscription · no report is started.`;
   }
   $("#f-budget").value = state.defaultBudget;
   $("#a-budget").value = Math.min(state.defaultBudget, 60);
@@ -344,7 +389,9 @@ async function requestPromptDraft() {
     if (!state.promptDraft) throw new Error("The prompt coach returned no usable draft.");
     renderPromptDraft(state.promptDraft);
     const cost = Number(data.cost_usd);
-    const costLabel = Number.isFinite(cost) ? ` · ≈$${cost.toFixed(2)}` : "";
+    const costLabel = data.auth_mode === "chatgpt_subscription"
+      ? " · ChatGPT plan"
+      : (Number.isFinite(cost) ? ` · ≈$${cost.toFixed(2)}` : "");
     status.textContent = `Draft ready${data.model ? ` · ${modelShort(data.model)}` : ""}${costLabel}. Review before applying.`;
     $("#prompt-coach-preview").classList.remove("hidden");
   } catch (error) {
@@ -515,8 +562,8 @@ function goStep(n) {
   $$(".wiz-dots i").forEach((d) => d.classList.toggle("on", +d.dataset.dot === n));
   $("#wiz-back").style.visibility = n === 1 ? "hidden" : "visible";
   $("#wiz-next").textContent = n === 3 ? "🚀  Convene the Council" : "Next →";
-  $("#wiz-next").disabled = n === 3 && (!state.authOk || state.sourceUploading.report > 0);
-  if (n === 3) buildReview();
+  $("#wiz-next").disabled = n === 3 && (!councilModelReady() || state.sourceUploading.report > 0);
+  if (n === 3) { updateCouncilModelAvailability(); buildReview(); }
 }
 function flash(el, msg) {
   const original = el.innerHTML; el.textContent = msg; el.style.color = "var(--red)";
@@ -537,6 +584,7 @@ function buildReview() {
     ["Title", escapeHtml($("#f-title").value.trim() || "—")],
     ["Thesis", escapeHtml($("#f-thesis").value.trim() || "—")],
     ["Format", escapeHtml(fmtLabel)],
+    ["Model", escapeHtml(councilModelMeta().label)],
     [`Council`, chips || "—"],
   ];
   if (scope.length) rows.push(["Scope", scope.map(escapeHtml).join(" · ")]);
@@ -553,10 +601,9 @@ function buildReview() {
     rows.push(["Deck", escapeHtml($("#f-deck-mode").selectedOptions[0]?.textContent || "Board decision")]);
   }
   if (state.sourceUploads.report.length) rows.push(["Sources", state.sourceUploads.report.map((s) => escapeHtml(s.name)).join(", ")]);
-  const e = estimateCost($("#f-pptx").checked);
-  rows.push(["Est. cost", `<span class="est">$${e.low}–$${e.high}</span>` +
-    (e.deep ? ` <span class="est-note">+ OpenAI deep research, billed separately</span>` : "") +
-    ` <span class="est-note">· rough estimate, calibrated from past runs</span>`]);
+  rows.push(["Plan", `<span class="est">${escapeHtml(
+    councilModelMeta().provider === "openai" ? "ChatGPT subscription" : "Claude subscription"
+  )}</span><span class="est-note"> · no provider API key</span>`]);
   $("#review-summary").innerHTML = rows.map(([k, v]) =>
     `<div class="rs-row"><div class="rs-key">${k}</div><div class="rs-val">${v}</div></div>`).join("");
 }
@@ -1143,7 +1190,7 @@ function buildAgentCatalog() {
       : member.category === "outside" ? "Outside perspective" : member.group;
     const flags = [
       member.default ? '<span class="catalog-tag default">Balanced roster</span>' : "",
-      member.gated ? '<span class="catalog-tag gated">OpenAI key</span>' : "",
+      member.name === "deep-research" ? '<span class="catalog-tag gated">Long-horizon lens</span>' : "",
     ].filter(Boolean).join("");
     card.innerHTML = `<span class="catalog-card-top"><span class="catalog-kind">${escapeHtml(type)}</span>${flags}</span>
       <span class="catalog-card-title">${escapeHtml(member.display)}</span>
@@ -1223,10 +1270,11 @@ function buildArgumentAgentGroups() {
 }
 function agentChip(m, picker = "report") {
   const chip = document.createElement("div"); chip.className = "agent-chip"; chip.dataset.name = m.name; chip.dataset.picker = picker;
-  chip.innerHTML = `<div class="agent-check">✓</div><div><div class="agent-name">${escapeHtml(m.display)}${m.gated ? '<span class="agent-gated">needs OpenAI key</span>' : ""}</div><div class="agent-desc">${escapeHtml(m.description)}</div></div>`;
+  const needsSeparateOpenAI = picker === "argument" && m.gated;
+  chip.innerHTML = `<div class="agent-check">✓</div><div><div class="agent-name">${escapeHtml(m.display)}${needsSeparateOpenAI ? '<span class="agent-gated">needs ChatGPT login</span>' : ""}</div><div class="agent-desc">${escapeHtml(m.description)}</div></div>`;
   chip.onclick = () => {
-    if (m.gated && !state.openaiKey) {
-      alert(`${m.display} requires OPENAI_API_KEY. Set it before seating this agent, then reload the app.`);
+    if (needsSeparateOpenAI && !state.codexOk) {
+      alert(`${m.display} uses your ChatGPT subscription. Run codex login, restart the Council, and reload.`);
       return;
     }
     const selected = picker === "argument" ? state.argumentSeated : state.seated;
@@ -1257,18 +1305,17 @@ function applyArgumentPreset(which) {
 }
 // Cost estimate — mirrors cli/menu.py estimate_cost so web and terminal agree.
 function estimateCost(includeDeck) {
-  const hasDeep = state.seated.has("deep-research");
-  const n = state.seated.size - (hasDeep ? 1 : 0); // Deep Research bills to OpenAI, not here
+  const n = state.seated.size;
   let low = 1.5 * n + 14, high = 4.0 * n + 36;
   if (includeDeck) { low += 3; high += 8; }
-  return { low: Math.round(low), high: Math.round(high), deep: hasDeep };
+  return { low: Math.round(low), high: Math.round(high), deep: false };
 }
 function updateCount() {
-  const e = estimateCost(false);
   const n = state.seated.size;
   let html = `<b>${n}</b> agent${n === 1 ? "" : "s"} seated`;
-  if (n > 0) html += ` &middot; est. <span class="est">$${e.low}–$${e.high}</span>`;
-  if (e.deep) html += ` <span class="est-note">+ OpenAI deep research, billed separately</span>`;
+  if (n > 0) html += ` &middot; <span class="est">${escapeHtml(
+    councilModelMeta().provider === "openai" ? "ChatGPT plan" : "Claude plan"
+  )}</span>`;
   $("#seated-count").innerHTML = html;
 }
 function estimateArgumentCost() {
@@ -1282,7 +1329,7 @@ function updateArgumentCount() {
   const n = state.argumentSeated.size, e = estimateArgumentCost();
   let html = `<b>${n}</b> agent${n === 1 ? "" : "s"} seated`;
   if (n) html += ` &middot; est. <span class="est">$${e.low}–$${e.high}</span>`;
-  if (e.deep) html += ` <span class="est-note">+ OpenAI deep research, billed separately</span>`;
+  if (e.deep) html += ` <span class="est-note">+ Deep Research on your ChatGPT plan</span>`;
   $("#argument-seated-count").innerHTML = html;
 }
 
@@ -1316,7 +1363,7 @@ function updateSourceControls() {
     $("#argument-launch").disabled = !state.authOk || state.sourceUploading.argument > 0;
   }
   if ($("#wiz-next") && state.step === 3) {
-    $("#wiz-next").disabled = !state.authOk || state.sourceUploading.report > 0;
+    $("#wiz-next").disabled = !councilModelReady() || state.sourceUploading.report > 0;
   }
 }
 function renderSourceFiles(purpose) {
@@ -1410,6 +1457,7 @@ function launchNew() {
       time_horizon: current.time_horizon, approval_path: current.approval_path,
       success_measure: current.success_measure,
       agents: Array.from(state.seated), want_pptx: $("#f-pptx").checked,
+      council_model: selectedCouncilModel(),
       deck_mode: $("#f-deck-mode").value,
       source_tokens: state.sourceUploads.report.map((file) => file.token) },
     auto_approve: !$("#f-review").checked, budget: readBudget("#f-budget"),
@@ -1441,7 +1489,7 @@ function startRun(payload) {
   }
   nav("run");
   $("#side-run").classList.remove("hidden");
-  $("#sr-fill").style.width = "0%"; $("#sr-cost").textContent = "Claude $0.00"; $("#sr-stage").textContent = "Starting…";
+  $("#sr-fill").style.width = "0%"; $("#sr-cost").textContent = "Starting…"; $("#sr-stage").textContent = "Starting…";
   $("#activity-log").innerHTML = "";
   $("#tm-evidence").textContent = "—"; $("#tm-artifacts").textContent = "0";
   $("#tm-gaps").textContent = "—"; $("#tm-gate").textContent = "Pending";
@@ -1624,9 +1672,11 @@ function handleEvent(e) {
       applyControlStatus(e);
       return;
     case "run_start":
+      state.runBilling = e.billing || "provider_subscriptions";
       if (e.stages) buildStageRail(e.stages);
       buildConstellation(e.agents || []);
       $("#run-title").textContent = e.title || e.slug || "Council run";
+      $("#sr-cost").textContent = `${planLabel() || "Subscription"} usage`;
       log("Council convened: " + e.title, "ok"); break;
     case "preflight":
       log("✓ Preflight passed · authentication, document rendering, and storage ready", "ok"); break;
@@ -1642,10 +1692,12 @@ function handleEvent(e) {
     case "agent_start": nodeState(e.agent, "running"); log(`▶ ${e.display || e.agent} started · ${modelShort(e.model)}`); break;
     case "agent_tool": if (e.target) log(`  ${e.tool}: ${shortPath(e.target)}`); break;
     case "agent_done": {
+      const billedOn = planLabel(e.billing) || planLabel();
+      const subscription = Boolean(billedOn);
       const separatelyBilled = e.billed_separately || e.cost == null;
-      const costLabel = separatelyBilled ? "separate billing" : "$" + Number(e.cost).toFixed(2);
-      const node = constellation.nodes[e.agent]; if (node) { node.cost.textContent = separatelyBilled ? "separate" : costLabel; flyEvidence(node); }
-      nodeState(e.agent, "done"); $("#sr-cost").textContent = "Claude $" + Number(e.total || 0).toFixed(2);
+      const costLabel = subscription ? billedOn : (separatelyBilled ? "separate billing" : "$" + Number(e.cost).toFixed(2));
+      const node = constellation.nodes[e.agent]; if (node) { node.cost.textContent = subscription ? "plan" : (separatelyBilled ? "separate" : costLabel); flyEvidence(node); }
+      nodeState(e.agent, "done"); $("#sr-cost").textContent = subscription ? `${billedOn} usage` : "Run $" + Number(e.total || 0).toFixed(2);
       log(`✓ ${state.meta[e.agent]?.display || e.agent} — ${costLabel}`, "ok"); break;
     }
     case "artifact_validated":
@@ -1761,7 +1813,9 @@ async function showResult(e) {
   state.resultReviseSlug = e.revise_slug || e.slug;
   $("#side-run").classList.add("hidden");
   $("#result-badge").textContent = "✓ Complete"; $("#result-title").textContent = e.title;
-  $("#result-cost").textContent = `Total cost $${(e.total || 0).toFixed(2)} · archived to ${e.archive || "runs/"}`;
+  $("#result-cost").textContent = planLabel()
+    ? `${planLabel()} usage · archived to ${e.archive || "runs/"}`
+    : `Total cost $${(e.total || 0).toFixed(2)} · archived to ${e.archive || "runs/"}`;
   if (e.mode === "scope") {
     $("#result-new").textContent = "New report";
     $("#result-revise").classList.add("hidden");

@@ -445,6 +445,21 @@ textarea.text-input { resize: vertical; line-height: 1.5; }
 .select-input { display: block; margin-top: 5px; min-width: 250px; background: var(--input); color: var(--ink); border: 1px solid var(--control-border); border-radius: var(--r-sm); padding: 8px 10px; font: 13px var(--sans); }
 .deck-mode-label { color: var(--ink-soft); font-size: 12px; }
 .launch-row #f-pptx:not(:checked) ~ span { color: var(--ink-soft); }
+.council-model-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; padding: 0; border: 0; min-width: 0; }
+.council-model-picker legend { grid-column: 1 / -1; margin: 0 0 2px; color: var(--ink); font-size: 13px; font-weight: 650; }
+.council-model-card { position: relative; display: grid; grid-template-columns: 18px minmax(0,1fr) auto; align-items: center; gap: 11px; min-width: 0; padding: 14px 15px; border: 1px solid var(--control-border); border-radius: var(--r); background: var(--surface-2); cursor: pointer; transition: border-color .14s, box-shadow .14s, background .14s; }
+.council-model-card:hover { border-color: var(--border-strong); }
+.council-model-card:has(input:checked) { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 2px var(--accent-ring); }
+.council-model-card input { position: absolute; opacity: 0; pointer-events: none; }
+.council-model-card:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.model-radio-mark { width: 17px; height: 17px; border: 1.5px solid var(--control-border); border-radius: 50%; display: grid; place-items: center; }
+.council-model-card:has(input:checked) .model-radio-mark { border: 5px solid var(--accent); background: #fff; }
+.council-model-card > span:nth-of-type(2) { display: grid; min-width: 0; gap: 3px; }
+.council-model-card b { color: var(--ink); font-size: 13.5px; }
+.council-model-card small { color: var(--ink-soft); font-size: 11.5px; line-height: 1.35; }
+.council-model-card em { color: var(--ink-faint); font: 600 9.5px var(--mono); text-transform: uppercase; letter-spacing: .045em; white-space: nowrap; }
+.council-model-card em.unavailable { color: var(--red); }
+#council-model-note { grid-column: 1 / -1; margin: 1px 1px 0; color: var(--ink-faint); font-size: 11.5px; line-height: 1.45; }
 
 /* ── Agent groups ── */
 .preset-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 6px; }
@@ -840,6 +855,7 @@ sup.fn { color: var(--accent-hi); font-size: 0.68em; font-weight: 600; margin-le
   .prompt-coach-actions { align-items: flex-start; flex-direction: column; }
   .prompt-coach-actions.preview-actions { align-items: stretch; }
   .delete-summary { grid-template-columns: 1fr; }
+  .council-model-picker { grid-template-columns: 1fr; }
   .agent-profile-hero { position: relative; grid-template-columns: 48px minmax(0,1fr); gap: 12px; padding: 18px; }
   .agent-profile-monogram { width: 48px; height: 48px; border-radius: 14px; font-size: 14px; }
   .agent-profile-heading { padding-right: 68px; }

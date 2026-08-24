@@ -604,6 +604,126 @@ class QualityGateTests(unittest.TestCase):
         self.assertNotIn("claim_not_supported_by_evidence_record", codes)
         self.assertNotIn("claim_evidence_citation_mismatch", codes)
 
+    def test_reader_footnote_marker_is_not_treated_as_evidence_number(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            final = root / "final-draft.md"
+            final.write_text(
+                "# Decision\n\n"
+                "Skylink arrives every two minutes and its longest ride takes "
+                "nine minutes.[^7]\n\n"
+                "[^7]: DFW passenger guidance.\n",
+                encoding="utf-8",
+            )
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                '{"evidence_id":"ev-1","claim":"DFW publishes two-minute '
+                'Skylink arrivals and a maximum nine-minute ride.",'
+                '"source_title":"DFW passenger guidance","is_primary":true}\n',
+                encoding="utf-8",
+            )
+            lineage = root / "claim-lineage.jsonl"
+            lineage.write_text(
+                '{"claim_id":"claim-1","claim":"Skylink arrives every two '
+                'minutes and its longest ride takes nine minutes.[^7]",'
+                '"citation":"DFW passenger guidance.","footnote_id":"7",'
+                '"evidence_ids":["ev-1"],"retained":true,'
+                '"verification_status":"verified",'
+                '"primary_source_checked":true}\n',
+                encoding="utf-8",
+            )
+            bind_claim_lineage_to_draft(final_draft=final, output_path=lineage)
+            payload = run_publication_quality_gate(
+                final_draft=final,
+                report_path=root / "quality-gate.json",
+                evidence_ledger_path=ledger,
+                claim_lineage_path=lineage,
+                raise_on_failure=False,
+            )
+
+        codes = {issue["code"] for issue in payload["issues"]}
+        self.assertNotIn("claim_not_supported_by_evidence_record", codes)
+
+    def test_structured_caveat_and_date_can_support_reader_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            final = root / "final-draft.md"
+            final.write_text(
+                "# Decision\n\n"
+                "A 2025 review relied on airport surveys.[^1]\n\n"
+                "[^1]: Independent performance review.\n",
+                encoding="utf-8",
+            )
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                '{"evidence_id":"ev-1","claim":"The independent review '
+                'evaluated airport operations centres.",'
+                '"caveat":"Its benefit inventory relied on airport surveys.",'
+                '"date":"2025-04-04",'
+                '"source_title":"Independent performance review",'
+                '"is_primary":true}\n',
+                encoding="utf-8",
+            )
+            lineage = root / "claim-lineage.jsonl"
+            lineage.write_text(
+                '{"claim_id":"claim-1","claim":"A 2025 review relied on '
+                'airport surveys.[^1]","citation":"Independent performance '
+                'review.","footnote_id":"1","evidence_ids":["ev-1"],'
+                '"retained":true,"verification_status":"qualified",'
+                '"primary_source_checked":true}\n',
+                encoding="utf-8",
+            )
+            bind_claim_lineage_to_draft(final_draft=final, output_path=lineage)
+            payload = run_publication_quality_gate(
+                final_draft=final,
+                report_path=root / "quality-gate.json",
+                evidence_ledger_path=ledger,
+                claim_lineage_path=lineage,
+                raise_on_failure=False,
+            )
+
+        codes = {issue["code"] for issue in payload["issues"]}
+        self.assertNotIn("claim_not_supported_by_evidence_record", codes)
+
+    def test_precisely_rounded_ledger_value_supports_reader_value(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            final = root / "final-draft.md"
+            final.write_text(
+                "# Decision\n\n"
+                "The budget projected $3.176 billion in capital spending.[^1]\n\n"
+                "[^1]: Airport capital budget.\n",
+                encoding="utf-8",
+            )
+            ledger = root / "evidence-ledger.jsonl"
+            ledger.write_text(
+                '{"evidence_id":"ev-1","claim":"The airport projected '
+                '$3.1759 billion in capital spending.",'
+                '"source_title":"Airport capital budget","is_primary":true}\n',
+                encoding="utf-8",
+            )
+            lineage = root / "claim-lineage.jsonl"
+            lineage.write_text(
+                '{"claim_id":"claim-1","claim":"The budget projected '
+                '$3.176 billion in capital spending.[^1]",'
+                '"citation":"Airport capital budget.","footnote_id":"1",'
+                '"evidence_ids":["ev-1"],"retained":true,'
+                '"verification_status":"verified",'
+                '"primary_source_checked":true}\n',
+                encoding="utf-8",
+            )
+            bind_claim_lineage_to_draft(final_draft=final, output_path=lineage)
+            payload = run_publication_quality_gate(
+                final_draft=final,
+                report_path=root / "quality-gate.json",
+                evidence_ledger_path=ledger,
+                claim_lineage_path=lineage,
+                raise_on_failure=False,
+            )
+
+        codes = {issue["code"] for issue in payload["issues"]}
+        self.assertNotIn("claim_not_supported_by_evidence_record", codes)
+
 
 if __name__ == "__main__":
     unittest.main()

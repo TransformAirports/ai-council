@@ -78,11 +78,10 @@ def _write_retrospective(archive_dir: Path, slug: str, tally: CostTally) -> None
         "## Cost",
         "",
         (
-            f"Claude API total: **${tally.total:.2f}** "
-            "(OpenAI Deep Research, when seated, is billed separately.)"
+            f"Tracked Council model total: **${tally.total:.2f}**"
         ),
         "",
-        "| Claude step | Cost (USD) |",
+        "| Council step | Cost (USD) |",
         "| --- | ---: |",
     ]
     for step, cost in sorted(tally.by_step.items()):

@@ -16,6 +16,7 @@ from rich.panel import Panel
 from slugify import slugify
 
 from cli.agents import Agent, research_agents
+from cli.council_models import COUNCIL_MODELS, DEFAULT_COUNCIL_MODEL
 
 console = Console()
 
@@ -218,6 +219,8 @@ class RunSpec:
     deck_mode: str = "executive_briefing"
     output_format: str = "article"  # report | article | brief | recommendations
     source_paths: list[str] = field(default_factory=list)  # readable paths for sources
+    # Empty is reserved for legacy prompts that used role-by-role routing.
+    council_model: str = ""
 
 
 # ----------------------------------------------------------------------------
@@ -266,10 +269,9 @@ def _parse_bullets(text: str) -> list[str]:
 def _apply_preset(preset: str, research: list[Agent]) -> list[str]:
     available = {a.name for a in research}
     if preset.startswith("All"):
-        # "All standard" = the core airport-domain lenses on Claude. Excludes
-        # the OpenAI Deep Research lens (needs OPENAI_API_KEY) and the
-        # supplemental Council-of-High-Intelligence personas — both opt-in via
-        # Custom, so a missing key or a 37-agent run never happens by accident.
+        # "All standard" = core airport-domain lenses. The long-horizon Deep
+        # Research seat and supplemental personas remain deliberate Custom
+        # opt-ins, so an unexpectedly huge run never happens by accident.
         return [
             a.name for a in research
             if a.provider == "anthropic" and not a.is_supplemental
@@ -296,18 +298,14 @@ def _custom_council_picker(research: list[Agent]) -> list[str]:
             short = agent.description.splitlines()[0].strip()
             if len(short) > 100:
                 short = short[:97] + "..."
-            gated = agent.provider != "anthropic"
             title = f"{agent.display_name} — {short}"
-            if gated:
-                title = f"{agent.display_name} (requires OPENAI_API_KEY) — {short}"
             choices.append(
                 questionary.Choice(
                     title=title,
                     value=name,
-                    # Supplemental personas and provider-gated agents are
-                    # opt-in: unchecked by default so Custom starts from the
-                    # standard roster.
-                    checked=not gated and not agent.is_supplemental,
+                    # Supplemental personas are opt-in so Custom starts from
+                    # the standard roster. The run-level model applies later.
+                    checked=not agent.is_supplemental,
                 )
             )
     selected = questionary.checkbox(
@@ -388,7 +386,26 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
     length = OUTPUT_FORMATS[format_choice]
     output_format = FORMAT_KEYS[format_choice]
 
-    # 6. Council preset
+    # 6. One coherent model for the complete report pipeline.
+    console.print()
+    model_labels = {
+        f"{item.label} — {item.description}": item.id
+        for item in COUNCIL_MODELS
+    }
+    selected_model_label = questionary.select(
+        "Council model (used by every report role):",
+        choices=list(model_labels),
+        default=next(
+            label
+            for label, model_id in model_labels.items()
+            if model_id == DEFAULT_COUNCIL_MODEL
+        ),
+    ).ask()
+    if selected_model_label is None:
+        raise KeyboardInterrupt
+    selected_council_model = model_labels[selected_model_label]
+
+    # 7. Council preset
     console.print()
     research = research_agents(all_agents)
     standard_count = len([
@@ -442,6 +459,7 @@ def collect_run_spec(all_agents: list[Agent]) -> RunSpec:
         agent_overrides={},
         want_pptx=want_pptx,
         output_format=output_format,
+        council_model=selected_council_model,
     )
 
 
@@ -458,6 +476,7 @@ def confirm_spec(spec: RunSpec) -> bool:
             f"[bold]{spec.title}[/bold]\n"
             f"[dim]slug:[/dim] {spec.slug}\n\n"
             f"[bold]Thesis[/bold]\n{thesis_preview}\n\n"
+            f"[bold]Model[/bold]\n{spec.council_model or 'legacy role routing'}\n\n"
             f"[bold]Council ({len(spec.selected_research_agents)} agents)[/bold]\n"
             f"{council_preview}",
             border_style="green",

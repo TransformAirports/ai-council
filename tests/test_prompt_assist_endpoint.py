@@ -57,6 +57,13 @@ class PromptAssistEndpointTests(unittest.TestCase):
         self.assertNotIn(narrative.lines_of_inquiry[0], narrative.success_criteria)
         self.assertTrue(opted_in.decision_frame_enabled)
         self.assertEqual(opted_in.decision_owner, "Chief Operating Officer")
+        self.assertEqual(narrative.council_model, "claude-fable-5")
+        self.assertEqual(
+            server._build_spec({"council_model": "gpt-5.6-sol"}).council_model,
+            "gpt-5.6-sol",
+        )
+        with self.assertRaisesRegex(ValueError, "Unknown Council model"):
+            server._build_spec({"council_model": "not-a-model"})
 
     def setUp(self) -> None:
         self.client = TestClient(
@@ -97,9 +104,11 @@ class PromptAssistEndpointTests(unittest.TestCase):
             },
             "output_format": "report",
             "model": "test-model",
-            "cost_usd": 0.12,
+            "cost_usd": 0.0,
+            "auth_mode": "chatgpt_subscription",
+            "cost_is_estimate": False,
             "turns": 1,
-            "budget_ceiling_usd": 1.5,
+            "budget_ceiling_usd": None,
             "started_run": False,
         }
         fake = AsyncMock(return_value=result)
@@ -169,9 +178,8 @@ class PromptAssistEndpointTests(unittest.TestCase):
 
     def test_model_access_failure_is_actionable_in_the_browser(self) -> None:
         message = (
-            "This OpenAI API project cannot use gpt-5.6-sol. Enable that model "
-            "for the project or use a key from a project with access, then restart "
-            "the Council."
+            "GPT-5.6 Sol is not available to this ChatGPT workspace. Check the "
+            "active Codex account and plan."
         )
         fake = AsyncMock(side_effect=PromptAssistModelError(message))
         with patch("cli.prompt_assist.generate_prompt_draft", fake):

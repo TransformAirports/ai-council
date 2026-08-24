@@ -29,10 +29,10 @@ Requirements:
 
 - macOS or Linux
 - Python 3.11 or newer
-- Claude Code plus a Claude subscription login, or an `ANTHROPIC_API_KEY`
+- Claude Code with a Claude subscription login
+- Codex CLI plus `codex login` for ChatGPT-subscription GPT-5.6 Sol runs
 - LibreOffice (`soffice`) for Office-to-PDF rendering
 - Poppler (`pdftoppm`) for page and slide inspection
-- `OPENAI_API_KEY` for the GPT-5.6 Sol Prompt Coach and the optional Deep Research lens
 
 The copy-and-paste macOS and Ubuntu installation path is in
 [`getting-started.md`](getting-started.md). After installing system tools, run
@@ -40,13 +40,14 @@ the read-only doctor before opening the app:
 
 ```bash
 claude auth login
+codex login
 ./council --doctor
 ./council
 ```
 
 The launcher creates `.venv`, installs dependencies, and opens the browser app.
-Copy `.env.example` to `.env` for local credentials. The file is ignored by
-Git, and shell environment variables take precedence.
+The saved `claude auth login` and `codex login` sessions are the only model
+credentials the Council uses; no `.env` credential file is needed.
 
 Useful headless commands:
 
@@ -65,8 +66,8 @@ Useful headless commands:
 `--run` first performs a no-model-call preflight. It rejects unresolved
 placeholders, unsafe paths, duplicate or unknown agent names, missing sources,
 and incomplete required sections. `--dry-run` creates a new run file; it
-cannot be combined with `--run`. A zero budget permits no Claude calls. The
-optional OpenAI Deep Research lens is billed separately from that ceiling.
+cannot be combined with `--run`. A zero budget permits no model calls. New run
+prompts choose Claude Fable 5 or GPT-5.6 Sol for every report role.
 
 ## Architecture
 
@@ -133,7 +134,8 @@ ceilings are enforced between model calls.
 
 ## Model routing
 
-`council.toml` maps roles—not individual hard-coded stages—to models:
+New report prompts store one run-level model selection. `council.toml` retains
+the role map used by legacy prompts that predate this selector:
 
 - context
 - research
@@ -148,9 +150,9 @@ ceilings are enforced between model calls.
 - art direction
 - presentation
 
-This is multi-model orchestration: the system assigns each kind of reasoning to
-the configured model instead of assuming one model is best at every job. The
-manifest records what actually ran.
+For a new report, the selected Claude Fable 5 or GPT-5.6 Sol model overrides
+every role in this list. The manifest records what actually ran, and resume
+refuses to mix artifacts created under different routing.
 
 ## Source material
 

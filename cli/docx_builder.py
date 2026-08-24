@@ -22,6 +22,7 @@ from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.shared import Inches, Pt, RGBColor
 
 from cli.publishing_quality import (
@@ -93,7 +94,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 COUNCIL_LOGO = REPO_ROOT / "assets" / "council-logo.png"
 AI_ACCOUNTABILITY_NOTICE = (
     "This decision-support document was generated with assistance from a "
-    "multi-model AI research system. A named human decision owner remains "
+    "multi-agent AI research system. A named human decision owner remains "
     "responsible for verifying the evidence, judging local applicability, "
     "and approving any action."
 )
@@ -140,8 +141,44 @@ def _compact_argument_memo_source_urls(markdown: str) -> str:
     return "\n".join(lines)
 
 
+def _add_hyperlink(
+    paragraph,
+    label: str,
+    url: str,
+    *,
+    base_size: float,
+    font: str,
+) -> None:
+    """Add one external Word hyperlink without exposing Markdown syntax."""
+
+    relation = paragraph.part.relate_to(url, RT.HYPERLINK, is_external=True)
+    hyperlink = OxmlElement("w:hyperlink")
+    hyperlink.set(qn("r:id"), relation)
+    run = OxmlElement("w:r")
+    properties = OxmlElement("w:rPr")
+    fonts = OxmlElement("w:rFonts")
+    fonts.set(qn("w:ascii"), font)
+    fonts.set(qn("w:hAnsi"), font)
+    properties.append(fonts)
+    color = OxmlElement("w:color")
+    color.set(qn("w:val"), "1F5E7A")
+    properties.append(color)
+    underline = OxmlElement("w:u")
+    underline.set(qn("w:val"), "single")
+    properties.append(underline)
+    size = OxmlElement("w:sz")
+    size.set(qn("w:val"), str(int(round(base_size * 2))))
+    properties.append(size)
+    run.append(properties)
+    node = OxmlElement("w:t")
+    node.text = re.sub(r"[*_`]", "", label).strip()
+    run.append(node)
+    hyperlink.append(run)
+    paragraph._p.append(hyperlink)
+
+
 def _add_inline(paragraph, text: str, base_size: int = 11, font: str = "Calibri") -> None:
-    """Add a text run, parsing **bold**, *italic*, `code`, and [^n] footnotes."""
+    """Add text while parsing emphasis, links, code, and numbered notes."""
     # This is the final common boundary for prose written into a Word file.
     # Sanitizing here also covers structured visual-brief fields and source
     # appendix records that do not pass through ``sanitize_reader_markdown``.
@@ -149,26 +186,41 @@ def _add_inline(paragraph, text: str, base_size: int = 11, font: str = "Calibri"
     if not text:
         return
     pos = 0
-    tokens: list[tuple[str, str]] = []
+    tokens: list[tuple[str, str, str | None]] = []
     pattern = re.compile(
-        r"\*\*(.+?)\*\*|(?<!\*)\*([^*]+?)\*(?!\*)|`([^`]+)`|\[\^(\d+)\]"
+        r"\[([^\]]+)\]\((https?://[^)\s]+)\)"
+        r"|\*\*(.+?)\*\*"
+        r"|(?<!\*)\*([^*]+?)\*(?!\*)"
+        r"|`([^`]+)`"
+        r"|\[\^(\d+)\]"
     )
     for m in pattern.finditer(text):
         if m.start() > pos:
-            tokens.append(("plain", text[pos : m.start()]))
+            tokens.append(("plain", text[pos : m.start()], None))
         if m.group(1) is not None:
-            tokens.append(("bold", m.group(1)))
-        elif m.group(2) is not None:
-            tokens.append(("italic", m.group(2)))
+            tokens.append(("link", m.group(1), m.group(2)))
         elif m.group(3) is not None:
-            tokens.append(("code", m.group(3)))
+            tokens.append(("bold", m.group(3), None))
         elif m.group(4) is not None:
-            tokens.append(("footnote", m.group(4)))
+            tokens.append(("italic", m.group(4), None))
+        elif m.group(5) is not None:
+            tokens.append(("code", m.group(5), None))
+        elif m.group(6) is not None:
+            tokens.append(("footnote", m.group(6), None))
         pos = m.end()
     if pos < len(text):
-        tokens.append(("plain", text[pos:]))
+        tokens.append(("plain", text[pos:], None))
 
-    for kind, value in tokens:
+    for kind, value, target in tokens:
+        if kind == "link" and target:
+            _add_hyperlink(
+                paragraph,
+                value,
+                target,
+                base_size=base_size,
+                font=font,
+            )
+            continue
         run = paragraph.add_run(value)
         run.font.size = Pt(base_size)
         run.font.name = font
@@ -364,9 +416,22 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11, font: s
                 bm = BULLET_RE.match(line)
                 if not bm:
                     break
-                p = doc.add_paragraph(style="List Bullet")
-                _add_inline(p, bm.group(1), base_size=body_size, font=font)
+                parts = [bm.group(1).strip()]
                 i += 1
+                while i < len(lines) and lines[i].strip():
+                    continuation = lines[i].rstrip()
+                    if (
+                        HEADING_RE.match(continuation)
+                        or BULLET_RE.match(continuation)
+                        or ORDERED_RE.match(continuation)
+                        or BLOCKQUOTE_RE.match(continuation)
+                        or HORIZONTAL_RULE_RE.match(continuation)
+                    ):
+                        break
+                    parts.append(continuation.strip())
+                    i += 1
+                p = doc.add_paragraph(style="List Bullet")
+                _add_inline(p, " ".join(parts), base_size=body_size, font=font)
             continue
 
         m = ORDERED_RE.match(raw)
@@ -376,9 +441,22 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11, font: s
                 om = ORDERED_RE.match(line)
                 if not om:
                     break
-                p = doc.add_paragraph(style="List Number")
-                _add_inline(p, om.group(1), base_size=body_size, font=font)
+                parts = [om.group(1).strip()]
                 i += 1
+                while i < len(lines) and lines[i].strip():
+                    continuation = lines[i].rstrip()
+                    if (
+                        HEADING_RE.match(continuation)
+                        or BULLET_RE.match(continuation)
+                        or ORDERED_RE.match(continuation)
+                        or BLOCKQUOTE_RE.match(continuation)
+                        or HORIZONTAL_RULE_RE.match(continuation)
+                    ):
+                        break
+                    parts.append(continuation.strip())
+                    i += 1
+                p = doc.add_paragraph(style="List Number")
+                _add_inline(p, " ".join(parts), base_size=body_size, font=font)
             continue
 
         m = BLOCKQUOTE_RE.match(raw)
@@ -415,15 +493,17 @@ def _markdown_to_docx(doc: Document, markdown: str, body_size: int = 11, font: s
     if notes:
         heading = doc.add_heading(level=2)
         _add_inline(heading, "Notes", base_size=14, font=DISPLAY_FONT)
+        note_size = min(max(body_size - 2.75, 8), 8.25)
         for num, note_text in notes:
             p = doc.add_paragraph()
-            p.paragraph_format.space_after = Pt(3)
+            p.paragraph_format.line_spacing = 1.0
+            p.paragraph_format.space_after = Pt(1.5)
             mark = p.add_run(num)
             mark.font.superscript = True
-            mark.font.size = Pt(8)
+            mark.font.size = Pt(7.5)
             mark.font.name = font
             p.add_run("  ")
-            _add_inline(p, note_text, base_size=max(body_size - 1.5, 8), font=font)
+            _add_inline(p, note_text, base_size=note_size, font=font)
             for run in p.runs[2:]:
                 run.font.color.rgb = RGBColor(0x55, 0x55, 0x55)
 
@@ -629,21 +709,57 @@ def _add_ai_accountability_notice(
     _style_callout(p)
 
 
-def _add_table_of_contents(doc: Document) -> None:
+def _add_table_of_contents(
+    doc: Document,
+    narrative_markdown: str,
+    *,
+    include_exhibits: bool,
+) -> None:
+    """Add a deterministic static report map for headless Word rendering."""
+
     heading = doc.add_heading("Contents", level=1)
-    heading.paragraph_format.space_after = Pt(12)
-    p = doc.add_paragraph()
-    run = p.add_run()
-    fld_begin = run._element.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "begin"})
-    run._element.append(fld_begin)
-    instr = run._element.makeelement(qn("w:instrText"), {qn("xml:space"): "preserve"})
-    instr.text = 'TOC \\o "1-3" \\h \\z \\u'
-    run._element.append(instr)
-    fld_sep = run._element.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "separate"})
-    run._element.append(fld_sep)
-    fld_end = run._element.makeelement(qn("w:fldChar"), {qn("w:fldCharType"): "end"})
-    fld_end.set(qn("w:dirty"), "true")
-    run._element.append(fld_end)
+    heading.paragraph_format.space_after = Pt(6)
+    intro = doc.add_paragraph()
+    intro.paragraph_format.space_after = Pt(10)
+    _add_inline(
+        intro,
+        "A reliable map of the argument and its evidence appendices.",
+        base_size=9.5,
+        font=BODY_FONT,
+    )
+    for run in intro.runs:
+        run.font.color.rgb = OPERATIONS_SLATE
+
+    entries: list[str] = []
+    for line in sanitize_reader_markdown(narrative_markdown).splitlines():
+        match = HEADING_RE.match(line.strip())
+        if not match or len(match.group(1)) not in {2, 3}:
+            continue
+        label = re.sub(r"[*_`]", "", match.group(2)).strip()
+        if label and label.casefold() not in _FRONT_SUMMARY_HEADINGS:
+            entries.append(label)
+    if include_exhibits:
+        entries.append("Decision exhibits")
+    entries.extend(
+        (
+            "Technical appendix: Evidence register",
+            "Technical appendix: Methodology",
+        )
+    )
+    for index, label in enumerate(dict.fromkeys(entries), 1):
+        p = doc.add_paragraph()
+        p.paragraph_format.space_before = Pt(1)
+        p.paragraph_format.space_after = Pt(4)
+        p.paragraph_format.keep_together = True
+        number = p.add_run(f"{index:02d}  ")
+        number.bold = True
+        number.font.name = BODY_FONT
+        number.font.size = Pt(8.5)
+        number.font.color.rgb = GUIDANCE_GOLD
+        title = p.add_run(label)
+        title.font.name = DISPLAY_FONT
+        title.font.size = Pt(10.5)
+        title.font.color.rgb = RUNWAY_NAVY
     doc.add_page_break()
 
 
@@ -750,9 +866,14 @@ def _build_full_report(
         narrative_md = _without_front_summary(final_draft_md)
         _add_decision_brief(doc, brief)
         doc.add_page_break()
-    _add_table_of_contents(doc)
+    exhibits = _renderable_exhibits(visual_brief)
+    _add_table_of_contents(
+        doc,
+        narrative_md,
+        include_exhibits=bool(exhibits),
+    )
     _markdown_to_docx(doc, narrative_md, body_size=11)
-    if _renderable_exhibits(visual_brief):
+    if exhibits:
         doc.add_page_break()
         _add_decision_exhibits(doc, visual_brief)
     doc.add_page_break()
@@ -1567,9 +1688,15 @@ def _add_exhibit_source(
     label.font.name = BODY_FONT
     label.font.size = Pt(7.75 if compact else 8.25)
     label.font.color.rgb = OPERATIONS_SLATE
+    source_note = re.sub(
+        r"^\s*sources?\s*:\s*",
+        "",
+        exhibit.source_note,
+        flags=re.IGNORECASE,
+    )
     _add_inline(
         source,
-        exhibit.source_note,
+        source_note,
         base_size=7.75 if compact else 8.25,
         font=BODY_FONT,
     )
@@ -1606,7 +1733,7 @@ def _add_decision_exhibits(
         run.font.color.rgb = OPERATIONS_SLATE
 
     for exhibit_index, exhibit in enumerate(exhibits):
-        if exhibit_index and exhibit.exhibit_type == "timeline":
+        if exhibit_index:
             doc.add_page_break()
         _add_exhibit_title(doc, exhibit, compact=compact)
         if exhibit.exhibit_type in {"table", "comparison"}:
@@ -1649,7 +1776,7 @@ def _footnote_evidence_records(
 
 
 def _source_appendix_entries(visual_brief: dict | None) -> tuple[str, ...]:
-    """Return source-register text while excluding internal lineage fields."""
+    """Return explicit source records, never source-appendix production notes."""
     if not isinstance(visual_brief, dict):
         return ()
     payload = visual_brief.get("source_appendix")
@@ -1683,9 +1810,6 @@ def _source_appendix_entries(visual_brief: dict | None) -> tuple[str, ...]:
                 fields.append((label, values))
         return fields
 
-    if isinstance(payload, str):
-        cleaned = _clean_text(payload)
-        return (cleaned,) if cleaned else ()
     if isinstance(payload, list):
         entries: list[str] = []
         for item in payload:
@@ -1696,10 +1820,20 @@ def _source_appendix_entries(visual_brief: dict | None) -> tuple[str, ...]:
                 ]
                 if parts:
                     entries.append(" | ".join(parts))
-            else:
-                entries.extend(_string_values(item))
         return tuple(entries)
     if isinstance(payload, dict):
+        normalized_keys = {
+            re.sub(r"[^a-z0-9]+", "_", str(key).lower()).strip("_")
+            for key in payload
+        }
+        # The Art Director also uses this object for appendix layout,
+        # grouping, exclusions, and legibility instructions. Those notes are
+        # production metadata, not reader-facing sources. Only a dictionary
+        # that identifies an actual source record may cross this boundary.
+        if not normalized_keys.intersection(
+            {"source", "source_title", "title", "url", "issuing_body"}
+        ):
+            return ()
         entries = []
         for label, values in reader_fields(payload):
             entries.append(f"{label}: {'; '.join(values)}")
@@ -1730,43 +1864,64 @@ def _add_technical_evidence_appendix(
     records = _footnote_evidence_records(final_draft_md)
     if records:
         doc.add_heading("Report source notes", level=2)
-        table = doc.add_table(rows=1, cols=3)
-        table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        table.style = "Table Grid"
-        _set_repeat_table_header(table.rows[0])
-        for cell, label in zip(
-            table.rows[0].cells,
-            ("Note", "Claim context", "Source record"),
-        ):
-            _set_cell_shading(cell, "0B2D4D")
-            _set_cell_margins(cell)
-            p = cell.paragraphs[0]
-            _add_inline(p, label, base_size=9, font=BODY_FONT)
-            for run in p.runs:
-                run.bold = True
-                run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        for index, (note_id, context, source) in enumerate(records, 1):
-            row = table.add_row()
-            _prevent_row_split(row)
-            for cell in row.cells:
+        # LibreOffice can intermittently omit a repeated Word table header on
+        # one continuation page of a long table. Use bounded, explicitly
+        # paginated tables instead. Three records fit even when source records
+        # carry long titles and URLs; every page gets its own real header row.
+        chunks = [records[start : start + 3] for start in range(0, len(records), 3)]
+        record_index = 0
+        for chunk_index, chunk in enumerate(chunks):
+            if chunk_index:
+                # A literal page-break run can be pushed onto a fresh page
+                # when the preceding table finishes at the bottom margin,
+                # producing a blank page before the next table. Put the page
+                # boundary on a real continuation label instead.
+                continuation = doc.add_paragraph()
+                continuation.paragraph_format.page_break_before = True
+                continuation.paragraph_format.space_after = Pt(4)
+                label = continuation.add_run("Report source notes · continued")
+                label.bold = True
+                label.font.name = DISPLAY_FONT
+                label.font.size = Pt(9)
+                label.font.color.rgb = RUNWAY_NAVY
+            table = doc.add_table(rows=1, cols=3)
+            table.alignment = WD_TABLE_ALIGNMENT.CENTER
+            table.style = "Table Grid"
+            _set_repeat_table_header(table.rows[0])
+            for cell, label in zip(
+                table.rows[0].cells,
+                ("Note", "Claim context", "Source record"),
+            ):
+                _set_cell_shading(cell, "0B2D4D")
                 _set_cell_margins(cell)
-                if index % 2 == 0:
-                    _set_cell_shading(cell, APRON_FOG)
-            note_p = row.cells[0].paragraphs[0]
-            note_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            _add_inline(note_p, note_id, base_size=9, font=BODY_FONT)
-            _add_inline(
-                row.cells[1].paragraphs[0],
-                context,
-                base_size=8.5,
-                font=BODY_FONT,
-            )
-            _add_inline(
-                row.cells[2].paragraphs[0],
-                source,
-                base_size=8.5,
-                font=BODY_FONT,
-            )
+                p = cell.paragraphs[0]
+                _add_inline(p, label, base_size=9, font=BODY_FONT)
+                for run in p.runs:
+                    run.bold = True
+                    run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+            for note_id, context, source in chunk:
+                record_index += 1
+                row = table.add_row()
+                _prevent_row_split(row)
+                for cell in row.cells:
+                    _set_cell_margins(cell)
+                    if record_index % 2 == 0:
+                        _set_cell_shading(cell, APRON_FOG)
+                note_p = row.cells[0].paragraphs[0]
+                note_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                _add_inline(note_p, note_id, base_size=9, font=BODY_FONT)
+                _add_inline(
+                    row.cells[1].paragraphs[0],
+                    context,
+                    base_size=8.5,
+                    font=BODY_FONT,
+                )
+                _add_inline(
+                    row.cells[2].paragraphs[0],
+                    source,
+                    base_size=8.5,
+                    font=BODY_FONT,
+                )
     else:
         p = doc.add_paragraph()
         _add_inline(
@@ -1778,7 +1933,8 @@ def _add_technical_evidence_appendix(
 
     visuals = _renderable_exhibits(visual_brief)
     if visuals:
-        doc.add_heading("Exhibit source notes", level=2)
+        exhibit_heading = doc.add_heading("Exhibit source notes", level=2)
+        exhibit_heading.paragraph_format.page_break_before = True
         table = doc.add_table(rows=1, cols=3)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
         table.style = "Table Grid"
@@ -1815,6 +1971,7 @@ def _add_technical_evidence_appendix(
 
     source_appendix = _source_appendix_entries(visual_brief)
     if source_appendix:
+        doc.add_page_break()
         doc.add_heading("Additional exhibit sources", level=2)
         for entry in source_appendix:
             p = doc.add_paragraph(style="List Bullet")

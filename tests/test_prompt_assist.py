@@ -8,17 +8,18 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from cli.prompt_assist import (
-    PROMPT_ASSIST_MAX_BUDGET_USD,
     PROMPT_ASSIST_MAX_OUTPUT_TOKENS,
     PROMPT_ASSIST_MODEL,
     PROMPT_ASSIST_REASONING_EFFORT,
     PROMPT_ASSIST_MAX_TURNS,
+    PROMPT_DRAFT_SCHEMA,
     PromptAssistModelError,
     PromptAssistValidationError,
     generate_prompt_draft,
     normalise_prompt_assist_request,
     normalise_prompt_draft,
 )
+from cli.codex_subscription import CodexExecResult, CodexSubscriptionError
 
 
 def _draft(**updates: object) -> dict[str, object]:
@@ -241,10 +242,11 @@ class PromptAssistModelTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(response["model"], "test-creative-model")
         self.assertEqual(response["provider"], "openai")
-        self.assertEqual(response["cost_usd"], 0.014)
-        self.assertTrue(response["cost_is_estimate"])
+        self.assertEqual(response["cost_usd"], 0.0)
+        self.assertFalse(response["cost_is_estimate"])
         self.assertEqual(response["turns"], 1)
-        self.assertEqual(response["budget_ceiling_usd"], 1.5)
+        self.assertIsNone(response["budget_ceiling_usd"])
+        self.assertEqual(response["auth_mode"], "chatgpt_subscription")
         self.assertEqual(response["output_format"], "report")
         self.assertFalse(response["decision_frame_enabled"])
         self.assertEqual(response["draft"]["decision_required"], "")
@@ -268,6 +270,35 @@ class PromptAssistModelTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(captured["model"], PROMPT_ASSIST_MODEL)
         self.assertEqual(response["model"], "gpt-5.6-sol")
 
+    async def test_live_path_uses_chatgpt_subscription_without_api_cost(self) -> None:
+        async def fake_codex(**kwargs):
+            self.assertEqual(kwargs["model"], "gpt-5.6-sol")
+            self.assertEqual(kwargs["sandbox"], "read-only")
+            self.assertTrue(kwargs["skip_git_repo_check"])
+            self.assertEqual(kwargs["output_schema"], PROMPT_DRAFT_SCHEMA)
+            self.assertEqual(
+                kwargs["reasoning_effort"], PROMPT_ASSIST_REASONING_EFFORT
+            )
+            return CodexExecResult(
+                final_text=json.dumps(_draft()),
+                input_tokens=100,
+                cached_input_tokens=20,
+                output_tokens=50,
+                reasoning_output_tokens=10,
+                tool_calls=0,
+                turns=1,
+            )
+
+        with patch("cli.prompt_assist.run_codex_exec", new=fake_codex):
+            response = await generate_prompt_draft(
+                {"brief": "Test the operating claim before approving construction."}
+            )
+
+        self.assertEqual(response["auth_mode"], "chatgpt_subscription")
+        self.assertEqual(response["cost_usd"], 0.0)
+        self.assertFalse(response["cost_is_estimate"])
+        self.assertIsNone(response["budget_ceiling_usd"])
+
     async def test_missing_failed_or_malformed_model_result_fails_closed(self) -> None:
         async def no_result(**kwargs):
             return None
@@ -284,7 +315,7 @@ class PromptAssistModelTests(unittest.IsolatedAsyncioTestCase):
             return _response(output_text="not-json")
 
         for response_fn, expected in (
-            (no_result, "without an OpenAI response"),
+            (no_result, "without a model response"),
             (failed_result, "did not complete"),
             (missing_field, "did not match the Council form"),
             (invalid_json, "could not be decoded"),
@@ -312,9 +343,8 @@ class PromptAssistModelTests(unittest.IsolatedAsyncioTestCase):
             )
 
         message = str(raised.exception)
-        self.assertIn("gpt-5.6-sol", message)
-        self.assertIn("OpenAI API project", message)
-        self.assertIn("restart", message)
+        self.assertIn("GPT-5.6 Sol", message)
+        self.assertIn("ChatGPT workspace", message)
         self.assertNotIn("project detail", message)
 
     async def test_provider_exception_is_replaced_with_safe_error(self) -> None:
@@ -344,28 +374,31 @@ class PromptAssistModelTests(unittest.IsolatedAsyncioTestCase):
                 response_fn=tool_response,
             )
 
-    async def test_usage_must_stay_inside_the_fixed_contract(self) -> None:
+    async def test_injected_usage_never_becomes_api_billing(self) -> None:
         async def too_expensive(**kwargs):
             return _response(output_tokens=100_000)
 
         async def invalid_usage(**kwargs):
             return _response(input_tokens=-1)
 
-        for response_fn, expected in (
-            (too_expensive, "cost ceiling"),
-            (invalid_usage, "usage metadata"),
-        ):
-            with self.subTest(expected=expected):
-                with self.assertRaisesRegex(PromptAssistModelError, expected):
-                    await generate_prompt_draft(
-                        {"brief": "Test the operating claim before approving construction."},
-                        model="test-model",
-                        response_fn=response_fn,
-                    )
+        for response_fn in (too_expensive, invalid_usage):
+            with self.subTest(response_fn=response_fn.__name__):
+                response = await generate_prompt_draft(
+                    {"brief": "Test the operating claim before approving construction."},
+                    model="test-model",
+                    response_fn=response_fn,
+                )
+                self.assertEqual(response["cost_usd"], 0.0)
+                self.assertEqual(response["auth_mode"], "chatgpt_subscription")
 
-    async def test_missing_openai_key_fails_before_a_model_call(self) -> None:
-        with patch.dict("os.environ", {"OPENAI_API_KEY": ""}):
-            with self.assertRaisesRegex(PromptAssistModelError, "OPENAI_API_KEY"):
+    async def test_missing_chatgpt_login_fails_before_a_model_call(self) -> None:
+        with patch(
+            "cli.prompt_assist.run_codex_exec",
+            side_effect=CodexSubscriptionError(
+                "Codex is not signed in with ChatGPT. Run `codex login`."
+            ),
+        ):
+            with self.assertRaisesRegex(PromptAssistModelError, "codex login"):
                 await generate_prompt_draft(
                     {"brief": "Test the operating claim before approving construction."}
                 )

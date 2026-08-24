@@ -8,28 +8,23 @@ tools, MCP servers, project settings, or skills.
 from __future__ import annotations
 
 import json
-import math
-import os
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Awaitable, Callable
+
+from cli.codex_subscription import CodexSubscriptionError, run_codex_exec
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PROMPT_COACH_PATH = REPO_ROOT / "prompts" / "prompt-coach.md"
 
 PROMPT_ASSIST_MAX_TURNS = 1
-PROMPT_ASSIST_MAX_BUDGET_USD = 1.50
 PROMPT_ASSIST_MAX_INPUT_CHARS = 20_000
 PROMPT_ASSIST_MAX_OUTPUT_TOKENS = 4_000
 PROMPT_ASSIST_MODEL = "gpt-5.6-sol"
 PROMPT_ASSIST_REASONING_EFFORT = "medium"
-# Current promotional GPT-5.6 Sol token prices through at least 2026-11-21.
-# Cost is labeled as an estimate because OpenAI may change pricing independently
-# of this local app. https://developers.openai.com/api/docs/models/gpt-5.6-sol
-PROMPT_ASSIST_INPUT_USD_PER_MILLION = 4.0
-PROMPT_ASSIST_OUTPUT_USD_PER_MILLION = 20.0
 
 ALLOWED_OUTPUT_FORMATS = frozenset(
     {"report", "article", "brief", "recommendations"}
@@ -126,6 +121,9 @@ class PromptAssistResult:
     cost_usd: float
     turns: int
     decision_frame_enabled: bool
+    auth_mode: str = "chatgpt_subscription"
+    cost_is_estimate: bool = False
+    budget_ceiling_usd: float | None = None
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -135,10 +133,11 @@ class PromptAssistResult:
             "decision_frame_enabled": self.decision_frame_enabled,
             "model": self.model,
             "cost_usd": self.cost_usd,
-            "cost_is_estimate": True,
+            "cost_is_estimate": self.cost_is_estimate,
             "turns": self.turns,
-            "budget_ceiling_usd": PROMPT_ASSIST_MAX_BUDGET_USD,
+            "budget_ceiling_usd": self.budget_ceiling_usd,
             "provider": "openai",
+            "auth_mode": self.auth_mode,
             "started_run": False,
         }
 
@@ -359,47 +358,18 @@ def _safe_provider_failure_message(
     """Map provider failures to actionable text without echoing raw secrets."""
 
     folded = str(detail or "").casefold()
-    if status == 401 or "incorrect api key" in folded:
-        return (
-            "OpenAI rejected OPENAI_API_KEY. Replace it in .env with an active "
-            "OpenAI API key, then restart the Council."
-        )
+    if status == 401 or "not logged in" in folded or "authentication" in folded:
+        return "Codex is not signed in with ChatGPT. Run `codex login` and restart the Council."
     if status in {403, 404} or "model_not_found" in folded:
         return (
-            "This OpenAI API project cannot use gpt-5.6-sol. Enable that model "
-            "for the project or use a key from a project with access, then restart "
-            "the Council."
+            "GPT-5.6 Sol is not available to this ChatGPT workspace. Check the "
+            "active Codex account and plan."
         )
     if status == 429 or "rate limit" in folded:
-        return "OpenAI is rate-limiting this request. Wait briefly and try again."
+        return "The ChatGPT plan has reached a Codex usage limit. Wait for the plan window to reset and try again."
     if isinstance(status, int) and status >= 500:
         return "OpenAI returned a temporary service error. Try the prompt coach again."
     return "GPT-5.6 Sol could not complete the bounded Prompt Coach call."
-
-
-def _estimated_openai_cost(response: object) -> float:
-    usage = getattr(response, "usage", None)
-    input_tokens = getattr(usage, "input_tokens", 0) or 0
-    output_tokens = getattr(usage, "output_tokens", 0) or 0
-    if (
-        not isinstance(input_tokens, int)
-        or isinstance(input_tokens, bool)
-        or input_tokens < 0
-        or not isinstance(output_tokens, int)
-        or isinstance(output_tokens, bool)
-        or output_tokens < 0
-    ):
-        raise PromptAssistModelError(
-            "The prompt coach returned invalid OpenAI usage metadata."
-        )
-    return round(
-        (
-            input_tokens * PROMPT_ASSIST_INPUT_USD_PER_MILLION
-            + output_tokens * PROMPT_ASSIST_OUTPUT_USD_PER_MILLION
-        )
-        / 1_000_000,
-        6,
-    )
 
 
 async def generate_prompt_draft(
@@ -422,42 +392,53 @@ async def generate_prompt_draft(
         raise PromptAssistModelError("The configured Prompt Coach model must be text.")
     model_id = model.strip() if isinstance(model, str) else PROMPT_ASSIST_MODEL
     if not isinstance(model_id, str) or not model_id.strip():
-        raise PromptAssistModelError("No OpenAI Prompt Coach model is configured.")
+        raise PromptAssistModelError("No Prompt Coach model is configured.")
     model_id = model_id.strip()
     _ = repo_root  # Deliberately accepted for compatibility; the call cannot write.
     call = response_fn
     client = None
+    subscription_result = None
     try:
         if call is None:
-            if not os.environ.get("OPENAI_API_KEY"):
-                raise PromptAssistModelError(
-                    "Prompt Coach requires OPENAI_API_KEY in .env. Add the key "
-                    "and restart the Council."
+            with tempfile.TemporaryDirectory(prefix="council-prompt-coach-") as directory:
+                subscription_result = await run_codex_exec(
+                    prompt=(
+                        _load_system_prompt(prompt_path)
+                        + "\n\n"
+                        + _operator_prompt(request)
+                    ),
+                    model=model_id,
+                    execution_cwd=Path(directory),
+                    sandbox="read-only",
+                    output_schema=PROMPT_DRAFT_SCHEMA,
+                    timeout_seconds=85,
+                    skip_git_repo_check=True,
+                    reasoning_effort=PROMPT_ASSIST_REASONING_EFFORT,
                 )
-            from openai import AsyncOpenAI
-
-            client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"], timeout=60.0)
-            call = client.responses.create
-        response = await call(
-            model=model_id,
-            instructions=_load_system_prompt(prompt_path),
-            input=_operator_prompt(request),
-            reasoning={"effort": PROMPT_ASSIST_REASONING_EFFORT},
-            max_output_tokens=PROMPT_ASSIST_MAX_OUTPUT_TOKENS,
-            text={
-                "format": {
-                    "type": "json_schema",
-                    "name": "council_prompt_draft",
-                    "schema": PROMPT_DRAFT_SCHEMA,
-                    "strict": True,
+            response = None
+        else:
+            response = await call(
+                model=model_id,
+                instructions=_load_system_prompt(prompt_path),
+                input=_operator_prompt(request),
+                reasoning={"effort": PROMPT_ASSIST_REASONING_EFFORT},
+                max_output_tokens=PROMPT_ASSIST_MAX_OUTPUT_TOKENS,
+                text={
+                    "format": {
+                        "type": "json_schema",
+                        "name": "council_prompt_draft",
+                        "schema": PROMPT_DRAFT_SCHEMA,
+                        "strict": True,
+                    },
+                    "verbosity": "low",
                 },
-                "verbosity": "low",
-            },
-            tools=[],
-            store=False,
-        )
+                tools=[],
+                store=False,
+            )
     except PromptAssistError:
         raise
+    except CodexSubscriptionError as exc:
+        raise PromptAssistModelError(str(exc)) from exc
     except Exception as exc:  # noqa: BLE001 - provider details stay behind the API
         status = getattr(exc, "status_code", None)
         if not isinstance(status, int):
@@ -472,24 +453,31 @@ async def generate_prompt_draft(
         if client is not None:
             await client.close()
 
-    if response is None:
-        raise PromptAssistModelError(
-            "The prompt coach ended without an OpenAI response."
-        )
-    status = str(getattr(response, "status", "") or "").casefold()
-    if status != "completed" or getattr(response, "error", None) is not None:
-        raise PromptAssistModelError(
-            "GPT-5.6 Sol did not complete the Prompt Coach response. Try again."
-        )
-    output_items = getattr(response, "output", ()) or ()
-    if any(
-        str(getattr(item, "type", "") or "").casefold().endswith("_call")
-        for item in output_items
-    ):
-        raise PromptAssistModelError(
-            "The prompt coach attempted an action it is not allowed to perform."
-        )
-    output_text = getattr(response, "output_text", None)
+    if subscription_result is not None:
+        if subscription_result.tool_calls:
+            raise PromptAssistModelError(
+                "The prompt coach attempted an action it is not allowed to perform."
+            )
+        output_text = subscription_result.final_text
+    else:
+        if response is None:
+            raise PromptAssistModelError(
+                "The prompt coach ended without a model response."
+            )
+        status = str(getattr(response, "status", "") or "").casefold()
+        if status != "completed" or getattr(response, "error", None) is not None:
+            raise PromptAssistModelError(
+                "GPT-5.6 Sol did not complete the Prompt Coach response. Try again."
+            )
+        output_items = getattr(response, "output", ()) or ()
+        if any(
+            str(getattr(item, "type", "") or "").casefold().endswith("_call")
+            for item in output_items
+        ):
+            raise PromptAssistModelError(
+                "The prompt coach attempted an action it is not allowed to perform."
+            )
+        output_text = getattr(response, "output_text", None)
     if not isinstance(output_text, str) or not output_text.strip():
         raise PromptAssistModelError(
             "GPT-5.6 Sol returned no structured Prompt Coach draft."
@@ -510,25 +498,26 @@ async def generate_prompt_draft(
             "GPT-5.6 Sol returned a draft that did not match the Council form."
         ) from exc
 
-    cost = _estimated_openai_cost(response)
-    if not math.isfinite(cost) or cost < 0:
-        raise PromptAssistModelError("The prompt coach returned invalid usage metadata.")
-    if cost > PROMPT_ASSIST_MAX_BUDGET_USD + 1e-6:
-        raise PromptAssistModelError("The prompt coach exceeded its fixed cost ceiling.")
     return PromptAssistResult(
         draft=draft,
         output_format=request.output_format,
         model=model_id,
-        cost_usd=cost,
-        turns=PROMPT_ASSIST_MAX_TURNS,
+        cost_usd=0.0,
+        turns=(
+            subscription_result.turns
+            if subscription_result is not None
+            else PROMPT_ASSIST_MAX_TURNS
+        ),
         decision_frame_enabled=request.decision_frame_enabled,
+        auth_mode="chatgpt_subscription",
+        cost_is_estimate=False,
+        budget_ceiling_usd=None,
     ).to_dict()
 
 
 __all__ = [
     "ALLOWED_OUTPUT_FORMATS",
     "DECISION_FIELDS",
-    "PROMPT_ASSIST_MAX_BUDGET_USD",
     "PROMPT_ASSIST_MAX_INPUT_CHARS",
     "PROMPT_ASSIST_MAX_OUTPUT_TOKENS",
     "PROMPT_ASSIST_MAX_TURNS",

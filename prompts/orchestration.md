@@ -15,7 +15,7 @@ manually invoking a fixed roster of agents.
    a missing supplied source, and an empty research roster.
 3. Read the prompt and confirm the thesis, writing mode, any opted-in decision
    frame, selected research lenses, requested deliverables, and configured budget with the user. Make
-   clear that this is a paid, multi-model run. Do not quote a fixed time or cost
+   clear that this is a paid Council run. Do not quote a fixed time or cost
    for every roster.
 4. After confirmation, launch the exact file:
 
@@ -184,7 +184,9 @@ research and writing finished.
 ## Rules throughout the run
 
 - Use the manifest roster and paths; never hard-code a researcher count.
-- Respect role-based model assignments in `council.toml`.
+- Respect the run prompt's explicit `## Council model` for every report role.
+  Use role-based assignments in `council.toml` only for legacy prompts that do
+  not contain that section.
 - Keep research independent until curation.
 - Treat briefs as analysis and the evidence ledger as provenance; cite the
   underlying source to the reader.

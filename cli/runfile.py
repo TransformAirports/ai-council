@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 
 from cli.agents import RESEARCH_AGENT_NAMES, SUPPLEMENTAL_AGENT_NAMES
+from cli.council_models import council_model
 
 # Every agent that can be seated on a run, in a stable order (core roster
 # first, then supplemental personas).
@@ -65,6 +66,15 @@ def render_run_file(spec: RunSpec) -> str:
     lines.append("")
     lines.append(spec.output_format)
     lines.append("")
+
+    if spec.council_model:
+        # Resolve before writing so a hand-constructed RunSpec cannot persist
+        # arbitrary model/provider identifiers into the execution contract.
+        council_model(spec.council_model)
+        lines.append("## Council model")
+        lines.append("")
+        lines.append(spec.council_model)
+        lines.append("")
 
     if spec.source_paths:
         lines.append("## Source material")
@@ -444,6 +454,8 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
     length = _section_body(text, "Length")
     output_format = _section_body(text, "Output format").strip().lower()
     source_section = _section_body(text, "Source material")
+    selected_model = _section_body(text, "Council model").strip()
+    council_model(selected_model)
     source_paths: list[str] = []
     for line in source_section.splitlines():
         s = line.strip()
@@ -498,4 +510,5 @@ def parse_run_file(slug: str, runs_dir: Path = RUNS_DIR) -> RunSpec:
             _section_body(text, "Presentation mode").strip()
             or "board_decision"
         ),
+        council_model=selected_model,
     )

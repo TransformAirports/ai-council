@@ -996,6 +996,11 @@ def create_run_manifest(
     selected_names = list(getattr(spec, "selected_research_agents", []) or [])
     agents_by_name = {agent.name: agent for agent in all_agents}
     model_assignments = model_assignments or {}
+    from cli.council_models import council_model
+
+    selected_council_model = council_model(
+        getattr(spec, "council_model", "")
+    )
 
     def agent_contract(
         name: str, *, model_role: str, override: str = ""
@@ -1010,13 +1015,21 @@ def create_run_manifest(
         return {
             "name": name,
             "display_name": getattr(agent, "display_name", name),
-            "provider": getattr(agent, "provider", "unknown"),
+            "provider": (
+                selected_council_model.provider
+                if selected_council_model is not None
+                else getattr(agent, "provider", "unknown")
+            ),
             "prompt_path": prompt_rel,
             "prompt_sha256": prompt_sha256,
             "model_role": model_role,
             "model_id": (
-                getattr(agent, "model_override", None)
-                or model_assignments.get(model_role)
+                selected_council_model.id
+                if selected_council_model is not None
+                else (
+                    getattr(agent, "model_override", None)
+                    or model_assignments.get(model_role)
+                )
             ),
             "override": override,
         }
@@ -1136,6 +1149,12 @@ def create_run_manifest(
             "tone": str(getattr(spec, "tone", "")),
             "length": str(getattr(spec, "length", "")),
             "output_format": str(getattr(spec, "output_format", "report")),
+            "council_model": str(getattr(spec, "council_model", "") or ""),
+            "council_provider": (
+                selected_council_model.provider
+                if selected_council_model is not None
+                else "legacy-role-routing"
+            ),
             "want_pptx": bool(getattr(spec, "want_pptx", False)),
             "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
             "decision_frame_enabled": bool(
@@ -1190,8 +1209,21 @@ def create_run_manifest(
                 "phase": str(getattr(step, "phase", "")),
                 "agent": str(getattr(step, "agent", "")),
                 "model_role": str(getattr(step, "model_role", "")),
-                "model_id": model_assignments.get(
-                    str(getattr(step, "model_role", ""))
+                "model_id": (
+                    selected_council_model.id
+                    if selected_council_model is not None
+                    else model_assignments.get(
+                        str(getattr(step, "model_role", ""))
+                    )
+                ),
+                "provider": (
+                    selected_council_model.provider
+                    if selected_council_model is not None
+                    else getattr(
+                        agents_by_name.get(str(getattr(step, "agent", ""))),
+                        "provider",
+                        "unknown",
+                    )
                 ),
                 "inputs": list(getattr(step, "inputs", ())),
                 "output": str(getattr(step, "output", "")),
@@ -1283,6 +1315,12 @@ def create_run_manifest(
         "run_prompt_size": run_prompt_size,
         "resume_identity_sha256": resume_identity_sha256,
         "output_format": str(getattr(spec, "output_format", "report")),
+        "council_model": str(getattr(spec, "council_model", "") or ""),
+        "council_provider": (
+            selected_council_model.provider
+            if selected_council_model is not None
+            else "legacy-role-routing"
+        ),
         "want_pptx": bool(getattr(spec, "want_pptx", False)),
         "deck_mode": str(getattr(spec, "deck_mode", "board") or "board"),
         "decision_frame_enabled": bool(
@@ -1336,8 +1374,23 @@ def create_run_manifest(
                     "phase": str(getattr(step, "phase", "")),
                     "agent": str(getattr(step, "agent", "")),
                     "model_role": str(getattr(step, "model_role", "")),
-                    "model_id": model_assignments.get(
-                        str(getattr(step, "model_role", ""))
+                    "model_id": (
+                        selected_council_model.id
+                        if selected_council_model is not None
+                        else model_assignments.get(
+                            str(getattr(step, "model_role", ""))
+                        )
+                    ),
+                    "provider": (
+                        selected_council_model.provider
+                        if selected_council_model is not None
+                        else getattr(
+                            agents_by_name.get(
+                                str(getattr(step, "agent", ""))
+                            ),
+                            "provider",
+                            "unknown",
+                        )
                     ),
                     "inputs": list(getattr(step, "inputs", ())),
                     "output": str(getattr(step, "output", "")),

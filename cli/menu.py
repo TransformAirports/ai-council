@@ -30,6 +30,8 @@ from cli.agents import (
     supplemental_agents,
 )
 from cli.config import MODEL_CHOICES, choices_for_role, get_config, save_config
+from cli.codex_subscription import codex_subscription_status
+from cli.council_models import council_model
 from cli.sources import (
     DROPZONE,
     attach_sources,
@@ -258,17 +260,13 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
     if _auth_probe_cache is not None and not force:
         return _auth_probe_cache
 
-    if os.environ.get("ANTHROPIC_API_KEY"):
-        _auth_probe_cache = (True, "API key (pay-as-you-go)")
-        return _auth_probe_cache
-
     import subprocess
 
     claude = shutil.which("claude")
     if not claude:
         _auth_probe_cache = (
             False,
-            "⚠ Claude CLI not found — install Claude Code or set ANTHROPIC_API_KEY",
+            "⚠ Claude CLI not found — install Claude Code and run `claude auth login`",
         )
         return _auth_probe_cache
 
@@ -292,6 +290,11 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
                 capture_output=True,
                 text=True,
                 timeout=90,
+                env={
+                    key: value
+                    for key, value in os.environ.items()
+                    if key not in {"ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN"}
+                },
             )
         blob = f"{proc.stdout}\n{proc.stderr}"
         if "PONG" in blob:
@@ -306,9 +309,8 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
         ):
             _auth_probe_cache = (
                 False,
-                "Claude access is disabled for this organization — add "
-                "ANTHROPIC_API_KEY to .env or ask the Claude administrator "
-                "to enable Claude Code subscription access",
+                "Claude subscription access is disabled for this organization — "
+                "ask the Claude administrator to enable Claude Code access",
             )
         elif any(
             marker in blob.casefold()
@@ -341,19 +343,35 @@ def check_claude_auth(force: bool = False) -> tuple[bool, str]:
 
 
 def _auth_lines(spec) -> list[tuple[str, str]]:
+    selected = council_model(getattr(spec, "council_model", ""))
+    if selected is not None and selected.provider == "openai":
+        status = codex_subscription_status()
+        return [
+            (
+                "ChatGPT",
+                "subscription login ready for GPT-5.6 Sol"
+                if status.authenticated
+                else "⚠ run `codex login` before launching",
+            )
+        ]
     ok, msg = check_claude_auth()
     lines: list[tuple[str, str]] = [("Claude", msg)]
-    if "deep-research" in spec.selected_research_agents:
-        if os.environ.get("OPENAI_API_KEY"):
-            lines.append(("OpenAI", "API key set (Deep Research bills to OpenAI)"))
-        else:
-            lines.append(("OpenAI", "⚠ OPENAI_API_KEY missing — Deep Research will fail"))
+    if selected is None and "deep-research" in spec.selected_research_agents:
+        status = codex_subscription_status()
+        lines.append(
+            (
+                "ChatGPT",
+                "subscription login ready for Deep Research"
+                if status.authenticated
+                else "⚠ run `codex login` before seating Deep Research",
+            )
+        )
     return lines
 
 
 def estimate_cost(spec) -> tuple[float, float]:
     """Rough Council v2 range, including curation and specialized reviews."""
-    n = len([a for a in spec.selected_research_agents if a != "deep-research"])
+    n = len(spec.selected_research_agents)
     low = 1.5 * n + 14
     high = 4.0 * n + 36
     if getattr(spec, "want_pptx", False):
@@ -371,25 +389,38 @@ def preflight(spec) -> dict | None:
     checkpoints_on = True
     budget: float | None = cfg.default_budget_usd or None
 
-    # Hard gate: dead Claude auth makes every agent 401 at "1 turn / $0.00".
-    # Catch it here, before a single dollar or minute is spent.
-    auth_ok, auth_msg = check_claude_auth()
+    selected_model = council_model(getattr(spec, "council_model", ""))
+    uses_openai = selected_model is not None and selected_model.provider == "openai"
+    if uses_openai:
+        codex_status = codex_subscription_status()
+        auth_ok, auth_msg = codex_status.authenticated, codex_status.detail
+    else:
+        auth_ok, auth_msg = check_claude_auth()
     if not auth_ok:
+        provider = "ChatGPT" if uses_openai else "Claude"
+        fix = (
+            "Run: codex login"
+            if uses_openai
+            else "Run: claude auth login"
+        )
         console.print(Panel(
-            f"[bold]Claude isn't authenticated, so the run can't proceed.[/bold]\n\n"
+            f"[bold]{provider} isn't configured, so the run can't proceed.[/bold]\n\n"
             f"{auth_msg}\n\n"
-            f"Fix it in one step:\n"
-            f"  [cyan]claude auth login[/cyan]\n\n"
-            f"Verify with:  [cyan]claude -p \"say PONG\" --max-turns 1[/cyan]\n"
-            f"Then relaunch [cyan]./council[/cyan] and choose Resume.",
+            f"Fix it in one step:\n  [cyan]{fix}[/cyan]\n\n"
+            f"Then relaunch [cyan]./council[/cyan].",
             border_style="red", title="Authentication required",
         ))
         return None
 
-    # Hard gate: Deep Research seated without a key fails an hour in. Fix now.
-    if "deep-research" in spec.selected_research_agents and not os.environ.get("OPENAI_API_KEY"):
+    # Legacy mixed-route prompts can still contain the ChatGPT-backed Deep
+    # Research seat. New coherent-model prompts never special-case it.
+    if (
+        selected_model is None
+        and "deep-research" in spec.selected_research_agents
+        and not codex_subscription_status().authenticated
+    ):
         action = questionary.select(
-            "Deep Research is seated but OPENAI_API_KEY is not set:",
+            "Deep Research is seated but Codex is not signed in with ChatGPT:",
             choices=["Unseat Deep Research and continue", "Cancel the run"],
         ).ask()
         if action is None or action.startswith("Cancel"):
@@ -397,7 +428,6 @@ def preflight(spec) -> dict | None:
         spec.selected_research_agents.remove("deep-research")
 
     while True:
-        low, high = estimate_cost(spec)
         t = Table(show_header=False, box=None, padding=(0, 2))
         t.add_row("[bold]Title[/bold]", spec.title)
         t.add_row("[bold]Format[/bold]", FORMAT_TITLES.get(spec.output_format, spec.output_format))
@@ -408,13 +438,24 @@ def preflight(spec) -> dict | None:
         t.add_row(f"[bold]Council[/bold] ({len(spec.selected_research_agents)})", roster)
         t.add_row(
             "[bold]Models[/bold]",
-            f"research {cfg.model('research')} · synthesis {cfg.model('synthesis')} · "
-            f"critique/edit {cfg.model('critique')}",
+            (
+                f"{selected_model.label} · every report role"
+                if selected_model is not None
+                else f"legacy routing · research {cfg.model('research')} · synthesis {cfg.model('synthesis')}"
+            ),
         )
-        t.add_row("[bold]Estimated cost[/bold]", f"${low}–${high}" + (
-            "  (+ Deep Research on OpenAI)" if "deep-research" in spec.selected_research_agents else ""))
+        t.add_row(
+            "[bold]Billing route[/bold]",
+            (
+                "ChatGPT subscription"
+                if selected_model is not None and selected_model.provider == "openai"
+                else "Claude subscription"
+                if selected_model is not None and selected_model.provider == "anthropic"
+                else "Claude + ChatGPT subscriptions"
+            ),
+        )
         t.add_row("[bold]Checkpoints[/bold]", "on — pause for your review twice" if checkpoints_on else "off — fully autonomous")
-        t.add_row("[bold]Budget ceiling[/bold]", f"${budget:.0f}" if budget else "none")
+        t.add_row("[bold]Execution guardrail[/bold]", f"${budget:.0f} equivalent" if budget else "none")
         t.add_row("[bold]Companion deck[/bold]", "yes" if getattr(spec, "want_pptx", False) else "no")
         if getattr(spec, "want_pptx", False):
             t.add_row(
@@ -445,7 +486,7 @@ def preflight(spec) -> dict | None:
             "Pause at the two human checkpoints?", default=checkpoints_on
         ).ask())
         raw = questionary.text(
-            f"Budget ceiling in USD (Enter for {f'${budget:.0f}' if budget else 'none'}, 0 for none):",
+            f"Execution guardrail in USD-equivalent units (Enter for {f'${budget:.0f}' if budget else 'none'}, 0 for none):",
         ).ask()
         if raw and raw.strip():
             try:
@@ -609,7 +650,7 @@ def new_run_flow() -> None:
         spec=spec, run_file=run_file, repo_root=REPO_ROOT,
         auto_approve=launch["auto_approve"], budget_usd=launch["budget_usd"],
     ))
-    console.print(f"[bold green]Done. Total cost: ${result.tally.total:.2f}[/bold green]")
+    console.print("[bold green]Done. Subscription-plan report complete.[/bold green]")
     if result.completed:
         post_run_menu(spec, result)
 

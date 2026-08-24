@@ -15,17 +15,11 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
-from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
 
 console = Console()
 REPO_ROOT = Path(__file__).resolve().parent.parent
-
-# Load API keys from .env at the repo root (see .env.example). Shell exports
-# take precedence — load_dotenv never overrides an existing environment var.
-load_dotenv(REPO_ROOT / ".env")
-
 
 # When ./council is launched from inside an active Claude Code session (a
 # common case while developing this very tool!), env vars like CLAUDECODE=1,
@@ -50,15 +44,21 @@ _PARENT_CLAUDE_ENV_VARS = (
     "CLAUDE_AGENT_SDK_VERSION",
     "CLAUDE_EFFORT",
     "ANTHROPIC_BASE_URL",
+    # Council model execution is subscription-only. Removing these prevents a
+    # forgotten shell export from changing the billing route.
+    "ANTHROPIC_API_KEY",
+    "CLAUDE_CODE_OAUTH_TOKEN",
+    "OPENAI_API_KEY",
+    "CODEX_API_KEY",
 )
 _stripped_parent_env = [v for v in _PARENT_CLAUDE_ENV_VARS if v in os.environ]
 for _v in _stripped_parent_env:
     os.environ.pop(_v, None)
 if _stripped_parent_env:
     console.print(
-        f"[dim]Detected a parent Claude Code session; stripped "
-        f"{len(_stripped_parent_env)} inherited env var(s) so child sessions "
-        f"boot cleanly.[/dim]"
+        f"[dim]Removed {len(_stripped_parent_env)} inherited session or API-key "
+        f"environment variable(s); Council model calls use saved subscription "
+        f"sign-ins.[/dim]"
     )
 
 
@@ -195,19 +195,38 @@ def main(argv: list[str] | None = None) -> int:
                 ))
                 return 2
             spec = parse_run_file(run_file.stem, runs_dir=run_file.parent)
-            if "deep-research" in spec.selected_research_agents and not os.environ.get(
-                "OPENAI_API_KEY"
+            from cli.codex_subscription import codex_subscription_status
+            from cli.council_models import council_model
+
+            selected_model = council_model(getattr(spec, "council_model", ""))
+            if selected_model is not None and selected_model.provider == "openai":
+                codex_status = codex_subscription_status()
+                if not codex_status.authenticated:
+                    console.print(
+                        Panel(
+                            "Run `codex login`, complete the ChatGPT browser sign-in, "
+                            "then relaunch ./council.",
+                            border_style="red",
+                            title="ChatGPT authentication required",
+                        )
+                    )
+                    return 2
+            elif (
+                "deep-research" in spec.selected_research_agents
+                and not codex_subscription_status().authenticated
             ):
                 console.print(
-                    "[red]Deep Research is seated, but OPENAI_API_KEY is not set.[/red]"
+                    "[red]This legacy prompt seats Deep Research, but Codex is not "
+                    "signed in with ChatGPT. Run `codex login`.[/red]"
                 )
                 return 2
-            auth_ok, auth_message = menu.check_claude_auth()
-            if not auth_ok:
-                console.print(
-                    Panel(auth_message, border_style="red", title="Authentication required")
-                )
-                return 2
+            if selected_model is None or selected_model.provider == "anthropic":
+                auth_ok, auth_message = menu.check_claude_auth()
+                if not auth_ok:
+                    console.print(
+                        Panel(auth_message, border_style="red", title="Authentication required")
+                    )
+                    return 2
             ceiling = args.budget
             if ceiling is None:
                 ceiling = get_config().default_budget_usd

@@ -77,13 +77,14 @@ class DoctorTests(unittest.TestCase):
 
         failed = {check.key: check for check in checks if check.required and not check.ok}
         self.assertTrue(
-            {"python", "claude-cli", "claude-auth", "libreoffice", "poppler", "workspace", "disk"}
+            {"python", "report-provider", "libreoffice", "poppler", "workspace", "disk"}
             .issubset(failed)
         )
         self.assertIn("brew install poppler", failed["poppler"].fix)
-        self.assertIn("claude auth login", failed["claude-auth"].fix)
+        self.assertIn("claude auth login", failed["report-provider"].fix)
+        self.assertIn("codex login", failed["report-provider"].fix)
 
-    def test_api_key_without_claude_binary_is_configured_but_unverified(self) -> None:
+    def test_api_key_without_claude_binary_cannot_replace_subscription_login(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             checks = collect_doctor_checks(
                 Path(directory),
@@ -94,17 +95,17 @@ class DoctorTests(unittest.TestCase):
             )
         by_key = {check.key: check for check in checks}
         self.assertFalse(by_key["claude-auth"].ok)
-        self.assertTrue(by_key["claude-auth"].required)
-        self.assertTrue(by_key["claude-cli"].required)
-        self.assertIn("configured", by_key["claude-auth"].detail)
-        self.assertIn("unverified", by_key["claude-auth"].detail)
+        self.assertFalse(by_key["claude-auth"].required)
+        self.assertFalse(by_key["claude-cli"].required)
+        self.assertIn("subscription", by_key["claude-auth"].detail)
         self.assertNotIn("ANTHROPIC_API_KEY=x", by_key["claude-auth"].detail)
+        self.assertFalse(by_key["report-provider"].ok)
 
     def test_api_key_still_requires_cli_auth_status_verification(self) -> None:
-        calls: list[tuple[object, ...]] = []
+        calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
 
         def runner(*args, **kwargs):
-            calls.append(args)
+            calls.append((args, kwargs))
             return SimpleNamespace(returncode=1, stdout="{}", stderr="")
 
         with tempfile.TemporaryDirectory() as directory:
@@ -119,7 +120,38 @@ class DoctorTests(unittest.TestCase):
             )
         by_key = {check.key: check for check in checks}
         self.assertFalse(by_key["claude-auth"].ok)
-        self.assertEqual(calls[0][0], ["/usr/bin/claude", "auth", "status", "--json"])
+        self.assertEqual(calls[0][0][0], ["/usr/bin/claude", "auth", "status", "--json"])
+        self.assertNotIn("ANTHROPIC_API_KEY", calls[0][1]["env"])
+
+    def test_chatgpt_login_allows_gpt_only_report_setup_without_claude_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("outputs", "reports", "runs"):
+                (root / name).mkdir()
+            checks = collect_doctor_checks(
+                root,
+                environment={"OPENAI_API_KEY": "must-not-enable-api-billing"},
+                which=lambda name: (
+                    "/usr/bin/soffice" if name == "soffice"
+                    else "/usr/bin/pdftoppm" if name == "pdftoppm"
+                    else "/usr/bin/codex" if name == "codex"
+                    else None
+                ),
+                runner=lambda *args, **kwargs: SimpleNamespace(
+                    returncode=0,
+                    stdout="Logged in using ChatGPT",
+                    stderr="",
+                ),
+                disk_usage=lambda _: SimpleNamespace(free=2 * 1024 ** 3),
+                python_version=(3, 11, 9),
+            )
+        by_key = {check.key: check for check in checks}
+        self.assertFalse(by_key["claude-cli"].required)
+        self.assertFalse(by_key["claude-auth"].required)
+        self.assertTrue(by_key["codex-auth"].ok)
+        self.assertTrue(by_key["report-provider"].ok)
+        self.assertIn("GPT-5.6 Sol", by_key["report-provider"].detail)
+        self.assertNotIn("must-not-enable-api-billing", by_key["report-provider"].detail)
 
     def test_doctor_reports_malformed_config_without_changing_its_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -36,6 +36,7 @@ Use these defaults silently unless the user specifies otherwise:
 - **Tone:** Fascinating, vivid, and argument-led. Open with a scene, case, or surprise. Write like an excellent magazine feature, not a consulting assignment or technical paper.
 - **Length:** A 1,500–2,000-word narrative feature, with no appendices or separate executive summary.
 - **Output format:** article.
+- **Council model:** claude-fable-5, unless the operator chooses gpt-5.6-sol.
 - **Council:** balanced airport council unless the thesis clearly requires a
   specialist roster.
 - **Research agent overrides:** none.
@@ -73,7 +74,7 @@ On confirmation, execute the canonical Council v2 pipeline from
 
 Execute the canonical Council v2 pipeline from
 [`prompts/orchestration.md`](orchestration.md). Do not copy an older roster or
-stage sequence into the conversation. The CLI owns model routing, manifests,
+stage sequence into the conversation. The CLI owns the run-level model route, manifests,
 resume behavior, quality gates, archiving, and publishing.
 
 ## Rules that apply to any run

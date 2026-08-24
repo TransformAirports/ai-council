@@ -256,6 +256,67 @@ class ManifestContractTests(unittest.TestCase):
                     },
                 )
 
+    def test_explicit_run_model_overrides_every_agent_and_pipeline_provider(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            run_file = root / "prompts" / "runs" / "test.md"
+            run_file.parent.mkdir(parents=True)
+            run_file.write_text("# Run: Test", encoding="utf-8")
+            research_prompt = root / "research.md"
+            process_prompt = root / "process.md"
+            research_prompt.write_text("research", encoding="utf-8")
+            process_prompt.write_text("process", encoding="utf-8")
+            agents = [
+                SimpleNamespace(
+                    name="alpha", display_name="Alpha", provider="anthropic",
+                    model_override=None, path=research_prompt,
+                ),
+                SimpleNamespace(
+                    name="strategist", display_name="Strategist", provider="anthropic",
+                    model_override="some-agent-override", path=process_prompt,
+                ),
+            ]
+            spec = SimpleNamespace(
+                slug="test", title="Test", thesis="Test thesis",
+                selected_research_agents=["alpha"], agent_overrides={},
+                output_format="brief", want_pptx=False, source_paths=[],
+                council_model="gpt-5.6-sol",
+            )
+            step = SimpleNamespace(
+                id="strategist-v1", phase="synthesis", agent="strategist",
+                model_role="synthesis", inputs=(),
+                output="stage2/strategist-draft-v1.md",
+                quality_gate="typed_artifact",
+            )
+            path = create_run_manifest(
+                spec=spec,
+                run_file=run_file,
+                outputs_dir=outputs,
+                all_agents=agents,
+                pipeline_steps=[step],
+                model_assignments={
+                    "research": "role-research-model",
+                    "synthesis": "role-synthesis-model",
+                },
+            )
+            payload = json.loads(path.read_text(encoding="utf-8"))
+
+            self.assertEqual(payload["run"]["council_model"], "gpt-5.6-sol")
+            self.assertEqual(payload["run"]["council_provider"], "openai")
+            self.assertEqual(
+                payload["selected_research_agents"][0]["model_id"],
+                "gpt-5.6-sol",
+            )
+            self.assertEqual(
+                payload["selected_research_agents"][0]["provider"], "openai"
+            )
+            self.assertEqual(payload["process_agents"][0]["model_id"], "gpt-5.6-sol")
+            self.assertEqual(payload["process_agents"][0]["provider"], "openai")
+            self.assertEqual(payload["pipeline"]["steps"][0]["model_id"], "gpt-5.6-sol")
+            self.assertEqual(payload["pipeline"]["steps"][0]["provider"], "openai")
+
     def test_resume_repairs_audited_rebaseline_digest_without_rerun(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

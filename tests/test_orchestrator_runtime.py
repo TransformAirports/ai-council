@@ -13,6 +13,7 @@ from claude_agent_sdk import ResultMessage
 from cli.agents import Agent
 from cli.artifacts import ArtifactContract, validate_artifact
 from cli.orchestrator import (
+    CLAIM_LINEAGE_CONTRACT,
     EVIDENCE_LEDGER_CONTRACT,
     CostTally,
     RunBudgetExceeded,
@@ -20,12 +21,20 @@ from cli.orchestrator import (
     _existing_artifacts,
     _checkpoint_outputs_match_manifest,
     _required_outputs_match_manifest,
+    _validated_stage3_package_matches_manifest,
     _run_agent,
+    _ACTIVE_COUNCIL_MODEL,
+    _archived_council_model,
     report_runtime_preflight,
     prepare_outputs,
+    run_presentation_for_archive,
     run_pipeline,
     run_quality_gate_with_remediation,
+    run_revision_pipeline,
 )
+from cli.council_models import council_model
+from cli.codex_subscription import CodexSubscriptionStatus
+from cli.openai_council import OpenAICouncilMetrics
 from cli.quality_gate import PublicationQualityError, QualityIssue
 from cli.run_manifest import build_dependency_fingerprint, update_artifact
 
@@ -92,6 +101,113 @@ class CostTallyTests(unittest.TestCase):
 
 
 class AgentRuntimeTests(unittest.TestCase):
+    def test_explicit_gpt_route_runs_an_anthropic_charter_through_openai(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "outputs").mkdir()
+            output = root / "outputs" / "report.md"
+            tally = CostTally(budget_usd=10)
+            tally.plan_calls(1)
+
+            async def fake_openai_runner(**kwargs):
+                self.assertEqual(kwargs["model"], "gpt-5.6-sol")
+                output.write_text(
+                    "# Report\n\n" + "completed " * 40,
+                    encoding="utf-8",
+                )
+                return OpenAICouncilMetrics(
+                    input_tokens=100,
+                    cached_input_tokens=0,
+                    output_tokens=50,
+                    total_tokens=150,
+                    cost_usd=0.0,
+                    turns=2,
+                    tool_calls=1,
+                )
+
+            token = _ACTIVE_COUNCIL_MODEL.set(council_model("gpt-5.6-sol"))
+            try:
+                with patch(
+                    "cli.openai_council.run_openai_council_agent",
+                    new=fake_openai_runner,
+                ):
+                    result = asyncio.run(
+                        _run_agent(
+                            agent=_agent(root),
+                            user_prompt="Write it.",
+                            model="gpt-5.6-sol",
+                            cwd=root,
+                            step_label="stage1/test-agent",
+                            tally=tally,
+                            output_path=output,
+                            artifact_contract=ArtifactContract(
+                                "markdown", min_words=20
+                            ),
+                        )
+                    )
+            finally:
+                _ACTIVE_COUNCIL_MODEL.reset(token)
+
+            self.assertEqual(result["provider"], "openai")
+            self.assertFalse(result["billed_separately"])
+            self.assertEqual(result["billing"], "chatgpt_subscription")
+            self.assertAlmostEqual(tally.total, 0.0)
+            self.assertAlmostEqual(tally.remaining or 0.0, 10.0)
+
+    def test_archived_route_is_reused_for_revisions_and_deck_backfills(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / "run"
+            archive.mkdir()
+            (archive / "run-manifest.json").write_text(
+                json.dumps({"run": {"council_model": "gpt-5.6-sol"}}),
+                encoding="utf-8",
+            )
+            selected = _archived_council_model(archive)
+            self.assertIsNotNone(selected)
+            self.assertEqual(selected.id, "gpt-5.6-sol")
+
+            async def fake_revision(**kwargs):
+                active = _ACTIVE_COUNCIL_MODEL.get()
+                self.assertIsNotNone(active)
+                self.assertEqual(active.id, "gpt-5.6-sol")
+                return None, CostTally(budget_usd=1)
+
+            request = type(
+                "RevisionRequest",
+                (),
+                {"source": type("Source", (), {"archive_dir": archive})()},
+            )()
+            with patch("cli.orchestrator._run_revision_pipeline", new=fake_revision):
+                asyncio.run(
+                    run_revision_pipeline(
+                        request=request,
+                        repo_root=root,
+                        auto_approve=True,
+                    )
+                )
+            self.assertIsNone(_ACTIVE_COUNCIL_MODEL.get())
+
+            async def fake_presentation(**kwargs):
+                active = _ACTIVE_COUNCIL_MODEL.get()
+                self.assertIsNotNone(active)
+                self.assertEqual(active.id, "gpt-5.6-sol")
+                return archive / "report.pptx"
+
+            with patch(
+                "cli.orchestrator._run_presentation_for_archive",
+                new=fake_presentation,
+            ):
+                asyncio.run(
+                    run_presentation_for_archive(
+                        archive_dir=archive,
+                        slug="report",
+                        title="Report",
+                        repo_root=root,
+                    )
+                )
+            self.assertIsNone(_ACTIVE_COUNCIL_MODEL.get())
+
     def test_web_new_run_confirms_stale_output_in_the_browser(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             outputs = Path(directory) / "outputs"
@@ -174,6 +290,82 @@ class AgentRuntimeTests(unittest.TestCase):
             _is_transient_model_failure(messages=("permission denied",))
         )
 
+    def test_zero_cost_429_result_uses_rate_limit_backoff_not_startup_race(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "report.md"
+            calls = 0
+            events: list[tuple[str, dict[str, object]]] = []
+
+            async def fake_query(*, prompt, options):
+                nonlocal calls
+                del prompt, options
+                calls += 1
+                if calls == 1:
+                    # This is the exact shape observed in the live failed run:
+                    # the provider detail sits in ResultMessage.result while
+                    # the session otherwise resembles a zero-work SDK race.
+                    yield ResultMessage(
+                        subtype="success",
+                        duration_ms=1,
+                        duration_api_ms=1,
+                        is_error=True,
+                        num_turns=0,
+                        session_id="rate-limited-session",
+                        stop_reason="stop_sequence",
+                        total_cost_usd=0.0,
+                        result="API status: 429",
+                    )
+                    return
+                output.write_text(
+                    " ".join(["completed"] * 30), encoding="utf-8"
+                )
+                yield _result()
+
+            async def capture_emit(
+                event_type: str, **data: object
+            ) -> None:
+                events.append((event_type, data))
+
+            sleeper = AsyncMock()
+            with (
+                patch("claude_agent_sdk.query", fake_query),
+                patch("cli.orchestrator.asyncio.sleep", new=sleeper),
+                patch("cli.orchestrator.emit", new=capture_emit),
+            ):
+                result = asyncio.run(
+                    _run_agent(
+                        agent=_agent(root),
+                        user_prompt="Write it.",
+                        model="test-model",
+                        cwd=root,
+                        step_label="stage1/rate-limited-agent",
+                        tally=CostTally(),
+                        output_path=output,
+                        artifact_contract=ArtifactContract(
+                            "markdown", min_words=20
+                        ),
+                    )
+                )
+
+            self.assertFalse(result["skipped"])
+            self.assertEqual(calls, 2)
+            retry_events = [
+                data for kind, data in events if kind == "agent_retry"
+            ]
+            self.assertEqual(len(retry_events), 1)
+            self.assertEqual(
+                retry_events[0]["reason"], "provider rate limit (429)"
+            )
+            self.assertGreaterEqual(
+                int(retry_events[0]["delay_seconds"]), 30
+            )
+            sleeper.assert_awaited_once_with(
+                retry_events[0]["delay_seconds"]
+            )
+
     def test_preflight_catches_stage4_tools_before_model_work(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -187,20 +379,52 @@ class AgentRuntimeTests(unittest.TestCase):
             ):
                 report_runtime_preflight(root, outputs)
 
-    def test_preflight_rejects_deep_research_without_openai_key(self) -> None:
+    def test_preflight_rejects_legacy_deep_research_without_chatgpt_login(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             outputs = root / "outputs"
             outputs.mkdir()
             with (
                 patch("cli.orchestrator.shutil.which", return_value="/tool"),
-                patch.dict(os.environ, {"OPENAI_API_KEY": ""}),
-                self.assertRaisesRegex(RuntimeError, "OPENAI_API_KEY"),
+                patch(
+                    "cli.codex_subscription.codex_subscription_status",
+                    return_value=CodexSubscriptionStatus(
+                        available=True,
+                        authenticated=False,
+                        executable="/usr/bin/codex",
+                        detail="not signed in",
+                    ),
+                ),
+                self.assertRaisesRegex(RuntimeError, "codex login"),
             ):
                 report_runtime_preflight(
                     root,
                     outputs,
                     selected_research_agents=("deep-research",),
+                )
+
+    def test_preflight_rejects_gpt_run_without_chatgpt_login(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            outputs.mkdir()
+            with (
+                patch("cli.orchestrator.shutil.which", return_value="/tool"),
+                patch(
+                    "cli.codex_subscription.codex_subscription_status",
+                    return_value=CodexSubscriptionStatus(
+                        available=True,
+                        authenticated=False,
+                        executable="/usr/bin/codex",
+                        detail="not signed in",
+                    ),
+                ),
+                self.assertRaisesRegex(RuntimeError, "codex login"),
+            ):
+                report_runtime_preflight(
+                    root,
+                    outputs,
+                    council_model_id="gpt-5.6-sol",
                 )
 
     def test_failed_preflight_does_not_create_a_run_manifest(self) -> None:
@@ -609,6 +833,133 @@ class AgentRuntimeTests(unittest.TestCase):
             )
             self.assertTrue(final_record["dependencies"]["complete"])
 
+    def test_passed_remediated_stage3_package_is_a_resume_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            outputs = root / "outputs"
+            stage3 = outputs / "stage3"
+            stage3.mkdir(parents=True)
+            manifest = outputs / "run-manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "2.0",
+                        "run": {"resume_identity_sha256": "a" * 64},
+                        "artifacts": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            evidence = outputs / "evidence-ledger.jsonl"
+            evidence.write_text(
+                '{"evidence_id":"ev-1","claim":"The airport invested '
+                '$4 million in 2024.","source_title":"Financial statements",'
+                '"source_url":"https://airport.example/financials"}\n',
+                encoding="utf-8",
+            )
+            final = stage3 / "final-draft.md"
+            final.write_text(
+                "# Decision\n\nThe airport invested $4 million in 2024.[^1]\n\n"
+                + " ".join(["Operational context remains material."] * 260)
+                + "\n\n[^1]: Financial statements.\n",
+                encoding="utf-8",
+            )
+            fact_report = stage3 / "fact-check-report.md"
+            fact_report.write_text(
+                "# Fact check\n\n"
+                + " ".join(["The retained claim matches its source."] * 45),
+                encoding="utf-8",
+            )
+            final_validation = validate_artifact(final)
+            self.assertTrue(final_validation.valid)
+            lineage = outputs / "claim-lineage.jsonl"
+            lineage.write_text(
+                json.dumps(
+                    {
+                        "claim_id": "claim-1",
+                        "claim": "The airport invested $4 million in 2024.[^1]",
+                        "citation": "Financial statements.",
+                        "footnote_id": "1",
+                        "evidence_ids": ["ev-1"],
+                        "verification_status": "verified",
+                        "primary_source_checked": True,
+                        "retained": True,
+                        "draft_sha256": final_validation.sha256,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            upstream = ("run-manifest.json", "evidence-ledger.jsonl")
+            dependencies = build_dependency_fingerprint(manifest, upstream)
+            for path, contract in (
+                (final, ArtifactContract("markdown", min_words=250)),
+                (fact_report, ArtifactContract("markdown", min_words=40)),
+                (lineage, CLAIM_LINEAGE_CONTRACT),
+            ):
+                update_artifact(
+                    manifest,
+                    path,
+                    validate_artifact(path, contract),
+                    dependencies=dependencies,
+                )
+            gate = outputs / "quality-gate.json"
+            gate.write_text(
+                json.dumps({"passed": True, "error_count": 0}),
+                encoding="utf-8",
+            )
+            gate_dependencies = build_dependency_fingerprint(
+                manifest,
+                (
+                    "run-manifest.json",
+                    "stage3/final-draft.md",
+                    "claim-lineage.jsonl",
+                    "evidence-ledger.jsonl",
+                ),
+            )
+            update_artifact(
+                manifest,
+                gate,
+                validate_artifact(gate),
+                dependencies=gate_dependencies,
+            )
+
+            self.assertTrue(
+                _validated_stage3_package_matches_manifest(outputs, manifest)
+            )
+
+            gate.write_text(
+                json.dumps({"passed": False, "error_count": 1}),
+                encoding="utf-8",
+            )
+            update_artifact(
+                manifest,
+                gate,
+                validate_artifact(gate),
+                dependencies=gate_dependencies,
+            )
+            self.assertFalse(
+                _validated_stage3_package_matches_manifest(outputs, manifest)
+            )
+
+            gate.write_text(
+                json.dumps({"passed": True, "error_count": 0}),
+                encoding="utf-8",
+            )
+            update_artifact(
+                manifest,
+                gate,
+                validate_artifact(gate),
+                dependencies=gate_dependencies,
+            )
+            evidence.write_text(
+                evidence.read_text(encoding="utf-8") + "\n",
+                encoding="utf-8",
+            )
+            self.assertFalse(
+                _validated_stage3_package_matches_manifest(outputs, manifest)
+            )
+
     def test_changed_stage1_invalidates_curated_evidence_set(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -1001,10 +1352,12 @@ class AgentRuntimeTests(unittest.TestCase):
             root = Path(directory)
             output = root / "report.md"
             seen_budget: list[float | None] = []
+            seen_environment: list[dict[str, str]] = []
 
             async def fake_query(*, prompt, options):
                 del prompt
                 seen_budget.append(options.max_budget_usd)
+                seen_environment.append(options.env)
                 output.write_text(" ".join(["complete"] * 30), encoding="utf-8")
                 yield _result(cost=1.0)
 
@@ -1024,6 +1377,10 @@ class AgentRuntimeTests(unittest.TestCase):
                 )
 
             self.assertEqual(seen_budget, [5.0])
+            self.assertEqual(seen_environment, [{
+                "ANTHROPIC_API_KEY": "",
+                "CLAUDE_CODE_OAUTH_TOKEN": "",
+            }])
             self.assertAlmostEqual(tally.total, 1.0)
 
 

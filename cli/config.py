@@ -38,19 +38,16 @@ DEFAULT_MODELS: dict[str, str] = {
     "factcheck": "claude-sonnet-4-6",
     "art_direction": "claude-fable-5",
     "presentation": "claude-fable-5",
-    # OpenAI's deep-research model. `o3-deep-research` is the heavyweight
-    # long-horizon sweep; `o4-mini-deep-research` is the faster/cheaper pass.
-    # NOTE: OpenAI's purpose-built deep-research family is only these two —
-    # there is no gpt-5.x deep-research model. Verified against the live
-    # models list 2026-07-20; the undated alias tracks the newest snapshot.
-    "openai_deep_research": "o3-deep-research",
+    # The mixed-Council Deep Research seat runs through the operator's saved
+    # ChatGPT subscription login, never API-key billing.
+    "openai_deep_research": "gpt-5.6-sol",
 }
 
 MODEL_CHOICES = ["opus", "claude-fable-5", "claude-sonnet-4-6"]
 
-# The OpenAI-hosted Deep Research role takes different models than the
-# Claude-hosted roles.
-OPENAI_DR_CHOICES = ["o3-deep-research", "o4-mini-deep-research"]
+# The ChatGPT-backed Deep Research role is pinned to the same supported Sol
+# model used by coherent GPT reports.
+OPENAI_DR_CHOICES = ["gpt-5.6-sol"]
 
 
 def choices_for_role(role: str) -> list[str]:
@@ -66,10 +63,11 @@ BLOCKED_MODELS: dict[str, str] = {
     # This literal model ID is not currently exposed by Claude Code. The Opus
     # alias is the supported forward-compatible route to the latest Opus.
     "claude-opus-5-0": "opus",
-    # `gpt-5.5-pro-deep-research` was a placeholder ID that never existed in the
-    # OpenAI catalog. Real Deep Research models are `o3-deep-research` (heavy)
-    # and `o4-mini-deep-research` (light). Auto-rewrite the placeholder.
-    "gpt-5.5-pro-deep-research": "o3-deep-research",
+    # Historical API-only Deep Research IDs now route to the subscription-
+    # authenticated GPT-5.6 Sol seat.
+    "gpt-5.5-pro-deep-research": "gpt-5.6-sol",
+    "o3-deep-research": "gpt-5.6-sol",
+    "o4-mini-deep-research": "gpt-5.6-sol",
 }
 
 
