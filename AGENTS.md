@@ -83,3 +83,38 @@ generated native-Codex mirror. See
 - [`prompts/research-contract.md`](prompts/research-contract.md) — structured
   evidence contract
 - [`runs/2026-04-17-infrastructure-vs-intelligence/`](runs/2026-04-17-infrastructure-vs-intelligence/) — first run's complete archive; use as a reference for what a good run looks like end-to-end
+
+## Cursor Cloud specific instructions
+
+This is a Python 3.11+ CLI + FastAPI web app. Setup, run, and test commands are
+documented in [`README.md`](README.md) and [`docs/getting-started.md`](docs/getting-started.md);
+the notes below are only the non-obvious cloud caveats.
+
+- **Model runs need an interactive subscription login that cannot be scripted.**
+  Any real report/scope/argument run (and the doctor's "Report model provider"
+  check, and the web app's launch button) requires `claude auth login` (Claude
+  Fable 5) or `codex login` (GPT-5.6 Sol / Prompt Coach). The Council uses those
+  saved CLI subscription sessions, never provider API keys — API-key env vars are
+  deliberately stripped from model subprocesses, so setting `ANTHROPIC_API_KEY`
+  etc. does nothing. Without a login you can still exercise everything that makes
+  no model call: `./council --doctor`, the full test suite, the web app UI
+  (Meet the Council, How it works, the framing wizard through the review/launch
+  screen with its assembled roster + budget), and the code-only doc builders in
+  `scripts/`.
+- **Virtualenv:** dependencies live in `.venv/` (gitignored). Run tools via
+  `.venv/bin/...` or the `./council` wrapper; never activate manually or use
+  `sudo`. The `./council` wrapper only auto-installs when `.venv/bin/council` is
+  missing — it does NOT reinstall after `pyproject.toml` changes, so re-run
+  `.venv/bin/pip install -e .` (the startup update script already does this).
+- **Tests:** run `.venv/bin/python -m pytest tests/ -q` (357+ tests, ~5s). The
+  suite is mostly `unittest`-style; `tests/test_reattach.py` is the one module
+  that imports `pytest`, so `pytest` must be installed (the update script installs
+  it). `python -m unittest discover -s tests -v` also works but errors on that
+  one module.
+- **Web app:** `./council` starts uvicorn on `http://127.0.0.1:8723` in the
+  foreground (blocking) and tries to open a browser (harmless/no-op when headless).
+  For scripted/headless use, run `.venv/bin/python -c "from cli.server import serve; serve(open_browser=False)"` under tmux/background. State-changing API
+  routes require a same-origin session token from `/api/meta`; loopback-only.
+- **System renderers:** LibreOffice (`soffice`) and Poppler (`pdftoppm`) are
+  required for the stage-4 rendered Word/PPTX QA and are checked by the doctor.
+  They are installed in the base environment (not via the update script).
